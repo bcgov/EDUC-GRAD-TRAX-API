@@ -1,6 +1,6 @@
 package ca.bc.gov.educ.api.trax.util;
 
-import ca.bc.gov.educ.api.codes.model.dto.BaseModel;
+import ca.bc.gov.educ.api.trax.model.dto.BaseModel;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;

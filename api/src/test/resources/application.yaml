@@ -1,0 +1,50 @@
+#DB Properties
+spring:
+  jmx:
+    enabled: false
+  datasource:
+    hikari:
+      pool-name: gradtraxapi-api-cp
+      maximum-pool-size: 1
+      connection-timeout: 6000
+      max-lifetime: 600000
+    driver-class: org.h2.Driver
+  jpa:
+    show-sql: true
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    generate-ddl: true
+  mvc:
+    log-request-details: true
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: false
+
+#Logging properties
+logging:
+  #pattern:
+  #  file: %d | [${HOSTNAME}] | %clr(%5p) | [%t]   | %logger{36}:%L | %msg%n
+  #  console: %d | [${HOSTNAME}] | %clr(%5p) | [%t]   | %logger{36}:%L | %msg%n
+  level:
+    root: INFO
+    ca:
+      bc:
+        gov:
+          educ:
+            api:
+              codes: INFO
+    org:
+      springframework:
+        web: INFO
+        security: INFO
+        boot:
+          autoconfigure:
+            logging: INFO
+      hibernate: ERROR
+
+#Endpoints
+endpoint:
+  grad-trax-api:
+
+  

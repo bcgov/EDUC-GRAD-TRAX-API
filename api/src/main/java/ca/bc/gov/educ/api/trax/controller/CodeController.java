@@ -36,12 +36,6 @@ import java.util.List;
 public class CodeController {
 
     private static Logger logger = LoggerFactory.getLogger(CodeController.class);
-    
-    private static final String REASON_CODE="Reason Code";
-    private static final String STATUS_CODE="Status Code";
-    private static final String REPORT_TYPE_CODE="Report Type Code";
-    private static final String REQUIREMENT_TYPE_CODE="Requirement Type Code";
-    private static final String CERTIFICATE_TYPE_CODE="Certificate Type Code";
 
     @Autowired
     CodeService codeService;

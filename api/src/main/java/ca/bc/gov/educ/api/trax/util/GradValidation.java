@@ -1,6 +1,6 @@
 package ca.bc.gov.educ.api.trax.util;
 
-import ca.bc.gov.educ.api.codes.exception.GradBusinessRuleException;
+import ca.bc.gov.educ.api.trax.exception.GradBusinessRuleException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -23,7 +23,7 @@ public class GradValidation {
     });
 
     @Autowired
-    ca.bc.gov.educ.api.codes.util.MessageHelper messagesHelper;
+    ca.bc.gov.educ.api.trax.util.MessageHelper messagesHelper;
 
     public void addWarning(String warningMessage) {
         warningList.get().add(warningMessage);
