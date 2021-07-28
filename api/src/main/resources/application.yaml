@@ -15,9 +15,9 @@ spring:
       maximum-pool-size: ${MAXIMUM_POOL_SIZE}
       connection-timeout: ${CONNECTION_TIMEOUT}
       max-lifetime: ${MAX_LIFETIME}
-    url: ${JDBC_URL}
-    username: ${ORACLE_USERNAME}
-    password: ${ORACLE_PASSWORD}
+    url: ${CONNECTION_STRING}
+    username: ${USERNAME}
+    password: ${PASSWORD}
     driver-class: oracle.jdbc.driver.OracleDriver
   jpa:
     show-sql: true
@@ -46,7 +46,7 @@ logging:
         gov:
           educ:
             api:
-              codes: ${APP_LOG_LEVEL}
+              trax: ${APP_LOG_LEVEL}
     org:
       springframework:
         web: ${SPRING_WEB_LOG_LEVEL}
@@ -70,8 +70,3 @@ springdoc:
   swagger-ui:
     path: /api/v1/api-docs-ui.html
     operationsSorter: alpha
-
-#Endpoints
-endpoint: 
- grad-trax-api:
-
