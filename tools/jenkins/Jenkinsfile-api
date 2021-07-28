@@ -43,7 +43,7 @@ pipeline{
       JOB_NAME = 'main'
       TAG = 'dev'
 
-      APP_NAME = 'grad-trax-api'
+      APP_NAME = 'educ-grad-trax-api'
       APP_DOMAIN = 'apps.silver.devops.gov.bc.ca'
 
       SOURCE_REPO_RAW = 'https://github.com/${OWNER}/${REPO_NAME}/main'
