@@ -33,7 +33,7 @@ logging:
         gov:
           educ:
             api:
-              codes: INFO
+              trax: INFO
     org:
       springframework:
         web: INFO
@@ -41,10 +41,4 @@ logging:
         boot:
           autoconfigure:
             logging: INFO
-      hibernate: ERROR
-
-#Endpoints
-endpoint:
-  grad-trax-api:
-
-  
+      hibernate: ERROR  
