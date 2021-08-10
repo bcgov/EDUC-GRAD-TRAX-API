@@ -11,7 +11,7 @@ spring:
     enabled: false
   datasource:
     hikari:
-      pool-name: gradtraxapi-api-cp
+      pool-name: grad-trax-api-cp
       maximum-pool-size: ${MAXIMUM_POOL_SIZE}
       connection-timeout: ${CONNECTION_TIMEOUT}
       max-lifetime: ${MAX_LIFETIME}
@@ -29,6 +29,15 @@ spring:
   jackson:
     deserialization:
       fail-on-unknown-properties: false
+  flyway:
+    enabled: ${ENABLE_FLYWAY}
+    baseline-on-migrate: false
+    table: FLYWAY_SCHEMA_HISTORY
+    url: ${CONNECTION_STRING}
+    schema: ${USERNAME}
+    user: ${USERNAME}
+    password: ${PASSWORD}
+    location: classpath:db/migration
 
 #Logging properties
 logging:
