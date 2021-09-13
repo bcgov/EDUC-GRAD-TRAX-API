@@ -55,7 +55,7 @@ logging:
         gov:
           educ:
             api:
-              codes: ${APP_LOG_LEVEL}
+              trax: ${APP_LOG_LEVEL}
     org:
       springframework:
         web: ${SPRING_WEB_LOG_LEVEL}
@@ -80,7 +80,4 @@ springdoc:
     path: /api/v1/api-docs-ui.html
     operationsSorter: alpha
 
-#Endpoints
-endpoint: 
-  grad-trax-api:
 
