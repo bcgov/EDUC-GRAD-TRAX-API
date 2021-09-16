@@ -26,8 +26,8 @@ public class BaseEntity {
 	
 	@PrePersist
 	protected void onCreate() {
-		this.updateUser = "API_COURSE";
-		this.createUser = "API_COURSE";
+		this.updateUser = "API_GRAD_TRAX";
+		this.createUser = "API_GRAD_TRAX";
 		this.createDate = new Date(System.currentTimeMillis());
 		this.updateDate = new Date(System.currentTimeMillis());
 	}
@@ -35,9 +35,9 @@ public class BaseEntity {
 	@PreUpdate
 	protected void onPersist() {
 		this.updateDate = new Date(System.currentTimeMillis());
-		this.updateUser = "API_COURSE";
+		this.updateUser = "API_GRAD_TRAX";
 		if (StringUtils.isBlank(createUser)) {
-			createUser = "API_COURSE";
+			createUser = "API_GRAD_TRAX";
 		}
 		if (this.createDate == null) {
 			this.createDate = new Date(System.currentTimeMillis());

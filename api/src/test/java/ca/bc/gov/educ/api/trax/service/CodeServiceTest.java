@@ -1,5 +1,7 @@
 package ca.bc.gov.educ.api.trax.service;
 
+import ca.bc.gov.educ.api.trax.messaging.NatsConnection;
+import ca.bc.gov.educ.api.trax.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.trax.model.dto.GradCountry;
 import ca.bc.gov.educ.api.trax.model.dto.GradProvince;
 import ca.bc.gov.educ.api.trax.model.entity.GradCountryEntity;
@@ -38,6 +40,13 @@ public class CodeServiceTest {
 
 	@Autowired
 	GradValidation validation;
+
+	// NATS
+	@MockBean
+	private NatsConnection natsConnection;
+
+	@MockBean
+	private Subscriber subscriber;
 	
 	@Test
 	public void testGetAllProvinceList() {
