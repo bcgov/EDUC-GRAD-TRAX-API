@@ -79,4 +79,19 @@ springdoc:
   swagger-ui:
     path: /api/v1/api-docs-ui.html
     operationsSorter: alpha
-    
+
+#NATS
+nats:
+  url: ${NATS}
+  maxReconnect: ${NATS_MAX_RECONNECT}
+  connectionName: GRAD-TRAX-API
+
+#Scheduler
+cron:
+  scheduled:
+    process:
+      events:
+        stan:
+          run: ${CRON_SCHEDULED_PROCESS_EVENTS_STAN}
+          lockAtLeastFor: ${CRON_SCHEDULED_PROCESS_EVENTS_STAN_LOCK_AT_LEAST_FOR}
+          lockAtMostFor: ${CRON_SCHEDULED_PROCESS_EVENTS_STAN_LOCK_AT_MOST_FOR}
