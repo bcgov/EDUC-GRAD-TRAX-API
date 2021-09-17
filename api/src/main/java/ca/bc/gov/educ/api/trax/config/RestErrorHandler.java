@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.trax.config;
 
+import ca.bc.gov.educ.api.trax.exception.BusinessException;
 import ca.bc.gov.educ.api.trax.util.ApiResponseMessage.MessageTypeEnum;
 import ca.bc.gov.educ.api.trax.exception.GradBusinessRuleException;
 import ca.bc.gov.educ.api.trax.util.ApiResponseModel;
@@ -30,11 +31,11 @@ public class RestErrorHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(value = { IllegalArgumentException.class, IllegalStateException.class })
 	protected ResponseEntity<Object> handleConflict(RuntimeException ex, WebRequest request) {
 		LOGGER.error("Illegal argument ERROR IS: " + ex.getClass().getName(), ex);
-		ApiResponseModel<?> reponse = ApiResponseModel.ERROR(null, ex.getLocalizedMessage());
-		validation.ifErrors(errorList -> reponse.addErrorMessages(errorList));
-		validation.ifWarnings(warningList -> reponse.addWarningMessages(warningList));
+		ApiResponseModel<?> response = ApiResponseModel.ERROR(null, ex.getLocalizedMessage());
+		validation.ifErrors(errorList -> response.addErrorMessages(errorList));
+		validation.ifWarnings(warningList -> response.addWarningMessages(warningList));
 		validation.clear();
-		return new ResponseEntity<>(reponse, HttpStatus.UNPROCESSABLE_ENTITY);
+		return new ResponseEntity<>(response, HttpStatus.UNPROCESSABLE_ENTITY);
 	}
 
 	@ExceptionHandler(value = { JpaObjectRetrievalFailureException.class, DataRetrievalFailureException.class })
@@ -54,7 +55,7 @@ public class RestErrorHandler extends ResponseEntityExceptionHandler {
 	}
 
 	@ExceptionHandler(value = { GradBusinessRuleException.class })
-	protected ResponseEntity<Object> handleIrisBusinessException(Exception ex, WebRequest request) {
+	protected ResponseEntity<Object> handleGradBusinessException(Exception ex, WebRequest request) {
 		ApiResponseModel<?> response = ApiResponseModel.ERROR(null);
 		validation.ifErrors(errorList -> response.addErrorMessages(errorList));
 		validation.ifWarnings(warningList -> response.addWarningMessages(warningList));
@@ -95,11 +96,11 @@ public class RestErrorHandler extends ResponseEntityExceptionHandler {
 			}
 		}
 
-		ApiResponseModel<?> reponse = ApiResponseModel.ERROR(null, msg);
-		validation.ifErrors(errorList -> reponse.addErrorMessages(errorList));
-		validation.ifWarnings(warningList -> reponse.addWarningMessages(warningList));
+		ApiResponseModel<?> response = ApiResponseModel.ERROR(null, msg);
+		validation.ifErrors(errorList -> response.addErrorMessages(errorList));
+		validation.ifWarnings(warningList -> response.addWarningMessages(warningList));
 		validation.clear();
-		return new ResponseEntity<>(reponse, HttpStatus.UNPROCESSABLE_ENTITY);
+		return new ResponseEntity<>(response, HttpStatus.UNPROCESSABLE_ENTITY);
 	}
 
 	@ExceptionHandler(value = { Exception.class })

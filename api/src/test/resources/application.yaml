@@ -43,4 +43,10 @@ logging:
         boot:
           autoconfigure:
             logging: INFO
-      hibernate: ERROR  
+      hibernate: ERROR
+
+#NATS
+nats:
+  url: test
+  maxReconnect: 60
+  connectionName: GRAD-TRAX-API
