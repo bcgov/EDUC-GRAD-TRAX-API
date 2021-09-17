@@ -31,7 +31,7 @@ spring:
       fail-on-unknown-properties: false
   flyway:
     enabled: ${ENABLE_FLYWAY}
-    baseline-on-migrate: false
+    baseline-on-migrate: ${BASELINE_ON_MIGRATE}
     table: FLYWAY_SCHEMA_HISTORY
     url: ${CONNECTION_STRING}
     schema: ${USERNAME}
