@@ -43,3 +43,4 @@ CREATE TABLE "REPLICATION_SHEDLOCK"
   TABLESPACE "API_GRAD_DATA"   NO INMEMORY ;
 
 COMMENT ON TABLE REPLICATION_SHEDLOCK IS 'This table is used to achieve distributed lock between pods, for schedulers.';
+
