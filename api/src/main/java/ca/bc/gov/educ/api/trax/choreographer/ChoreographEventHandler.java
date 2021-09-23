@@ -38,8 +38,9 @@ public class ChoreographEventHandler {
   }
 
   public void handleEvent(@NonNull final Event event) {
-    //only one thread will process all the request. since RDB won't handle concurrent requests.
+    //only one thread will process all the request. since RDB wont handle concurrent requests.
     this.singleTaskExecutor.execute(() -> {
+
       try {
         switch (event.getEventType()) {
           case "CREATE_GRAD_STATUS":
