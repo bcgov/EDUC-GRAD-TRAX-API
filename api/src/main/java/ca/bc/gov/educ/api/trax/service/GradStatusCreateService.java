@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.trax.service;
 
+import ca.bc.gov.educ.api.trax.model.dto.GradSearchStudent;
 import ca.bc.gov.educ.api.trax.model.dto.GraduationStatus;
 import ca.bc.gov.educ.api.trax.model.entity.Event;
 import ca.bc.gov.educ.api.trax.model.entity.TraxStudentEntity;
@@ -8,6 +9,8 @@ import ca.bc.gov.educ.api.trax.repository.TraxStudentRepository;
 import ca.bc.gov.educ.api.trax.util.ReplicationUtils;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -44,8 +47,10 @@ public class GradStatusCreateService extends BaseService {
                 TraxStudentEntity traxStudentEntity = new TraxStudentEntity();
                 // TODO (jsung)
                 // 1. Calls PEN Student API to get pen demographic data to populate TraxStudentEntity
+                GradSearchStudent pendemog = new GradSearchStudent();
+                populateTraxStudent(traxStudentEntity, pendemog);
                 // 2. Needs to transfer required fields from GraduationStatus to TraxStudentEntity
-
+                populateTraxStudent(traxStudentEntity, gradStatusCreate);
                 // below timeout is in milli seconds, so it is 10 seconds.
                 tx.begin();
                 em.createNativeQuery(this.buildInsert(traxStudentEntity)).setHint("javax.persistence.query.timeout", 10000).executeUpdate();
@@ -65,8 +70,48 @@ public class GradStatusCreateService extends BaseService {
                 em.close();
             }
         }
+    }
 
+    private void populateTraxStudent(TraxStudentEntity traxStudentEntity, GradSearchStudent demogStudent) {
+        traxStudentEntity.setStudBirth(demogStudent.getDob());
+        traxStudentEntity.setStudSex(demogStudent.getSexCode());
 
+        traxStudentEntity.setStudSurname(demogStudent.getLegalLastName());
+        traxStudentEntity.setStudGiven(demogStudent.getLegalFirstName());
+        traxStudentEntity.setStudMiddle(demogStudent.getLegalMiddleNames());
+
+        traxStudentEntity.setAddress1("");
+        traxStudentEntity.setAddress2("");
+        traxStudentEntity.setCity("");
+        traxStudentEntity.setProvCode("");
+        traxStudentEntity.setCntryCode("");
+        traxStudentEntity.setPostal("");
+
+    }
+
+    private void populateTraxStudent(TraxStudentEntity traxStudentEntity, GraduationStatus gradStatus) {
+        // Needs to update required fields from GraduationStatus to TraxStudentEntity
+        if (StringUtils.isNotBlank(gradStatus.getProgram())) {
+            String year = convertProgramToYear(gradStatus.getProgram());
+            if (year != null) {
+                traxStudentEntity.setGradReqtYear(year);
+            }
+        }
+        if (StringUtils.isNotBlank(gradStatus.getProgramCompletionDate())) {
+            String gradDateStr = gradStatus.getProgramCompletionDate().replace("/", "");
+            if (NumberUtils.isDigits(gradDateStr)) {
+                traxStudentEntity.setGradDate(Long.valueOf(gradDateStr));
+            }
+        } else {
+            traxStudentEntity.setGradDate(0L);
+        }
+        traxStudentEntity.setMincode(gradStatus.getSchoolOfRecord());
+        traxStudentEntity.setStudGrade(gradStatus.getStudentGrade());
+        traxStudentEntity.setStudStatus(gradStatus.getStudentStatus());
+
+        traxStudentEntity.setStudNo(StringUtils.rightPad(gradStatus.getPen(), 10));
+        traxStudentEntity.setArchiveFlag("A");
+        traxStudentEntity.setHonourFlag(gradStatus.getHonoursStanding());
     }
 
     private String buildInsert(TraxStudentEntity traxStudentEntity) {
