@@ -46,7 +46,24 @@ public class GradStatusUpdateService extends BaseService {
             if (existingStudent.isPresent()) {
                 TraxStudentEntity traxStudentEntity = existingStudent.get();
                 // Needs to update required fields from GraduationStatus to TraxStudentEntity
-                populateTraxStudent(traxStudentEntity, gradStatusUpdate);
+                if (StringUtils.isNotBlank(gradStatusUpdate.getProgram())) {
+                    String year = convertProgramToYear(gradStatusUpdate.getProgram());
+                    if (year != null) {
+                        traxStudentEntity.setGradReqtYear(year);
+                    }
+                }
+                if (StringUtils.isNotBlank(gradStatusUpdate.getProgramCompletionDate())) {
+                    String gradDateStr = gradStatusUpdate.getProgramCompletionDate().replace("/", "");
+                    if (NumberUtils.isDigits(gradDateStr)) {
+                        traxStudentEntity.setGradDate(Long.valueOf(gradDateStr));
+                    }
+                } else {
+                    traxStudentEntity.setGradDate(0L);
+                }
+                traxStudentEntity.setMincode(gradStatusUpdate.getSchoolOfRecord());
+                traxStudentEntity.setStudGrade(gradStatusUpdate.getStudentGrade());
+                traxStudentEntity.setStudStatus(gradStatusUpdate.getStudentStatus());
+                //traxStudentRepository.save(traxStudentEntity);
                 // below timeout is in milli seconds, so it is 10 seconds.
                 tx.begin();
                 em.createNativeQuery(this.buildUpdate(traxStudentEntity.getGradReqtYear(),
@@ -70,27 +87,6 @@ public class GradStatusUpdateService extends BaseService {
                 em.close();
             }
         }
-    }
-
-    private void populateTraxStudent(TraxStudentEntity traxStudentEntity, GraduationStatus gradStatus) {
-        // Needs to update required fields from GraduationStatus to TraxStudentEntity
-        if (StringUtils.isNotBlank(gradStatus.getProgram())) {
-            String year = convertProgramToYear(gradStatus.getProgram());
-            if (year != null) {
-                traxStudentEntity.setGradReqtYear(year);
-            }
-        }
-        if (StringUtils.isNotBlank(gradStatus.getProgramCompletionDate())) {
-            String gradDateStr = gradStatus.getProgramCompletionDate().replace("/", "");
-            if (NumberUtils.isDigits(gradDateStr)) {
-                traxStudentEntity.setGradDate(Long.valueOf(gradDateStr));
-            }
-        } else {
-            traxStudentEntity.setGradDate(0L);
-        }
-        traxStudentEntity.setMincode(gradStatus.getSchoolOfRecord());
-        traxStudentEntity.setStudGrade(gradStatus.getStudentGrade());
-        traxStudentEntity.setStudStatus(gradStatus.getStudentStatus());
     }
 
     private String buildUpdate(final String gradReqtYear, final Long gradDate, final String mincode, final String studGrade, final String studStatus, final String studNo) {
