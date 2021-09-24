@@ -116,7 +116,7 @@ public class GradStatusCreateService extends BaseService {
 
     private String buildInsert(TraxStudentEntity traxStudentEntity) {
         String insert = "insert into student_master (archive_flag, stud_no, stud_surname, stud_given, stud_middle, address1, address2, city, prov_code, cntry_code, postal, stud_birth, stud_sex, stud_citiz, stud_grade, mincode," +
-                "stud_status, grad_date, dogwood_flag, honour_flag, mincode_grad, french_dogwood, grad_reqt_year, slp_date, stud_reqt_year_at_grad, stud_grade_at_grad) values (" +
+                "stud_status, grad_date, dogwood_flag, honour_flag, mincode_grad, french_dogwood, grad_reqt_year, slp_date, grad_reqt_year_at_grad, stud_grade_at_grad) values (" +
                 "'" + traxStudentEntity.getArchiveFlag() + "'," +
                 "'" + traxStudentEntity.getStudNo() + "'," +
                 "'" + traxStudentEntity.getStudSurname() + "'," +
