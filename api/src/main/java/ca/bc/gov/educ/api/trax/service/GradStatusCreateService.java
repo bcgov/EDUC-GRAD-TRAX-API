@@ -142,7 +142,7 @@ public class GradStatusCreateService extends BaseService {
                 "'" + traxStudentEntity.getGradReqtYear() + "'," +
                 " " + traxStudentEntity.getSlpDate() + "," +
                 "'" + traxStudentEntity.getGradReqtYearAtGrad() + "'," +
-                "'" + ReplicationUtils.getBlankWhenNull(traxStudentEntity.getStudGradeAtGrad()) +
+                "'" + ReplicationUtils.getBlankWhenNull(traxStudentEntity.getStudGradeAtGrad()) + "'" +
               ")";
         log.debug("Create Student_Master: " + insert);
         return insert;
