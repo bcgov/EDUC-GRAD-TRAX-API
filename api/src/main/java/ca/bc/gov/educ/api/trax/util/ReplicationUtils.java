@@ -11,4 +11,20 @@ public class ReplicationUtils {
         // Return a blank
         return " ";
     }
+
+    public static String getEmptyWhenNull(final String s){
+        if(StringUtils.isNotEmpty(s)){
+            return s;
+        }
+        // Return an empty value
+        return "";
+    }
+
+    public static Long getZeroWhenNull(final Long s){
+        if(s != null){
+            return s;
+        }
+        // Return zero
+        return 0L;
+    }
 }
