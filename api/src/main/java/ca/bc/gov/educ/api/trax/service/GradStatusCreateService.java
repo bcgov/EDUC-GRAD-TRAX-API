@@ -119,29 +119,29 @@ public class GradStatusCreateService extends BaseService {
                 "stud_status, grad_date, dogwood_flag, honour_flag, mincode_grad, french_dogwood, grad_reqt_year, slp_date, grad_reqt_year_at_grad, stud_grade_at_grad) values (" +
                 "'" + traxStudentEntity.getArchiveFlag() + "'," +
                 "'" + traxStudentEntity.getStudNo() + "'," +
-                "'" + traxStudentEntity.getStudSurname() + "'," +
-                "'" + (traxStudentEntity.getStudGiven() == null? "" : traxStudentEntity.getStudGiven()) + "'," +
-                "'" + (traxStudentEntity.getStudMiddle() == null? "" : traxStudentEntity.getStudMiddle()) + "'," +
-                "'" + (traxStudentEntity.getAddress1() == null? "" : traxStudentEntity.getAddress1()) + "'," +
-                "'" + (traxStudentEntity.getAddress2() == null? "" : traxStudentEntity.getAddress2()) + "'," +
-                "'" + (traxStudentEntity.getCity() == null? "" : traxStudentEntity.getCity()) + "'," +
-                "'" + (traxStudentEntity.getProvCode() == null? "" : traxStudentEntity.getProvCode()) + "'," +
-                "'" + (traxStudentEntity.getCntryCode() == null? "" : traxStudentEntity.getCntryCode()) + "'," +
-                "'" + (traxStudentEntity.getPostal() == null? "" : traxStudentEntity.getPostal()) + "'," +
-                "'" + traxStudentEntity.getStudBirth() + "'," +
-                "'" + traxStudentEntity.getStudSex() + "'," +
-                "'" + traxStudentEntity.getStudCitiz() + "'," +
+                "'" + ReplicationUtils.getEmptyWhenNull(traxStudentEntity.getStudSurname()) + "'," +
+                "'" + ReplicationUtils.getEmptyWhenNull(traxStudentEntity.getStudGiven()) + "'," +
+                "'" + ReplicationUtils.getEmptyWhenNull(traxStudentEntity.getStudMiddle()) + "'," +
+                "'" + ReplicationUtils.getEmptyWhenNull(traxStudentEntity.getAddress1()) + "'," +
+                "'" + ReplicationUtils.getEmptyWhenNull(traxStudentEntity.getAddress2()) + "'," +
+                "'" + ReplicationUtils.getEmptyWhenNull(traxStudentEntity.getCity()) + "'," +
+                "'" + ReplicationUtils.getEmptyWhenNull(traxStudentEntity.getProvCode()) + "'," +
+                "'" + ReplicationUtils.getEmptyWhenNull(traxStudentEntity.getCntryCode()) + "'," +
+                "'" + ReplicationUtils.getEmptyWhenNull(traxStudentEntity.getPostal()) + "'," +
+                "'" + ReplicationUtils.getEmptyWhenNull(traxStudentEntity.getStudBirth()) + "'," +
+                "'" + ReplicationUtils.getEmptyWhenNull(traxStudentEntity.getStudSex()) + "'," +
+                "'" + ReplicationUtils.getEmptyWhenNull(traxStudentEntity.getStudCitiz()) + "'," +
                 "'" + ReplicationUtils.getBlankWhenNull(traxStudentEntity.getStudGrade()) + "'," +
-                "'" + (traxStudentEntity.getMincode() == null? "" : traxStudentEntity.getMincode()) + "'," +
-                "'" + (traxStudentEntity.getStudStatus() == null ? "" : traxStudentEntity.getStudStatus()) + "'," +
-                " " + traxStudentEntity.getGradDate() + "," +
-                "'" + traxStudentEntity.getDogwoodFlag() + "'," +
-                "'" + traxStudentEntity.getHonourFlag() + "'," +
+                "'" + ReplicationUtils.getEmptyWhenNull(traxStudentEntity.getMincode()) + "'," +
+                "'" + ReplicationUtils.getEmptyWhenNull(traxStudentEntity.getStudStatus()) + "'," +
+                " " + ReplicationUtils.getZeroWhenNull(traxStudentEntity.getGradDate()) + "," +
+                "'" + ReplicationUtils.getEmptyWhenNull(traxStudentEntity.getDogwoodFlag()) + "'," +
+                "'" + ReplicationUtils.getEmptyWhenNull(traxStudentEntity.getHonourFlag()) + "'," +
                 "'" + ReplicationUtils.getBlankWhenNull(traxStudentEntity.getMincodeGrad()) + "'," +
-                "'" + traxStudentEntity.getFrenchDogwood() + "'," +
-                "'" + traxStudentEntity.getGradReqtYear() + "'," +
-                " " + traxStudentEntity.getSlpDate() + "," +
-                "'" + traxStudentEntity.getGradReqtYearAtGrad() + "'," +
+                "'" + ReplicationUtils.getEmptyWhenNull(traxStudentEntity.getFrenchDogwood()) + "'," +
+                "'" + ReplicationUtils.getEmptyWhenNull(traxStudentEntity.getGradReqtYear()) + "'," +
+                " " + ReplicationUtils.getZeroWhenNull(traxStudentEntity.getSlpDate()) + "," +
+                "'" + ReplicationUtils.getEmptyWhenNull(traxStudentEntity.getGradReqtYearAtGrad()) + "'," +
                 "'" + ReplicationUtils.getBlankWhenNull(traxStudentEntity.getStudGradeAtGrad()) + "'" +
               ")";
         log.debug("Create Student_Master: " + insert);
