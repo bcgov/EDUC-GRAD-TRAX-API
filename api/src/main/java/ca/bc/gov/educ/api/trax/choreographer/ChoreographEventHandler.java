@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 
-import static ca.bc.gov.educ.api.trax.model.dto.EventType.*;
+import static ca.bc.gov.educ.api.trax.constant.EventType.*;
 
 
 /**
