@@ -50,3 +50,13 @@ nats:
   url: test
   maxReconnect: 60
   connectionName: GRAD-TRAX-API
+
+#Scheduler
+cron:
+  scheduled:
+    process:
+      events:
+        stan:
+          run: 0 0/1 * * * *
+          lockAtLeastFor: 800ms
+          lockAtMostFor: 900ms

@@ -18,7 +18,7 @@ import javax.persistence.EntityTransaction;
 import java.time.LocalDateTime;
 
 import static ca.bc.gov.educ.api.trax.constant.EventStatus.PROCESSED;
-import static ca.bc.gov.educ.api.trax.model.dto.EventType.UPDATE_GRAD_STATUS;
+import static ca.bc.gov.educ.api.trax.constant.EventType.UPDATE_GRAD_STATUS;
 
 @Service
 @Slf4j
