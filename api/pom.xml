@@ -15,15 +15,22 @@
         <sonar.language>java</sonar.language>
         <sonar.exclusions>
             src/main/resources/**,
+            src/main/java/ca/bc/gov/educ/api/trax/config/**,
             src/main/java/ca/bc/gov/educ/api/trax/exception/**,
             src/main/java/ca/bc/gov/educ/api/trax/model/dto/**,
-            src/main/java/ca/bc/gov/educ/api/trax/model/entity**
+            src/main/java/ca/bc/gov/educ/api/trax/model/entity**,
+            src/main/java/ca/bc/gov/educ/api/trax/util/**
         </sonar.exclusions>
         <sonar.coverage.exclusions>
             src/main/resources/**,
+            src/main/java/ca/bc/gov/educ/api/trax/config/**,
+            src/main/java/ca/bc/gov/educ/api/trax/constant/**,
+            src/main/java/ca/bc/gov/educ/api/trax/messaging/**,
             src/main/java/ca/bc/gov/educ/api/trax/exception/**,
             src/main/java/ca/bc/gov/educ/api/trax/model/dto/**,
-            src/main/java/ca/bc/gov/educ/api/trax/model/entity**
+            src/main/java/ca/bc/gov/educ/api/trax/model/entity**,
+            src/main/java/ca/bc/gov/educ/api/trax/scheduler/**,
+            src/main/java/ca/bc/gov/educ/api/trax/util/**
         </sonar.coverage.exclusions>
         <java.version>11</java.version>
         <maven.compiler.version>3.8.0</maven.compiler.version>
