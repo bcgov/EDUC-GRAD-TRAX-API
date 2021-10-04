@@ -19,7 +19,7 @@ public class TestUtils {
         GraduationStatus graduationStatus = new GraduationStatus();
         graduationStatus.setPen("123456789 ");
         graduationStatus.setStudentID(UUID.randomUUID());
-        graduationStatus.setProgramName("2018-EN");
+        graduationStatus.setProgram("2018-EN");
         graduationStatus.setStudentStatus("A");
         graduationStatus.setRecalculateGradStatus("Y");
         graduationStatus.setSchoolOfRecord("111222333");
