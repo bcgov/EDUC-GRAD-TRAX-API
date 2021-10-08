@@ -39,6 +39,7 @@ public class ChoreographedEventPersistenceService {
         .eventType(choreographedEvent.getEventType().toString())
         .eventId(choreographedEvent.getEventID())
         .eventOutcome(choreographedEvent.getEventOutcome().toString())
+        .activityCode(choreographedEvent.getActivityCode())
         .eventPayload(choreographedEvent.getEventPayload())
         .eventStatus(DB_COMMITTED.toString())
         .createUser(StringUtils.isBlank(choreographedEvent.getCreateUser()) ? DEFAULT_CREATED_BY : choreographedEvent.getCreateUser())
