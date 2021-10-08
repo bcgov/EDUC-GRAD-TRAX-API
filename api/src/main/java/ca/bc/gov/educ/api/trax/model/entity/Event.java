@@ -83,6 +83,12 @@ public class Event {
   private String eventOutcome;
 
   /**
+   * The Activity code.
+   */
+  @Column(name = "ACTIVITY_CODE")
+  private String activityCode;
+
+  /**
    * Gets event payload.
    *
    * @return the event payload
