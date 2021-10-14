@@ -6,6 +6,7 @@ import ca.bc.gov.educ.api.trax.model.entity.Event;
 import ca.bc.gov.educ.api.trax.model.entity.TraxStudentEntity;
 import ca.bc.gov.educ.api.trax.repository.EventRepository;
 import ca.bc.gov.educ.api.trax.repository.TraxStudentRepository;
+import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.ReplicationUtils;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -27,12 +28,17 @@ public class GradStatusCreateService extends BaseService {
     private final EntityManagerFactory emf;
     private final TraxStudentRepository traxStudentRepository;
     private final EventRepository eventRepository;
+    private final EducGradTraxApiConstants constants;
 
     @Autowired
-    public GradStatusCreateService(EntityManagerFactory emf, TraxStudentRepository traxStudentRepository, EventRepository eventRepository) {
+    public GradStatusCreateService(EntityManagerFactory emf,
+                                   TraxStudentRepository traxStudentRepository,
+                                   EventRepository eventRepository,
+                                   EducGradTraxApiConstants constants) {
         this.emf = emf;
         this.traxStudentRepository = traxStudentRepository;
         this.eventRepository = eventRepository;
+        this.constants = constants;
     }
 
     @Override
@@ -43,7 +49,9 @@ public class GradStatusCreateService extends BaseService {
         var existingStudent = traxStudentRepository.findById(gradStatusCreate.getPen());
         final EntityTransaction tx = em.getTransaction();
         try {
-            if (existingStudent.isEmpty()) {
+            if (existingStudent.isEmpty()
+                && constants.isTraxUpdateEnabled()) {
+                log.info("==========> Start - Trax New Create: pen# [{}]", gradStatusCreate.getPen());
                 TraxStudentEntity traxStudentEntity = new TraxStudentEntity();
                 // TODO (jsung)
                 // 1. Calls PEN Student API to get pen demographic data to populate TraxStudentEntity
@@ -55,6 +63,7 @@ public class GradStatusCreateService extends BaseService {
                 tx.begin();
                 em.createNativeQuery(this.buildInsert(traxStudentEntity)).setHint("javax.persistence.query.timeout", 10000).executeUpdate();
                 tx.commit();
+                log.info("==========> End - Trax New Create: pen# [{}]", gradStatusCreate.getPen());
             }
             var existingEvent = eventRepository.findByEventId(event.getEventId());
             existingEvent.ifPresent(eventRecord -> {

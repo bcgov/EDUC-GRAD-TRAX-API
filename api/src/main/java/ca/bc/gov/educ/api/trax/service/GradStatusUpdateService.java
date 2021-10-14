@@ -5,6 +5,7 @@ import ca.bc.gov.educ.api.trax.model.entity.Event;
 import ca.bc.gov.educ.api.trax.model.entity.TraxStudentEntity;
 import ca.bc.gov.educ.api.trax.repository.EventRepository;
 import ca.bc.gov.educ.api.trax.repository.TraxStudentRepository;
+import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.ReplicationUtils;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -26,12 +27,17 @@ public class GradStatusUpdateService extends BaseService {
     private final EntityManagerFactory emf;
     private final TraxStudentRepository traxStudentRepository;
     private final EventRepository eventRepository;
+    private final EducGradTraxApiConstants constants;
 
     @Autowired
-    public GradStatusUpdateService( EntityManagerFactory emf, TraxStudentRepository traxStudentRepository, EventRepository eventRepository) {
+    public GradStatusUpdateService( EntityManagerFactory emf,
+                                    TraxStudentRepository traxStudentRepository,
+                                    EventRepository eventRepository,
+                                    EducGradTraxApiConstants constants) {
         this.emf = emf;
         this.traxStudentRepository = traxStudentRepository;
         this.eventRepository = eventRepository;
+        this.constants = constants;
     }
 
     @Override
@@ -43,7 +49,9 @@ public class GradStatusUpdateService extends BaseService {
 
         final EntityTransaction tx = em.getTransaction();
         try {
-            if (existingStudent.isPresent()) {
+            if (existingStudent.isPresent()
+                && constants.isTraxUpdateEnabled()) {
+                log.info("==========> Start - Trax Incremental Update: pen# [{}]", gradStatusUpdate.getPen());
                 TraxStudentEntity traxStudentEntity = existingStudent.get();
                 // Needs to update required fields from GraduationStatus to TraxStudentEntity
                 populateTraxStudent(traxStudentEntity, gradStatusUpdate);
@@ -54,6 +62,7 @@ public class GradStatusUpdateService extends BaseService {
                         traxStudentEntity.getStudGrade(), traxStudentEntity.getStudStatus(),
                         traxStudentEntity.getStudNo())).setHint("javax.persistence.query.timeout", 10000).executeUpdate();
                 tx.commit();
+                log.info("==========> End - Trax Incremental Update: pen# [{}]", gradStatusUpdate.getPen());
             }
 
             var existingEvent = eventRepository.findByEventId(event.getEventId());

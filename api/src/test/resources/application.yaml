@@ -60,3 +60,8 @@ cron:
           run: 0 0/1 * * * *
           lockAtLeastFor: 800ms
           lockAtMostFor: 900ms
+
+#Incremental Trax Update
+trax:
+  update:
+    enabled: true

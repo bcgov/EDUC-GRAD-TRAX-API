@@ -72,4 +72,8 @@ public class EducGradTraxApiConstants {
      */
     @Value("${nats.connectionName}")
     private String connectionName;
+
+    // Incremental Trax Update
+    @Value("${trax.update.enabled}")
+    private boolean traxUpdateEnabled;
 }
