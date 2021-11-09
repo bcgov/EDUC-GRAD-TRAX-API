@@ -98,31 +98,6 @@ public class GradStatusCreateService extends BaseService {
 
     }
 
-    private void populateTraxStudent(TraxStudentEntity traxStudentEntity, GraduationStatus gradStatus) {
-        // Needs to update required fields from GraduationStatus to TraxStudentEntity
-        if (StringUtils.isNotBlank(gradStatus.getProgram())) {
-            String year = convertProgramToYear(gradStatus.getProgram());
-            if (year != null) {
-                traxStudentEntity.setGradReqtYear(year);
-            }
-        }
-        if (StringUtils.isNotBlank(gradStatus.getProgramCompletionDate())) {
-            String gradDateStr = gradStatus.getProgramCompletionDate().replace("/", "");
-            if (NumberUtils.isDigits(gradDateStr)) {
-                traxStudentEntity.setGradDate(Long.valueOf(gradDateStr));
-            }
-        } else {
-            traxStudentEntity.setGradDate(0L);
-        }
-        traxStudentEntity.setMincode(gradStatus.getSchoolOfRecord());
-        traxStudentEntity.setStudGrade(gradStatus.getStudentGrade());
-        traxStudentEntity.setStudStatus(gradStatus.getStudentStatus());
-
-        traxStudentEntity.setStudNo(StringUtils.rightPad(gradStatus.getPen(), 10));
-        traxStudentEntity.setArchiveFlag("A");
-        traxStudentEntity.setHonourFlag(gradStatus.getHonoursStanding());
-    }
-
     private String buildInsert(TraxStudentEntity traxStudentEntity) {
         String insert = "insert into student_master (archive_flag, stud_no, stud_surname, stud_given, stud_middle, address1, address2, city, prov_code, cntry_code, postal, stud_birth, stud_sex, stud_citiz, stud_grade, mincode," +
                 "stud_status, grad_date, dogwood_flag, honour_flag, mincode_grad, french_dogwood, grad_reqt_year, slp_date, grad_reqt_year_at_grad, stud_grade_at_grad) values (" +
