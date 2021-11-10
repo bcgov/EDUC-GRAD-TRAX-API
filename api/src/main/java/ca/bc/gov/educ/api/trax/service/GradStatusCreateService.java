@@ -10,8 +10,6 @@ import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.ReplicationUtils;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -100,7 +98,7 @@ public class GradStatusCreateService extends BaseService {
 
     private String buildInsert(TraxStudentEntity traxStudentEntity) {
         String insert = "insert into student_master (archive_flag, stud_no, stud_surname, stud_given, stud_middle, address1, address2, city, prov_code, cntry_code, postal, stud_birth, stud_sex, stud_citiz, stud_grade, mincode," +
-                "stud_status, grad_date, dogwood_flag, honour_flag, mincode_grad, french_dogwood, grad_reqt_year, slp_date, grad_reqt_year_at_grad, stud_grade_at_grad) values (" +
+                "stud_status, grad_date, dogwood_flag, honour_flag, mincode_grad, french_dogwood, grad_reqt_year, slp_date, grad_reqt_year_at_grad, stud_grade_at_grad, xcript_actv_date) values (" +
                 "'" + traxStudentEntity.getArchiveFlag() + "'," +
                 "'" + traxStudentEntity.getStudNo() + "'," +
                 "'" + ReplicationUtils.getEmptyWhenNull(traxStudentEntity.getStudSurname()) + "'," +
@@ -126,7 +124,8 @@ public class GradStatusCreateService extends BaseService {
                 "'" + ReplicationUtils.getEmptyWhenNull(traxStudentEntity.getGradReqtYear()) + "'," +
                 " " + ReplicationUtils.getZeroWhenNull(traxStudentEntity.getSlpDate()) + "," +
                 "'" + ReplicationUtils.getEmptyWhenNull(traxStudentEntity.getGradReqtYearAtGrad()) + "'," +
-                "'" + ReplicationUtils.getBlankWhenNull(traxStudentEntity.getStudGradeAtGrad()) + "'" +
+                "'" + ReplicationUtils.getBlankWhenNull(traxStudentEntity.getStudGradeAtGrad()) + "'," +
+                traxStudentEntity.getXcriptActvDate() +
               ")";
         log.debug("Create Student_Master: " + insert);
         return insert;

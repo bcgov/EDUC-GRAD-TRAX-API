@@ -2,8 +2,12 @@ package ca.bc.gov.educ.api.trax.service;
 
 import ca.bc.gov.educ.api.trax.model.dto.GraduationStatus;
 import ca.bc.gov.educ.api.trax.model.entity.TraxStudentEntity;
+import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
+import ca.bc.gov.educ.api.trax.util.EducGradTraxApiUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+
+import java.util.Date;
 
 public abstract class BaseService implements EventService {
 
@@ -46,7 +50,10 @@ public abstract class BaseService implements EventService {
         traxStudentEntity.setMincodeGrad(gradStatus.getSchoolAtGrad());
         traxStudentEntity.setStudGrade(gradStatus.getStudentGrade());
         traxStudentEntity.setHonourFlag(gradStatus.getHonoursStanding());
-        traxStudentEntity.setXcriptActvDate(System.currentTimeMillis());
+        String currentDateStr = EducGradTraxApiUtils.formatDate(new Date(), EducGradTraxApiConstants.TRAX_DATE_FORMAT);
+        if (NumberUtils.isDigits(currentDateStr)) {
+            traxStudentEntity.setXcriptActvDate(Long.valueOf(currentDateStr));
+        }
         populateTraxStudentStatus(traxStudentEntity, gradStatus.getStudentStatus());
     }
 

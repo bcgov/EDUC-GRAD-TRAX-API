@@ -10,7 +10,6 @@ import ca.bc.gov.educ.api.trax.util.ReplicationUtils;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -93,8 +92,8 @@ public class GradStatusUpdateService extends BaseService {
                 + "STUD_GRADE=" + "'" + ReplicationUtils.getBlankWhenNull(studGrade) + "'" + ","
                 + "STUD_STATUS=" + "'" + (studStatus == null ? "" : studStatus) + "'" + ","
                 + "ARCHIVE_FLAG=" + "'" + (archiveFlag == null ? "" : archiveFlag) + "'" + ","
-                + "HONOUR_FLAG=" + "'" + (honourFlag == null ? "" : honourFlag) + "'"
-//                + "XCRIPT_ACTV_DATE=" + activeDate
+                + "HONOUR_FLAG=" + "'" + (honourFlag == null ? "" : honourFlag) + "'" + ","
+                + "XCRIPT_ACTV_DATE=" + activeDate
                 + " WHERE STUD_NO=" + "'" + StringUtils.rightPad(studNo, 10) + "'"; // a space is appended CAREFUL not to remove.
         log.debug("Update Student_Master: " + update);
         return update;
