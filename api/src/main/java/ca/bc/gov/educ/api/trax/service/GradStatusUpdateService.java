@@ -93,8 +93,8 @@ public class GradStatusUpdateService extends BaseService {
                 + "STUD_GRADE=" + "'" + ReplicationUtils.getBlankWhenNull(studGrade) + "'" + ","
                 + "STUD_STATUS=" + "'" + (studStatus == null ? "" : studStatus) + "'" + ","
                 + "ARCHIVE_FLAG=" + "'" + (archiveFlag == null ? "" : archiveFlag) + "'" + ","
-                + "HONOUR_FLAG=" + "'" + (honourFlag == null ? "" : honourFlag) + "'" + ","
-                + "XCRIPT_ACTV_DATE=" + activeDate
+                + "HONOUR_FLAG=" + "'" + (honourFlag == null ? "" : honourFlag) + "'"
+//                + "XCRIPT_ACTV_DATE=" + activeDate
                 + " WHERE STUD_NO=" + "'" + StringUtils.rightPad(studNo, 10) + "'"; // a space is appended CAREFUL not to remove.
         log.debug("Update Student_Master: " + update);
         return update;
