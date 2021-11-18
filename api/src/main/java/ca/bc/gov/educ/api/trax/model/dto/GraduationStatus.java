@@ -27,5 +27,6 @@ public class GraduationStatus extends BaseModel{
     private UUID studentID;
     private String schoolAtGrad;
     private String schoolAtGradName;
-				
+    private String recalculateProjectedGrad;
+    private Long batchId;
 }
