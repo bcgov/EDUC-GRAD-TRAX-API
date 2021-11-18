@@ -1,6 +1,5 @@
 package ca.bc.gov.educ.api.trax.util;
 
-import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -48,6 +47,14 @@ public final class LogHelper {
     }
   }
 
+  /**
+   * WebClient to call other REST APIs
+   *
+   * @param method
+   * @param url
+   * @param responseCode
+   * @param correlationID
+   */
   public static void logClientHttpReqResponseDetails(@NonNull final HttpMethod method, final String url, final int responseCode, final List<String> correlationID) {
     try {
       final Map<String, Object> httpMap = new HashMap<>();
@@ -66,6 +73,7 @@ public final class LogHelper {
   }
 
   /**
+   * NATS messaging
    * the event is a json string.
    *
    * @param event the json string
@@ -79,19 +87,5 @@ public final class LogHelper {
       log.error(EXCEPTION, exception);
     }
   }
-
-//  public static void logSagaRetry(final Saga saga) {
-//    final Map<String, Object> retrySagaMap = new HashMap<>();
-//    try {
-//      retrySagaMap.put("sagaName", saga.getSagaName());
-//      retrySagaMap.put("sagaId", saga.getSagaId());
-//      retrySagaMap.put("retryCount", saga.getRetryCount());
-//      MDC.putCloseable("sagaRetry", mapper.writeValueAsString(retrySagaMap));
-//      log.info("Saga is being retried.");
-//      MDC.clear();
-//    } catch (final Exception ex) {
-//      log.error(EXCEPTION, ex);
-//    }
-//  }
 
 }
