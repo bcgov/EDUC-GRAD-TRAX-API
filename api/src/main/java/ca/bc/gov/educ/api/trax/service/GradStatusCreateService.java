@@ -6,11 +6,10 @@ import ca.bc.gov.educ.api.trax.model.entity.Event;
 import ca.bc.gov.educ.api.trax.model.entity.TraxStudentEntity;
 import ca.bc.gov.educ.api.trax.repository.EventRepository;
 import ca.bc.gov.educ.api.trax.repository.TraxStudentRepository;
+import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.ReplicationUtils;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,12 +26,17 @@ public class GradStatusCreateService extends BaseService {
     private final EntityManagerFactory emf;
     private final TraxStudentRepository traxStudentRepository;
     private final EventRepository eventRepository;
+    private final EducGradTraxApiConstants constants;
 
     @Autowired
-    public GradStatusCreateService(EntityManagerFactory emf, TraxStudentRepository traxStudentRepository, EventRepository eventRepository) {
+    public GradStatusCreateService(EntityManagerFactory emf,
+                                   TraxStudentRepository traxStudentRepository,
+                                   EventRepository eventRepository,
+                                   EducGradTraxApiConstants constants) {
         this.emf = emf;
         this.traxStudentRepository = traxStudentRepository;
         this.eventRepository = eventRepository;
+        this.constants = constants;
     }
 
     @Override
@@ -43,7 +47,9 @@ public class GradStatusCreateService extends BaseService {
         var existingStudent = traxStudentRepository.findById(gradStatusCreate.getPen());
         final EntityTransaction tx = em.getTransaction();
         try {
-            if (existingStudent.isEmpty()) {
+            if (existingStudent.isEmpty()
+                && constants.isTraxUpdateEnabled()) {
+                log.info("==========> Start - Trax New Create: pen# [{}]", gradStatusCreate.getPen());
                 TraxStudentEntity traxStudentEntity = new TraxStudentEntity();
                 // TODO (jsung)
                 // 1. Calls PEN Student API to get pen demographic data to populate TraxStudentEntity
@@ -55,6 +61,7 @@ public class GradStatusCreateService extends BaseService {
                 tx.begin();
                 em.createNativeQuery(this.buildInsert(traxStudentEntity)).setHint("javax.persistence.query.timeout", 10000).executeUpdate();
                 tx.commit();
+                log.info("==========> End - Trax New Create: pen# [{}]", gradStatusCreate.getPen());
             }
             var existingEvent = eventRepository.findByEventId(event.getEventId());
             existingEvent.ifPresent(eventRecord -> {
@@ -89,34 +96,9 @@ public class GradStatusCreateService extends BaseService {
 
     }
 
-    private void populateTraxStudent(TraxStudentEntity traxStudentEntity, GraduationStatus gradStatus) {
-        // Needs to update required fields from GraduationStatus to TraxStudentEntity
-        if (StringUtils.isNotBlank(gradStatus.getProgram())) {
-            String year = convertProgramToYear(gradStatus.getProgram());
-            if (year != null) {
-                traxStudentEntity.setGradReqtYear(year);
-            }
-        }
-        if (StringUtils.isNotBlank(gradStatus.getProgramCompletionDate())) {
-            String gradDateStr = gradStatus.getProgramCompletionDate().replace("/", "");
-            if (NumberUtils.isDigits(gradDateStr)) {
-                traxStudentEntity.setGradDate(Long.valueOf(gradDateStr));
-            }
-        } else {
-            traxStudentEntity.setGradDate(0L);
-        }
-        traxStudentEntity.setMincode(gradStatus.getSchoolOfRecord());
-        traxStudentEntity.setStudGrade(gradStatus.getStudentGrade());
-        traxStudentEntity.setStudStatus(gradStatus.getStudentStatus());
-
-        traxStudentEntity.setStudNo(StringUtils.rightPad(gradStatus.getPen(), 10));
-        traxStudentEntity.setArchiveFlag("A");
-        traxStudentEntity.setHonourFlag(gradStatus.getHonoursStanding());
-    }
-
     private String buildInsert(TraxStudentEntity traxStudentEntity) {
         String insert = "insert into student_master (archive_flag, stud_no, stud_surname, stud_given, stud_middle, address1, address2, city, prov_code, cntry_code, postal, stud_birth, stud_sex, stud_citiz, stud_grade, mincode," +
-                "stud_status, grad_date, dogwood_flag, honour_flag, mincode_grad, french_dogwood, grad_reqt_year, slp_date, grad_reqt_year_at_grad, stud_grade_at_grad) values (" +
+                "stud_status, grad_date, dogwood_flag, honour_flag, mincode_grad, french_dogwood, grad_reqt_year, slp_date, grad_reqt_year_at_grad, stud_grade_at_grad, xcript_actv_date) values (" +
                 "'" + traxStudentEntity.getArchiveFlag() + "'," +
                 "'" + traxStudentEntity.getStudNo() + "'," +
                 "'" + ReplicationUtils.getEmptyWhenNull(traxStudentEntity.getStudSurname()) + "'," +
@@ -142,7 +124,8 @@ public class GradStatusCreateService extends BaseService {
                 "'" + ReplicationUtils.getEmptyWhenNull(traxStudentEntity.getGradReqtYear()) + "'," +
                 " " + ReplicationUtils.getZeroWhenNull(traxStudentEntity.getSlpDate()) + "," +
                 "'" + ReplicationUtils.getEmptyWhenNull(traxStudentEntity.getGradReqtYearAtGrad()) + "'," +
-                "'" + ReplicationUtils.getBlankWhenNull(traxStudentEntity.getStudGradeAtGrad()) + "'" +
+                "'" + ReplicationUtils.getBlankWhenNull(traxStudentEntity.getStudGradeAtGrad()) + "'," +
+                traxStudentEntity.getXcriptActvDate() +
               ")";
         log.debug("Create Student_Master: " + insert);
         return insert;
