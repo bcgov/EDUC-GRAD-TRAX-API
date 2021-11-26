@@ -43,11 +43,12 @@ public class ChoreographEventHandler {
       try {
         switch (event.getEventType()) {
           case "CREATE_GRAD_STATUS":
+            log.info("Processing CREATE_GRAD_STATUS event record :: {} ", event);
             final GraduationStatus gradStatusCreate = JsonUtil.getJsonObjectFromString(GraduationStatus.class, event.getEventPayload());
             this.eventServiceMap.get(CREATE_GRAD_STATUS.toString()).processEvent(gradStatusCreate, event);
             break;
           case "UPDATE_GRAD_STATUS":
-            log.info("Processing UPDATE_STUDENT event record :: {} ", event);
+            log.info("Processing UPDATE_GRAD_STATUS event record :: {} ", event);
             final GraduationStatus gradStatusUpdate = JsonUtil.getJsonObjectFromString(GraduationStatus.class, event.getEventPayload());
             this.eventServiceMap.get(UPDATE_GRAD_STATUS.toString()).processEvent(gradStatusUpdate, event);
             break;
