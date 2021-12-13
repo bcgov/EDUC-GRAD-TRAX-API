@@ -51,6 +51,7 @@ public class GradStatusCreateService extends BaseService {
                 && constants.isTraxUpdateEnabled()) {
                 log.info("==========> Start - Trax New Create: pen# [{}]", gradStatusCreate.getPen());
                 TraxStudentEntity traxStudentEntity = new TraxStudentEntity();
+                traxStudentEntity.setStudNo(gradStatusCreate.getPen());
                 // TODO (jsung)
                 // 1. Calls PEN Student API to get pen demographic data to populate TraxStudentEntity
                 GradSearchStudent pendemog = new GradSearchStudent();
