@@ -48,7 +48,7 @@ public class DistrictController {
     @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
     @Operation(summary = "Find a District by District Number", description = "Get District by District Number", tags = { "District" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
-			@ApiResponse(responseCode = "204", description = "NO CONTENT")})
+			@ApiResponse(responseCode = "404", description = "NOT FOUND")})
     public ResponseEntity<District> getDistrictDetails(@PathVariable String distCode) {
     	District distResponse = districtService.getDistrictDetails(distCode);
     	if(distResponse != null) {
