@@ -29,7 +29,9 @@ public class EducGradTraxApiConstants {
     // Controller Mappings
     public static final String GRAD_TRAX_CODE_URL_MAPPING = GRAD_TRAX_API_ROOT_MAPPING + "/code";
     public static final String GRAD_SCHOOL_URL_MAPPING = GRAD_TRAX_API_ROOT_MAPPING + "/school";
+    public static final String GRAD_DISTRICT_URL_MAPPING = GRAD_TRAX_API_ROOT_MAPPING + "/district";
     public static final String GRAD_PSI_URL_MAPPING = GRAD_TRAX_API_ROOT_MAPPING + "/psi";
+
 
     // Service Methods Mappings
     public static final String GET_ALL_COUNTRY_MAPPING = "/country";
@@ -43,6 +45,8 @@ public class EducGradTraxApiConstants {
 
     public static final String GET_PSI_BY_CODE_MAPPING = "/{psiCode}";
     public static final String GET_PSI_SEARCH_MAPPING="/search";
+
+    public static final String GET_DISTRICT_BY_DISTNO_MAPPING = "/{distCode}";
     
     
     //Default Attribute value constants
