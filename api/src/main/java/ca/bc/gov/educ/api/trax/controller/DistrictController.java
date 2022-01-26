@@ -50,12 +50,11 @@ public class DistrictController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
 			@ApiResponse(responseCode = "204", description = "NO CONTENT")})
     public ResponseEntity<District> getDistrictDetails(@PathVariable String distCode) {
-    	logger.debug("getDistrictDetails : ");
     	District distResponse = districtService.getDistrictDetails(distCode);
     	if(distResponse != null) {
     		return response.GET(distResponse);
     	}else {
-    		return response.NO_CONTENT();
+    		return response.NOT_FOUND();
     	}
     }
 }
