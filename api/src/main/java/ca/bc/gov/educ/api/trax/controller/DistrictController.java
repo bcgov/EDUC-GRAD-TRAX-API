@@ -47,14 +47,16 @@ public class DistrictController {
     @GetMapping(EducGradTraxApiConstants.GET_DISTRICT_BY_DISTNO_MAPPING)
     @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
     @Operation(summary = "Find a District by District Number", description = "Get District by District Number", tags = { "District" })
-    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
-			@ApiResponse(responseCode = "404", description = "NOT FOUND")})
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
     public ResponseEntity<District> getDistrictDetails(@PathVariable String distCode) {
-    	District distResponse = districtService.getDistrictDetails(distCode);
-    	if(distResponse != null) {
-    		return response.GET(distResponse);
-    	}else {
-    		return response.NOT_FOUND();
-    	}
+    	if(distCode.length() <=3) {
+            District distResponse = districtService.getDistrictDetails(distCode);
+            if (distResponse != null) {
+                return response.GET(distResponse);
+            } else {
+                return null;
+            }
+        }
+        return null;
     }
 }
