@@ -57,23 +57,20 @@ public class TraxUpdateService {
 
     @Scheduled(cron = "${cron.scheduled.process.jobs.stan.run}") // every 5 minute
     @SchedulerLock(name = "PROCESS_TRAX_UPDATE_IN_GRAD_RECORDS", lockAtLeastFor = "${cron.scheduled.process.events.stan.lockAtLeastFor}", lockAtMostFor = "${cron.scheduled.process.events.stan.lockAtMostFor}")
+    @Transactional(propagation = Propagation.REQUIRED)
     public void scheduledRunForTraxUpdates() {
         LockAssert.assertLocked();
         try {
             List<TraxUpdateInGradEntity> list = getOutstandingList();
             process(list);
         } catch (Exception ex) {
-            logger.error("Unknown exception : " + ex.getMessage());
+            logger.error("Unknown exception : {}", ex.getMessage());
         }
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public void process(List<TraxUpdateInGradEntity> traxStudents) throws Exception {
+    public void process(List<TraxUpdateInGradEntity> traxStudents) {
         traxStudents.forEach(entity -> {
-            // update status to IN_PROGRESS
-//            entity.setStatus("IN_PROGRESS");
-//            traxUpdateInGradRepository.save(entity);
-
             publishTraxUpdatedEvent(entity);
 
             // update status to PUBLISHED
@@ -82,7 +79,7 @@ public class TraxUpdateService {
         });
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRED)
     public void publishTraxUpdatedEvent(TraxUpdateInGradEntity traxStudentEntity) {
         // Save TraxUpdatedPubEvent
         TraxUpdatedPubEvent traxUpdatedPubEvent = null;

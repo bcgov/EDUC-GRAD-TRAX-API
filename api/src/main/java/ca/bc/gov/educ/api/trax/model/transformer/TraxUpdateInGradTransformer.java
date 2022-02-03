@@ -34,8 +34,7 @@ public class TraxUpdateInGradTransformer {
         List<TraxUpdateInGrad> traxUpdateInGradList = new ArrayList<>();
 
         for (TraxUpdateInGradEntity traxUpdateInGradEntity : traxUpdateInGradEntities) {
-            TraxUpdateInGrad traxUpdateInGrad = new TraxUpdateInGrad();
-            traxUpdateInGrad = transformToDTO(traxUpdateInGradEntity);
+            TraxUpdateInGrad traxUpdateInGrad = transformToDTO(traxUpdateInGradEntity);
             traxUpdateInGradList.add(traxUpdateInGrad);
         }
 

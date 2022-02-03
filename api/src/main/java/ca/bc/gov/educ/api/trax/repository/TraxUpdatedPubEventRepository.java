@@ -1,6 +1,5 @@
 package ca.bc.gov.educ.api.trax.repository;
 
-import ca.bc.gov.educ.api.trax.model.entity.Event;
 import ca.bc.gov.educ.api.trax.model.entity.TraxUpdatedPubEvent;
 import org.springframework.data.jpa.repository.JpaRepository;
 
