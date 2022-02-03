@@ -85,12 +85,8 @@ public class TraxUpdateService {
         TraxUpdatedPubEvent traxUpdatedPubEvent = null;
         try {
             traxUpdatedPubEvent = persistTraxUpdatedEvent(traxStudentEntity);
-        } catch (Exception ex) {
-            try {
-                throw ex;
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
+        } catch (JsonProcessingException ex) {
+            logger.error("JSON Processing exception : {}", ex.getMessage());
         }
 
         // publish NATS message
