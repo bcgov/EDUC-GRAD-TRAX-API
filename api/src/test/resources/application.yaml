@@ -57,10 +57,12 @@ cron:
     process:
       events:
         stan:
-          run: 0 0/1 * * * *
+          run: 0 0/5 * * * *
           lockAtLeastFor: 800ms
           lockAtMostFor: 900ms
-
+      jobs:
+        stan:
+          run: 0 0/10 * * * *
 #Incremental Trax Update
 trax:
   update:

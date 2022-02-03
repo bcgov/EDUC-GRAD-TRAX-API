@@ -4,10 +4,12 @@ import ca.bc.gov.educ.api.trax.constant.EventOutcome;
 import ca.bc.gov.educ.api.trax.constant.EventType;
 import ca.bc.gov.educ.api.trax.exception.BusinessException;
 import ca.bc.gov.educ.api.trax.messaging.NatsConnection;
+import ca.bc.gov.educ.api.trax.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.trax.model.dto.ChoreographedEvent;
 import ca.bc.gov.educ.api.trax.model.entity.Event;
 import ca.bc.gov.educ.api.trax.repository.EventRepository;
+import ca.bc.gov.educ.api.trax.repository.TraxUpdatedPubEventRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -30,12 +32,18 @@ public class ChoreographedEventPersistenceServiceTest {
     @Autowired
     ChoreographedEventPersistenceService choreographedEventPersistenceService;
 
+    @Autowired
+    TraxUpdatedPubEventRepository traxUpdatedPubEventRepository;
+
     @MockBean
     EventRepository eventRepository;
 
     // NATS
     @MockBean
     private NatsConnection natsConnection;
+
+    @MockBean
+    private Publisher publisher;
 
     @MockBean
     private Subscriber subscriber;

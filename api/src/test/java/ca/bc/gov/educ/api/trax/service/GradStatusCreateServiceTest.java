@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.trax.service;
 
 import ca.bc.gov.educ.api.trax.messaging.NatsConnection;
+import ca.bc.gov.educ.api.trax.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.trax.repository.EventRepository;
 import ca.bc.gov.educ.api.trax.repository.TraxStudentRepository;
@@ -33,6 +34,9 @@ public class GradStatusCreateServiceTest {
     // NATS
     @MockBean
     private NatsConnection natsConnection;
+
+    @MockBean
+    private Publisher publisher;
 
     @MockBean
     private Subscriber subscriber;
