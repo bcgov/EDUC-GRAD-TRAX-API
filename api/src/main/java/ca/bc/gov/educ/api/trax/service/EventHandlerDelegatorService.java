@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
+import static ca.bc.gov.educ.api.trax.constant.Topics.TRAX_UPDATE_EVENTS_TOPIC;
+
 @Service
 @Slf4j
 public class EventHandlerDelegatorService {
@@ -41,12 +43,17 @@ public class EventHandlerDelegatorService {
      */
     public void handleChoreographyEvent(@NonNull final ChoreographedEvent choreographedEvent, final Message message) throws IOException {
         try {
-            final var persistedEvent = this.choreographedEventPersistenceService.persistEventToDB(choreographedEvent);
-            if (message.isJetStream()) {
-                message.ack(); // acknowledge to Jet Stream that api got the message and it is now in DB.
-                log.info("acknowledged to Jet Stream...");
+            if (message.getSubject().equalsIgnoreCase(TRAX_UPDATE_EVENTS_TOPIC.toString())) {
+                this.choreographedEventPersistenceService.updateEventStatus(choreographedEvent);
+                message.ack();
+            } else {
+                final var persistedEvent = this.choreographedEventPersistenceService.persistEventToDB(choreographedEvent);
+                if (message.isJetStream()) {
+                    message.ack(); // acknowledge to Jet Stream that api got the message and it is now in DB.
+                    log.info("acknowledged to Jet Stream...");
+                }
+                this.choreographer.handleEvent(persistedEvent);
             }
-            this.choreographer.handleEvent(persistedEvent);
         } catch (final BusinessException businessException) {
             message.ack(); // acknowledge to Jet Stream that api got the message already...
             log.info("acknowledged to Jet Stream...");

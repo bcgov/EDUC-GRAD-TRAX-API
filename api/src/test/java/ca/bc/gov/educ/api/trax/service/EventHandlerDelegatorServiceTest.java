@@ -9,7 +9,6 @@ import ca.bc.gov.educ.api.trax.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.trax.model.dto.ChoreographedEvent;
 import ca.bc.gov.educ.api.trax.model.entity.Event;
 import io.nats.client.Message;
-import io.nats.client.impl.NatsJetStream;
 import io.nats.client.impl.NatsMessage;
 import org.junit.Test;
 import org.junit.runner.RunWith;

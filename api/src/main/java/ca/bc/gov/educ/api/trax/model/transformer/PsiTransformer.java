@@ -17,8 +17,7 @@ public class PsiTransformer {
     ModelMapper modelMapper;
 
     public Psi transformToDTO (PsiEntity psiEntity) {
-        Psi psi = modelMapper.map(psiEntity, Psi.class);
-        return psi;
+        return modelMapper.map(psiEntity, Psi.class);
     }
 
     public Psi transformToDTO ( Optional<PsiEntity> schoolEntity ) {
@@ -27,8 +26,7 @@ public class PsiTransformer {
         if (schoolEntity.isPresent())
             cae = schoolEntity.get();
 
-        Psi school = modelMapper.map(cae, Psi.class);
-        return school;
+        return modelMapper.map(cae, Psi.class);
     }
 
 	public List<Psi> transformToDTO (Iterable<PsiEntity> schoolEntities ) {
@@ -36,8 +34,7 @@ public class PsiTransformer {
         List<Psi> schoolList = new ArrayList<Psi>();
 
         for (PsiEntity schoolEntity : schoolEntities) {
-            Psi school = new Psi();
-            school = modelMapper.map(schoolEntity, Psi.class);            
+            Psi school = modelMapper.map(schoolEntity, Psi.class);
             schoolList.add(school);
         }
 
@@ -45,7 +42,6 @@ public class PsiTransformer {
     }
 
     public PsiEntity transformToEntity(Psi school) {
-        PsiEntity schoolEntity = modelMapper.map(school, PsiEntity.class);
-        return schoolEntity;
+       return modelMapper.map(school, PsiEntity.class);
     }
 }

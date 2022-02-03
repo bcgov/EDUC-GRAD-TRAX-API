@@ -102,6 +102,9 @@ cron:
           run: ${CRON_SCHEDULED_PROCESS_EVENTS_STAN}
           lockAtLeastFor: ${CRON_SCHEDULED_PROCESS_EVENTS_STAN_LOCK_AT_LEAST_FOR}
           lockAtMostFor: ${CRON_SCHEDULED_PROCESS_EVENTS_STAN_LOCK_AT_MOST_FOR}
+      jobs:
+        stan:
+          run: ${CRON_SCHEDULED_PROCESS_JOBS_STAN}
 
 #Incremental Trax Update
 trax:
