@@ -8,6 +8,7 @@ import ca.bc.gov.educ.api.trax.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.trax.model.dto.ChoreographedEvent;
 import ca.bc.gov.educ.api.trax.model.entity.Event;
+import ca.bc.gov.educ.api.trax.model.entity.TraxUpdatedPubEvent;
 import ca.bc.gov.educ.api.trax.repository.EventRepository;
 import ca.bc.gov.educ.api.trax.repository.TraxUpdatedPubEventRepository;
 import org.junit.Test;
@@ -23,6 +24,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static ca.bc.gov.educ.api.trax.constant.EventStatus.DB_COMMITTED;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -32,7 +34,7 @@ public class ChoreographedEventPersistenceServiceTest {
     @Autowired
     ChoreographedEventPersistenceService choreographedEventPersistenceService;
 
-    @Autowired
+    @MockBean
     TraxUpdatedPubEventRepository traxUpdatedPubEventRepository;
 
     @MockBean
@@ -67,6 +69,8 @@ public class ChoreographedEventPersistenceServiceTest {
         Mockito.when(eventRepository.findByEventId(eventId)).thenReturn(Optional.of(event));
 
         choreographedEventPersistenceService.persistEventToDB(choreographedEvent);
+
+        assertThatNoException();
     }
 
     @Test
@@ -90,6 +94,32 @@ public class ChoreographedEventPersistenceServiceTest {
         Mockito.when(eventRepository.save(event)).thenReturn(event);
 
         choreographedEventPersistenceService.persistEventToDB(choreographedEvent);
+
+        assertThatNoException();
+    }
+
+    @Test
+    public void testUpdateEventStatus_givenTraxUpdatedEvent() throws BusinessException {
+        UUID eventId = UUID.randomUUID();
+
+        ChoreographedEvent choreographedEvent = new ChoreographedEvent();
+        choreographedEvent.setEventID(eventId);
+        choreographedEvent.setEventType(EventType.UPDATE_TRAX_STUDENT_MASTER);
+        choreographedEvent.setEventOutcome(EventOutcome.TRAX_STUDENT_MASTER_UPDATED);
+        choreographedEvent.setEventPayload("{ test: 'event'}");
+
+        TraxUpdatedPubEvent event = new TraxUpdatedPubEvent();
+        event.setEventType(EventType.UPDATE_TRAX_STUDENT_MASTER.toString());
+        event.setEventStatus(DB_COMMITTED.toString());
+        event.setEventId(eventId);
+        event.setEventOutcome(EventOutcome.TRAX_STUDENT_MASTER_UPDATED.toString());
+
+        Mockito.when(traxUpdatedPubEventRepository.findByEventId(eventId)).thenReturn(Optional.of(event));
+        Mockito.when(traxUpdatedPubEventRepository.save(event)).thenReturn(event);
+
+        choreographedEventPersistenceService.updateEventStatus(choreographedEvent);
+
+        assertThatNoException();
     }
 
 }

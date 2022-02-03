@@ -37,10 +37,10 @@ public class TraxUpdateService {
     private TraxUpdateInGradTransformer traxUpdateInGradTransformer;
 
     @Autowired
-    TraxUpdateInGradRepository traxUpdateInGradRepository;
+    private TraxUpdateInGradRepository traxUpdateInGradRepository;
 
     @Autowired
-    TraxUpdatedPubEventRepository traxUpdatedPubEventRepository;
+    private TraxUpdatedPubEventRepository traxUpdatedPubEventRepository;
 
     @Autowired
     Publisher publisher;
@@ -48,11 +48,6 @@ public class TraxUpdateService {
     @Transactional(readOnly = true)
     public List<TraxUpdateInGradEntity> getOutstandingList() {
         return traxUpdateInGradRepository.findOutstandingUpdates(new Date(System.currentTimeMillis()));
-    }
-
-    @Transactional(readOnly = true)
-    public List<TraxUpdateInGradEntity> getInProgressByPen(String pen) {
-        return traxUpdateInGradRepository.findByStatusAndPen("IN_PROGRESS", pen);
     }
 
     @Scheduled(cron = "${cron.scheduled.process.jobs.stan.run}") // every 5 minute
