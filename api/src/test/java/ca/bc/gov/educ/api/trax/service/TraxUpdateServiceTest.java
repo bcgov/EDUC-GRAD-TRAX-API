@@ -93,7 +93,7 @@ public class TraxUpdateServiceTest {
         List<TraxUpdateInGradEntity> results = traxUpdateService.getOutstandingList();
 
         assertThat(results).isNotNull();
-        assertThat(results.size()).isEqualTo(1);
+        assertThat(results).hasSize(1);
         TraxUpdateInGradEntity responseEntity = results.get(0);
         assertThat(traxUpdateInGradEntity.getPen()).isEqualTo(responseEntity.getPen());
         assertThat(traxUpdateInGradEntity.getStatus()).isEqualTo(responseEntity.getStatus());
