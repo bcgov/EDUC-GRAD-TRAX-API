@@ -8,6 +8,8 @@ import ca.bc.gov.educ.api.trax.repository.TraxStudentRepository;
 import ca.bc.gov.educ.api.trax.support.TestUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.MockitoAnnotations.openMocks;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -40,6 +43,17 @@ public class GradStatusCreateServiceTest {
 
     @MockBean
     private Subscriber subscriber;
+
+    @Before
+    public void setUp() {
+        openMocks(this);
+    }
+
+    @After
+    public void tearDown() {
+        this.traxStudentRepository.deleteAll();
+        this.eventRepository.deleteAll();
+    }
 
     @Test
     public void testProcessEvent_givenCREATE_GRAD_STATUS_Event_for_2018_program() throws JsonProcessingException {
