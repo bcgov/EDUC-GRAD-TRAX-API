@@ -42,7 +42,7 @@ public class GradStatusCreateServiceTest {
     private Subscriber subscriber;
 
     @Test
-    public void testProcessEvent_givenCREATE_GRAD_STATUS_Event() throws JsonProcessingException {
+    public void testProcessEvent_givenCREATE_GRAD_STATUS_Event_for_2018_program() throws JsonProcessingException {
         final var request = TestUtils.createGraduationStatus();
         final var event = TestUtils.createEvent("CREATE_GRAD_STATUS", request, eventRepository);
         this.gradStatusCreateService.processEvent(request, event);
@@ -50,4 +50,129 @@ public class GradStatusCreateServiceTest {
         final var traxStudent = this.traxStudentRepository.findById(StringUtils.rightPad(request.getPen(), 10));
         assertThat(traxStudent).isPresent();
     }
+
+    @Test
+    public void testProcessEvent_givenCREATE_GRAD_STATUS_Event_for_2004_program() throws JsonProcessingException {
+        final var request = TestUtils.createGraduationStatus();
+        request.setProgram("2004-EN");
+        final var event = TestUtils.createEvent("CREATE_GRAD_STATUS", request, eventRepository);
+        this.gradStatusCreateService.processEvent(request, event);
+
+        final var traxStudent = this.traxStudentRepository.findById(StringUtils.rightPad(request.getPen(), 10));
+        assertThat(traxStudent).isPresent();
+    }
+
+    @Test
+    public void testProcessEvent_givenCREATE_GRAD_STATUS_Event_for_1996_program() throws JsonProcessingException {
+        final var request = TestUtils.createGraduationStatus();
+        request.setProgram("1996-EN");
+        final var event = TestUtils.createEvent("CREATE_GRAD_STATUS", request, eventRepository);
+        this.gradStatusCreateService.processEvent(request, event);
+
+        final var traxStudent = this.traxStudentRepository.findById(StringUtils.rightPad(request.getPen(), 10));
+        assertThat(traxStudent).isPresent();
+    }
+
+    @Test
+    public void testProcessEvent_givenCREATE_GRAD_STATUS_Event_for_1986_program() throws JsonProcessingException {
+        final var request = TestUtils.createGraduationStatus();
+        request.setProgram("1986-EN");
+        final var event = TestUtils.createEvent("CREATE_GRAD_STATUS", request, eventRepository);
+        this.gradStatusCreateService.processEvent(request, event);
+
+        final var traxStudent = this.traxStudentRepository.findById(StringUtils.rightPad(request.getPen(), 10));
+        assertThat(traxStudent).isPresent();
+    }
+
+    @Test
+    public void testProcessEvent_givenCREATE_GRAD_STATUS_Event_for_1950_program() throws JsonProcessingException {
+        final var request = TestUtils.createGraduationStatus();
+        request.setProgram("1950");
+        final var event = TestUtils.createEvent("CREATE_GRAD_STATUS", request, eventRepository);
+        this.gradStatusCreateService.processEvent(request, event);
+
+        final var traxStudent = this.traxStudentRepository.findById(StringUtils.rightPad(request.getPen(), 10));
+        assertThat(traxStudent).isPresent();
+    }
+
+    @Test
+    public void testProcessEvent_givenCREATE_GRAD_STATUS_Event_for_SCCP_program() throws JsonProcessingException {
+        final var request = TestUtils.createGraduationStatus();
+        request.setProgram("SCCP");
+        final var event = TestUtils.createEvent("CREATE_GRAD_STATUS", request, eventRepository);
+        this.gradStatusCreateService.processEvent(request, event);
+
+        final var traxStudent = this.traxStudentRepository.findById(StringUtils.rightPad(request.getPen(), 10));
+        assertThat(traxStudent).isPresent();
+    }
+
+    @Test
+    public void testProcessEvent_givenCREATE_GRAD_STATUS_Event_for_2018_program_withArchivedStatus() throws JsonProcessingException {
+        final var request = TestUtils.createGraduationStatus();
+        request.setStudentStatus("ARC");
+        final var event = TestUtils.createEvent("CREATE_GRAD_STATUS", request, eventRepository);
+        this.gradStatusCreateService.processEvent(request, event);
+
+        final var traxStudent = this.traxStudentRepository.findById(StringUtils.rightPad(request.getPen(), 10));
+        assertThat(traxStudent).isPresent();
+    }
+
+    @Test
+    public void testProcessEvent_givenCREATE_GRAD_STATUS_Event_for_2018_program_withDeceasedStatus() throws JsonProcessingException {
+        final var request = TestUtils.createGraduationStatus();
+        request.setStudentStatus("DEC");
+        final var event = TestUtils.createEvent("CREATE_GRAD_STATUS", request, eventRepository);
+        this.gradStatusCreateService.processEvent(request, event);
+
+        final var traxStudent = this.traxStudentRepository.findById(StringUtils.rightPad(request.getPen(), 10));
+        assertThat(traxStudent).isPresent();
+    }
+
+    @Test
+    public void testProcessEvent_givenCREATE_GRAD_STATUS_Event_for_2018_program_withTerminatedStatus() throws JsonProcessingException {
+        final var request = TestUtils.createGraduationStatus();
+        request.setStudentStatus("TER");
+        final var event = TestUtils.createEvent("CREATE_GRAD_STATUS", request, eventRepository);
+        this.gradStatusCreateService.processEvent(request, event);
+
+        final var traxStudent = this.traxStudentRepository.findById(StringUtils.rightPad(request.getPen(), 10));
+        assertThat(traxStudent).isPresent();
+    }
+
+    @Test
+    public void testProcessEvent_givenCREATE_GRAD_STATUS_Event_for_2004_program_withArchivedStatus() throws JsonProcessingException {
+        final var request = TestUtils.createGraduationStatus();
+        request.setProgram("2004-EN");
+        request.setStudentStatus("ARC");
+        final var event = TestUtils.createEvent("CREATE_GRAD_STATUS", request, eventRepository);
+        this.gradStatusCreateService.processEvent(request, event);
+
+        final var traxStudent = this.traxStudentRepository.findById(StringUtils.rightPad(request.getPen(), 10));
+        assertThat(traxStudent).isPresent();
+    }
+
+    @Test
+    public void testProcessEvent_givenCREATE_GRAD_STATUS_Event_for_2004_program_withDeceasedStatus() throws JsonProcessingException {
+        final var request = TestUtils.createGraduationStatus();
+        request.setProgram("2004-EN");
+        request.setStudentStatus("DEC");
+        final var event = TestUtils.createEvent("CREATE_GRAD_STATUS", request, eventRepository);
+        this.gradStatusCreateService.processEvent(request, event);
+
+        final var traxStudent = this.traxStudentRepository.findById(StringUtils.rightPad(request.getPen(), 10));
+        assertThat(traxStudent).isPresent();
+    }
+
+    @Test
+    public void testProcessEvent_givenCREATE_GRAD_STATUS_Event_for_1996_program_withMergedStatus() throws JsonProcessingException {
+        final var request = TestUtils.createGraduationStatus();
+        request.setProgram("1996-EN");
+        request.setStudentStatus("MER");
+        final var event = TestUtils.createEvent("CREATE_GRAD_STATUS", request, eventRepository);
+        this.gradStatusCreateService.processEvent(request, event);
+
+        final var traxStudent = this.traxStudentRepository.findById(StringUtils.rightPad(request.getPen(), 10));
+        assertThat(traxStudent).isPresent();
+    }
+
 }

@@ -16,19 +16,15 @@
         <sonar.exclusions>
             src/main/resources/**,
             src/main/java/ca/bc/gov/educ/api/trax/config/**,
+            src/main/java/ca/bc/gov/educ/api/trax/constant/**,
+            src/main/java/ca/bc/gov/educ/api/trax/choreographer/**,
             src/main/java/ca/bc/gov/educ/api/trax/exception/**,
             src/main/java/ca/bc/gov/educ/api/trax/model/**,
             src/main/java/ca/bc/gov/educ/api/trax/util/**
         </sonar.exclusions>
         <sonar.coverage.exclusions>
-            src/main/resources/**,
-            src/main/java/ca/bc/gov/educ/api/trax/config/**,
-            src/main/java/ca/bc/gov/educ/api/trax/constant/**,
             src/main/java/ca/bc/gov/educ/api/trax/messaging/**,
-            src/main/java/ca/bc/gov/educ/api/trax/exception/**,
-            src/main/java/ca/bc/gov/educ/api/trax/model/**,
-            src/main/java/ca/bc/gov/educ/api/trax/scheduler/**,
-            src/main/java/ca/bc/gov/educ/api/trax/util/**
+            src/main/java/ca/bc/gov/educ/api/trax/scheduler/**
         </sonar.coverage.exclusions>
         <java.version>11</java.version>
         <maven.compiler.version>3.8.0</maven.compiler.version>
