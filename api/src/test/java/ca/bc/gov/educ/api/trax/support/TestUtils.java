@@ -7,7 +7,6 @@ import ca.bc.gov.educ.api.trax.util.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.UUID;
 
 import static ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants.DEFAULT_CREATED_BY;
@@ -20,7 +19,7 @@ public class TestUtils {
         graduationStatus.setPen("123456789 ");
         graduationStatus.setStudentID(UUID.randomUUID());
         graduationStatus.setProgram("2018-EN");
-        graduationStatus.setStudentStatus("A");
+        graduationStatus.setStudentStatus("CUR");
         graduationStatus.setRecalculateGradStatus("Y");
         graduationStatus.setSchoolOfRecord("111222333");
         return graduationStatus;

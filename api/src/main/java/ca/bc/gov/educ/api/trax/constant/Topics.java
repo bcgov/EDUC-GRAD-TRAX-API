@@ -7,5 +7,10 @@ public enum Topics {
   /**
    * GradStatus events topic topics.
    */
-  GRAD_STATUS_EVENTS_TOPIC
+  GRAD_STATUS_EVENTS_TOPIC,
+  /**
+   * TraxUpdate events topic topics.
+   */
+  TRAX_UPDATE_EVENTS_TOPIC,
+
 }

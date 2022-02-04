@@ -18,8 +18,7 @@ public class GradCountryTransformer {
     ModelMapper modelMapper;
 
     public GradCountry transformToDTO (GradCountryEntity gradProgramEntity) {
-    	GradCountry gradCountry = modelMapper.map(gradProgramEntity, GradCountry.class);
-        return gradCountry;
+    	return modelMapper.map(gradProgramEntity, GradCountry.class);
     }
 
     public GradCountry transformToDTO ( Optional<GradCountryEntity> gradProgramEntity ) {
@@ -27,8 +26,7 @@ public class GradCountryTransformer {
         if (gradProgramEntity.isPresent())
             cae = gradProgramEntity.get();
 
-        GradCountry gradCountry = modelMapper.map(cae, GradCountry.class);
-        return gradCountry;
+        return modelMapper.map(cae, GradCountry.class);
     }
 
 	public List<GradCountry> transformToDTO (List<GradCountryEntity> gradCountryEntities ) {
@@ -42,7 +40,6 @@ public class GradCountryTransformer {
     }
 
     public GradCountryEntity transformToEntity(GradCountry gradCountry) {
-        GradCountryEntity gradCountryEntity = modelMapper.map(gradCountry, GradCountryEntity.class);
-        return gradCountryEntity;
+        return modelMapper.map(gradCountry, GradCountryEntity.class);
     }
 }

@@ -17,15 +17,12 @@ public class DistrictTransformer {
     ModelMapper modelMapper;
 
     public District transformToDTO (DistrictEntity districtEntity) {
-        District district = modelMapper.map(districtEntity, District.class);
-        return district;
+        return modelMapper.map(districtEntity, District.class);
     }
 
     public District transformToDTO ( Optional<DistrictEntity> districtEntity ) {
-        DistrictEntity cae = new DistrictEntity();
-
         if (districtEntity.isPresent()) {
-            cae = districtEntity.get();
+            DistrictEntity cae = districtEntity.get();
 	        District district = modelMapper.map(cae, District.class);
 	        return district;
         }
@@ -33,12 +30,10 @@ public class DistrictTransformer {
     }
 
 	public List<District> transformToDTO (Iterable<DistrictEntity> districtEntities ) {
-
-        List<District> districtList = new ArrayList<District>();
+        List<District> districtList = new ArrayList<>();
 
         for (DistrictEntity districtEntity : districtEntities) {
-            District district = new District();
-            district = modelMapper.map(districtEntity, District.class);            
+            District district = modelMapper.map(districtEntity, District.class);
             districtList.add(district);
         }
 
@@ -46,7 +41,6 @@ public class DistrictTransformer {
     }
 
     public DistrictEntity transformToEntity(District district) {
-        DistrictEntity districtEntity = modelMapper.map(district, DistrictEntity.class);
-        return districtEntity;
+        return modelMapper.map(district, DistrictEntity.class);
     }
 }

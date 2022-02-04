@@ -11,5 +11,9 @@ public enum EventStatus {
   /**
    * Message processed event status.
    */
-  PROCESSED
+  PROCESSED,
+  /**
+   * Message published event status.
+   */
+  MESSAGE_PUBLISHED
 }

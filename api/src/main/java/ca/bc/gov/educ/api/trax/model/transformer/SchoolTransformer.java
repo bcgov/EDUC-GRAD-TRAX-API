@@ -17,28 +17,22 @@ public class SchoolTransformer {
     ModelMapper modelMapper;
 
     public School transformToDTO (SchoolEntity schoolEntity) {
-        School school = modelMapper.map(schoolEntity, School.class);
-        return school;
+        return modelMapper.map(schoolEntity, School.class);
     }
 
     public School transformToDTO ( Optional<SchoolEntity> schoolEntity ) {
-        SchoolEntity cae = new SchoolEntity();
-
         if (schoolEntity.isPresent()) {
-            cae = schoolEntity.get();
-	        School school = modelMapper.map(cae, School.class);
-	        return school;
+            SchoolEntity cae = schoolEntity.get();
+	       return modelMapper.map(cae, School.class);
         }
         return null;
     }
 
 	public List<School> transformToDTO (Iterable<SchoolEntity> schoolEntities ) {
-
-        List<School> schoolList = new ArrayList<School>();
+        List<School> schoolList = new ArrayList<>();
 
         for (SchoolEntity schoolEntity : schoolEntities) {
-            School school = new School();
-            school = modelMapper.map(schoolEntity, School.class);            
+            School school = modelMapper.map(schoolEntity, School.class);
             schoolList.add(school);
         }
 
@@ -46,7 +40,6 @@ public class SchoolTransformer {
     }
 
     public SchoolEntity transformToEntity(School school) {
-        SchoolEntity schoolEntity = modelMapper.map(school, SchoolEntity.class);
-        return schoolEntity;
+        return modelMapper.map(school, SchoolEntity.class);
     }
 }
