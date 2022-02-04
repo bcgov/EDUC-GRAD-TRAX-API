@@ -13,6 +13,7 @@ import ca.bc.gov.educ.api.trax.repository.TraxUpdateInGradRepository;
 import ca.bc.gov.educ.api.trax.repository.TraxUpdatedPubEventRepository;
 import ca.bc.gov.educ.api.trax.util.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import net.javacrumbs.shedlock.core.LockAssert;
 import org.apache.commons.lang3.time.DateUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -125,6 +126,41 @@ public class TraxUpdateServiceTest {
         when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
 
         traxUpdateService.process(Arrays.asList(traxUpdateInGradEntity));
+
+        assertThatNoException();
+    }
+
+    @Test
+    public void testScheduledRunForTraxUpdates() throws JsonProcessingException {
+        LockAssert.TestHelper.makeAllAssertsPass(true);
+
+        TraxUpdateInGradEntity traxUpdateInGradEntity = new TraxUpdateInGradEntity();
+        traxUpdateInGradEntity.setPen("123456789");
+        traxUpdateInGradEntity.setUpdateType("STUDENT");
+        traxUpdateInGradEntity.setStatus("OUTSTANDING");
+        traxUpdateInGradEntity.setUpdateDate(DateUtils.addDays(new Date(), -1));
+
+        TraxUpdateInGrad traxUpdateInGrad = traxUpdateInGradTransformer.transformToDTO(traxUpdateInGradEntity);
+        String jsonString = JsonUtil.getJsonStringFromObject(traxUpdateInGrad);
+
+        TraxUpdatedPubEvent traxUpdatedPubEvent = TraxUpdatedPubEvent.builder()
+                .eventType(EventType.UPDATE_TRAX_STUDENT_MASTER.toString())
+                .eventId(UUID.randomUUID())
+                .eventOutcome(EventOutcome.TRAX_STUDENT_MASTER_UPDATED.toString())
+                .activityCode(traxUpdateInGradEntity.getUpdateType())
+                .eventPayload(jsonString)
+                .eventStatus(DB_COMMITTED.toString())
+                .createUser(DEFAULT_CREATED_BY)
+                .updateUser(DEFAULT_UPDATED_BY)
+                .createDate(LocalDateTime.now())
+                .updateDate(LocalDateTime.now())
+                .build();
+
+        when(traxUpdateInGradRepository.findOutstandingUpdates(any())).thenReturn(Arrays.asList(traxUpdateInGradEntity));
+        when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
+
+        traxUpdateService.scheduledRunForTraxUpdates();
+
         assertThatNoException();
     }
 }
