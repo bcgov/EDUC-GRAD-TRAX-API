@@ -27,22 +27,19 @@ public class GradProvinceTransformer {
         if (gradProgramEntity.isPresent())
             cae = gradProgramEntity.get();
 
-        GradProvince gradProvince = modelMapper.map(cae, GradProvince.class);
-        return gradProvince;
+        return modelMapper.map(cae, GradProvince.class);
     }
 
 	public List<GradProvince> transformToDTO (Iterable<GradProvinceEntity> gradProvinceEntities ) {
 		List<GradProvince> gradProvinceList = new ArrayList<GradProvince>();
         for (GradProvinceEntity gradProvinceEntity : gradProvinceEntities) {
-        	GradProvince gradProvince = new GradProvince();
-        	gradProvince = modelMapper.map(gradProvinceEntity, GradProvince.class);            
+            GradProvince gradProvince = modelMapper.map(gradProvinceEntity, GradProvince.class);
         	gradProvinceList.add(gradProvince);
         }
         return gradProvinceList;
     }
 
     public GradProvinceEntity transformToEntity(GradProvince gradProvince) {
-        GradProvinceEntity gradProvinceEntity = modelMapper.map(gradProvince, GradProvinceEntity.class);
-        return gradProvinceEntity;
+        return modelMapper.map(gradProvince, GradProvinceEntity.class);
     }
 }

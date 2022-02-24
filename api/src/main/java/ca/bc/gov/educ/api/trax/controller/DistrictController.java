@@ -53,8 +53,6 @@ public class DistrictController {
             District distResponse = districtService.getDistrictDetails(distCode);
             if (distResponse != null) {
                 return response.GET(distResponse);
-            } else {
-                return null;
             }
         }
         return null;

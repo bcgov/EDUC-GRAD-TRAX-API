@@ -62,9 +62,12 @@ public class Subscriber {
   private void initializeStreamTopicMap() {
     final List<String> gradStatusEventsTopics = new ArrayList<>();
     gradStatusEventsTopics.add(Topics.GRAD_STATUS_EVENTS_TOPIC.name());
-    this.streamTopicsMap.put(EducGradTraxApiConstants.STREAM_NAME, gradStatusEventsTopics);
-  }
+    this.streamTopicsMap.put(EducGradTraxApiConstants.GRAD_STREAM_NAME, gradStatusEventsTopics);
 
+    final List<String> traxUpdatedEventsTopics = new ArrayList<>();
+    traxUpdatedEventsTopics.add(Topics.TRAX_UPDATE_EVENTS_TOPIC.name());
+    this.streamTopicsMap.put(EducGradTraxApiConstants.TRAX_STREAM_NAME, traxUpdatedEventsTopics);
+  }
 
   @PostConstruct
   public void subscribe() throws IOException, JetStreamApiException {
