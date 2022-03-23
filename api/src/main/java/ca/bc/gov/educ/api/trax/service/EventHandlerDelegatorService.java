@@ -47,19 +47,19 @@ public class EventHandlerDelegatorService {
                 this.choreographedEventPersistenceService.updateEventStatus(choreographedEvent);
                 if (message.isJetStream()) {
                     message.ack();
-                    log.info("acknowledged to Jet Stream for TRAX UPDATE EVENT sent...");
+                    log.warn("acknowledged to Jet Stream for TRAX UPDATE EVENT sent...");
                 }
             } else {
                 final var persistedEvent = this.choreographedEventPersistenceService.persistEventToDB(choreographedEvent);
                 if (message.isJetStream()) {
                     message.ack(); // acknowledge to Jet Stream that api got the message and it is now in DB.
-                    log.info("acknowledged to Jet Stream for GRAD STATUS EVENT received...");
+                    log.warn("acknowledged to Jet Stream for GRAD STATUS EVENT received...");
                 }
                 this.choreographer.handleEvent(persistedEvent);
             }
         } catch (final BusinessException businessException) {
             message.ack(); // acknowledge to Jet Stream that api got the message already...
-            log.info("acknowledged to Jet Stream for exception...");
+            log.error("acknowledged to Jet Stream for exception...");
         }
     }
 }
