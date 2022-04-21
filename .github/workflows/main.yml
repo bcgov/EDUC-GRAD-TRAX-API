@@ -1,18 +1,15 @@
-name: API CI
+name: Build
 on:
   push:
     branches:
-      - main
-      - release/*
+      - main # or the name of your main branch
   pull_request:
     branches:
       - main
       - release/*
-    paths:
-      - 'api/**'
 jobs:
-  quality_profile:
-    name: Build and test
+  build:
+    name: Build
     runs-on: ubuntu-latest
     defaults:
       run:
