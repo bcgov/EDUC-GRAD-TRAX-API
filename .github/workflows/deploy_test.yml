@@ -10,9 +10,8 @@ env:
 
   SPRING_BOOT_IMAGE_NAME: educ-grad-trax-api-dc
 
-  REPO_NAME: "educ-edx-api"
+  REPO_NAME: "educ-grad-trax-api"
   NAMESPACE: ${{ secrets.GRAD_NAMESPACE_NO_ENV }}
-  TAG: "latest"
 
 on:
   # https://docs.github.com/en/actions/reference/events-that-trigger-workflows
