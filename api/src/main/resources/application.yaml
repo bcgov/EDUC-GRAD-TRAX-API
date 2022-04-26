@@ -110,3 +110,8 @@ cron:
 trax:
   update:
     enabled: ${ENABLE_TRAX_UPDATE}
+
+#Splunk LogHelper
+splunk:
+  log-helper:
+    enabled: ${ENABLE_SPLUNK_LOG_HELPER}
