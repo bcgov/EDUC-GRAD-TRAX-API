@@ -55,7 +55,7 @@ public class Publisher {
       if (exception.getErrorCode() == 404) { // the stream does not exist , lets create it.
         natsConnection.jetStreamManagement().addStream(streamConfiguration);
       } else {
-        log.info("exception", exception);
+        log.error("exception", exception);
       }
     }
 
@@ -78,7 +78,7 @@ public class Publisher {
       choreographedEvent.setCreateUser(traxUpdatedPubEvent.getCreateUser());
       choreographedEvent.setUpdateUser(traxUpdatedPubEvent.getUpdateUser());
       try {
-        log.info("Broadcasting replicationEvent :: {}", choreographedEvent);
+        log.debug("Broadcasting replicationEvent :: {}", choreographedEvent);
         val pub = this.jetStream.publishAsync(TRAX_UPDATE_EVENTS_TOPIC.toString(), JsonUtil.getJsonBytesFromObject(choreographedEvent));
         pub.thenAcceptAsync(result -> log.info("Event ID :: {} Published to JetStream :: {}", traxUpdatedPubEvent.getEventId(), result.getSeqno()));
       } catch (IOException e) {
