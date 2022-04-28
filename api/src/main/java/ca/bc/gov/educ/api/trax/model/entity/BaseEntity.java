@@ -1,5 +1,7 @@
 package ca.bc.gov.educ.api.trax.model.entity;
 
+import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
+import ca.bc.gov.educ.api.trax.util.ThreadLocalStateUtil;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
@@ -26,8 +28,18 @@ public class BaseEntity {
 	
 	@PrePersist
 	protected void onCreate() {
-		this.updateUser = "API_GRAD_TRAX";
-		this.createUser = "API_GRAD_TRAX";
+		if (StringUtils.isBlank(createUser)) {
+			this.createUser = ThreadLocalStateUtil.getCurrentUser();
+			if (StringUtils.isBlank(createUser)) {
+				this.createUser = EducGradTraxApiConstants.DEFAULT_CREATED_BY;
+			}
+		}
+		if (StringUtils.isBlank(updateUser)) {
+			this.updateUser = ThreadLocalStateUtil.getCurrentUser();
+			if (StringUtils.isBlank(updateUser)) {
+				this.updateUser = EducGradTraxApiConstants.DEFAULT_UPDATED_BY;
+			}
+		}
 		this.createDate = new Date(System.currentTimeMillis());
 		this.updateDate = new Date(System.currentTimeMillis());
 	}
@@ -35,9 +47,17 @@ public class BaseEntity {
 	@PreUpdate
 	protected void onPersist() {
 		this.updateDate = new Date(System.currentTimeMillis());
-		this.updateUser = "API_GRAD_TRAX";
+		if (StringUtils.isBlank(updateUser)) {
+			this.updateUser = ThreadLocalStateUtil.getCurrentUser();
+			if (StringUtils.isBlank(updateUser)) {
+				this.updateUser = EducGradTraxApiConstants.DEFAULT_UPDATED_BY;
+			}
+		}
 		if (StringUtils.isBlank(createUser)) {
-			createUser = "API_GRAD_TRAX";
+			this.createUser = ThreadLocalStateUtil.getCurrentUser();
+			if (StringUtils.isBlank(createUser)) {
+				this.createUser = EducGradTraxApiConstants.DEFAULT_CREATED_BY;
+			}
 		}
 		if (this.createDate == null) {
 			this.createDate = new Date(System.currentTimeMillis());
