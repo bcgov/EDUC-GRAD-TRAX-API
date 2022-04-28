@@ -18,14 +18,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping(EducGradTraxApiConstants.GRAD_TRAX_CODE_URL_MAPPING)
-@EnableResourceServer
 @CrossOrigin
 @OpenAPIDefinition(info = @Info(title = "API for TRAX Code Tables Data.",
         description = "This API is for Reading TRAX Code Tables data.", version = "1"),

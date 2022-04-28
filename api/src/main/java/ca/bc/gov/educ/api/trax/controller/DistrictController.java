@@ -1,9 +1,7 @@
 package ca.bc.gov.educ.api.trax.controller;
 
 import ca.bc.gov.educ.api.trax.model.dto.District;
-import ca.bc.gov.educ.api.trax.model.dto.School;
 import ca.bc.gov.educ.api.trax.service.DistrictService;
-import ca.bc.gov.educ.api.trax.service.SchoolService;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.GradValidation;
 import ca.bc.gov.educ.api.trax.util.PermissionsConstants;
@@ -19,14 +17,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @CrossOrigin
 @RestController
-@EnableResourceServer
 @RequestMapping(EducGradTraxApiConstants.GRAD_DISTRICT_URL_MAPPING)
 @OpenAPIDefinition(info = @Info(title = "API for School Data.", description = "This Read API is for Reading school data.", version = "1"),
 		security = {@SecurityRequirement(name = "OAUTH2", scopes = {"READ_GRAD_SCHOOL_DATA"})})

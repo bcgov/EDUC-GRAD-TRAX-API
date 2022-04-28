@@ -15,16 +15,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @CrossOrigin
 @RestController
 @RequestMapping(EducGradTraxApiConstants.GRAD_PSI_URL_MAPPING)
-@EnableResourceServer
 @OpenAPIDefinition(info = @Info(title = "API for PSI Data.", description = "This API is for PSI.", version = "1"))
 public class PsiController {
 
