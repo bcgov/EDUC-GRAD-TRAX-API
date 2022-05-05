@@ -63,4 +63,21 @@ public final class LogHelper {
     }
   }
 
+  /**
+   * log message details
+   * the message is a string.
+   *
+   * @param message string
+   */
+  public static void logMessage(final String message, final boolean logging) {
+    if (!logging) return;
+    try {
+      MDC.putCloseable("msg", message);
+      log.info("");
+      MDC.clear();
+    } catch (final Exception exception) {
+      log.error(EXCEPTION, exception);
+    }
+  }
+
 }
