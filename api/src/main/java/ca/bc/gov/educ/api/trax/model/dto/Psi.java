@@ -41,7 +41,7 @@ public class Psi {
 	}
 	
 	public String getAddress3() {
-		return address3 != null ? address2.trim(): null;
+		return address3 != null ? address3.trim(): null;
 	}
 
 	public String getCity() {
