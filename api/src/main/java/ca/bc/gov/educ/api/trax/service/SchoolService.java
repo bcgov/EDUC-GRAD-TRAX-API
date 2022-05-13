@@ -119,4 +119,8 @@ public class SchoolService {
 	    }
         return criteria;
     }
+
+	public boolean existsSchool(String minCode) {
+		return schoolRepository.countTabSchools(minCode) > 0L;
+	}
 }

@@ -74,4 +74,13 @@ public class SchoolController {
     		@RequestParam(value = "mincode", required = false) String mincode) {
 		return response.GET(schoolService.getSchoolsByParams(schoolName,mincode));
     }
+
+    @GetMapping(EducGradTraxApiConstants.CHECK_SCHOOL_BY_CODE_MAPPING)
+    @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
+    @Operation(summary = "Check school existence by Mincode", description = "Check school existence by Mincode", tags = { "School" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "204", description = "NO CONTENT")})
+    public ResponseEntity<Boolean> checkSchoolExists(@PathVariable String minCode) {
+        return response.GET(schoolService.existsSchool(minCode));
+    }
 }
