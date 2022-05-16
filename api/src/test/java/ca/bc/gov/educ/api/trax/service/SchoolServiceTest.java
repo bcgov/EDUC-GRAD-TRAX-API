@@ -182,4 +182,12 @@ public class SchoolServiceTest {
         assertThat(result.get(0).getMinCode()).isEqualTo("1234567");
         assertThat(result.get(0).getSchoolName()).isEqualTo("Test School");
     }
+
+    @Test
+    public void testExistsSchool() {
+        when(schoolRepository.countTabSchools(eq("1234567"))).thenReturn(1L);
+        var result = schoolService.existsSchool("1234567");
+        assertThat(result).isNotNull();
+        assertThat(result).isTrue();
+    }
 }
