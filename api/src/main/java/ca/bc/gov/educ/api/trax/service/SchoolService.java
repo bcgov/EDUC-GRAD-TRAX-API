@@ -70,18 +70,19 @@ public class SchoolService {
 			District dist = districtTransformer.transformToDTO(districtRepository.findById(school.getMinCode().substring(0, 3)));
 			if(dist != null)
 				school.setDistrictName(dist.getDistrictName());
-			if(StringUtils.isNotBlank(school.getCountryCode())) {
-				GradCountry country = codeService.getSpecificCountryCode(school.getCountryCode());
-		        if(country != null) {
-		        	school.setCountryName(country.getCountryName());
-				}
-			}
-			if(StringUtils.isNotBlank(school.getProvCode())) {
-				GradProvince province = codeService.getSpecificProvinceCode(school.getProvCode());
-		        if(province != null) {
-		        	school.setProvinceName(province.getProvName());
-				}
-			}
+			// TODO (jsung) : block this until traxlink is effective
+//			if(StringUtils.isNotBlank(school.getCountryCode())) {
+//				GradCountry country = codeService.getSpecificCountryCode(school.getCountryCode());
+//		        if(country != null) {
+//		        	school.setCountryName(country.getCountryName());
+//				}
+//			}
+//			if(StringUtils.isNotBlank(school.getProvCode())) {
+//				GradProvince province = codeService.getSpecificProvinceCode(school.getProvCode());
+//		        if(province != null) {
+//		        	school.setProvinceName(province.getProvName());
+//				}
+//			}
 		}
 		return school;
 	}
