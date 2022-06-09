@@ -32,6 +32,7 @@ public class EducGradTraxApiConstants {
     public static final String GRAD_SCHOOL_URL_MAPPING = GRAD_TRAX_API_ROOT_MAPPING + "/school";
     public static final String GRAD_DISTRICT_URL_MAPPING = GRAD_TRAX_API_ROOT_MAPPING + "/district";
     public static final String GRAD_PSI_URL_MAPPING = GRAD_TRAX_API_ROOT_MAPPING + "/psi";
+    public static final String GRAD_TRAX_COMMON_URL_MAPPING = GRAD_TRAX_API_ROOT_MAPPING + "/common";
 
 
     // Service Methods Mappings
@@ -41,6 +42,7 @@ public class EducGradTraxApiConstants {
     public static final String GET_ALL_PROVINCE_MAPPING = "/province";
     public static final String GET_ALL_PROVINCE_BY_CODE_MAPPING = "/province/{provinceCode}";
 
+    public static final String CHECK_SCHOOL_BY_CODE_MAPPING = "/check/{minCode}";
     public static final String GET_SCHOOL_BY_CODE_MAPPING = "/{minCode}";
     public static final String GET_SCHOOL_SEARCH_MAPPING = "/search";
 
@@ -48,7 +50,14 @@ public class EducGradTraxApiConstants {
     public static final String GET_PSI_SEARCH_MAPPING="/search";
 
     public static final String GET_DISTRICT_BY_DISTNO_MAPPING = "/{distCode}";
-    
+
+    public static final String GET_TRAX_STUDENT_MASTER_MAPPING = "/student-master/{pen}";
+    public static final String GET_TRAX_STUDENT_DEMOG_MAPPING = "/student-demog/{pen}";
+    public static final String GET_TRAX_STUDENT_NO_LIST_BY_PAGING_MAPPING = "/student-no-list/paginated";
+    public static final String GET_TOTAL_NUMBER_OF_TRAX_STUDENT_NO_LIST_MAPPING = "/student-no-list/total-count";
+    public static final String GET_COURSE_RESTRICTION_LIST_MAPPING = "/course-restrictions";
+    public static final String GET_COURSE_REQUIREMENT_LIST_MAPPING = "/course-requirements";
+    public static final String POST_SAVE_TRAX_STUDENT_NO_MAPPING = "/trax-student-no";
     
     //Default Attribute value constants
     public static final String DEFAULT_CREATED_BY = "API_GRAD_TRAX";

@@ -1,12 +1,10 @@
 package ca.bc.gov.educ.api.trax.config;
 
-import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
-import ca.bc.gov.educ.api.trax.util.GradValidation;
-import ca.bc.gov.educ.api.trax.util.LogHelper;
-import ca.bc.gov.educ.api.trax.util.ThreadLocalStateUtil;
+import ca.bc.gov.educ.api.trax.util.*;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -41,11 +39,14 @@ public class RequestInterceptor implements AsyncHandlerInterceptor {
 		}
 
 		// username
-		JwtAuthenticationToken authenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-		Jwt jwt = (Jwt) authenticationToken.getCredentials();
-		String email = (String) jwt.getClaims().get("email");
-		if (email != null) {
-			ThreadLocalStateUtil.setCurrentUser(email);
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth instanceof JwtAuthenticationToken) {
+			JwtAuthenticationToken authenticationToken = (JwtAuthenticationToken) auth;
+			Jwt jwt = (Jwt) authenticationToken.getCredentials();
+			String username = JwtUtil.getName(jwt);
+			if (username != null) {
+				ThreadLocalStateUtil.setCurrentUser(username);
+			}
 		}
 		return true;
 	}

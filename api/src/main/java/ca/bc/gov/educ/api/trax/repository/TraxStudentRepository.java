@@ -10,4 +10,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TraxStudentRepository extends CrudRepository<TraxStudentEntity, String> {
 
+
 }
