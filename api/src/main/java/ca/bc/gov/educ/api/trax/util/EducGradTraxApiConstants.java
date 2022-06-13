@@ -25,7 +25,7 @@ public class EducGradTraxApiConstants {
     public static final String API_VERSION = "v1";
 
     // API Root Mapping
-    public static final String GRAD_TRAX_API_ROOT_MAPPING = "/api/" + API_VERSION;
+    public static final String GRAD_TRAX_API_ROOT_MAPPING = "/api/" + API_VERSION+"/trax";
 
     // Controller Mappings
     public static final String GRAD_TRAX_CODE_URL_MAPPING = GRAD_TRAX_API_ROOT_MAPPING + "/code";
