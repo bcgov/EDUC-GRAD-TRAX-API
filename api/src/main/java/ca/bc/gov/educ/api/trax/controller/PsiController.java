@@ -62,7 +62,9 @@ public class PsiController {
     		@RequestParam(value = "psiName", required = false) String psiName,
     		@RequestParam(value = "psiCode", required = false) String psiCode,
     		@RequestParam(value = "cslCode", required = false) String cslCode,
-    		@RequestParam(value = "transmissionMode", required = false) String transmissionMode) {
-		return response.GET(psiService.getPSIByParams(psiName,psiCode,cslCode,transmissionMode));
+    		@RequestParam(value = "transmissionMode", required = false) String transmissionMode,
+            @RequestParam(value = "openFlag", required = false) String openFlag,
+            @RequestParam(value = "psiGrouping", required = false) String psiGrouping) {
+		return response.GET(psiService.getPSIByParams(psiName,psiCode,cslCode,transmissionMode,openFlag,psiGrouping));
 	}
 }

@@ -64,8 +64,8 @@ public class PsiControllerTest {
         school.setPsiCode("1234567");
         school.setPsiName("Test Psi");
 
-        Mockito.when(psiService.getPSIByParams("Test Psi", "1234567", null,null)).thenReturn(Arrays.asList(school));
-        psiController.getPSIByParams("Test Psi","1234567", null, null);
-        Mockito.verify(psiService).getPSIByParams("Test Psi", "1234567", null,null);
+        Mockito.when(psiService.getPSIByParams("Test Psi", "1234567", null,null,null,null)).thenReturn(List.of(school));
+        psiController.getPSIByParams("Test Psi","1234567", null, null,null,null);
+        Mockito.verify(psiService).getPSIByParams("Test Psi", "1234567", null,null,null,null);
     }
 }

@@ -36,6 +36,8 @@ public class PsiService {
     @SuppressWarnings("unused")
 	private static Logger logger = LoggerFactory.getLogger(PsiService.class);
 
+
+    private static final String PSI_NAME = "psiName";
      /**
      * Get all Schools in PSI DTO
      */
@@ -62,17 +64,19 @@ public class PsiService {
 		return psi;
 	}
 
-	public List<Psi> getPSIByParams(String psiName, String psiCode, String cslCode, String transmissionMode) {
+	public List<Psi> getPSIByParams(String psiName, String psiCode, String cslCode, String transmissionMode,String openFlag,String psiGrouping) {
 		CriteriaHelper criteria = new CriteriaHelper();
         getSearchCriteria("psiCode", psiCode,"psiCode", criteria);
-        getSearchCriteria("psiName", psiName,"psiName", criteria);
+        getSearchCriteria(PSI_NAME, psiName,PSI_NAME, criteria);
         getSearchCriteria("cslCode", cslCode,"cslCode", criteria);
-        getSearchCriteria("transmissionMode",transmissionMode,"transmissionMode", criteria);        
-		return psiTransformer.transformToDTO(psiCriteriaQueryRepository.findByCriteria(criteria, PsiEntity.class));
+        getSearchCriteria("transmissionMode",transmissionMode,"transmissionMode", criteria);
+        getSearchCriteria("openFlag",openFlag,"openFlag", criteria);
+        getSearchCriteria("psiGrouping",psiGrouping,"psiGrouping", criteria);
+        return psiTransformer.transformToDTO(psiCriteriaQueryRepository.findByCriteria(criteria, PsiEntity.class));
 	}
 	
 	public CriteriaHelper getSearchCriteria(String roolElement, String value, String parameterType, CriteriaHelper criteria) {
-        if(parameterType.equalsIgnoreCase("psiName")) {
+        if(parameterType.equalsIgnoreCase(PSI_NAME)) {
         	if (StringUtils.isNotBlank(value)) {
                 if (StringUtils.contains(value, "*")) {
                     criteria.add(roolElement, OperationEnum.LIKE, StringUtils.strip(value.toUpperCase(), "*"));
