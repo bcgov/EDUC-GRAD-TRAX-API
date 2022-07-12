@@ -22,4 +22,9 @@ public class TswService {
     public TranscriptStudentDemog getTranscriptStudentDemog(String studNo) {
        return transcriptStudentDemogTransformer.transformToDTO(transcriptStudentDemogRepository.findById(studNo));
     }
+
+    public boolean isGraduated(String studNo) {
+        Integer count = transcriptStudentDemogRepository.countGradDateByPen(studNo);
+        return count != null && count.intValue() > 0;
+    }
 }
