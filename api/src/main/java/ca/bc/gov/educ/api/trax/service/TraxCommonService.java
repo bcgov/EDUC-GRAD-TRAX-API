@@ -32,17 +32,21 @@ public class TraxCommonService {
     private final TraxStudentNoTransformer traxStudentNoTransformer;
     private final GradCourseTransformer gradCourseTransformer;
 
+    private final TswService tswService;
+
     @Autowired
     public TraxCommonService(TraxStudentsLoadRepository traxStudentsLoadRepository,
                              TraxStudentNoRepository traxStudentNoRepository,
                              GradCourseRepository gradCourseRepository,
                              TraxStudentNoTransformer traxStudentNoTransformer,
-                             GradCourseTransformer gradCourseTransformer) {
+                             GradCourseTransformer gradCourseTransformer,
+                             TswService tswService) {
         this.traxStudentsLoadRepository = traxStudentsLoadRepository;
         this.traxStudentNoRepository = traxStudentNoRepository;
         this.gradCourseRepository = gradCourseRepository;
         this.traxStudentNoTransformer = traxStudentNoTransformer;
         this.gradCourseTransformer = gradCourseTransformer;
+        this.tswService = tswService;
     }
 
     // Pagination
@@ -60,7 +64,14 @@ public class TraxCommonService {
     // Student Master from TRAX
     @Transactional(readOnly = true)
     public List<ConvGradStudent> getStudentMasterDataFromTrax(String pen) {
-        List<Object[]> results = traxStudentsLoadRepository.loadTraxStudent(pen);
+        boolean isGraudated = tswService.isGraduated(pen);
+        List<Object[]> results;
+        if (isGraudated) {
+            results = traxStudentsLoadRepository.loadTraxGraduatedStudent(pen);
+        } else {
+            results = traxStudentsLoadRepository.loadTraxStudent(pen);
+        }
+
         return buildConversionGradStudents(results);
     }
 
@@ -224,6 +235,9 @@ public class TraxCommonService {
         // consumer education requirement met
         String consumerEducationRequirementMet = (String) fields[16];
 
+        // english cert
+        String englishCert = (String) fields[17];
+
         ConvGradStudent student = null;
         try {
             student = ConvGradStudent.builder()
@@ -236,6 +250,7 @@ public class TraxCommonService {
                     .studentStatus(studentStatus != null? studentStatus.toString() : null)
                     .archiveFlag(archiveFlag != null? archiveFlag.toString() : null)
                     .frenchCert(frenchCert)
+                    .englishCert(englishCert)
                     .graduationRequestYear(graduationRequestYear)
                     .programCodes(programCodes)
                     .graduated(isGraduated)
