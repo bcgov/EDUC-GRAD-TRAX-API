@@ -57,7 +57,7 @@ public class GradStatusCreateService extends BaseService {
                 GradSearchStudent pendemog = new GradSearchStudent();
                 populateTraxStudent(traxStudentEntity, pendemog);
                 // 2. Needs to transfer required fields from GraduationStatus to TraxStudentEntity
-                populateTraxStudent(traxStudentEntity, gradStatusCreate);
+                validateAndSetTraxStudentUpdate(traxStudentEntity, gradStatusCreate);
                 // below timeout is in milli seconds, so it is 10 seconds.
                 tx.begin();
                 em.createNativeQuery(this.buildInsert(traxStudentEntity)).setHint("javax.persistence.query.timeout", 10000).executeUpdate();

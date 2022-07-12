@@ -30,34 +30,71 @@ public abstract class BaseService implements EventService {
         return ret;
     }
 
-    protected void populateTraxStudent(TraxStudentEntity traxStudentEntity, GraduationStatus gradStatus) {
+    protected boolean validateAndSetTraxStudentUpdate(TraxStudentEntity traxStudentEntity, GraduationStatus gradStatus) {
+        boolean isUpdated = false;
         // Needs to update required fields from GraduationStatus to TraxStudentEntity
+        // GRAD Requested Year
         if (StringUtils.isNotBlank(gradStatus.getProgram())) {
             String year = convertProgramToYear(gradStatus.getProgram());
-            if (year != null) {
+            if (!StringUtils.equalsIgnoreCase(year, traxStudentEntity.getGradReqtYear())) {
+                isUpdated = true;
                 traxStudentEntity.setGradReqtYear(year);
             }
         }
+        // GRAD Date
         if (StringUtils.isNotBlank(gradStatus.getProgramCompletionDate())) {
             String gradDateStr = gradStatus.getProgramCompletionDate().replace("/", "");
-            if (NumberUtils.isDigits(gradDateStr)) {
+            if (NumberUtils.isDigits(gradDateStr) && NumberUtils.compare(Long.valueOf(gradDateStr), traxStudentEntity.getGradDate()) != 0) {
+                isUpdated = true;
                 traxStudentEntity.setGradDate(Long.valueOf(gradDateStr));
             }
-        } else {
+        } else if (traxStudentEntity.getGradDate() != null && traxStudentEntity.getGradDate() != 0L) {
+            isUpdated = true;
             traxStudentEntity.setGradDate(0L);
         }
-        traxStudentEntity.setMincode(gradStatus.getSchoolOfRecord());
-        traxStudentEntity.setMincodeGrad(gradStatus.getSchoolAtGrad());
-        traxStudentEntity.setStudGrade(gradStatus.getStudentGrade());
-        traxStudentEntity.setHonourFlag(gradStatus.getHonoursStanding());
+
+        // Mincode
+        if (!StringUtils.equalsIgnoreCase(gradStatus.getSchoolOfRecord(), traxStudentEntity.getMincode())) {
+            isUpdated = true;
+            traxStudentEntity.setMincode(gradStatus.getSchoolOfRecord());
+        }
+
+        // Mincode_Grad
+        if (!StringUtils.equalsIgnoreCase(gradStatus.getSchoolAtGrad(), traxStudentEntity.getMincodeGrad())) {
+            isUpdated = true;
+            traxStudentEntity.setMincodeGrad(gradStatus.getSchoolAtGrad());
+        }
+
+        // Student Grade
+        if (!StringUtils.equalsIgnoreCase(gradStatus.getStudentGrade(), traxStudentEntity.getStudGrade())) {
+            isUpdated = true;
+            traxStudentEntity.setStudGrade(gradStatus.getStudentGrade());
+        }
+
+        // Student Status
+        if (validateAndSetTraxStudentStatus(traxStudentEntity, gradStatus.getStudentStatus())) {
+            isUpdated = true;
+        }
+
+        // Honour Flag
+        if (!StringUtils.equalsIgnoreCase(gradStatus.getHonoursStanding(), traxStudentEntity.getHonourFlag())) {
+            isUpdated = true;
+            traxStudentEntity.setHonourFlag(gradStatus.getHonoursStanding());
+        }
+
+        // Current Date
         String currentDateStr = EducGradTraxApiUtils.formatDate(new Date(), EducGradTraxApiConstants.TRAX_DATE_FORMAT);
         if (NumberUtils.isDigits(currentDateStr)) {
             traxStudentEntity.setXcriptActvDate(Long.valueOf(currentDateStr));
         }
-        populateTraxStudentStatus(traxStudentEntity, gradStatus.getStudentStatus());
+
+        return isUpdated;
     }
 
-    private void populateTraxStudentStatus(TraxStudentEntity traxStudentEntity, String gradStudentStatus) {
+    private boolean validateAndSetTraxStudentStatus(TraxStudentEntity traxStudentEntity, String gradStudentStatus) {
+        String studStatus = traxStudentEntity.getStudStatus();
+        String archivedFlag = traxStudentEntity.getArchiveFlag();
+
         if (StringUtils.equals(gradStudentStatus, "CUR")) {
             traxStudentEntity.setStudStatus("A");
             traxStudentEntity.setArchiveFlag("A");
@@ -74,5 +111,15 @@ public abstract class BaseService implements EventService {
             traxStudentEntity.setStudStatus("T");
             traxStudentEntity.setArchiveFlag("I");
         }
+
+        if (!StringUtils.equalsIgnoreCase(studStatus, traxStudentEntity.getStudStatus())) {
+            return true;
+        }
+
+        if (!StringUtils.equalsIgnoreCase(archivedFlag, traxStudentEntity.getArchiveFlag())) {
+            return true;
+        }
+
+        return false; // status is not updated at all
     }
 }

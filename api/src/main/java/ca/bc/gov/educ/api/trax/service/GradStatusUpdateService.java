@@ -53,15 +53,20 @@ public class GradStatusUpdateService extends BaseService {
                 log.info("==========> Start - Trax Incremental Update: pen# [{}]", gradStatusUpdate.getPen());
                 TraxStudentEntity traxStudentEntity = existingStudent.get();
                 // Needs to update required fields from GraduationStatus to TraxStudentEntity
-                populateTraxStudent(traxStudentEntity, gradStatusUpdate);
-                // below timeout is in milli seconds, so it is 10 seconds.
-                tx.begin();
-                em.createNativeQuery(this.buildUpdate(traxStudentEntity.getGradReqtYear(),
-                        traxStudentEntity.getGradDate(), traxStudentEntity.getMincode(), traxStudentEntity.getMincodeGrad(),
-                        traxStudentEntity.getStudGrade(), traxStudentEntity.getStudStatus(), traxStudentEntity.getArchiveFlag(),
-                        traxStudentEntity.getHonourFlag(), traxStudentEntity.getXcriptActvDate(),
-                        traxStudentEntity.getStudNo())).setHint("javax.persistence.query.timeout", 10000).executeUpdate();
-                tx.commit();
+                boolean isUpdated = validateAndSetTraxStudentUpdate(traxStudentEntity, gradStatusUpdate);
+                if (isUpdated) {
+                    // below timeout is in milli seconds, so it is 10 seconds.
+                    tx.begin();
+                    em.createNativeQuery(this.buildUpdate(traxStudentEntity.getGradReqtYear(),
+                            traxStudentEntity.getGradDate(), traxStudentEntity.getMincode(), traxStudentEntity.getMincodeGrad(),
+                            traxStudentEntity.getStudGrade(), traxStudentEntity.getStudStatus(), traxStudentEntity.getArchiveFlag(),
+                            traxStudentEntity.getHonourFlag(), traxStudentEntity.getXcriptActvDate(),
+                            traxStudentEntity.getStudNo())).setHint("javax.persistence.query.timeout", 10000).executeUpdate();
+                    tx.commit();
+                    log.info("  === Update Transaction is committed! ===");
+                } else {
+                    log.info("  === Skip Transaction as no changes are detected!!! ===");
+                }
                 log.info("==========> End - Trax Incremental Update: pen# [{}]", gradStatusUpdate.getPen());
             }
 
