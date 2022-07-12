@@ -73,4 +73,44 @@ public class TswServiceTest {
         assertThat(result.getSchoolName()).isEqualTo(transcriptStudentDemogEntity.getSchoolName());
         assertThat(result.getStudNo()).isEqualTo(transcriptStudentDemogEntity.getStudNo());
     }
+
+    @Test
+    public void testStudentIsNotGraduated() {
+        // Student is graduated or not
+
+        final TranscriptStudentDemogEntity transcriptStudentDemogEntity = new TranscriptStudentDemogEntity();
+        transcriptStudentDemogEntity.setStudNo("123456789");
+        transcriptStudentDemogEntity.setFirstName("Test");
+        transcriptStudentDemogEntity.setLastName("QA");
+        transcriptStudentDemogEntity.setMincode("7654321");
+        transcriptStudentDemogEntity.setSchoolName("Test2 School");
+        transcriptStudentDemogEntity.setGradDate(0L);
+
+        when(transcriptStudentDemogRepository.countGradDateByPen(eq("123456789"))).thenReturn(0);
+
+        Boolean result = tswService.isGraduated(transcriptStudentDemogEntity.getStudNo());
+
+        assertThat(result).isNotNull();
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    public void testStudentIsGraduated() {
+        // Student is graduated or not
+
+        final TranscriptStudentDemogEntity transcriptStudentDemogEntity = new TranscriptStudentDemogEntity();
+        transcriptStudentDemogEntity.setStudNo("123456789");
+        transcriptStudentDemogEntity.setFirstName("Test");
+        transcriptStudentDemogEntity.setLastName("QA");
+        transcriptStudentDemogEntity.setMincode("7654321");
+        transcriptStudentDemogEntity.setSchoolName("Test2 School");
+        transcriptStudentDemogEntity.setGradDate(20201031L);
+
+        when(transcriptStudentDemogRepository.countGradDateByPen(eq("123456789"))).thenReturn(1);
+
+        Boolean result = tswService.isGraduated(transcriptStudentDemogEntity.getStudNo());
+
+        assertThat(result).isNotNull();
+        assertThat(result).isTrue();
+    }
 }

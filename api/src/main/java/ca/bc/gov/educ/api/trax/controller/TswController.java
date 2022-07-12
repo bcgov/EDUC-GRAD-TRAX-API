@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -43,7 +44,29 @@ public class TswController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
 			@ApiResponse(responseCode = "400", description = "BAD REQUEST")})
     public ResponseEntity<TranscriptStudentDemog> getTranscriptStudentDemogByPen(@PathVariable String pen) {
+        logger.debug("getTranscriptStudentDemogByPen : ");
+        validation.requiredField(pen, "Pen #");
+        if (validation.hasErrors()) {
+            validation.stopOnErrors();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
 		return response.GET(tswService.getTranscriptStudentDemog(pen));
     }
+
+    @GetMapping(EducGradTraxApiConstants.GET_TRANSCRIPT_STUDENT_GRADUATED_BY_PEN_MAPPING)
+    @PreAuthorize(PermissionsConstants.READ_GRAD_TRAX_STUDENT_DATA)
+    @Operation(summary = "Get student is graduated or not from TSW", description = "Find a student graduated or not", tags = { "TSW" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
+    public ResponseEntity<Boolean> getTranscriptStudentGraduatedByPen(@PathVariable String pen) {
+        logger.debug("getTranscriptStudentGraduatedByPen : ");
+        validation.requiredField(pen, "Pen #");
+        if (validation.hasErrors()) {
+            validation.stopOnErrors();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        return response.GET(tswService.isGraduated(pen));
+    }
+
 
 }

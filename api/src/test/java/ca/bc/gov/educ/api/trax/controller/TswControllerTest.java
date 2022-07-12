@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.trax.controller;
 
 import ca.bc.gov.educ.api.trax.model.dto.TranscriptStudentDemog;
 import ca.bc.gov.educ.api.trax.service.TswService;
+import ca.bc.gov.educ.api.trax.util.GradValidation;
 import ca.bc.gov.educ.api.trax.util.ResponseHelper;
 import org.junit.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,13 +21,16 @@ public class TswControllerTest {
     private TswService tswService;
 
     @Mock
+    GradValidation validation;
+
+    @Mock
     ResponseHelper responseHelper;
 
     @InjectMocks
     private TswController tswController;
 
     @Test
-    public void testGetPsiDetails() {
+    public void testGetTranscriptStudentDemogByPen() {
         TranscriptStudentDemog transcriptStudentDemog = new TranscriptStudentDemog();
         transcriptStudentDemog.setStudNo("123456789");
         transcriptStudentDemog.setFirstName("Test");
@@ -38,6 +42,13 @@ public class TswControllerTest {
         tswController.getTranscriptStudentDemogByPen("123456789");
         Mockito.verify(tswService).getTranscriptStudentDemog("123456789");
 
+    }
+
+    @Test
+    public void testGetTranscriptStudentGraduatedByPen() {
+        Mockito.when(tswService.isGraduated("123456789")).thenReturn(true);
+        tswController.getTranscriptStudentGraduatedByPen("123456789");
+        Mockito.verify(tswService).getTranscriptStudentDemog("123456789");
     }
 
 }
