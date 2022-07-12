@@ -64,9 +64,9 @@ public class TraxCommonService {
     // Student Master from TRAX
     @Transactional(readOnly = true)
     public List<ConvGradStudent> getStudentMasterDataFromTrax(String pen) {
-        boolean isGraudated = tswService.isGraduated(pen);
+        boolean isGraduated = tswService.isGraduated(pen);
         List<Object[]> results;
-        if (isGraudated) {
+        if (isGraduated) {
             results = traxStudentsLoadRepository.loadTraxGraduatedStudent(pen);
         } else {
             results = traxStudentsLoadRepository.loadTraxStudent(pen);
@@ -238,6 +238,9 @@ public class TraxCommonService {
         // english cert
         String englishCert = (String) fields[17];
 
+        // honour_flag
+        Character honourFlag = (Character) fields[18];
+
         ConvGradStudent student = null;
         try {
             student = ConvGradStudent.builder()
@@ -251,6 +254,7 @@ public class TraxCommonService {
                     .archiveFlag(archiveFlag != null? archiveFlag.toString() : null)
                     .frenchCert(frenchCert)
                     .englishCert(englishCert)
+                    .honoursStanding(honourFlag != null? honourFlag.toString() : null)
                     .graduationRequestYear(graduationRequestYear)
                     .programCodes(programCodes)
                     .graduated(isGraduated)
