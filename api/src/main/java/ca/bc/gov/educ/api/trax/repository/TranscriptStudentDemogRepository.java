@@ -7,7 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
- * The interface TRAX Student repository.
+ * The interface TSW Student Demog repository.
  */
 @Repository
 public interface TranscriptStudentDemogRepository extends CrudRepository<TranscriptStudentDemogEntity, String> {

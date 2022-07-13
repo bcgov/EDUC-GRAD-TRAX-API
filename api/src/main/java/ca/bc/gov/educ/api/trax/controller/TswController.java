@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.trax.controller;
 
+import ca.bc.gov.educ.api.trax.model.dto.TranscriptStudentCourse;
 import ca.bc.gov.educ.api.trax.model.dto.TranscriptStudentDemog;
 import ca.bc.gov.educ.api.trax.service.TswService;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
@@ -19,6 +20,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @CrossOrigin
 @RestController
@@ -40,7 +43,7 @@ public class TswController {
     
     @GetMapping(EducGradTraxApiConstants.GET_TRANSCRIPT_DEMOG_BY_PEN_MAPPING)
     @PreAuthorize(PermissionsConstants.READ_GRAD_TRAX_STUDENT_DATA)
-    @Operation(summary = "Get transcript student demographics data from TSW", description = "Find a transcript student demographics data", tags = { "TSW" })
+    @Operation(summary = "Get transcript student demographics data from TSW", description = "Find transcript student demographics data", tags = { "TSW" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
 			@ApiResponse(responseCode = "400", description = "BAD REQUEST")})
     public ResponseEntity<TranscriptStudentDemog> getTranscriptStudentDemogByPen(@PathVariable String pen) {
@@ -68,5 +71,19 @@ public class TswController {
         return response.GET(tswService.isGraduated(pen));
     }
 
+    @GetMapping(EducGradTraxApiConstants.GET_TRANSCRIPT_COURSE_BY_PEN_MAPPING)
+    @PreAuthorize(PermissionsConstants.READ_GRAD_TRAX_STUDENT_DATA)
+    @Operation(summary = "Get transcript student courses from TSW", description = "Find transcript student courses", tags = { "TSW" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
+    public ResponseEntity<List<TranscriptStudentCourse>> getTranscriptStudentCoursesByPen(@PathVariable String pen) {
+        logger.debug("getTranscriptStudentCoursesByPen : ");
+        validation.requiredField(pen, "Pen #");
+        if (validation.hasErrors()) {
+            validation.stopOnErrors();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        return response.GET(tswService.getTranscriptStudentCourses(pen));
+    }
 
 }
