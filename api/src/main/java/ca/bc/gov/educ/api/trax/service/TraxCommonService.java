@@ -74,7 +74,7 @@ public class TraxCommonService {
             results = traxStudentsLoadRepository.loadTraxStudent(pen);
         }
 
-        return buildConversionGradStudents(results);
+        return buildConversionGradStudents(results, isGraduated);
     }
 
     @Transactional(readOnly = true)
@@ -181,10 +181,10 @@ public class TraxCommonService {
         return traxStudentNo;
     }
 
-    private List<ConvGradStudent> buildConversionGradStudents(List<Object[]> traxStudents) {
+    private List<ConvGradStudent> buildConversionGradStudents(List<Object[]> traxStudents, boolean isGraduated) {
         List<ConvGradStudent> students = new ArrayList<>();
         traxStudents.forEach(result -> {
-            ConvGradStudent student = populateConvGradStudent(result);
+            ConvGradStudent student = populateConvGradStudent(result, isGraduated);
             if (student != null) {
                 students.add(student);
             }
@@ -202,7 +202,7 @@ public class TraxCommonService {
         }
     }
 
-    private ConvGradStudent populateConvGradStudent(Object[] fields) {
+    private ConvGradStudent populateConvGradStudent(Object[] fields, boolean isGraduated) {
         String pen = (String) fields[0];
         String schoolOfRecord = (String) fields[1];
         String schoolAtGrad = (String) fields[2];
@@ -216,14 +216,25 @@ public class TraxCommonService {
             recalculateGradStatus = null;
         }
         // grad or non-grad
-        BigDecimal gradDate = (BigDecimal) fields[8];
-        boolean isGraduated = gradDate != null && !gradDate.equals(BigDecimal.ZERO);
         Date programCompletionDate = null;
+        String gradDateStr = null;
         if (isGraduated) {
+            gradDateStr = (String) fields[8];
+            if (gradDateStr != null) {
+                gradDateStr = gradDateStr.trim();
+            }
+        } else {
+            BigDecimal gradDate = (BigDecimal) fields[8];
+            if (gradDate != null && !gradDate.equals(BigDecimal.ZERO)) {
+                gradDateStr = gradDate.toString();
+            }
+        }
+
+        if (StringUtils.isNotBlank(gradDateStr) && !StringUtils.equals(gradDateStr, "0")) {
             try {
-                programCompletionDate = EducGradTraxApiUtils.parseDate(gradDate.toString(), "yyyyMM");
+                programCompletionDate = EducGradTraxApiUtils.parseDate(gradDateStr, "yyyyMM");
             } catch (Exception e) {
-                log.error("graduated date conversion is failed for gradDate = " + gradDate);
+                log.error("graduated date conversion is failed for gradDate = " + gradDateStr);
             }
         }
 
