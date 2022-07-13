@@ -8,6 +8,7 @@ import ca.bc.gov.educ.api.trax.model.transformer.TraxStudentNoTransformer;
 import ca.bc.gov.educ.api.trax.repository.GradCourseRepository;
 import ca.bc.gov.educ.api.trax.repository.TraxStudentNoRepository;
 import ca.bc.gov.educ.api.trax.repository.TraxStudentsLoadRepository;
+import ca.bc.gov.educ.api.trax.util.EducGradTraxApiUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -216,6 +218,14 @@ public class TraxCommonService {
         // grad or non-grad
         BigDecimal gradDate = (BigDecimal) fields[8];
         boolean isGraduated = gradDate != null && !gradDate.equals(BigDecimal.ZERO);
+        Date programCompletionDate = null;
+        if (isGraduated) {
+            try {
+                programCompletionDate = EducGradTraxApiUtils.parseDate(gradDate.toString(), "yyyyMM");
+            } catch (Exception e) {
+                log.error("graduated date conversion is failed for gradDate = " + gradDate);
+            }
+        }
 
         List<String> programCodes = new ArrayList<>();
         // student optional programs
@@ -257,6 +267,7 @@ public class TraxCommonService {
                     .honoursStanding(honourFlag != null? honourFlag.toString() : null)
                     .graduationRequestYear(graduationRequestYear)
                     .programCodes(programCodes)
+                    .programCompletionDate(programCompletionDate)
                     .graduated(isGraduated)
                     .consumerEducationRequirementMet(StringUtils.equalsIgnoreCase(consumerEducationRequirementMet, "Y")? "Y" : null)
                     .result(ConversionResultType.SUCCESS)
