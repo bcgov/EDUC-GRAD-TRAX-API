@@ -170,7 +170,7 @@ public class PsiServiceTest {
 		obj.setOpenFlag("Y");
 		obj.setPhone1("123213 ");
 		obj.setPostal("V3T1C4 ");
-		List<PsiEntity> list = new ArrayList<PsiEntity>();
+		List<PsiEntity> list = new ArrayList<>();
 		list.add(obj);
         // Country
         GradCountry country = new GradCountry();
@@ -188,7 +188,7 @@ public class PsiServiceTest {
         when(codeService.getSpecificCountryCode(obj.getCountryCode())).thenReturn(country);
         when(codeService.getSpecificProvinceCode(obj.getProvinceCode())).thenReturn(province);
 
-        var result = psiService.getPSIByParams("Autobody", "AB", null,null);
+        var result = psiService.getPSIByParams("Autobody", "AB", null,null,null,null);
         assertThat(result).isNotNull();
         assertThat(result.size()).isEqualTo(1);
         assertThat(result.get(0).getPsiCode()).isEqualTo("AB");
@@ -213,7 +213,7 @@ public class PsiServiceTest {
 		obj.setOpenFlag("Y");
 		obj.setPhone1("123213 ");
 		obj.setPostal("V3T1C4 ");
-		List<PsiEntity> list = new ArrayList<PsiEntity>();
+		List<PsiEntity> list = new ArrayList<>();
 		list.add(obj);
         // Country
         GradCountry country = new GradCountry();
@@ -231,7 +231,7 @@ public class PsiServiceTest {
         when(codeService.getSpecificCountryCode(obj.getCountryCode())).thenReturn(country);
         when(codeService.getSpecificProvinceCode(obj.getProvinceCode())).thenReturn(province);
 
-        var result = psiService.getPSIByParams("Autobody", "AB*", null,null);
+        var result = psiService.getPSIByParams("Autobody", "AB*", null,null,null,null);
         assertThat(result).isNotNull();
         assertThat(result.size()).isEqualTo(1);
         assertThat(result.get(0).getPsiCode()).isEqualTo("AB");

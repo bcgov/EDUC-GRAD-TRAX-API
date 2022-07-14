@@ -25,7 +25,7 @@ public class EducGradTraxApiConstants {
     public static final String API_VERSION = "v1";
 
     // API Root Mapping
-    public static final String GRAD_TRAX_API_ROOT_MAPPING = "/api/" + API_VERSION;
+    public static final String GRAD_TRAX_API_ROOT_MAPPING = "/api/" + API_VERSION+"/trax";
 
     // Controller Mappings
     public static final String GRAD_TRAX_CODE_URL_MAPPING = GRAD_TRAX_API_ROOT_MAPPING + "/code";
@@ -33,6 +33,7 @@ public class EducGradTraxApiConstants {
     public static final String GRAD_DISTRICT_URL_MAPPING = GRAD_TRAX_API_ROOT_MAPPING + "/district";
     public static final String GRAD_PSI_URL_MAPPING = GRAD_TRAX_API_ROOT_MAPPING + "/psi";
     public static final String GRAD_TRAX_COMMON_URL_MAPPING = GRAD_TRAX_API_ROOT_MAPPING + "/common";
+    public static final String GRAD_TSW_URL_MAPPING = GRAD_TRAX_API_ROOT_MAPPING + "/tsw";
 
 
     // Service Methods Mappings
@@ -50,6 +51,10 @@ public class EducGradTraxApiConstants {
     public static final String GET_PSI_SEARCH_MAPPING="/search";
 
     public static final String GET_DISTRICT_BY_DISTNO_MAPPING = "/{distCode}";
+
+    public static final String GET_TRANSCRIPT_DEMOG_BY_PEN_MAPPING = "/tran-demog/{pen}";
+    public static final String GET_TRANSCRIPT_COURSE_BY_PEN_MAPPING = "/tran-courses/{pen}";
+    public static final String GET_TRANSCRIPT_STUDENT_GRADUATED_BY_PEN_MAPPING = "/student/{pen}";
 
     public static final String GET_TRAX_STUDENT_MASTER_MAPPING = "/student-master/{pen}";
     public static final String GET_TRAX_STUDENT_DEMOG_MAPPING = "/student-demog/{pen}";
