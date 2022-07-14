@@ -8,6 +8,7 @@ import ca.bc.gov.educ.api.trax.model.transformer.TraxStudentNoTransformer;
 import ca.bc.gov.educ.api.trax.repository.GradCourseRepository;
 import ca.bc.gov.educ.api.trax.repository.TraxStudentNoRepository;
 import ca.bc.gov.educ.api.trax.repository.TraxStudentsLoadRepository;
+import ca.bc.gov.educ.api.trax.util.EducGradTraxApiUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,17 +34,21 @@ public class TraxCommonService {
     private final TraxStudentNoTransformer traxStudentNoTransformer;
     private final GradCourseTransformer gradCourseTransformer;
 
+    private final TswService tswService;
+
     @Autowired
     public TraxCommonService(TraxStudentsLoadRepository traxStudentsLoadRepository,
                              TraxStudentNoRepository traxStudentNoRepository,
                              GradCourseRepository gradCourseRepository,
                              TraxStudentNoTransformer traxStudentNoTransformer,
-                             GradCourseTransformer gradCourseTransformer) {
+                             GradCourseTransformer gradCourseTransformer,
+                             TswService tswService) {
         this.traxStudentsLoadRepository = traxStudentsLoadRepository;
         this.traxStudentNoRepository = traxStudentNoRepository;
         this.gradCourseRepository = gradCourseRepository;
         this.traxStudentNoTransformer = traxStudentNoTransformer;
         this.gradCourseTransformer = gradCourseTransformer;
+        this.tswService = tswService;
     }
 
     // Pagination
@@ -60,8 +66,15 @@ public class TraxCommonService {
     // Student Master from TRAX
     @Transactional(readOnly = true)
     public List<ConvGradStudent> getStudentMasterDataFromTrax(String pen) {
-        List<Object[]> results = traxStudentsLoadRepository.loadTraxStudent(pen);
-        return buildConversionGradStudents(results);
+        boolean isGraduated = tswService.isGraduated(pen);
+        List<Object[]> results;
+        if (isGraduated) {
+            results = traxStudentsLoadRepository.loadTraxGraduatedStudent(pen);
+        } else {
+            results = traxStudentsLoadRepository.loadTraxStudent(pen);
+        }
+
+        return buildConversionGradStudents(results, isGraduated);
     }
 
     @Transactional(readOnly = true)
@@ -168,10 +181,10 @@ public class TraxCommonService {
         return traxStudentNo;
     }
 
-    private List<ConvGradStudent> buildConversionGradStudents(List<Object[]> traxStudents) {
+    private List<ConvGradStudent> buildConversionGradStudents(List<Object[]> traxStudents, boolean isGraduated) {
         List<ConvGradStudent> students = new ArrayList<>();
         traxStudents.forEach(result -> {
-            ConvGradStudent student = populateConvGradStudent(result);
+            ConvGradStudent student = populateConvGradStudent(result, isGraduated);
             if (student != null) {
                 students.add(student);
             }
@@ -189,7 +202,7 @@ public class TraxCommonService {
         }
     }
 
-    private ConvGradStudent populateConvGradStudent(Object[] fields) {
+    private ConvGradStudent populateConvGradStudent(Object[] fields, boolean isGraduated) {
         String pen = (String) fields[0];
         String schoolOfRecord = (String) fields[1];
         String schoolAtGrad = (String) fields[2];
@@ -203,8 +216,27 @@ public class TraxCommonService {
             recalculateGradStatus = null;
         }
         // grad or non-grad
-        BigDecimal gradDate = (BigDecimal) fields[8];
-        boolean isGraduated = gradDate != null && !gradDate.equals(BigDecimal.ZERO);
+        Date programCompletionDate = null;
+        String gradDateStr = null;
+        if (isGraduated) {
+            gradDateStr = (String) fields[8];
+            if (gradDateStr != null) {
+                gradDateStr = gradDateStr.trim();
+            }
+        } else {
+            BigDecimal gradDate = (BigDecimal) fields[8];
+            if (gradDate != null && !gradDate.equals(BigDecimal.ZERO)) {
+                gradDateStr = gradDate.toString();
+            }
+        }
+
+        if (StringUtils.isNotBlank(gradDateStr) && !StringUtils.equals(gradDateStr, "0")) {
+            try {
+                programCompletionDate = EducGradTraxApiUtils.parseDate(gradDateStr, "yyyyMM");
+            } catch (Exception e) {
+                log.error("graduated date conversion is failed for gradDate = " + gradDateStr);
+            }
+        }
 
         List<String> programCodes = new ArrayList<>();
         // student optional programs
@@ -224,6 +256,12 @@ public class TraxCommonService {
         // consumer education requirement met
         String consumerEducationRequirementMet = (String) fields[16];
 
+        // english cert
+        String englishCert = (String) fields[17];
+
+        // honour_flag
+        Character honourFlag = (Character) fields[18];
+
         ConvGradStudent student = null;
         try {
             student = ConvGradStudent.builder()
@@ -236,8 +274,11 @@ public class TraxCommonService {
                     .studentStatus(studentStatus != null? studentStatus.toString() : null)
                     .archiveFlag(archiveFlag != null? archiveFlag.toString() : null)
                     .frenchCert(frenchCert)
+                    .englishCert(englishCert)
+                    .honoursStanding(honourFlag != null? honourFlag.toString() : null)
                     .graduationRequestYear(graduationRequestYear)
                     .programCodes(programCodes)
+                    .programCompletionDate(programCompletionDate)
                     .graduated(isGraduated)
                     .consumerEducationRequirementMet(StringUtils.equalsIgnoreCase(consumerEducationRequirementMet, "Y")? "Y" : null)
                     .result(ConversionResultType.SUCCESS)
