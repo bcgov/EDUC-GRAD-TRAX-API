@@ -10,7 +10,7 @@ import javax.persistence.Column;
 import javax.persistence.Id;
 
 /**
- * The type TSW Transcript Demographics entity.
+ * The type TSW Transcript Demographics.
  */
 @Data
 @SuperBuilder

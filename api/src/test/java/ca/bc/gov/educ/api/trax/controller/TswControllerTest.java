@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.trax.controller;
 
+import ca.bc.gov.educ.api.trax.model.dto.TranscriptStudentCourse;
 import ca.bc.gov.educ.api.trax.model.dto.TranscriptStudentDemog;
 import ca.bc.gov.educ.api.trax.service.TswService;
 import ca.bc.gov.educ.api.trax.util.GradValidation;
@@ -12,6 +13,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Arrays;
 
 @RunWith(MockitoJUnitRunner.class)
 @ExtendWith(MockitoExtension.class)
@@ -49,6 +52,20 @@ public class TswControllerTest {
         Mockito.when(tswService.isGraduated("123456789")).thenReturn(true);
         tswController.getTranscriptStudentGraduatedByPen("123456789");
         Mockito.verify(tswService).isGraduated("123456789");
+    }
+
+    @Test
+    public void testGetTranscriptStudentCoursesByPen() {
+        TranscriptStudentCourse transcriptStudentCourse = new TranscriptStudentCourse();
+        transcriptStudentCourse.setStudNo("123456789");
+        transcriptStudentCourse.setCourseCode("Test");
+        transcriptStudentCourse.setCourseLevel("11");
+        transcriptStudentCourse.setCourseName("Test Course1");
+
+        Mockito.when(tswService.getTranscriptStudentCourses("123456789")).thenReturn(Arrays.asList(transcriptStudentCourse));
+        tswController.getTranscriptStudentCoursesByPen("123456789");
+        Mockito.verify(tswService).getTranscriptStudentCourses("123456789");
+
     }
 
 }
