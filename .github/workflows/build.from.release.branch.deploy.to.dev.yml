@@ -1,4 +1,4 @@
-name: Build & Deploy to DEV
+name: Build & Deploy to DEV from Release Branch
 
 env:
   # 🖊️ EDIT your repository secrets to log into your OpenShift cluster and set up the context.
@@ -6,7 +6,7 @@ env:
   # To get a permanent token, refer to https://github.com/redhat-actions/oc-login/wiki/Using-a-Service-Account-for-GitHub-Actions
   OPENSHIFT_SERVER: ${{ secrets.OPENSHIFT_SERVER }}
   OPENSHIFT_TOKEN: ${{ secrets.OPENSHIFT_TOKEN }}
-  OPENSHIFT_NAMESPACE: ${{ secrets.GRAD_NAMESPACE }}
+  OPENSHIFT_NAMESPACE: ${{ secrets.GRAD_NAMESPACE }}-dev
 
   # 🖊️ EDIT to change the image registry settings.
   # Registries such as GHCR, Quay.io, and Docker Hub are supported.
@@ -27,7 +27,7 @@ on:
 
 jobs:
   openshift-ci-cd:
-    name: Build and deploy to OpenShift DEV
+    name: Build and deploy to OpenShift DEV from release branch
     # ubuntu-20.04 can also be used.
     runs-on: ubuntu-18.04
     environment: dev
@@ -38,7 +38,9 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+        with:
+          ref: grad-release
 
       - name: Determine image tags
         if: env.TAG == ''
@@ -77,15 +79,25 @@ jobs:
           username: ${{ env.IMAGE_REGISTRY_USER }}
           password: ${{ env.IMAGE_REGISTRY_PASSWORD }}
 
-      # The path the image was pushed to is now stored in ${{ steps.push-image.outputs.registry-path }}
+      # scan the image for vulnerabilities
+      # TODO: set exit-code to '1' to fail on vulnerabilities
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: '${{ steps.push-image.outputs.registry-path }}'
+          format: 'table'
+          exit-code: '0'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
 
+      # The path the image was pushed to is now stored in ${{ steps.push-image.outputs.registry-path }}
       - name: Install oc
         uses: redhat-actions/openshift-tools-installer@v1
         with:
           oc: 4
 
         # https://github.com/redhat-actions/oc-login#readme
-      - uses: actions/checkout@v2
       - name: Deploy
         run: |
           set -eux
@@ -95,11 +107,11 @@ jobs:
           # Cancel any rollouts in progress
           oc rollout cancel dc/${{ env.SPRING_BOOT_IMAGE_NAME }} 2> /dev/null \
           || true && echo "No rollout in progress"
-
-          oc tag ${{ steps.push-image.outputs.registry-path }} ${{ env.REPO_NAME }}:${{ env.TAG }}
+          # tag image stream
+          oc -n ${{ env.OPENSHIFT_NAMESPACE }} tag ${{ steps.push-image.outputs.registry-path }} ${{ env.REPO_NAME }}:${{ env.TAG }}
 
           # Process and apply deployment template
-          oc process -f tools/openshift/api.dc.yaml -p REPO_NAME=${{ env.REPO_NAME }} -p TAG_NAME=${{ env.TAG }} -p HOST_ROUTE=${{ env.REPO_NAME }}-${{ env.OPENSHIFT_NAMESPACE }}.${{ env.APP_DOMAIN }}  \
+          oc process -f tools/openshift/api.dc.yaml -p IS_NAMESPACE=${{ env.OPENSHIFT_NAMESPACE }} -p REPO_NAME=${{ env.REPO_NAME }} -p TAG_NAME=${{ env.TAG }} -p HOST_ROUTE=${{ env.REPO_NAME }}-${{ env.OPENSHIFT_NAMESPACE }}.${{ env.APP_DOMAIN }}  \
           | oc apply -f -
 
           # Start rollout (if necessary) and follow it
@@ -108,3 +120,9 @@ jobs:
           oc logs -f dc/${{ env.SPRING_BOOT_IMAGE_NAME }}
           # Get status, returns 0 if rollout is successful
           oc rollout status dc/${{ env.SPRING_BOOT_IMAGE_NAME }}
+
+      # now hit it with a zap scan
+      - name: ZAP Scan
+        uses: zaproxy/action-api-scan@v0.1.0
+        with:
+         target: 'https://${{ env.REPO_NAME }}-${{ env.OPENSHIFT_NAMESPACE }}-dev.apps.silver.devops.gov.bc.ca/api/v1/api-docs'
