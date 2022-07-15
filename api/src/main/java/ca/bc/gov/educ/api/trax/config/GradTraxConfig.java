@@ -1,8 +1,6 @@
 package ca.bc.gov.educ.api.trax.config;
 
-import ca.bc.gov.educ.api.trax.util.MessageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
