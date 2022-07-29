@@ -69,10 +69,10 @@ objects:
               resources:
                 requests:
                   cpu: "25m"
-                  memory: "1024Mi"
+                  memory: "2048Mi"
                 limits:
                   cpu: "1500m"
-                  memory: "2048Mi"
+                  memory: "3072Mi"
             - image: docker-remote.artifacts.developer.gov.bc.ca/fluent/fluent-bit:1.5.7
               name: "${REPO_NAME}-fluent-bit-sidecar"
               imagePullPolicy: Always
