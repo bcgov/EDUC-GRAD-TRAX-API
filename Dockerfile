@@ -3,7 +3,7 @@ WORKDIR /workspace/app
 
 COPY api/pom.xml .
 COPY api/src src
-RUN apt-get install rsync -y
+RUN apt-get update && apt-get install rsync -y
 RUN mvn package -DskipTests
 RUN mkdir -p target/dependency && (cd target/dependency; jar -xf ../*.jar)
 
