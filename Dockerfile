@@ -14,9 +14,9 @@ ARG DEPENDENCY=/workspace/app/target/dependency
 COPY --from=build ${DEPENDENCY}/BOOT-INF/lib /app/lib
 COPY --from=build ${DEPENDENCY}/META-INF /app/META-INF
 COPY --from=build ${DEPENDENCY}/BOOT-INF/classes /app
-ENTRYPOINT ["java","-Duser.name=EDUC_GRAD_TRAX_API","-Xms2048m","-Xmx2048m","-noverify","-XX:TieredStopAtLevel=1",\
+ENTRYPOINT ["java","-Duser.name=EDUC_GRAD_TRAX_API","-Xms3072m","-Xmx3072m","-noverify","-XX:TieredStopAtLevel=1",\
             "-XX:+UseParallelGC","-XX:MinHeapFreeRatio=20","-XX:MaxHeapFreeRatio=40","-XX:GCTimeRatio=4",\
-            "-XX:AdaptiveSizePolicyWeight=90","-XX:MaxMetaspaceSize=400m","-XX:ParallelGCThreads=1",\
+            "-XX:AdaptiveSizePolicyWeight=90","-XX:MaxMetaspaceSize=100m","-XX:ParallelGCThreads=1",\
             "-Djava.util.concurrent.ForkJoinPool.common.parallelism=1","-XX:CICompilerCount=2",\
             "-XX:+ExitOnOutOfMemoryError","-Djava.security.egd=file:/dev/./urandom",\
             "-Dspring.backgroundpreinitializer.ignore=true","-cp","app:app/lib/*",\
