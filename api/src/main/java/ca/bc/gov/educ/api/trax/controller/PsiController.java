@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.trax.controller;
 
 import ca.bc.gov.educ.api.trax.model.dto.Psi;
+import ca.bc.gov.educ.api.trax.model.dto.StudentPsi;
 import ca.bc.gov.educ.api.trax.service.PsiService;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.GradValidation;
@@ -67,4 +68,16 @@ public class PsiController {
             @RequestParam(value = "psiGrouping", required = false) String psiGrouping) {
 		return response.GET(psiService.getPSIByParams(psiName,psiCode,cslCode,transmissionMode,openFlag,psiGrouping));
 	}
+
+    @GetMapping(EducGradTraxApiConstants.GET_STUDENT_PSI_BY_CODE_MAPPING)
+    @PreAuthorize(PermissionsConstants.READ_PSI_INFO)
+    @Operation(summary = "Find a PSI by Code", description = "Get a PSI by Code", tags = { "PSI" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),@ApiResponse(responseCode = "400", description = "BAD REQUEST")})
+    public ResponseEntity<List<StudentPsi>> getStudentPSIDetails(
+            @RequestParam(value = "transmissionMode") String transmissionMode,
+            @RequestParam(value = "psiCode") String psiCode,
+            @RequestParam(value = "psiYear") String psiYear) {
+        logger.debug("getStudentPSIDetails : ");
+        return response.GET(psiService.getStudentPSIDetails(transmissionMode,psiYear,psiCode));
+    }
 }

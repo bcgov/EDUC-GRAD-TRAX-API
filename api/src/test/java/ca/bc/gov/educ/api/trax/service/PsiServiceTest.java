@@ -6,14 +6,17 @@ import ca.bc.gov.educ.api.trax.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.trax.model.dto.GradCountry;
 import ca.bc.gov.educ.api.trax.model.dto.GradProvince;
 import ca.bc.gov.educ.api.trax.model.dto.Psi;
+import ca.bc.gov.educ.api.trax.model.dto.StudentPsi;
 import ca.bc.gov.educ.api.trax.model.entity.PsiEntity;
 import ca.bc.gov.educ.api.trax.repository.PsiCriteriaQueryRepository;
 import ca.bc.gov.educ.api.trax.repository.PsiRepository;
+import ca.bc.gov.educ.api.trax.repository.StudentPsiRepository;
 import ca.bc.gov.educ.api.trax.util.criteria.CriteriaHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -41,6 +44,9 @@ public class PsiServiceTest {
 
     @MockBean
     private PsiRepository psiRepository;
+
+	@MockBean
+	private StudentPsiRepository studentPsiRepository;
 
     @MockBean
     private PsiCriteriaQueryRepository psiCriteriaQueryRepository;
@@ -237,4 +243,42 @@ public class PsiServiceTest {
         assertThat(result.get(0).getPsiCode()).isEqualTo("AB");
         assertThat(result.get(0).getPsiName()).isEqualTo("Autobody");
     }
+
+	@Test
+	public void testGetStudentPSIDetails() {
+		final String transmissionMode = "paper";
+		final String psiYear = "2021";
+		final String psiCode="001";
+		List<Object[]> results = new ArrayList<>();
+		Object[] obj = new Object[5];
+		obj[0]="123123131";
+		obj[1] = "001";
+		obj[2]= "2021";
+		obj[3]= "";
+		obj[4] = "A";
+		results.add(obj);
+		Mockito.when(studentPsiRepository.findStudentsUsingPSI(transmissionMode,psiYear,"Yes",List.of(psiCode))).thenReturn(results);
+
+		List<StudentPsi> res = psiService.getStudentPSIDetails(transmissionMode,psiYear,psiCode);
+		assertThat(res).isNotNull().hasSize(1);
+	}
+
+	@Test
+	public void testGetStudentPSIDetails_all() {
+		final String transmissionMode = "paper";
+		final String psiYear = "2021";
+		final String psiCode="all";
+		List<Object[]> results = new ArrayList<>();
+		Object[] obj = new Object[5];
+		obj[0]="123123131";
+		obj[1] = "001";
+		obj[2]= "2021";
+		obj[3]= "";
+		obj[4] = "A";
+		results.add(obj);
+		Mockito.when(studentPsiRepository.findStudentsUsingPSI(transmissionMode,psiYear,null,List.of(psiCode))).thenReturn(results);
+
+		List<StudentPsi> res = psiService.getStudentPSIDetails(transmissionMode,psiYear,psiCode);
+		assertThat(res).isNotNull().hasSize(1);
+	}
 }
