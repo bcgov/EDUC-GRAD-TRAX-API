@@ -1,6 +1,9 @@
 package ca.bc.gov.educ.api.trax.repository;
 
 import ca.bc.gov.educ.api.trax.model.entity.Event;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,4 +16,6 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
     Optional<Event> findByEventId(UUID eventId);
 
     List<Event> findAllByEventStatusOrderByCreateDate(String eventStatus);
+
+    Slice<Event> findAllByEventStatus(String eventStatus, Pageable pageable);
 }
