@@ -50,7 +50,7 @@ public class JetStreamEventScheduler {
         this.publisher = publisher;
     }
 
-    @Scheduled(cron = "${cron.scheduled.process.events.stan.run}") // every 1 minute
+    /*@Scheduled(cron = "${cron.scheduled.process.events.stan.run}") // every 1 minute
     @SchedulerLock(name = "PROCESS_CHOREOGRAPHED_EVENTS_FROM_JET_STREAM", lockAtLeastFor = "${cron.scheduled.process.events.stan.lockAtLeastFor}", lockAtMostFor = "${cron.scheduled.process.events.stan.lockAtMostFor}")
     public void findAndProcessEvents() {
         LockAssert.assertLocked();
@@ -66,9 +66,9 @@ public class JetStreamEventScheduler {
                     }
                 });
         }
-    }
+    }*/
 
-    @Scheduled(cron = "${cron.scheduled.process.events.stan.run}") // every 1 minute
+    /*@Scheduled(cron = "${cron.scheduled.process.events.stan.run}") // every 1 minute
     @SchedulerLock(name = "PUBLISH_TRAX_UPDATED_EVENTS_TO_JET_STREAM", lockAtLeastFor = "${cron.scheduled.process.events.stan.lockAtLeastFor}", lockAtMostFor = "${cron.scheduled.process.events.stan.lockAtMostFor}")
     public void findAndPublishGradStatusEventsToJetStream() {
         LockAssert.assertLocked();
@@ -84,7 +84,7 @@ public class JetStreamEventScheduler {
                     }
                 });
         }
-    }
+    }*/
 
 }
 
