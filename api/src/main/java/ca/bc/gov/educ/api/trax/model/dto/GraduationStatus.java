@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.trax.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.stereotype.Component;
@@ -8,6 +9,7 @@ import java.util.UUID;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
+@JsonIgnoreProperties(ignoreUnknown = true)
 @Component
 public class GraduationStatus extends BaseModel{
 
