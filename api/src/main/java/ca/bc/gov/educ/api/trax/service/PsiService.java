@@ -4,10 +4,12 @@ package ca.bc.gov.educ.api.trax.service;
 import ca.bc.gov.educ.api.trax.model.dto.GradCountry;
 import ca.bc.gov.educ.api.trax.model.dto.GradProvince;
 import ca.bc.gov.educ.api.trax.model.dto.Psi;
+import ca.bc.gov.educ.api.trax.model.dto.StudentPsi;
 import ca.bc.gov.educ.api.trax.model.entity.PsiEntity;
 import ca.bc.gov.educ.api.trax.model.transformer.PsiTransformer;
 import ca.bc.gov.educ.api.trax.repository.PsiCriteriaQueryRepository;
 import ca.bc.gov.educ.api.trax.repository.PsiRepository;
+import ca.bc.gov.educ.api.trax.repository.StudentPsiRepository;
 import ca.bc.gov.educ.api.trax.util.criteria.CriteriaHelper;
 import ca.bc.gov.educ.api.trax.util.criteria.GradCriteria.OperationEnum;
 import org.apache.commons.lang3.StringUtils;
@@ -16,16 +18,20 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class PsiService {
 
     @Autowired
-    private PsiRepository psiRepository;  
+    private PsiRepository psiRepository;
 
     @Autowired
     private PsiTransformer psiTransformer;
+
+    @Autowired
+    private StudentPsiRepository studentPsiRepository;
     
     @Autowired
     private PsiCriteriaQueryRepository  psiCriteriaQueryRepository;
@@ -94,5 +100,28 @@ public class PsiService {
             }
         }
         return criteria;
+    }
+
+    public List<StudentPsi> getStudentPSIDetails(String transmissionMode, String psiYear, String psiCode) {
+        String psiCodeProvided = "Yes";
+        List<String> psiList = List.of(psiCode);
+        if(psiCode.equalsIgnoreCase("all")) {
+            psiCodeProvided = null;
+        }
+        List<StudentPsi> studentPsiList = new ArrayList<>();
+        List<Object[]> results = studentPsiRepository.findStudentsUsingPSI(transmissionMode,psiYear,psiCodeProvided,psiList);
+        results.forEach(result -> {
+            StudentPsi studPsi = new StudentPsi();
+            String pen = (String) result[0];
+            String pCode = (String) result[1];
+            String pYear = (String) result[2];
+            String psiStatus = (String) result[4];
+            studPsi.setPsiStatus(psiStatus);
+            studPsi.setPsiCode(pCode);
+            studPsi.setPen(pen);
+            studPsi.setPsiYear(pYear);
+            studentPsiList.add(studPsi);
+        });
+        return studentPsiList;
     }
 }
