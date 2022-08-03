@@ -1,6 +1,8 @@
 package ca.bc.gov.educ.api.trax.repository;
 
 import ca.bc.gov.educ.api.trax.model.entity.TraxUpdatedPubEvent;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -35,4 +37,12 @@ public interface TraxUpdatedPubEventRepository extends JpaRepository<TraxUpdated
    * @return the list
    */
   List<TraxUpdatedPubEvent> findByEventStatus(String eventStatus);
+
+  /**
+   * A pageable findByEventStatus
+   * @param eventStatus
+   * @param pageable
+   * @return
+   */
+  Slice<TraxUpdatedPubEvent> findByEventStatus(String eventStatus, Pageable pageable);
 }
