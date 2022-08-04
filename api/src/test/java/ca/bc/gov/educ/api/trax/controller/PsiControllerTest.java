@@ -74,7 +74,6 @@ public class PsiControllerTest {
     public void testGetStudentPSIDetails() {
         StudentPsi studentPsi = new StudentPsi();
         studentPsi.setPsiYear("2021");
-        studentPsi.setPsiStatus("A");
         studentPsi.setPsiCode("001");
         studentPsi.setPen("123123131");
         Mockito.when(psiService.getStudentPSIDetails("paper","2021","001")).thenReturn(List.of(studentPsi));

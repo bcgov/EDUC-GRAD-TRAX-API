@@ -9,7 +9,6 @@ public class StudentPsi {
 
 	private String pen;
 	private String psiCode;
-    private Character psiStatus;
     private String psiYear;
 
 	@Override
@@ -17,7 +16,6 @@ public class StudentPsi {
 		return "StudentPsi{" +
 				"pen='" + pen + '\'' +
 				", psiCode='" + psiCode + '\'' +
-				", psiStatus='" + psiStatus + '\'' +
 				", psiYear='" + psiYear + '\'' +
 				'}';
 	}

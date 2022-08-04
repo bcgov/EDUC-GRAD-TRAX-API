@@ -115,8 +115,6 @@ public class PsiService {
             String pen = (String) result[0];
             String pCode = (String) result[1];
             String pYear = (String) result[2];
-            String psiStatus = (String) result[4];
-            studPsi.setPsiStatus(psiStatus);
             studPsi.setPsiCode(pCode);
             studPsi.setPen(pen);
             studPsi.setPsiYear(pYear);
