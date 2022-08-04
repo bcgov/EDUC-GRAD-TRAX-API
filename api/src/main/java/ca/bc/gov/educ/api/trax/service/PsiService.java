@@ -62,13 +62,12 @@ public class PsiService {
 		return psi;
 	}
 
-	public List<Psi> getPSIByParams(String psiName, String psiCode, String cslCode, String transmissionMode,String openFlag,String psiGrouping) {
+	public List<Psi> getPSIByParams(String psiName, String psiCode, String cslCode, String transmissionMode,String openFlag) {
         String pCode = psiCode != null ?StringUtils.strip(psiCode.toUpperCase(Locale.ROOT), "*"):null;
         String pName = psiName != null ?StringUtils.strip(psiName.toUpperCase(Locale.ROOT), "*"):null;
         String pcCode = cslCode != null ?StringUtils.strip(cslCode.toUpperCase(Locale.ROOT), "*"):null;
         String ptMode = transmissionMode != null ?StringUtils.strip(transmissionMode.toUpperCase(Locale.ROOT), "*"):null;
-        String pGrouping = psiGrouping != null ?StringUtils.strip(psiGrouping.toUpperCase(Locale.ROOT), "*"):null;
-        return psiTransformer.transformToDTO(psiRepository.findPSIs(pCode,pName,pcCode,ptMode,openFlag,pGrouping));
+        return psiTransformer.transformToDTO(psiRepository.findPSIs(pCode,pName,pcCode,ptMode,openFlag));
 	}
 
     public List<StudentPsi> getStudentPSIDetails(String transmissionMode, String psiYear, String psiCode) {

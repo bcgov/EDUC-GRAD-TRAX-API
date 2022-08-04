@@ -24,7 +24,7 @@ public interface SchoolRepository extends JpaRepository<SchoolEntity, String> {
 	long countTabSchools(@Param("minCode") String minCode);
 
 	@Query(value="SELECT si.* FROM tab_school si where "
-			+ "(:schoolName is null or (si.SCHL_NAME like %:schoolName%)) and "
-			+ "(:mincode is null or (si.MINCODE like :mincode%))",nativeQuery = true)
+			+ "(:schoolName is null or si.SCHL_NAME like %:schoolName%) and "
+			+ "(:mincode is null or si.MINCODE like :mincode%)",nativeQuery = true)
 	List<SchoolEntity> findSchools(String schoolName, String mincode);
 }

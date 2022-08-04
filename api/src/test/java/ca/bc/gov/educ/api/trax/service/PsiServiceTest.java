@@ -183,12 +183,12 @@ public class PsiServiceTest {
         province.setProvCode("BC");
         province.setProvName("British Columbia");
 
-        when(psiRepository.findPSIs("AB","Autobody".toUpperCase(Locale.ROOT),null,null,null,null)).thenReturn(list);
+        when(psiRepository.findPSIs("AB","Autobody".toUpperCase(Locale.ROOT),null,null,null)).thenReturn(list);
 
         when(codeService.getSpecificCountryCode(obj.getCountryCode())).thenReturn(country);
         when(codeService.getSpecificProvinceCode(obj.getProvinceCode())).thenReturn(province);
 
-        var result = psiService.getPSIByParams("Autobody", "AB*", null,null,null,null);
+        var result = psiService.getPSIByParams("Autobody", "AB*", null,null,null);
         assertThat(result).isNotNull();
         assertThat(result.size()).isEqualTo(1);
         assertThat(result.get(0).getPsiCode()).isEqualTo("AB");
