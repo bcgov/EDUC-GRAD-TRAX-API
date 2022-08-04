@@ -11,6 +11,10 @@ public class StudentPsi {
 	private String psiCode;
     private String psiYear;
 
+	public String getPen() {
+		return  pen != null ? pen.trim(): null;
+	}
+
 	@Override
 	public String toString() {
 		return "StudentPsi{" +
