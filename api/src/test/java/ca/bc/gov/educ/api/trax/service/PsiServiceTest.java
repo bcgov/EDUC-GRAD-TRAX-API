@@ -8,10 +8,8 @@ import ca.bc.gov.educ.api.trax.model.dto.GradProvince;
 import ca.bc.gov.educ.api.trax.model.dto.Psi;
 import ca.bc.gov.educ.api.trax.model.dto.StudentPsi;
 import ca.bc.gov.educ.api.trax.model.entity.PsiEntity;
-import ca.bc.gov.educ.api.trax.repository.PsiCriteriaQueryRepository;
 import ca.bc.gov.educ.api.trax.repository.PsiRepository;
 import ca.bc.gov.educ.api.trax.repository.StudentPsiRepository;
-import ca.bc.gov.educ.api.trax.util.criteria.CriteriaHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,11 +23,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
@@ -47,9 +44,6 @@ public class PsiServiceTest {
 
 	@MockBean
 	private StudentPsiRepository studentPsiRepository;
-
-    @MockBean
-    private PsiCriteriaQueryRepository psiCriteriaQueryRepository;
 
     @MockBean
     private CodeService codeService;
@@ -157,49 +151,6 @@ public class PsiServiceTest {
         assertThat(result.getPsiCode()).isEqualTo("AB");
         assertThat(result.getPsiName()).isEqualTo("Autobody");
     }
-
-    @Test
-    public void testGetPSIsByParams() {
-        // School
-    	PsiEntity obj = new PsiEntity();
-		obj.setPsiCode("AB");
-		obj.setPsiName("Autobody");
-		obj.setAddress1("ABC ");
-		obj.setAddress2("DEF ");
-		obj.setAddress3("FGF ");
-		obj.setAttentionName("XZA");
-		obj.setCity("Abbotsford");
-		obj.setCountryCode("CDD");
-		obj.setProvinceCode("BC");
-		obj.setCslCode("SW@");
-		obj.setFax("23432234234");
-		obj.setOpenFlag("Y");
-		obj.setPhone1("123213 ");
-		obj.setPostal("V3T1C4 ");
-		List<PsiEntity> list = new ArrayList<>();
-		list.add(obj);
-        // Country
-        GradCountry country = new GradCountry();
-        country.setCountryCode("CA");
-        country.setCountryName("Canada");
-
-        // Provice
-        GradProvince province = new GradProvince();
-        province.setCountryCode("CA");
-        province.setProvCode("BC");
-        province.setProvName("British Columbia");
-
-        when(psiCriteriaQueryRepository.findByCriteria(any(CriteriaHelper.class), eq(PsiEntity.class))).thenReturn(list);
-
-        when(codeService.getSpecificCountryCode(obj.getCountryCode())).thenReturn(country);
-        when(codeService.getSpecificProvinceCode(obj.getProvinceCode())).thenReturn(province);
-
-        var result = psiService.getPSIByParams("Autobody", "AB", null,null,null,null);
-        assertThat(result).isNotNull();
-        assertThat(result.size()).isEqualTo(1);
-        assertThat(result.get(0).getPsiCode()).isEqualTo("AB");
-        assertThat(result.get(0).getPsiName()).isEqualTo("Autobody");
-    }
     
     @Test
     public void testGetPSIsByParamsStar() {
@@ -232,7 +183,7 @@ public class PsiServiceTest {
         province.setProvCode("BC");
         province.setProvName("British Columbia");
 
-        when(psiCriteriaQueryRepository.findByCriteria(any(CriteriaHelper.class), eq(PsiEntity.class))).thenReturn(list);
+        when(psiRepository.findPSIs("AB","Autobody".toUpperCase(Locale.ROOT),null,null,null,null)).thenReturn(list);
 
         when(codeService.getSpecificCountryCode(obj.getCountryCode())).thenReturn(country);
         when(codeService.getSpecificProvinceCode(obj.getProvinceCode())).thenReturn(province);

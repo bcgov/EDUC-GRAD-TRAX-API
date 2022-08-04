@@ -9,9 +9,7 @@ import ca.bc.gov.educ.api.trax.model.dto.School;
 import ca.bc.gov.educ.api.trax.model.entity.DistrictEntity;
 import ca.bc.gov.educ.api.trax.model.entity.SchoolEntity;
 import ca.bc.gov.educ.api.trax.repository.DistrictRepository;
-import ca.bc.gov.educ.api.trax.repository.SchoolCriteriaQueryRepository;
 import ca.bc.gov.educ.api.trax.repository.SchoolRepository;
-import ca.bc.gov.educ.api.trax.util.criteria.CriteriaHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,13 +20,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
@@ -46,9 +40,6 @@ public class SchoolServiceTest {
 
     @MockBean
     private DistrictRepository districtRepository;
-
-    @MockBean
-    private SchoolCriteriaQueryRepository schoolCriteriaQueryRepository;
 
     @MockBean
     private CodeService codeService;
@@ -93,7 +84,7 @@ public class SchoolServiceTest {
         district.setDistrictName("Test District");
 
         when(schoolRepository.findAll()).thenReturn(gradSchoolList);
-        when(districtRepository.findById(eq("123"))).thenReturn(Optional.of(district));
+        when(districtRepository.findById("123")).thenReturn(Optional.of(district));
         List<School> results = schoolService.getSchoolList();
 
         assertThat(results).isNotNull();
@@ -130,8 +121,8 @@ public class SchoolServiceTest {
         province.setProvCode("BC");
         province.setProvName("British Columbia");
 
-        when(schoolRepository.findById(eq("1234567"))).thenReturn(Optional.of(school));
-        when(districtRepository.findById(eq("123"))).thenReturn(Optional.of(district));
+        when(schoolRepository.findById("1234567")).thenReturn(Optional.of(school));
+        when(districtRepository.findById("123")).thenReturn(Optional.of(district));
 
         when(codeService.getSpecificCountryCode(country.getCountryCode())).thenReturn(country);
         when(codeService.getSpecificProvinceCode(province.getProvCode())).thenReturn(province);
@@ -148,7 +139,7 @@ public class SchoolServiceTest {
         // School
         final SchoolEntity school = new SchoolEntity();
         school.setMinCode("1234567");
-        school.setSchoolName("Test School");
+        school.setSchoolName("TEST SCHOOL");
         school.setCountryCode("CA");
         school.setProvCode("BC");
 
@@ -170,8 +161,8 @@ public class SchoolServiceTest {
         province.setProvCode("BC");
         province.setProvName("British Columbia");
 
-        when(schoolCriteriaQueryRepository.findByCriteria(any(CriteriaHelper.class), eq(SchoolEntity.class))).thenReturn(Arrays.asList(school));
-        when(districtRepository.findById(eq("123"))).thenReturn(Optional.of(district));
+        when(schoolRepository.findSchools("Test School".toUpperCase(Locale.ROOT),"1234567")).thenReturn(List.of(school));
+        when(districtRepository.findById("123")).thenReturn(Optional.of(district));
 
         when(codeService.getSpecificCountryCode(country.getCountryCode())).thenReturn(country);
         when(codeService.getSpecificProvinceCode(province.getProvCode())).thenReturn(province);
@@ -180,14 +171,13 @@ public class SchoolServiceTest {
         assertThat(result).isNotNull();
         assertThat(result.size()).isEqualTo(1);
         assertThat(result.get(0).getMinCode()).isEqualTo("1234567");
-        assertThat(result.get(0).getSchoolName()).isEqualTo("Test School");
+        assertThat(result.get(0).getSchoolName()).isEqualTo("TEST SCHOOL");
     }
 
     @Test
     public void testExistsSchool() {
-        when(schoolRepository.countTabSchools(eq("1234567"))).thenReturn(1L);
+        when(schoolRepository.countTabSchools("1234567")).thenReturn(1L);
         var result = schoolService.existsSchool("1234567");
-        assertThat(result).isNotNull();
         assertThat(result).isTrue();
     }
 }
