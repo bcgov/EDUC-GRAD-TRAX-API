@@ -18,7 +18,7 @@ public class StudentPsiEntity {
     private String psiYear;
 
     @Column(name = "PSI_STATUS")
-    private String psiStatus;
+    private Character psiStatus;
     
 
 }

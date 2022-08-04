@@ -9,7 +9,7 @@ public class StudentPsi {
 
 	private String pen;
 	private String psiCode;
-    private String psiStatus;
+    private Character psiStatus;
     private String psiYear;
 
 	@Override
