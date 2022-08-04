@@ -104,7 +104,7 @@ public class PsiService {
 
     public List<StudentPsi> getStudentPSIDetails(String transmissionMode, String psiYear, String psiCode) {
         String psiCodeProvided = "Yes";
-        List<String> psiList = List.of(psiCode);
+        List<String> psiList = List.of(psiCode.split(",", -1));
         if(psiCode.equalsIgnoreCase("all")) {
             psiCodeProvided = null;
         }
