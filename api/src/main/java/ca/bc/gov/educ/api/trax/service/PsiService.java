@@ -5,6 +5,7 @@ import ca.bc.gov.educ.api.trax.model.dto.GradCountry;
 import ca.bc.gov.educ.api.trax.model.dto.GradProvince;
 import ca.bc.gov.educ.api.trax.model.dto.Psi;
 import ca.bc.gov.educ.api.trax.model.dto.StudentPsi;
+import ca.bc.gov.educ.api.trax.model.entity.PsiEntity;
 import ca.bc.gov.educ.api.trax.model.transformer.PsiTransformer;
 import ca.bc.gov.educ.api.trax.repository.PsiRepository;
 import ca.bc.gov.educ.api.trax.repository.StudentPsiRepository;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 @Service
 public class PsiService {
@@ -44,8 +46,9 @@ public class PsiService {
     }
 
 	public Psi getPSIDetails(String psiCode) {
-		Psi psi =  psiTransformer.transformToDTO(psiRepository.findById(psiCode));
-		if(psi != null) {
+		Optional<PsiEntity> entOptional = psiRepository.findById(psiCode);
+		if(entOptional.isPresent()) {
+            Psi psi = psiTransformer.transformToDTO(entOptional.get());
 			if(StringUtils.isNotBlank(psi.getCountryCode())) {
 			    GradCountry country = codeService.getSpecificCountryCode(psi.getCountryCode());
 		        if(country != null) {
@@ -58,8 +61,9 @@ public class PsiService {
 		        	psi.setProvinceName(province.getProvName());
 				}
 			}
+            return psi;
 		}
-		return psi;
+		return null;
 	}
 
 	public List<Psi> getPSIByParams(String psiName, String psiCode, String cslCode, String transmissionMode,String openFlag) {

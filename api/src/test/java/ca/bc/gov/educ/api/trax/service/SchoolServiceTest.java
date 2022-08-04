@@ -135,6 +135,82 @@ public class SchoolServiceTest {
     }
 
     @Test
+    public void testGetSchoolDetails_empty() {
+        // School
+        final SchoolEntity school = new SchoolEntity();
+        school.setMinCode("1234567");
+        school.setSchoolName("Test School");
+        school.setCountryCode("CA");
+        school.setProvCode("BC");
+
+        // District
+        final DistrictEntity district = new DistrictEntity();
+        district.setDistrictNumber("123");
+        district.setDistrictName("Test District");
+        district.setCountryCode("CA");
+        district.setProvCode("BC");
+
+        // Country
+        final GradCountry country = new GradCountry();
+        country.setCountryCode("CA");
+        country.setCountryName("Canada");
+
+        // Province
+        final GradProvince province = new GradProvince();
+        province.setCountryCode("CA");
+        province.setProvCode("BC");
+        province.setProvName("British Columbia");
+
+        when(schoolRepository.findById("1234567")).thenReturn(Optional.empty());
+        when(districtRepository.findById("123")).thenReturn(Optional.of(district));
+
+        when(codeService.getSpecificCountryCode(country.getCountryCode())).thenReturn(country);
+        when(codeService.getSpecificProvinceCode(province.getProvCode())).thenReturn(province);
+
+        var result = schoolService.getSchoolDetails("1234567");
+
+        assertThat(result).isNull();
+    }
+
+    @Test
+    public void testGetSchoolDetails_empty_null() {
+        // School
+        final SchoolEntity school = new SchoolEntity();
+        school.setMinCode("1234567");
+        school.setSchoolName("Test School");
+        school.setCountryCode("CA");
+        school.setProvCode("BC");
+
+        // District
+        final DistrictEntity district = new DistrictEntity();
+        district.setDistrictNumber("123");
+        district.setDistrictName("Test District");
+        district.setCountryCode("CA");
+        district.setProvCode("BC");
+
+        // Country
+        final GradCountry country = new GradCountry();
+        country.setCountryCode("CA");
+        country.setCountryName("Canada");
+
+        // Province
+        final GradProvince province = new GradProvince();
+        province.setCountryCode("CA");
+        province.setProvCode("BC");
+        province.setProvName("British Columbia");
+
+        when(schoolRepository.findById("1234567")).thenReturn(Optional.empty());
+        when(districtRepository.findById("123")).thenReturn(null);
+
+        when(codeService.getSpecificCountryCode(country.getCountryCode())).thenReturn(null);
+        when(codeService.getSpecificProvinceCode(province.getProvCode())).thenReturn(null);
+
+        var result = schoolService.getSchoolDetails("1234567");
+
+        assertThat(result).isNull();
+    }
+
+    @Test
     public void testGetSchoolsByParams() {
         // School
         final SchoolEntity school = new SchoolEntity();

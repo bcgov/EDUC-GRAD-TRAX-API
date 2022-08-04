@@ -4,6 +4,7 @@ import ca.bc.gov.educ.api.trax.model.dto.District;
 import ca.bc.gov.educ.api.trax.model.dto.GradCountry;
 import ca.bc.gov.educ.api.trax.model.dto.GradProvince;
 import ca.bc.gov.educ.api.trax.model.dto.School;
+import ca.bc.gov.educ.api.trax.model.entity.SchoolEntity;
 import ca.bc.gov.educ.api.trax.model.transformer.DistrictTransformer;
 import ca.bc.gov.educ.api.trax.model.transformer.SchoolTransformer;
 import ca.bc.gov.educ.api.trax.repository.DistrictRepository;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 @Service
 public class SchoolService {
@@ -56,8 +58,9 @@ public class SchoolService {
     }
 
 	public School getSchoolDetails(String minCode) {
-		School school =  schoolTransformer.transformToDTO(schoolRepository.findById(minCode));
-		if(school != null) {
+		Optional<SchoolEntity> entOptional = schoolRepository.findById(minCode);
+		if(entOptional.isPresent()) {
+			School school = schoolTransformer.transformToDTO(entOptional.get());
 			District dist = districtTransformer.transformToDTO(districtRepository.findById(school.getMinCode().substring(0, 3)));
 			if(dist != null)
 				school.setDistrictName(dist.getDistrictName());
@@ -73,8 +76,9 @@ public class SchoolService {
 		        	school.setProvinceName(province.getProvName());
 				}
 			}
+			return school;
 		}
-		return school;
+		return null;
 	}
 
 	public List<School> getSchoolsByParams(String schoolName, String minCode) {    	

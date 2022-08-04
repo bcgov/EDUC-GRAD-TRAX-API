@@ -16,7 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -52,7 +53,11 @@ public class PsiController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),@ApiResponse(responseCode = "400", description = "BAD REQUEST")})
     public ResponseEntity<Psi> getPSIDetails(@PathVariable String psiCode) { 
     	logger.debug("getPSIDetails : ");
-        return response.GET(psiService.getPSIDetails(psiCode));
+        Psi psi = psiService.getPSIDetails(psiCode);
+        if(psi ==null) {
+            return response.NOT_FOUND();
+        }
+        return response.GET(psi);
     }
     
     @GetMapping(EducGradTraxApiConstants.GET_PSI_SEARCH_MAPPING)
