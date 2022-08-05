@@ -7,11 +7,8 @@ import ca.bc.gov.educ.api.trax.model.dto.Psi;
 import ca.bc.gov.educ.api.trax.model.dto.StudentPsi;
 import ca.bc.gov.educ.api.trax.model.entity.PsiEntity;
 import ca.bc.gov.educ.api.trax.model.transformer.PsiTransformer;
-import ca.bc.gov.educ.api.trax.repository.PsiCriteriaQueryRepository;
 import ca.bc.gov.educ.api.trax.repository.PsiRepository;
 import ca.bc.gov.educ.api.trax.repository.StudentPsiRepository;
-import ca.bc.gov.educ.api.trax.util.criteria.CriteriaHelper;
-import ca.bc.gov.educ.api.trax.util.criteria.GradCriteria.OperationEnum;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +17,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 
 @Service
 public class PsiService {
@@ -34,16 +33,11 @@ public class PsiService {
     private StudentPsiRepository studentPsiRepository;
     
     @Autowired
-    private PsiCriteriaQueryRepository  psiCriteriaQueryRepository;
-    
-    @Autowired
     CodeService codeService;
 
     @SuppressWarnings("unused")
 	private static Logger logger = LoggerFactory.getLogger(PsiService.class);
 
-
-    private static final String PSI_NAME = "psiName";
      /**
      * Get all Schools in PSI DTO
      */
@@ -52,8 +46,9 @@ public class PsiService {
     }
 
 	public Psi getPSIDetails(String psiCode) {
-		Psi psi =  psiTransformer.transformToDTO(psiRepository.findById(psiCode));
-		if(psi != null) {
+		Optional<PsiEntity> entOptional = psiRepository.findById(psiCode);
+		if(entOptional.isPresent()) {
+            Psi psi = psiTransformer.transformToDTO(entOptional.get());
 			if(StringUtils.isNotBlank(psi.getCountryCode())) {
 			    GradCountry country = codeService.getSpecificCountryCode(psi.getCountryCode());
 		        if(country != null) {
@@ -66,41 +61,18 @@ public class PsiService {
 		        	psi.setProvinceName(province.getProvName());
 				}
 			}
+            return psi;
 		}
-		return psi;
+		return null;
 	}
 
-	public List<Psi> getPSIByParams(String psiName, String psiCode, String cslCode, String transmissionMode,String openFlag,String psiGrouping) {
-		CriteriaHelper criteria = new CriteriaHelper();
-        getSearchCriteria("psiCode", psiCode,"psiCode", criteria);
-        getSearchCriteria(PSI_NAME, psiName,PSI_NAME, criteria);
-        getSearchCriteria("cslCode", cslCode,"cslCode", criteria);
-        getSearchCriteria("transmissionMode",transmissionMode,"transmissionMode", criteria);
-        getSearchCriteria("openFlag",openFlag,"openFlag", criteria);
-        getSearchCriteria("psiGrouping",psiGrouping,"psiGrouping", criteria);
-        return psiTransformer.transformToDTO(psiCriteriaQueryRepository.findByCriteria(criteria, PsiEntity.class));
+	public List<Psi> getPSIByParams(String psiName, String psiCode, String cslCode, String transmissionMode,String openFlag) {
+        String pCode = psiCode != null ?StringUtils.strip(psiCode.toUpperCase(Locale.ROOT), "*"):null;
+        String pName = psiName != null ?StringUtils.strip(psiName.toUpperCase(Locale.ROOT), "*"):null;
+        String pcCode = cslCode != null ?StringUtils.strip(cslCode.toUpperCase(Locale.ROOT), "*"):null;
+        String ptMode = transmissionMode != null ?StringUtils.strip(transmissionMode.toUpperCase(Locale.ROOT), "*"):null;
+        return psiTransformer.transformToDTO(psiRepository.findPSIs(pCode,pName,pcCode,ptMode,openFlag));
 	}
-	
-	public CriteriaHelper getSearchCriteria(String roolElement, String value, String parameterType, CriteriaHelper criteria) {
-        if(parameterType.equalsIgnoreCase(PSI_NAME)) {
-        	if (StringUtils.isNotBlank(value)) {
-                if (StringUtils.contains(value, "*")) {
-                    criteria.add(roolElement, OperationEnum.LIKE, StringUtils.strip(value.toUpperCase(), "*"));
-                } else {
-                    criteria.add(roolElement, OperationEnum.EQUALS, value.toUpperCase());
-                }
-            }
-        }else {
-        	if (StringUtils.isNotBlank(value)) {
-                if (StringUtils.contains(value, "*")) {
-                    criteria.add(roolElement, OperationEnum.STARTS_WITH_IGNORE_CASE, StringUtils.strip(value.toUpperCase(), "*"));
-                } else {
-                    criteria.add(roolElement, OperationEnum.EQUALS, value.toUpperCase());
-                }
-            }
-        }
-        return criteria;
-    }
 
     public List<StudentPsi> getStudentPSIDetails(String transmissionMode, String psiYear, String psiCode) {
         String psiCodeProvided = "Yes";

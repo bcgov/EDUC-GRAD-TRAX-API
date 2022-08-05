@@ -8,10 +8,7 @@ import ca.bc.gov.educ.api.trax.model.entity.SchoolEntity;
 import ca.bc.gov.educ.api.trax.model.transformer.DistrictTransformer;
 import ca.bc.gov.educ.api.trax.model.transformer.SchoolTransformer;
 import ca.bc.gov.educ.api.trax.repository.DistrictRepository;
-import ca.bc.gov.educ.api.trax.repository.SchoolCriteriaQueryRepository;
 import ca.bc.gov.educ.api.trax.repository.SchoolRepository;
-import ca.bc.gov.educ.api.trax.util.criteria.CriteriaHelper;
-import ca.bc.gov.educ.api.trax.util.criteria.GradCriteria.OperationEnum;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 
 @Service
 public class SchoolService {
@@ -34,14 +33,9 @@ public class SchoolService {
 
     @Autowired
     private DistrictTransformer districtTransformer;
-    
-    @Autowired
-    private SchoolCriteriaQueryRepository schoolCriteriaQueryRepository;
-    
+
 	@Autowired
 	private CodeService codeService;
-	
-	private static final String SCHOOL_NAME= "schoolName";
     
 
     @SuppressWarnings("unused")
@@ -50,8 +44,7 @@ public class SchoolService {
      /**
      * Get all Schools in School DTO
      *
-     * @return Course 
-     * @throws Exception
+     * @return List of Schools
      */
     public List<School> getSchoolList() {
         List<School> schoolList  = schoolTransformer.transformToDTO(schoolRepository.findAll());  
@@ -65,8 +58,9 @@ public class SchoolService {
     }
 
 	public School getSchoolDetails(String minCode) {
-		School school =  schoolTransformer.transformToDTO(schoolRepository.findById(minCode));
-		if(school != null) {
+		Optional<SchoolEntity> entOptional = schoolRepository.findById(minCode);
+		if(entOptional.isPresent()) {
+			School school = schoolTransformer.transformToDTO(entOptional.get());
 			District dist = districtTransformer.transformToDTO(districtRepository.findById(school.getMinCode().substring(0, 3)));
 			if(dist != null)
 				school.setDistrictName(dist.getDistrictName());
@@ -82,15 +76,15 @@ public class SchoolService {
 		        	school.setProvinceName(province.getProvName());
 				}
 			}
+			return school;
 		}
-		return school;
+		return null;
 	}
 
 	public List<School> getSchoolsByParams(String schoolName, String minCode) {    	
-		CriteriaHelper criteria = new CriteriaHelper();
-        getSearchCriteria("minCode", minCode, "minCode",criteria);
-        getSearchCriteria("schoolName", schoolName,"schoolName" ,criteria);
-		List<School> schoolList = schoolTransformer.transformToDTO(schoolCriteriaQueryRepository.findByCriteria(criteria, SchoolEntity.class));
+		String sName = schoolName != null? StringUtils.strip(schoolName.toUpperCase(Locale.ROOT),"*"):null;
+		String sCode = minCode != null? StringUtils.strip(minCode,"*"):null;
+		List<School> schoolList = schoolTransformer.transformToDTO(schoolRepository.findSchools(sName, sCode));
     	schoolList.forEach(sL -> {
     		District dist = districtTransformer.transformToDTO(districtRepository.findById(sL.getMinCode().substring(0, 3)));
     		if (dist != null) {
@@ -99,26 +93,6 @@ public class SchoolService {
     	});
     	return schoolList;
 	}
-	public CriteriaHelper getSearchCriteria(String roolElement, String value, String parameterType, CriteriaHelper criteria) {
-		if(parameterType.equalsIgnoreCase(SCHOOL_NAME)) {
-        	if (StringUtils.isNotBlank(value)) {
-                if (StringUtils.contains(value, "*")) {
-                    criteria.add(roolElement, OperationEnum.LIKE, StringUtils.strip(value.toUpperCase(), "*"));
-                } else {
-                    criteria.add(roolElement, OperationEnum.EQUALS, value.toUpperCase());
-                }
-            }
-		}else {	       
-        	if (StringUtils.isNotBlank(value)) {
-                if (StringUtils.contains(value, "*")) {
-                    criteria.add(roolElement, OperationEnum.STARTS_WITH_IGNORE_CASE, StringUtils.strip(value.toUpperCase(), "*"));
-                } else {
-                    criteria.add(roolElement, OperationEnum.EQUALS, value.toUpperCase());
-                }
-            }	        	
-	    }
-        return criteria;
-    }
 
 	public boolean existsSchool(String minCode) {
 		return schoolRepository.countTabSchools(minCode) > 0L;
