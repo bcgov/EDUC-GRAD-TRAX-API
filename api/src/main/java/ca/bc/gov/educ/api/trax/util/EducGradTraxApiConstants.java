@@ -101,4 +101,7 @@ public class EducGradTraxApiConstants {
     // Splunk LogHelper Enabled
     @Value("${splunk.log-helper.enabled}")
     private boolean splunkLogHelperEnabled;
+
+    @Value("${endpoint.educ-school-api.get-school-by-mincode.url}")
+    private String schoolByMincodeSchoolApiUrl;
 }

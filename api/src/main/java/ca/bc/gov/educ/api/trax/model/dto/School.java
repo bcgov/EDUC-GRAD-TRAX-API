@@ -33,7 +33,26 @@ public class School {
     private String schoolPhone;
     private String schoolFax;
     private String schoolEmail;
-    
+
+    private String districtNumber;
+	private String schoolType;
+	private String reportingFlag;
+	private String openDate;
+	private String closedDate;
+	private String authorityNumber;
+	private String gradeRange;
+	private String schoolCategory;
+	private String fundingGroups;
+	private String enrolmentAsOf;
+	private String grade10Enrolment;
+	private String grade11Emrolment;
+	private String grade12Enrolment;
+
+	private String principalTitle;
+	private String principalFirstName;
+	private String principalLastName;
+
+
 	public String getSchoolName() {
 		return  schoolName != null ? schoolName.trim(): null;
 	}

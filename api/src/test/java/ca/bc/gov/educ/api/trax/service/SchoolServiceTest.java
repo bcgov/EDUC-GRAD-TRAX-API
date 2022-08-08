@@ -3,6 +3,7 @@ package ca.bc.gov.educ.api.trax.service;
 import ca.bc.gov.educ.api.trax.messaging.NatsConnection;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Subscriber;
+import ca.bc.gov.educ.api.trax.model.dto.CommonSchool;
 import ca.bc.gov.educ.api.trax.model.dto.GradCountry;
 import ca.bc.gov.educ.api.trax.model.dto.GradProvince;
 import ca.bc.gov.educ.api.trax.model.dto.School;
@@ -10,20 +11,28 @@ import ca.bc.gov.educ.api.trax.model.entity.DistrictEntity;
 import ca.bc.gov.educ.api.trax.model.entity.SchoolEntity;
 import ca.bc.gov.educ.api.trax.repository.DistrictRepository;
 import ca.bc.gov.educ.api.trax.repository.SchoolRepository;
+import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
@@ -44,6 +53,9 @@ public class SchoolServiceTest {
     @MockBean
     private CodeService codeService;
 
+    @Autowired
+    private EducGradTraxApiConstants constants;
+
     // NATS
     @MockBean
     private NatsConnection natsConnection;
@@ -53,6 +65,15 @@ public class SchoolServiceTest {
 
     @MockBean
     private Subscriber subscriber;
+
+    @MockBean
+    private WebClient webClient;
+
+    @Mock WebClient.RequestHeadersSpec requestHeadersMock;
+    @Mock WebClient.RequestHeadersUriSpec requestHeadersUriMock;
+    @Mock WebClient.RequestBodySpec requestBodyMock;
+    @Mock WebClient.RequestBodyUriSpec requestBodyUriMock;
+    @Mock WebClient.ResponseSpec responseMock;
 
     @Before
     public void setUp() {
@@ -73,11 +94,6 @@ public class SchoolServiceTest {
         school1.setSchoolName("Test1 School");
         gradSchoolList.add(school1);
 
-        final SchoolEntity school2 = new SchoolEntity();
-        school2.setMinCode("7654321");
-        school2.setSchoolName("Test2 School");
-        gradSchoolList.add(school2);
-
         // District data
         final DistrictEntity district = new DistrictEntity();
         district.setDistrictNumber("123");
@@ -85,10 +101,12 @@ public class SchoolServiceTest {
 
         when(schoolRepository.findAll()).thenReturn(gradSchoolList);
         when(districtRepository.findById("123")).thenReturn(Optional.of(district));
-        List<School> results = schoolService.getSchoolList();
+
+        mockCommonSchool("1234567", "Test1 School");
+        List<School> results = schoolService.getSchoolList("accessToken");
 
         assertThat(results).isNotNull();
-        assertThat(results.size()).isEqualTo(2);
+        assertThat(results.size()).isEqualTo(1);
         School responseSchool = results.get(0);
         assertThat(responseSchool.getSchoolName()).isEqualTo(school1.getSchoolName());
         assertThat(responseSchool.getDistrictName()).isEqualTo(district.getDistrictName());
@@ -127,11 +145,12 @@ public class SchoolServiceTest {
         when(codeService.getSpecificCountryCode(country.getCountryCode())).thenReturn(country);
         when(codeService.getSpecificProvinceCode(province.getProvCode())).thenReturn(province);
 
-        var result = schoolService.getSchoolDetails("1234567");
+        mockCommonSchool("1234567", "Test School");
+        var result = schoolService.getSchoolDetails("1234567", "accessToken");
 
         assertThat(result).isNotNull();
         assertThat(result.getMinCode()).isEqualTo("1234567");
-        assertThat(result.getSchoolName()).isEqualTo("Test School");
+        assertThat(result.getSchoolName()).isEqualToIgnoringCase("Test School");
     }
 
     @Test
@@ -167,7 +186,8 @@ public class SchoolServiceTest {
         when(codeService.getSpecificCountryCode(country.getCountryCode())).thenReturn(country);
         when(codeService.getSpecificProvinceCode(province.getProvCode())).thenReturn(province);
 
-        var result = schoolService.getSchoolDetails("1234567");
+        mockCommonSchool("1234567", null);
+        var result = schoolService.getSchoolDetails("1234567", "accessToken");
 
         assertThat(result).isNull();
     }
@@ -205,7 +225,9 @@ public class SchoolServiceTest {
         when(codeService.getSpecificCountryCode(country.getCountryCode())).thenReturn(null);
         when(codeService.getSpecificProvinceCode(province.getProvCode())).thenReturn(null);
 
-        var result = schoolService.getSchoolDetails("1234567");
+        mockCommonSchool("1234567", null);
+
+        var result = schoolService.getSchoolDetails("1234567", "accessToken");
 
         assertThat(result).isNull();
     }
@@ -243,17 +265,34 @@ public class SchoolServiceTest {
         when(codeService.getSpecificCountryCode(country.getCountryCode())).thenReturn(country);
         when(codeService.getSpecificProvinceCode(province.getProvCode())).thenReturn(province);
 
-        var result = schoolService.getSchoolsByParams("Test School", "1234567");
+        mockCommonSchool("1234567", "Test School");
+
+        var result = schoolService.getSchoolsByParams("Test School", "1234567", "accessToken");
         assertThat(result).isNotNull();
         assertThat(result.size()).isEqualTo(1);
         assertThat(result.get(0).getMinCode()).isEqualTo("1234567");
-        assertThat(result.get(0).getSchoolName()).isEqualTo("TEST SCHOOL");
+        assertThat(result.get(0).getSchoolName()).isEqualToIgnoringCase("TEST SCHOOL");
     }
 
     @Test
     public void testExistsSchool() {
         when(schoolRepository.countTabSchools("1234567")).thenReturn(1L);
-        var result = schoolService.existsSchool("1234567");
+        mockCommonSchool("1234567", null);
+        var result = schoolService.existsSchool("1234567", "accessToken");
         assertThat(result).isTrue();
+    }
+
+    private void mockCommonSchool(String minCode, String schoolName) {
+        CommonSchool commonSchool = new CommonSchool();
+        commonSchool.setSchlNo(minCode);
+        commonSchool.setSchoolName(schoolName);
+        commonSchool.setSchoolCategoryCode("02");
+
+        when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+        when(this.requestHeadersUriMock.uri(String.format(constants.getSchoolByMincodeSchoolApiUrl(), minCode))).thenReturn(this.requestHeadersMock);
+        when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+        when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+        when(this.responseMock.bodyToMono(CommonSchool.class)).thenReturn(Mono.just(commonSchool));
+
     }
 }
