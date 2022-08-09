@@ -15,9 +15,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class SchoolService {
@@ -91,10 +93,10 @@ public class SchoolService {
 		return null;
 	}
 
-	public List<School> getSchoolsByParams(String schoolName, String minCode, String accessToken) {
+	public List<School> getSchoolsByParams(String schoolName, String minCode, String district, String authorityNumber, String accessToken) {
 		String sName = schoolName != null? StringUtils.strip(schoolName.toUpperCase(Locale.ROOT),"*"):null;
 		String sCode = minCode != null? StringUtils.strip(minCode,"*"):null;
-		List<School> schoolList = schoolTransformer.transformToDTO(schoolRepository.findSchools(sName, sCode));
+		List<School> schoolList = schoolTransformer.transformToDTO(schoolRepository.findSchools(sName, sCode, district));
     	schoolList.forEach(sL -> {
     		District dist = districtTransformer.transformToDTO(districtRepository.findById(sL.getMinCode().substring(0, 3)));
     		if (dist != null) {
@@ -103,7 +105,12 @@ public class SchoolService {
     		CommonSchool commonSchool = getCommonSchool(accessToken, minCode);
     		adaptSchool(sL, commonSchool);
     	});
-    	return schoolList;
+		List<School> result = filterByAuthorityNumber(schoolList, authorityNumber);
+		return sortSchools(result);
+	}
+
+	private List<School> sortSchools(List<School> result) {
+		return result.stream().sorted().collect(Collectors.toList());
 	}
 
 	public boolean existsSchool(String minCode, String accessToken) {
@@ -117,6 +124,20 @@ public class SchoolService {
 					h.set(EducGradTraxApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
 				})
 				.retrieve().bodyToMono(CommonSchool.class).block();
+	}
+
+	private List<School> filterByAuthorityNumber(List<School> schools, String authorityNumber) {
+    	if(StringUtils.isBlank(authorityNumber)) {
+    		return schools;
+		}
+		List<School> result = new ArrayList<>();
+		for (School sL : schools) {
+			String sLAuthorityNumber = sL.getAuthorityNumber();
+			if (!StringUtils.isBlank(sLAuthorityNumber) && StringUtils.startsWith(sLAuthorityNumber, authorityNumber)) {
+				result.add(sL);
+			}
+		}
+		return result;
 	}
 
 	private void adaptSchool(School school, CommonSchool commonSchool) {

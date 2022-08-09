@@ -259,7 +259,7 @@ public class SchoolServiceTest {
         province.setProvCode("BC");
         province.setProvName("British Columbia");
 
-        when(schoolRepository.findSchools("Test School".toUpperCase(Locale.ROOT),"1234567")).thenReturn(List.of(school));
+        when(schoolRepository.findSchools("Test School".toUpperCase(Locale.ROOT),"1234567", null)).thenReturn(List.of(school));
         when(districtRepository.findById("123")).thenReturn(Optional.of(district));
 
         when(codeService.getSpecificCountryCode(country.getCountryCode())).thenReturn(country);
@@ -267,7 +267,7 @@ public class SchoolServiceTest {
 
         mockCommonSchool("1234567", "Test School");
 
-        var result = schoolService.getSchoolsByParams("Test School", "1234567", "accessToken");
+        var result = schoolService.getSchoolsByParams("Test School", "1234567", null, null,"accessToken");
         assertThat(result).isNotNull();
         assertThat(result.size()).isEqualTo(1);
         assertThat(result.get(0).getMinCode()).isEqualTo("1234567");
