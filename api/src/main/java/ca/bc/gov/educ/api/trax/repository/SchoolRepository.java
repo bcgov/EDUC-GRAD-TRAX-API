@@ -26,6 +26,6 @@ public interface SchoolRepository extends JpaRepository<SchoolEntity, String> {
 	@Query(value="SELECT si.* FROM TAB_SCHOOL si where "
 			+ "(:schoolName is null or UPPER(si.SCHL_NAME) like %:schoolName%) and "
 			+ "(:mincode is null or si.MINCODE like :mincode%)  and "
-			+ "(:district is null or SUBSTR(si.MINCODE, 0, 3) like :district%)  and ROWNUM <= 1000",nativeQuery = true)
+			+ "(:district is null or si.MINCODE like :district%) and ROWNUM <= 1000",nativeQuery = true)
 	List<SchoolEntity> findSchools(String schoolName, String mincode, String district);
 }
