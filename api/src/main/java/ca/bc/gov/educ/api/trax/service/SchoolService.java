@@ -61,8 +61,8 @@ public class SchoolService {
     		if (dist != null) {
 				sL.setDistrictName(dist.getDistrictName());
 			}
-			CommonSchool commonSchool = getCommonSchool(accessToken, sL.getMinCode());
-			adaptSchool(sL, commonSchool);
+			//CommonSchool commonSchool = getCommonSchool(accessToken, sL.getMinCode());
+			//adaptSchool(sL, commonSchool);
     	});
         return schoolList;
     }
@@ -96,7 +96,9 @@ public class SchoolService {
 	public List<School> getSchoolsByParams(String schoolName, String minCode, String district, String authorityNumber, String accessToken) {
 		String sName = schoolName != null? StringUtils.strip(schoolName.toUpperCase(Locale.ROOT),"*"):null;
 		String sCode = minCode != null? StringUtils.strip(minCode,"*"):null;
-		List<School> schoolList = schoolTransformer.transformToDTO(schoolRepository.findSchools(sName, sCode, district));
+		String sDist = district != null? StringUtils.strip(district,"*"):null;
+		String sAuth = authorityNumber != null? StringUtils.strip(authorityNumber,"*"):null;
+		List<School> schoolList = schoolTransformer.transformToDTO(schoolRepository.findSchools(sName, sCode, sDist));
     	schoolList.forEach(sL -> {
     		District dist = districtTransformer.transformToDTO(districtRepository.findById(sL.getMinCode().substring(0, 3)));
     		if (dist != null) {
@@ -105,7 +107,7 @@ public class SchoolService {
     		CommonSchool commonSchool = getCommonSchool(accessToken, minCode);
     		adaptSchool(sL, commonSchool);
     	});
-		List<School> result = filterByAuthorityNumber(schoolList, authorityNumber);
+		List<School> result = filterByAuthorityNumber(schoolList, sAuth);
 		return sortSchools(result);
 	}
 
@@ -118,6 +120,9 @@ public class SchoolService {
 	}
 
 	public CommonSchool getCommonSchool(String accessToken, String mincode) {
+    	if(StringUtils.isBlank(mincode)) {
+    		return null;
+		}
     	try {
 			return webClient.get().uri(String.format(constants.getSchoolByMincodeSchoolApiUrl(), mincode))
 					.headers(h -> {
