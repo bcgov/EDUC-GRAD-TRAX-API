@@ -90,10 +90,10 @@ public class SchoolService {
 	}
 
 	public List<School> getSchoolsByParams(String schoolName, String minCode, String district, String authorityNumber, String accessToken) {
-		String sName = StringUtils.isBlank(schoolName) ? StringUtils.strip(schoolName.toUpperCase(Locale.ROOT),"*"):null;
-		String sCode = StringUtils.isBlank(minCode) ? StringUtils.strip(minCode,"*"):null;
-		String sDist = StringUtils.isBlank(district) ? StringUtils.strip(district,"*"):null;
-		String sAuth = StringUtils.isBlank(authorityNumber) ? StringUtils.strip(authorityNumber,"*"):null;
+		String sName = !StringUtils.isBlank(schoolName) ? StringUtils.strip(schoolName.toUpperCase(Locale.ROOT),"*"):null;
+		String sCode = !StringUtils.isBlank(minCode) ? StringUtils.strip(minCode,"*"):null;
+		String sDist = !StringUtils.isBlank(district) ? StringUtils.strip(district,"*"):null;
+		String sAuth = !StringUtils.isBlank(authorityNumber) ? StringUtils.strip(authorityNumber,"*"):null;
 		List<School> schoolList = schoolTransformer.transformToDTO(schoolRepository.findSchools(sName, sCode, sDist));
     	schoolList.forEach(sL -> {
     		District dist = districtTransformer.transformToDTO(districtRepository.findById(sL.getMinCode().substring(0, 3)));
