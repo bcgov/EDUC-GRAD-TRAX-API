@@ -126,7 +126,7 @@ public class SchoolService {
 					})
 					.retrieve().bodyToMono(CommonSchool.class).block();
 		} catch (Exception e) {
-			logger.warn("Common School not exists for Ministry Code:" + mincode);
+			logger.warn("Common School not exists for Ministry Code: " + mincode);
     		return null;
 		}
 	}
