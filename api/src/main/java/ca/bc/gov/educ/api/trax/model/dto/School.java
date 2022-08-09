@@ -163,9 +163,9 @@ public class School implements Comparable<School> {
 
 	@Override
 	public int compareTo(School o) {
-		return getDistrictNumber().compareTo(o.getDistrictNumber())
-				+ getMinCode().compareTo(o.getMinCode())
-				+ getSchoolName().compareTo(o.getSchoolName())
-				+ getAuthorityNumber().compareTo(o.getAuthorityNumber());
+		return getDistrictNumber().compareToIgnoreCase(o.getDistrictNumber())
+				+ getMinCode().compareToIgnoreCase(o.getMinCode())
+				+ getSchoolName().compareToIgnoreCase(o.getSchoolName())
+				+ getAuthorityNumber().compareToIgnoreCase(o.getAuthorityNumber());
 	}
 }

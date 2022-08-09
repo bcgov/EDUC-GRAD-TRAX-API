@@ -15,11 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Service
 public class SchoolService {
@@ -94,10 +90,10 @@ public class SchoolService {
 	}
 
 	public List<School> getSchoolsByParams(String schoolName, String minCode, String district, String authorityNumber, String accessToken) {
-		String sName = schoolName != null? StringUtils.strip(schoolName.toUpperCase(Locale.ROOT),"*"):null;
-		String sCode = minCode != null? StringUtils.strip(minCode,"*"):null;
-		String sDist = district != null? StringUtils.strip(district,"*"):null;
-		String sAuth = authorityNumber != null? StringUtils.strip(authorityNumber,"*"):null;
+		String sName = StringUtils.isBlank(schoolName) ? StringUtils.strip(schoolName.toUpperCase(Locale.ROOT),"*"):null;
+		String sCode = StringUtils.isBlank(minCode) ? StringUtils.strip(minCode,"*"):null;
+		String sDist = StringUtils.isBlank(district) ? StringUtils.strip(district,"*"):null;
+		String sAuth = StringUtils.isBlank(authorityNumber) ? StringUtils.strip(authorityNumber,"*"):null;
 		List<School> schoolList = schoolTransformer.transformToDTO(schoolRepository.findSchools(sName, sCode, sDist));
     	schoolList.forEach(sL -> {
     		District dist = districtTransformer.transformToDTO(districtRepository.findById(sL.getMinCode().substring(0, 3)));
@@ -108,11 +104,12 @@ public class SchoolService {
     		adaptSchool(sL, commonSchool);
     	});
 		List<School> result = filterByAuthorityNumber(schoolList, sAuth);
-		return sortSchools(result);
+		sortSchools(result);
+		return result;
 	}
 
-	private List<School> sortSchools(List<School> result) {
-		return result.stream().sorted().collect(Collectors.toList());
+	private void sortSchools(List<School> result) {
+		Arrays.sort(result.toArray());
 	}
 
 	public boolean existsSchool(String minCode, String accessToken) {
