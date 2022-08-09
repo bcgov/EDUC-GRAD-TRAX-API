@@ -118,12 +118,17 @@ public class SchoolService {
 	}
 
 	public CommonSchool getCommonSchool(String accessToken, String mincode) {
-		return webClient.get().uri(String.format(constants.getSchoolByMincodeSchoolApiUrl(), mincode))
-				.headers(h -> {
-					h.setBearerAuth(accessToken);
-					h.set(EducGradTraxApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-				})
-				.retrieve().bodyToMono(CommonSchool.class).block();
+    	try {
+			return webClient.get().uri(String.format(constants.getSchoolByMincodeSchoolApiUrl(), mincode))
+					.headers(h -> {
+						h.setBearerAuth(accessToken);
+						h.set(EducGradTraxApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+					})
+					.retrieve().bodyToMono(CommonSchool.class).block();
+		} catch (Exception e) {
+			logger.warn("Common School not exists for Ministry Code:" + mincode);
+    		return null;
+		}
 	}
 
 	private List<School> filterByAuthorityNumber(List<School> schools, String authorityNumber) {
