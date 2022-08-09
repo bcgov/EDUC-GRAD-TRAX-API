@@ -82,7 +82,7 @@ public class SchoolService {
 		        	school.setProvinceName(province.getProvName());
 				}
 			}
-			CommonSchool commonSchool = getCommonSchool(accessToken, minCode);
+			CommonSchool commonSchool = getCommonSchool(accessToken, school.getMinCode());
 			adaptSchool(school, commonSchool);
 			return school;
 		}
@@ -100,7 +100,7 @@ public class SchoolService {
     		if (dist != null) {
 				sL.setDistrictName(dist.getDistrictName());
 			}
-    		CommonSchool commonSchool = getCommonSchool(accessToken, minCode);
+    		CommonSchool commonSchool = getCommonSchool(accessToken, sL.getMinCode());
     		adaptSchool(sL, commonSchool);
     	});
 		List<School> result = filterByAuthorityNumber(schoolList, sAuth);
