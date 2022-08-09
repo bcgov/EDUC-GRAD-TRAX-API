@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.trax.controller;
 
 import ca.bc.gov.educ.api.trax.model.dto.Psi;
+import ca.bc.gov.educ.api.trax.model.dto.StudentPsi;
 import ca.bc.gov.educ.api.trax.service.PsiService;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.GradValidation;
@@ -15,7 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -51,7 +53,11 @@ public class PsiController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),@ApiResponse(responseCode = "400", description = "BAD REQUEST")})
     public ResponseEntity<Psi> getPSIDetails(@PathVariable String psiCode) { 
     	logger.debug("getPSIDetails : ");
-        return response.GET(psiService.getPSIDetails(psiCode));
+        Psi psi = psiService.getPSIDetails(psiCode);
+        if(psi ==null) {
+            return response.NOT_FOUND();
+        }
+        return response.GET(psi);
     }
     
     @GetMapping(EducGradTraxApiConstants.GET_PSI_SEARCH_MAPPING)
@@ -63,8 +69,19 @@ public class PsiController {
     		@RequestParam(value = "psiCode", required = false) String psiCode,
     		@RequestParam(value = "cslCode", required = false) String cslCode,
     		@RequestParam(value = "transmissionMode", required = false) String transmissionMode,
-            @RequestParam(value = "openFlag", required = false) String openFlag,
-            @RequestParam(value = "psiGrouping", required = false) String psiGrouping) {
-		return response.GET(psiService.getPSIByParams(psiName,psiCode,cslCode,transmissionMode,openFlag,psiGrouping));
+            @RequestParam(value = "openFlag", required = false) String openFlag) {
+		return response.GET(psiService.getPSIByParams(psiName,psiCode,cslCode,transmissionMode,openFlag));
 	}
+
+    @GetMapping(EducGradTraxApiConstants.GET_STUDENT_PSI_BY_CODE_MAPPING)
+    @PreAuthorize(PermissionsConstants.READ_PSI_INFO)
+    @Operation(summary = "Find a PSI by Code", description = "Get a PSI by Code", tags = { "PSI" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),@ApiResponse(responseCode = "400", description = "BAD REQUEST")})
+    public ResponseEntity<List<StudentPsi>> getStudentPSIDetails(
+            @RequestParam(value = "transmissionMode") String transmissionMode,
+            @RequestParam(value = "psiCode") String psiCode,
+            @RequestParam(value = "psiYear") String psiYear) {
+        logger.debug("getStudentPSIDetails : ");
+        return response.GET(psiService.getStudentPSIDetails(transmissionMode,psiYear,psiCode));
+    }
 }

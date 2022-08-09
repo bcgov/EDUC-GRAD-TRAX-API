@@ -50,6 +50,8 @@ public class EducGradTraxApiConstants {
     public static final String GET_PSI_BY_CODE_MAPPING = "/{psiCode}";
     public static final String GET_PSI_SEARCH_MAPPING="/search";
 
+    public static final String GET_STUDENT_PSI_BY_CODE_MAPPING = "/student";
+
     public static final String GET_DISTRICT_BY_DISTNO_MAPPING = "/{distCode}";
 
     public static final String GET_TRANSCRIPT_DEMOG_BY_PEN_MAPPING = "/tran-demog/{pen}";
@@ -66,9 +68,9 @@ public class EducGradTraxApiConstants {
     
     //Default Attribute value constants
     public static final String DEFAULT_CREATED_BY = "API_GRAD_TRAX";
-    public static final Date DEFAULT_CREATED_TIMESTAMP = new Date();
+    protected static final Date DEFAULT_CREATED_TIMESTAMP = new Date();
     public static final String DEFAULT_UPDATED_BY = "API_GRAD_TRAX";
-    public static final Date DEFAULT_UPDATED_TIMESTAMP = new Date();
+    protected static final Date DEFAULT_UPDATED_TIMESTAMP = new Date();
 
     //Default Date format constants
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";

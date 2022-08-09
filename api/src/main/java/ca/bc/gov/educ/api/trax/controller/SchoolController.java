@@ -60,7 +60,7 @@ public class SchoolController {
     	if(schoolResponse != null) {
     		return response.GET(schoolResponse);
     	}else {
-    		return response.NO_CONTENT();
+    		return response.NOT_FOUND();
     	}
     }
     
