@@ -57,6 +57,7 @@ public class JetStreamEventScheduler {
         this.choreographer = choreographer;
         this.publisher = publisher;
     }
+    
     @Scheduled(cron = "${cron.scheduled.process.events.stan.run}") // every 5 minutes
     @SchedulerLock(name = "PROCESS_CHOREOGRAPHED_EVENTS_FROM_JET_STREAM", lockAtLeastFor = "${cron.scheduled.process.events.stan.lockAtLeastFor}", lockAtMostFor = "${cron.scheduled.process.events.stan.lockAtMostFor}")
     public void findAndProcessEvents() {
@@ -79,7 +80,6 @@ public class JetStreamEventScheduler {
             }
         }
     }
-
 
     @Scheduled(cron = "${cron.scheduled.process.events.stan.run}") // every 5 minutes
     @SchedulerLock(name = "PUBLISH_TRAX_UPDATED_EVENTS_TO_JET_STREAM", lockAtLeastFor = "${cron.scheduled.process.events.stan.lockAtLeastFor}", lockAtMostFor = "${cron.scheduled.process.events.stan.lockAtMostFor}")
