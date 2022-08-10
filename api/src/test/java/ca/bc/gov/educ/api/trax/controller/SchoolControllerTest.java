@@ -64,9 +64,9 @@ public class SchoolControllerTest {
         obj.setSchoolName("Test2 School");
         gradSchoolList.add(obj);
 
-        Mockito.when(schoolService.getSchoolList("accessToken")).thenReturn(gradSchoolList);
-        schoolController.getAllSchools("accessToken");
-        Mockito.verify(schoolService).getSchoolList("accessToken");
+        Mockito.when(schoolService.getSchoolList()).thenReturn(gradSchoolList);
+        schoolController.getAllSchools();
+        Mockito.verify(schoolService).getSchoolList();
     }
 
     @Test

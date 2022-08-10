@@ -50,15 +50,13 @@ public class SchoolService {
      *
      * @return List of Schools
      */
-    public List<School> getSchoolList(String accessToken) {
+    public List<School> getSchoolList() {
         List<School> schoolList  = schoolTransformer.transformToDTO(schoolRepository.findAll());  
     	schoolList.forEach(sL -> {
     		District dist = districtTransformer.transformToDTO(districtRepository.findById(sL.getMinCode().substring(0, 3)));
     		if (dist != null) {
 				sL.setDistrictName(dist.getDistrictName());
 			}
-			//CommonSchool commonSchool = getCommonSchool(accessToken, sL.getMinCode());
-			//adaptSchool(sL, commonSchool);
     	});
         return schoolList;
     }
@@ -128,7 +126,7 @@ public class SchoolService {
 					})
 					.retrieve().bodyToMono(CommonSchool.class).block();
 		} catch (Exception e) {
-			logger.warn("Common School not exists for Ministry Code: " + mincode);
+			logger.warn(String.format("Common School not exists for Ministry Code: %s", mincode));
     		return null;
 		}
 	}

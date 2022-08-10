@@ -30,6 +30,8 @@ public class SchoolController {
 
     private static Logger logger = LoggerFactory.getLogger(SchoolController.class);
 
+    private static final String BEARER = "Bearer ";
+
     @Autowired
     SchoolService schoolService;
     
@@ -43,9 +45,9 @@ public class SchoolController {
     @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
     @Operation(summary = "Find All Schools", description = "Get All Schools", tags = { "School" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
-    public List<School> getAllSchools(@RequestHeader(name="Authorization") String accessToken) {
+    public List<School> getAllSchools() {
     	logger.debug("getAllSchools : ");
-        return schoolService.getSchoolList(accessToken.replace("Bearer ", ""));
+        return schoolService.getSchoolList();
     }
     
     
@@ -56,7 +58,7 @@ public class SchoolController {
 			@ApiResponse(responseCode = "204", description = "NO CONTENT")})
     public ResponseEntity<School> getSchoolDetails(@PathVariable String minCode, @RequestHeader(name="Authorization") String accessToken) {
     	logger.debug("getSchoolDetails : ");
-    	School schoolResponse = schoolService.getSchoolDetails(minCode, accessToken.replace("Bearer ", ""));
+    	School schoolResponse = schoolService.getSchoolDetails(minCode, accessToken.replace(BEARER, ""));
     	if(schoolResponse != null) {
     		return response.GET(schoolResponse);
     	}else {
@@ -75,7 +77,7 @@ public class SchoolController {
             @RequestParam(value = "district", required = false) String district,
             @RequestParam(value = "authorityNumber", required = false) String authorityNumber,
             @RequestHeader(name="Authorization") String accessToken) {
-		return response.GET(schoolService.getSchoolsByParams(schoolName, mincode, district, authorityNumber, accessToken.replace("Bearer ", "")));
+		return response.GET(schoolService.getSchoolsByParams(schoolName, mincode, district, authorityNumber, accessToken.replace(BEARER, "")));
     }
 
     @GetMapping(EducGradTraxApiConstants.CHECK_SCHOOL_BY_CODE_MAPPING)
@@ -84,6 +86,6 @@ public class SchoolController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "204", description = "NO CONTENT")})
     public ResponseEntity<Boolean> checkSchoolExists(@PathVariable String minCode, @RequestHeader(name="Authorization") String accessToken) {
-        return response.GET(schoolService.existsSchool(minCode, accessToken.replace("Bearer ", "")));
+        return response.GET(schoolService.existsSchool(minCode, accessToken.replace(BEARER, "")));
     }
 }
