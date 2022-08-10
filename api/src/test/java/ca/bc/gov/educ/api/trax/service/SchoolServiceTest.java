@@ -112,8 +112,7 @@ public class SchoolServiceTest {
         mockCommonSchool("1234567", "Test1 School");
         List<School> results = schoolService.getSchoolList();
 
-        assertThat(results).isNotNull();
-        assertThat(results).hasSize(1);
+        assertThat(results).isNotNull().hasSize(1);
         School responseSchool = results.get(0);
         assertThat(responseSchool.getSchoolName()).isEqualTo(school1.getSchoolName());
         assertThat(responseSchool.getDistrictName()).isEqualTo(districtEntity.getDistrictName());
