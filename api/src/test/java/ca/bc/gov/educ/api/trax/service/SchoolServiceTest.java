@@ -3,15 +3,14 @@ package ca.bc.gov.educ.api.trax.service;
 import ca.bc.gov.educ.api.trax.messaging.NatsConnection;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Subscriber;
-import ca.bc.gov.educ.api.trax.model.dto.CommonSchool;
-import ca.bc.gov.educ.api.trax.model.dto.GradCountry;
-import ca.bc.gov.educ.api.trax.model.dto.GradProvince;
-import ca.bc.gov.educ.api.trax.model.dto.School;
+import ca.bc.gov.educ.api.trax.model.dto.*;
 import ca.bc.gov.educ.api.trax.model.entity.DistrictEntity;
 import ca.bc.gov.educ.api.trax.model.entity.SchoolEntity;
+import ca.bc.gov.educ.api.trax.model.transformer.DistrictTransformer;
 import ca.bc.gov.educ.api.trax.repository.DistrictRepository;
 import ca.bc.gov.educ.api.trax.repository.SchoolRepository;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -75,6 +74,9 @@ public class SchoolServiceTest {
     @Mock WebClient.RequestBodyUriSpec requestBodyUriMock;
     @Mock WebClient.ResponseSpec responseMock;
 
+    @Autowired
+    private DistrictTransformer districtTransformer;
+
     @Before
     public void setUp() {
         openMocks(this);
@@ -94,13 +96,18 @@ public class SchoolServiceTest {
         school1.setSchoolName("Test1 School");
         gradSchoolList.add(school1);
 
+        assertThat(StringUtils.isBlank(school1.getMinCode())).isFalse();
+
         // District data
-        final DistrictEntity district = new DistrictEntity();
-        district.setDistrictNumber("123");
-        district.setDistrictName("Test District");
+        final DistrictEntity districtEntity = new DistrictEntity();
+        districtEntity.setDistrictNumber("123");
+        districtEntity.setDistrictName("Test District");
 
         when(schoolRepository.findAll()).thenReturn(gradSchoolList);
-        when(districtRepository.findById("123")).thenReturn(Optional.of(district));
+        when(districtRepository.findById("123")).thenReturn(Optional.of(districtEntity));
+
+        District district = districtTransformer.transformToDTO(districtEntity);
+        assertThat(district).isNotNull();
 
         mockCommonSchool("1234567", "Test1 School");
         List<School> results = schoolService.getSchoolList();
@@ -109,7 +116,7 @@ public class SchoolServiceTest {
         assertThat(results).hasSize(1);
         School responseSchool = results.get(0);
         assertThat(responseSchool.getSchoolName()).isEqualTo(school1.getSchoolName());
-        assertThat(responseSchool.getDistrictName()).isEqualTo(district.getDistrictName());
+        assertThat(responseSchool.getDistrictName()).isEqualTo(districtEntity.getDistrictName());
     }
 
     @Test
@@ -122,11 +129,11 @@ public class SchoolServiceTest {
         school.setProvCode("BC");
 
         // District
-        final DistrictEntity district = new DistrictEntity();
-        district.setDistrictNumber("123");
-        district.setDistrictName("Test District");
-        district.setCountryCode("CA");
-        district.setProvCode("BC");
+        final DistrictEntity districtEntity = new DistrictEntity();
+        districtEntity.setDistrictNumber("123");
+        districtEntity.setDistrictName("Test District");
+        districtEntity.setCountryCode("CA");
+        districtEntity.setProvCode("BC");
 
         // Country
         final GradCountry country = new GradCountry();
@@ -140,7 +147,10 @@ public class SchoolServiceTest {
         province.setProvName("British Columbia");
 
         when(schoolRepository.findById("1234567")).thenReturn(Optional.of(school));
-        when(districtRepository.findById("123")).thenReturn(Optional.of(district));
+        when(districtRepository.findById("123")).thenReturn(Optional.of(districtEntity));
+
+        District district = districtTransformer.transformToDTO(districtEntity);
+        assertThat(district).isNotNull();
 
         when(codeService.getSpecificCountryCode(country.getCountryCode())).thenReturn(country);
         when(codeService.getSpecificProvinceCode(province.getProvCode())).thenReturn(province);
