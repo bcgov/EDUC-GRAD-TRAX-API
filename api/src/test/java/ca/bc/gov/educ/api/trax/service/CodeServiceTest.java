@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -80,14 +82,17 @@ public class CodeServiceTest {
 		objEntity.setProvName("British Columbia");
 		Optional<GradProvinceEntity> ent = Optional.of(objEntity);
 		Mockito.when(gradProvinceRepository.findById(provCode)).thenReturn(ent);
-		codeService.getSpecificProvinceCode(provCode);
+		GradProvince gradProvince = codeService.getSpecificProvinceCode(provCode);
+		assertThat(gradProvince).isNotNull();
+
 	}
 	
 	@Test
 	public void testGetSpecificProvinceCodeReturnsNull() {
 		String provCode = "BC";
 		Mockito.when(gradProvinceRepository.findById(provCode)).thenReturn(Optional.empty());
-		codeService.getSpecificProvinceCode(provCode);
+		GradProvince gradProvince = codeService.getSpecificProvinceCode(provCode);
+		assertThat(gradProvince).isNull();
 	}
 	
 	@Test
@@ -102,7 +107,8 @@ public class CodeServiceTest {
 		obj.setCountryName("America");
 		gradCountryList.add(obj);
 		Mockito.when(gradCountryRepository.findAll()).thenReturn(gradCountryList);
-		codeService.getAllCountryCodeList();
+		List<GradCountry> gradCountries = codeService.getAllCountryCodeList();
+		assertThat(gradCountries).isNotNull();
 	}
 	
 	@Test
@@ -117,13 +123,15 @@ public class CodeServiceTest {
 		objEntity.setCountryName("Canada");
 		Optional<GradCountryEntity> ent = Optional.of(objEntity);
 		Mockito.when(gradCountryRepository.findById(countryCode)).thenReturn(ent);
-		codeService.getSpecificCountryCode(countryCode);
+		GradCountry country = codeService.getSpecificCountryCode(countryCode);
+		assertThat(country).isNotNull();
 	}
 	
 	@Test
 	public void testGetSpecificCountryCodeReturnsNull() {
 		String countryCode = "CA";
 		Mockito.when(gradCountryRepository.findById(countryCode)).thenReturn(Optional.empty());
-		codeService.getSpecificCountryCode(countryCode);
+		GradCountry country = codeService.getSpecificCountryCode(countryCode);
+		assertThat(country).isNull();
 	}
 }

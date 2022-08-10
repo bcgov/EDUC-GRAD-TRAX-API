@@ -13,7 +13,7 @@ import java.util.Set;
 public interface SchoolRepository extends JpaRepository<SchoolEntity, String> {
 
     List<SchoolEntity> findByMinCodeStartsWith(String districtNumber);
-	@Query(value="SELECT si.* FROM tab_school si where "
+	@Query(value="SELECT si.* FROM TAB_SCHOOL si where "
 			+ "(:city is null or si.CITY like %:city%)  and "
 			+ "(:schoolName is null or si.SCHL_NAME like %:schoolName%)  and "
 			+ "(:isMincodeListIncluded is null or si.MINCODE in :minCodeList) and ROWNUM <= 50",nativeQuery = true)			
@@ -23,8 +23,9 @@ public interface SchoolRepository extends JpaRepository<SchoolEntity, String> {
 			"where sc.mincode = :minCode \n", nativeQuery=true)
 	long countTabSchools(@Param("minCode") String minCode);
 
-	@Query(value="SELECT si.* FROM tab_school si where "
-			+ "(:schoolName is null or si.SCHL_NAME like %:schoolName%) and "
-			+ "(:mincode is null or si.MINCODE like :mincode%)",nativeQuery = true)
-	List<SchoolEntity> findSchools(String schoolName, String mincode);
+	@Query(value="SELECT si.* FROM TAB_SCHOOL si where "
+			+ "(:schoolName is null or UPPER(si.SCHL_NAME) like %:schoolName%) and "
+			+ "(:mincode is null or si.MINCODE like :mincode%)  and "
+			+ "(:district is null or si.MINCODE like :district%) and ROWNUM <= 1000",nativeQuery = true)
+	List<SchoolEntity> findSchools(String schoolName, String mincode, String district);
 }
