@@ -99,7 +99,7 @@ public class SchoolServiceTest {
         assertThat(StringUtils.isBlank(school1.getMinCode())).isFalse();
 
         // District data
-        final DistrictEntity districtEntity = new DistrictEntity();
+        DistrictEntity districtEntity = new DistrictEntity();
         districtEntity.setDistrictNumber("123");
         districtEntity.setDistrictName("Test District");
 
@@ -116,6 +116,7 @@ public class SchoolServiceTest {
         School responseSchool = results.get(0);
         assertThat(responseSchool.getSchoolName()).isEqualTo(school1.getSchoolName());
         assertThat(responseSchool.getDistrictName()).isEqualTo(districtEntity.getDistrictName());
+
     }
 
     @Test
@@ -291,6 +292,14 @@ public class SchoolServiceTest {
         mockCommonSchool("1234567", null);
         var result = schoolService.existsSchool("1234567", "accessToken");
         assertThat(result).isTrue();
+    }
+
+    @Test
+    public void testNotExistsSchool() {
+        when(schoolRepository.countTabSchools("1234567")).thenReturn(0L);
+        mockCommonSchool("1234567", null);
+        var result = schoolService.existsSchool("1234567", "accessToken");
+        assertThat(result).isFalse();
     }
 
     private void mockCommonSchool(String minCode, String schoolName) {

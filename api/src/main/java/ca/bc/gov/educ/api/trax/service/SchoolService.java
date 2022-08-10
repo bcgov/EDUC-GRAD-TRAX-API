@@ -78,6 +78,8 @@ public class SchoolService {
 				GradProvince province = codeService.getSpecificProvinceCode(school.getProvCode());
 		        if(province != null) {
 		        	school.setProvinceName(province.getProvName());
+				} else {
+					school.setProvinceName("");
 				}
 			}
 			CommonSchool commonSchool = getCommonSchool(accessToken, school.getMinCode());
@@ -97,6 +99,8 @@ public class SchoolService {
     		District dist = districtTransformer.transformToDTO(districtRepository.findById(sL.getMinCode().substring(0, 3)));
     		if (dist != null) {
 				sL.setDistrictName(dist.getDistrictName());
+			} else {
+				sL.setDistrictName("");
 			}
     		CommonSchool commonSchool = getCommonSchool(accessToken, sL.getMinCode());
     		adaptSchool(sL, commonSchool);
