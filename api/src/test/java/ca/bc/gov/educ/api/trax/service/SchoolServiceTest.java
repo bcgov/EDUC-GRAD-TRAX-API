@@ -145,6 +145,8 @@ public class SchoolServiceTest {
         province.setProvCode("BC");
         province.setProvName("British Columbia");
 
+        assertThat(StringUtils.isNotBlank(province.getProvCode())).isTrue();
+
         when(schoolRepository.findById("1234567")).thenReturn(Optional.of(school));
         when(districtRepository.findById("123")).thenReturn(Optional.of(districtEntity));
 
