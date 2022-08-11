@@ -9,6 +9,8 @@ import ca.bc.gov.educ.api.trax.model.entity.SchoolEntity;
 import ca.bc.gov.educ.api.trax.model.transformer.DistrictTransformer;
 import ca.bc.gov.educ.api.trax.repository.DistrictRepository;
 import ca.bc.gov.educ.api.trax.repository.SchoolRepository;
+import ca.bc.gov.educ.api.trax.repository.TraxSchoolSearchCriteria;
+import ca.bc.gov.educ.api.trax.repository.TraxSchoolSearchSpecification;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
@@ -19,6 +21,7 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -26,7 +29,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -271,7 +273,14 @@ public class SchoolServiceTest {
         province.setProvCode("BC");
         province.setProvName("British Columbia");
 
-        when(schoolRepository.findSchools("Test School".toUpperCase(Locale.ROOT),"1234567", null)).thenReturn(List.of(school));
+        TraxSchoolSearchCriteria searchCriteria = TraxSchoolSearchCriteria.builder()
+                .district(null)
+                .schoolName(null)
+                .minCode(school.getMinCode())
+                .build();
+        Specification<SchoolEntity> spec = new TraxSchoolSearchSpecification(searchCriteria);
+
+        when(schoolRepository.findAll(Specification.where(spec))).thenReturn(List.of(school));
         when(districtRepository.findById("123")).thenReturn(Optional.of(district));
 
         when(codeService.getSpecificCountryCode(country.getCountryCode())).thenReturn(country);
@@ -279,7 +288,7 @@ public class SchoolServiceTest {
 
         mockCommonSchool("1234567", "Test School");
 
-        var result = schoolService.getSchoolsByParams("Test School", "1234567", null, null,"accessToken");
+        var result = schoolService.getSchoolsByParams(null, searchCriteria.getMinCode(), null, null,"accessToken");
         assertThat(result).isNotNull();
         assertThat(result.size()).isEqualTo(1);
         assertThat(result.get(0).getMinCode()).isEqualTo("1234567");
@@ -290,7 +299,7 @@ public class SchoolServiceTest {
     public void testExistsSchool() {
         when(schoolRepository.countTabSchools("1234567")).thenReturn(1L);
         mockCommonSchool("1234567", null);
-        var result = schoolService.existsSchool("1234567", "accessToken");
+        var result = schoolService.existsSchool("1234567");
         assertThat(result).isTrue();
     }
 
@@ -298,7 +307,7 @@ public class SchoolServiceTest {
     public void testNotExistsSchool() {
         when(schoolRepository.countTabSchools("1234567")).thenReturn(0L);
         mockCommonSchool("1234567", null);
-        var result = schoolService.existsSchool("1234567", "accessToken");
+        var result = schoolService.existsSchool("1234567");
         assertThat(result).isFalse();
     }
 

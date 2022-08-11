@@ -6,12 +6,15 @@ import ca.bc.gov.educ.api.trax.model.transformer.DistrictTransformer;
 import ca.bc.gov.educ.api.trax.model.transformer.SchoolTransformer;
 import ca.bc.gov.educ.api.trax.repository.DistrictRepository;
 import ca.bc.gov.educ.api.trax.repository.SchoolRepository;
+import ca.bc.gov.educ.api.trax.repository.TraxSchoolSearchCriteria;
+import ca.bc.gov.educ.api.trax.repository.TraxSchoolSearchSpecification;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.ThreadLocalStateUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -94,7 +97,13 @@ public class SchoolService {
 		String sCode = !StringUtils.isBlank(minCode) ? StringUtils.strip(minCode,"*"):null;
 		String sDist = !StringUtils.isBlank(district) ? StringUtils.strip(district,"*"):null;
 		String sAuth = !StringUtils.isBlank(authorityNumber) ? StringUtils.strip(authorityNumber,"*"):null;
-		List<School> schoolList = schoolTransformer.transformToDTO(schoolRepository.findSchools(sName, sCode, sDist));
+		TraxSchoolSearchCriteria searchCriteria = TraxSchoolSearchCriteria.builder()
+				.district(sDist)
+				.schoolName(sName)
+				.minCode(sCode)
+				.build();
+		Specification<SchoolEntity> spec = new TraxSchoolSearchSpecification(searchCriteria);
+		List<School> schoolList = schoolTransformer.transformToDTO(schoolRepository.findAll(Specification.where(spec)));
     	schoolList.forEach(sL -> {
     		District dist = districtTransformer.transformToDTO(districtRepository.findById(sL.getMinCode().substring(0, 3)));
     		if (dist != null) {
@@ -114,8 +123,8 @@ public class SchoolService {
 		Arrays.sort(result.toArray());
 	}
 
-	public boolean existsSchool(String minCode, String accessToken) {
-		return schoolRepository.countTabSchools(minCode) > 0L && getCommonSchool(accessToken, minCode) != null;
+	public boolean existsSchool(String minCode) {
+		return schoolRepository.countTabSchools(minCode) > 0L;
 	}
 
 	public CommonSchool getCommonSchool(String accessToken, String mincode) {
@@ -165,18 +174,6 @@ public class SchoolService {
     		school.setPrincipalFirstName(commonSchool.getPrGivenName());
     		school.setPrincipalLastName(commonSchool.getPrSurname());
     		school.setPrincipalName(commonSchool.getPrSurname() + ", " + commonSchool.getPrGivenName() + " " + commonSchool.getPrMiddleName());
-
-    		//overwrite trax school with common school values
-			school.setSchoolName(commonSchool.getSchoolName());
-			school.setAddress1(commonSchool.getScAddressLine1());
-			school.setAddress2(commonSchool.getScAddressLine2());
-			school.setCity(commonSchool.getScCity());
-			school.setProvCode(commonSchool.getScProvinceCode());
-			school.setPostal(commonSchool.getScPostalCode());
-			school.setCountryCode(commonSchool.getScCountryCode());
-			school.setSchoolPhone(commonSchool.getScPhoneNumber());
-			school.setSchoolFax(commonSchool.getScFaxNumber());
-			school.setSchoolEmail(commonSchool.getScEMailId());
 		}
 	}
 }
