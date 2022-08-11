@@ -61,7 +61,7 @@ public class DistrictServiceTest {
 
         when(districtRepository.findById("123")).thenReturn(Optional.of(district));
         Optional<DistrictEntity> entity = districtRepository.findById("123");
-        assertThat(entity.isPresent()).isTrue();
+        assertThat(entity).isPresent();
 
         var result = districtService.getDistrictDetails("123");
 
@@ -74,7 +74,7 @@ public class DistrictServiceTest {
     public void testGetDistrictDetailsNull() {
         when(districtRepository.findById("123")).thenReturn(Optional.empty());
         Optional<DistrictEntity> entity = districtRepository.findById("123");
-        assertThat(entity.isPresent()).isFalse();
+        assertThat(entity).isPresent();
         var result = districtService.getDistrictDetails("123");
         assertThat(result).isNull();
     }
