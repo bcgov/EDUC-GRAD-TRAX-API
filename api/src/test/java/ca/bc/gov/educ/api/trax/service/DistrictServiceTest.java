@@ -64,7 +64,6 @@ public class DistrictServiceTest {
         assertThat(entity).isPresent();
 
         var result = districtService.getDistrictDetails("123");
-
         assertThat(result).isNotNull();
         assertThat(result.getDistrictNumber()).isEqualTo("123");
         assertThat(result.getDistrictName()).isEqualTo("Test District");
