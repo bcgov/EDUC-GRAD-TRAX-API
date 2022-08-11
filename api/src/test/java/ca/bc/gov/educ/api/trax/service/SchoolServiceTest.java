@@ -309,7 +309,21 @@ public class SchoolServiceTest {
         assertThat(result).isFalse();
     }
 
-    private void mockCommonSchool(String minCode, String schoolName) {
+    @Test
+    public void testCommonSchool() {
+        mockCommonSchool("02121000", "THE GATEWAY COMMUNITY LEARNING CENTRE");
+        var result = schoolService.getCommonSchool("accessToken", "02121000");
+        assertThat(result).isNotNull();
+    }
+
+    @Test
+    public void testCommonSchoolIsNull() {
+        mockCommonSchool("02121000", "THE GATEWAY COMMUNITY LEARNING CENTRE");
+        var result = schoolService.getCommonSchool("accessToken", "12345678");
+        assertThat(result).isNull();
+    }
+
+    public void mockCommonSchool(String minCode, String schoolName) {
         CommonSchool commonSchool = new CommonSchool();
         commonSchool.setSchlNo(minCode);
         commonSchool.setSchoolName(schoolName);
@@ -320,6 +334,5 @@ public class SchoolServiceTest {
         Mockito.when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
         Mockito.when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
         Mockito.when(this.responseMock.bodyToMono(CommonSchool.class)).thenReturn(Mono.just(commonSchool));
-
     }
 }
