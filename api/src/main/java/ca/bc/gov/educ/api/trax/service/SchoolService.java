@@ -125,18 +125,6 @@ public class SchoolService {
     		if (dist != null) {
 				sL.setDistrictName(dist.getDistrictName());
 			}
-			if(StringUtils.isNotBlank(sL.getCountryCode())) {
-				GradCountry country = codeService.getSpecificCountryCode(sL.getCountryCode());
-				if(country != null) {
-					sL.setCountryName(country.getCountryName());
-				}
-			}
-			if(StringUtils.isNotBlank(sL.getProvCode())) {
-				GradProvince province = codeService.getSpecificProvinceCode(sL.getProvCode());
-				if(province != null) {
-					sL.setProvinceName(province.getProvName());
-				}
-			}
     		CommonSchool commonSchool = getCommonSchool(accessToken, sL.getMinCode());
     		adaptSchool(sL, commonSchool);
     	});
@@ -201,6 +189,19 @@ public class SchoolService {
     		school.setPrincipalFirstName(commonSchool.getPrGivenName());
     		school.setPrincipalLastName(commonSchool.getPrSurname());
     		school.setPrincipalName(commonSchool.getPrSurname() + ", " + commonSchool.getPrGivenName() + " " + commonSchool.getPrMiddleName());
+
+			if(StringUtils.isNotBlank(school.getCountryCode())) {
+				GradCountry country = codeService.getSpecificCountryCode(school.getCountryCode());
+				if(country != null) {
+					school.setCountryName(country.getCountryName());
+				}
+			}
+			if(StringUtils.isNotBlank(school.getProvCode())) {
+				GradProvince province = codeService.getSpecificProvinceCode(school.getProvCode());
+				if(province != null) {
+					school.setProvinceName(province.getProvName());
+				}
+			}
 		}
 	}
 }
