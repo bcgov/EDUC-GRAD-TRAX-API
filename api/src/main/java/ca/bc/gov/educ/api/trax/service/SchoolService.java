@@ -87,18 +87,6 @@ public class SchoolService {
 			if(dist != null) {
 				school.setDistrictName(dist.getDistrictName());
 			}
-			if(StringUtils.isNotBlank(school.getCountryCode())) {
-				GradCountry country = codeService.getSpecificCountryCode(school.getCountryCode());
-		        if(country != null) {
-		        	school.setCountryName(country.getCountryName());
-				}
-			}
-			if(StringUtils.isNotBlank(school.getProvCode())) {
-				GradProvince province = codeService.getSpecificProvinceCode(school.getProvCode());
-		        if(province != null) {
-		        	school.setProvinceName(province.getProvName());
-				}
-			}
 			CommonSchool commonSchool = getCommonSchool(accessToken, school.getMinCode());
 			adaptSchool(school, commonSchool);
 			return school;
