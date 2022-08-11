@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.*;
@@ -53,6 +54,7 @@ public class SchoolService {
      *
      * @return List of Schools
      */
+    @Transactional
     public List<School> getSchoolList() {
         List<School> schoolList  = schoolTransformer.transformToDTO(schoolRepository.findAll());  
     	schoolList.forEach(sL -> {
@@ -60,17 +62,31 @@ public class SchoolService {
     		if (dist != null) {
 				sL.setDistrictName(dist.getDistrictName());
 			}
+			if(StringUtils.isNotBlank(sL.getCountryCode())) {
+				GradCountry country = codeService.getSpecificCountryCode(sL.getCountryCode());
+				if(country != null) {
+					sL.setCountryName(country.getCountryName());
+				}
+			}
+			if(StringUtils.isNotBlank(sL.getProvCode())) {
+				GradProvince province = codeService.getSpecificProvinceCode(sL.getProvCode());
+				if(province != null) {
+					sL.setProvinceName(province.getProvName());
+				}
+			}
     	});
         return schoolList;
     }
 
+	@Transactional
 	public School getSchoolDetails(String minCode, String accessToken) {
 		Optional<SchoolEntity> entOptional = schoolRepository.findById(minCode);
 		if(entOptional.isPresent()) {
 			School school = schoolTransformer.transformToDTO(entOptional.get());
 			District dist = districtTransformer.transformToDTO(districtRepository.findById(school.getMinCode().substring(0, 3)));
-			if(dist != null)
+			if(dist != null) {
 				school.setDistrictName(dist.getDistrictName());
+			}
 			if(StringUtils.isNotBlank(school.getCountryCode())) {
 				GradCountry country = codeService.getSpecificCountryCode(school.getCountryCode());
 		        if(country != null) {
@@ -81,8 +97,6 @@ public class SchoolService {
 				GradProvince province = codeService.getSpecificProvinceCode(school.getProvCode());
 		        if(province != null) {
 		        	school.setProvinceName(province.getProvName());
-				} else {
-					school.setProvinceName("");
 				}
 			}
 			CommonSchool commonSchool = getCommonSchool(accessToken, school.getMinCode());
@@ -92,6 +106,7 @@ public class SchoolService {
 		return null;
 	}
 
+	@Transactional
 	public List<School> getSchoolsByParams(String schoolName, String minCode, String district, String authorityNumber, String accessToken) {
 		String sName = !StringUtils.isBlank(schoolName) ? StringUtils.strip(schoolName.toUpperCase(Locale.ROOT),"*"):null;
 		String sCode = !StringUtils.isBlank(minCode) ? StringUtils.strip(minCode,"*"):null;
@@ -103,13 +118,24 @@ public class SchoolService {
 				.minCode(sCode)
 				.build();
 		Specification<SchoolEntity> spec = new TraxSchoolSearchSpecification(searchCriteria);
-		List<School> schoolList = schoolTransformer.transformToDTO(schoolRepository.findAll(Specification.where(spec)));
+		List<SchoolEntity> schoolEntities = schoolRepository.findAll(Specification.where(spec));
+		List<School> schoolList = schoolTransformer.transformToDTO(schoolEntities);
     	schoolList.forEach(sL -> {
     		District dist = districtTransformer.transformToDTO(districtRepository.findById(sL.getMinCode().substring(0, 3)));
     		if (dist != null) {
 				sL.setDistrictName(dist.getDistrictName());
-			} else {
-				sL.setDistrictName("");
+			}
+			if(StringUtils.isNotBlank(sL.getCountryCode())) {
+				GradCountry country = codeService.getSpecificCountryCode(sL.getCountryCode());
+				if(country != null) {
+					sL.setCountryName(country.getCountryName());
+				}
+			}
+			if(StringUtils.isNotBlank(sL.getProvCode())) {
+				GradProvince province = codeService.getSpecificProvinceCode(sL.getProvCode());
+				if(province != null) {
+					sL.setProvinceName(province.getProvName());
+				}
 			}
     		CommonSchool commonSchool = getCommonSchool(accessToken, sL.getMinCode());
     		adaptSchool(sL, commonSchool);
@@ -123,6 +149,7 @@ public class SchoolService {
 		Arrays.sort(result.toArray());
 	}
 
+	@Transactional
 	public boolean existsSchool(String minCode) {
 		return schoolRepository.countTabSchools(minCode) > 0L;
 	}
