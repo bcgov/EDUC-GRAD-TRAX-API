@@ -65,7 +65,7 @@ public class SchoolEntity {
     
     @Column(name = "SCHL_ORG", nullable = true)
     private String schoolOrg;
-    
+
     @Column(name = "APPEND_TRANS", nullable = true)
     private String appendTrans;
     

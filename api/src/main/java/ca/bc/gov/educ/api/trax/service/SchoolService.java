@@ -6,13 +6,17 @@ import ca.bc.gov.educ.api.trax.model.transformer.DistrictTransformer;
 import ca.bc.gov.educ.api.trax.model.transformer.SchoolTransformer;
 import ca.bc.gov.educ.api.trax.repository.DistrictRepository;
 import ca.bc.gov.educ.api.trax.repository.SchoolRepository;
+import ca.bc.gov.educ.api.trax.repository.TraxSchoolSearchCriteria;
+import ca.bc.gov.educ.api.trax.repository.TraxSchoolSearchSpecification;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.ThreadLocalStateUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.*;
@@ -50,6 +54,7 @@ public class SchoolService {
      *
      * @return List of Schools
      */
+    @Transactional
     public List<School> getSchoolList() {
         List<School> schoolList  = schoolTransformer.transformToDTO(schoolRepository.findAll());  
     	schoolList.forEach(sL -> {
@@ -57,30 +62,30 @@ public class SchoolService {
     		if (dist != null) {
 				sL.setDistrictName(dist.getDistrictName());
 			}
+			if(StringUtils.isNotBlank(sL.getCountryCode())) {
+				GradCountry country = codeService.getSpecificCountryCode(sL.getCountryCode());
+				if(country != null) {
+					sL.setCountryName(country.getCountryName());
+				}
+			}
+			if(StringUtils.isNotBlank(sL.getProvCode())) {
+				GradProvince province = codeService.getSpecificProvinceCode(sL.getProvCode());
+				if(province != null) {
+					sL.setProvinceName(province.getProvName());
+				}
+			}
     	});
         return schoolList;
     }
 
+	@Transactional
 	public School getSchoolDetails(String minCode, String accessToken) {
 		Optional<SchoolEntity> entOptional = schoolRepository.findById(minCode);
 		if(entOptional.isPresent()) {
 			School school = schoolTransformer.transformToDTO(entOptional.get());
 			District dist = districtTransformer.transformToDTO(districtRepository.findById(school.getMinCode().substring(0, 3)));
-			if(dist != null)
+			if(dist != null) {
 				school.setDistrictName(dist.getDistrictName());
-			if(StringUtils.isNotBlank(school.getCountryCode())) {
-				GradCountry country = codeService.getSpecificCountryCode(school.getCountryCode());
-		        if(country != null) {
-		        	school.setCountryName(country.getCountryName());
-				}
-			}
-			if(StringUtils.isNotBlank(school.getProvCode())) {
-				GradProvince province = codeService.getSpecificProvinceCode(school.getProvCode());
-		        if(province != null) {
-		        	school.setProvinceName(province.getProvName());
-				} else {
-					school.setProvinceName("");
-				}
 			}
 			CommonSchool commonSchool = getCommonSchool(accessToken, school.getMinCode());
 			adaptSchool(school, commonSchool);
@@ -89,18 +94,24 @@ public class SchoolService {
 		return null;
 	}
 
+	@Transactional
 	public List<School> getSchoolsByParams(String schoolName, String minCode, String district, String authorityNumber, String accessToken) {
 		String sName = !StringUtils.isBlank(schoolName) ? StringUtils.strip(schoolName.toUpperCase(Locale.ROOT),"*"):null;
 		String sCode = !StringUtils.isBlank(minCode) ? StringUtils.strip(minCode,"*"):null;
 		String sDist = !StringUtils.isBlank(district) ? StringUtils.strip(district,"*"):null;
 		String sAuth = !StringUtils.isBlank(authorityNumber) ? StringUtils.strip(authorityNumber,"*"):null;
-		List<School> schoolList = schoolTransformer.transformToDTO(schoolRepository.findSchools(sName, sCode, sDist));
+		TraxSchoolSearchCriteria searchCriteria = TraxSchoolSearchCriteria.builder()
+				.district(sDist)
+				.schoolName(sName)
+				.minCode(sCode)
+				.build();
+		Specification<SchoolEntity> spec = new TraxSchoolSearchSpecification(searchCriteria);
+		List<SchoolEntity> schoolEntities = schoolRepository.findAll(Specification.where(spec));
+		List<School> schoolList = schoolTransformer.transformToDTO(schoolEntities);
     	schoolList.forEach(sL -> {
     		District dist = districtTransformer.transformToDTO(districtRepository.findById(sL.getMinCode().substring(0, 3)));
     		if (dist != null) {
 				sL.setDistrictName(dist.getDistrictName());
-			} else {
-				sL.setDistrictName("");
 			}
     		CommonSchool commonSchool = getCommonSchool(accessToken, sL.getMinCode());
     		adaptSchool(sL, commonSchool);
@@ -114,8 +125,9 @@ public class SchoolService {
 		Arrays.sort(result.toArray());
 	}
 
-	public boolean existsSchool(String minCode, String accessToken) {
-		return schoolRepository.countTabSchools(minCode) > 0L && getCommonSchool(accessToken, minCode) != null;
+	@Transactional
+	public boolean existsSchool(String minCode) {
+		return schoolRepository.countTabSchools(minCode) > 0L;
 	}
 
 	public CommonSchool getCommonSchool(String accessToken, String mincode) {
@@ -166,17 +178,18 @@ public class SchoolService {
     		school.setPrincipalLastName(commonSchool.getPrSurname());
     		school.setPrincipalName(commonSchool.getPrSurname() + ", " + commonSchool.getPrGivenName() + " " + commonSchool.getPrMiddleName());
 
-    		//overwrite trax school with common school values
-			school.setSchoolName(commonSchool.getSchoolName());
-			school.setAddress1(commonSchool.getScAddressLine1());
-			school.setAddress2(commonSchool.getScAddressLine2());
-			school.setCity(commonSchool.getScCity());
-			school.setProvCode(commonSchool.getScProvinceCode());
-			school.setPostal(commonSchool.getScPostalCode());
-			school.setCountryCode(commonSchool.getScCountryCode());
-			school.setSchoolPhone(commonSchool.getScPhoneNumber());
-			school.setSchoolFax(commonSchool.getScFaxNumber());
-			school.setSchoolEmail(commonSchool.getScEMailId());
+			if(StringUtils.isNotBlank(school.getCountryCode())) {
+				GradCountry country = codeService.getSpecificCountryCode(school.getCountryCode());
+				if(country != null) {
+					school.setCountryName(country.getCountryName());
+				}
+			}
+			if(StringUtils.isNotBlank(school.getProvCode())) {
+				GradProvince province = codeService.getSpecificProvinceCode(school.getProvCode());
+				if(province != null) {
+					school.setProvinceName(province.getProvName());
+				}
+			}
 		}
 	}
 }

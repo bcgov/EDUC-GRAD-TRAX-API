@@ -85,7 +85,7 @@ public class SchoolController {
     @Operation(summary = "Check school existence by Mincode", description = "Check school existence by Mincode", tags = { "School" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "204", description = "NO CONTENT")})
-    public ResponseEntity<Boolean> checkSchoolExists(@PathVariable String minCode, @RequestHeader(name="Authorization") String accessToken) {
-        return response.GET(schoolService.existsSchool(minCode, accessToken.replace(BEARER, "")));
+    public ResponseEntity<Boolean> checkSchoolExists(@PathVariable String minCode) {
+        return response.GET(schoolService.existsSchool(minCode));
     }
 }

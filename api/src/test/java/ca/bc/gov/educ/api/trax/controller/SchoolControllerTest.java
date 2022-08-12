@@ -92,9 +92,9 @@ public class SchoolControllerTest {
 
     @Test
     public void testCheckSchoolExists() {
-        Mockito.when(schoolService.existsSchool("1234567", "accessToken")).thenReturn(true);
-        schoolController.checkSchoolExists("1234567", "accessToken");
-        Mockito.verify(schoolService).existsSchool("1234567", "accessToken");
+        Mockito.when(schoolService.existsSchool("1234567")).thenReturn(true);
+        schoolController.checkSchoolExists("1234567");
+        Mockito.verify(schoolService).existsSchool("1234567");
     }
 
     private void mockCommonSchool(String minCode, String schoolName) {

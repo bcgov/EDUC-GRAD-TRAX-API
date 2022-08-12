@@ -18,7 +18,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
@@ -61,11 +60,21 @@ public class DistrictServiceTest {
         district.setDistrictName("Test District");
 
         when(districtRepository.findById("123")).thenReturn(Optional.of(district));
+        Optional<DistrictEntity> entity = districtRepository.findById("123");
+        assertThat(entity).isPresent();
 
         var result = districtService.getDistrictDetails("123");
-
         assertThat(result).isNotNull();
         assertThat(result.getDistrictNumber()).isEqualTo("123");
         assertThat(result.getDistrictName()).isEqualTo("Test District");
+    }
+
+    @Test
+    public void testGetDistrictDetailsNull() {
+        when(districtRepository.findById("123")).thenReturn(Optional.empty());
+        Optional<DistrictEntity> entity = districtRepository.findById("123");
+        assertThat(entity).isNotPresent();
+        var result = districtService.getDistrictDetails("123");
+        assertThat(result).isNull();
     }
 }
