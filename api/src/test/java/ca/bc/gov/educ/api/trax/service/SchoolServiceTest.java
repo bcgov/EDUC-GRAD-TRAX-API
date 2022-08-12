@@ -96,6 +96,52 @@ public class SchoolServiceTest {
         final SchoolEntity school1 = new SchoolEntity();
         school1.setMinCode("1234567");
         school1.setSchoolName("Test1 School");
+        school1.setCountryCode("CA");
+        school1.setProvCode("BC");
+        gradSchoolList.add(school1);
+
+        assertThat(StringUtils.isBlank(school1.getMinCode())).isFalse();
+
+        // District data
+        DistrictEntity districtEntity = new DistrictEntity();
+        districtEntity.setDistrictNumber("123");
+        districtEntity.setDistrictName("Test District");
+
+        GradCountry gC = new GradCountry();
+        gC.setCountryCode("CA");
+        gC.setCountryName("Canada");
+
+        GradProvince gA = new GradProvince();
+        gA.setCountryCode("BC");
+        gA.setProvName("British Columbia");
+
+        Mockito.when(schoolRepository.findAll()).thenReturn(gradSchoolList);
+        Mockito.when(codeService.getSpecificCountryCode("CA")).thenReturn(gC);
+        Mockito.when(codeService.getSpecificProvinceCode("BC")).thenReturn(gA);
+        Mockito.when(districtRepository.findById("123")).thenReturn(Optional.of(districtEntity));
+
+        District district = districtTransformer.transformToDTO(districtEntity);
+        assertThat(district).isNotNull();
+
+        mockCommonSchool("1234567", "Test1 School");
+        List<School> results = schoolService.getSchoolList();
+
+        assertThat(results).isNotNull().hasSize(1);
+        School responseSchool = results.get(0);
+        assertThat(responseSchool.getSchoolName()).isEqualTo(school1.getSchoolName());
+        assertThat(responseSchool.getDistrictName()).isEqualTo(districtEntity.getDistrictName());
+
+    }
+
+    @Test
+    public void testGetSchoolList_null() {
+        // School data
+        final List<SchoolEntity> gradSchoolList = new ArrayList<>();
+        final SchoolEntity school1 = new SchoolEntity();
+        school1.setMinCode("1234567");
+        school1.setSchoolName("Test1 School");
+        school1.setCountryCode("CA");
+        school1.setProvCode("BC");
         gradSchoolList.add(school1);
 
         assertThat(StringUtils.isBlank(school1.getMinCode())).isFalse();
@@ -106,6 +152,8 @@ public class SchoolServiceTest {
         districtEntity.setDistrictName("Test District");
 
         Mockito.when(schoolRepository.findAll()).thenReturn(gradSchoolList);
+        Mockito.when(codeService.getSpecificCountryCode("CA")).thenReturn(null);
+        Mockito.when(codeService.getSpecificProvinceCode("BC")).thenReturn(null);
         Mockito.when(districtRepository.findById("123")).thenReturn(Optional.of(districtEntity));
 
         District district = districtTransformer.transformToDTO(districtEntity);
@@ -207,7 +255,7 @@ public class SchoolServiceTest {
     }
 
     @Test
-    public void testGetSchoolDetails_empty_null() {
+    public void testGetSchoolDetails_not_empty_null() {
         // School
         final SchoolEntity school = new SchoolEntity();
         school.setMinCode("02121000");
@@ -233,7 +281,7 @@ public class SchoolServiceTest {
         province.setProvCode("BC");
         province.setProvName("British Columbia");
 
-        Mockito.when(schoolRepository.findById("02121000")).thenReturn(Optional.empty());
+        Mockito.when(schoolRepository.findById("02121000")).thenReturn(Optional.of(school));
         Mockito.when(districtRepository.findById("021")).thenReturn(null);
 
         Mockito.when(codeService.getSpecificCountryCode(country.getCountryCode())).thenReturn(null);
@@ -292,6 +340,52 @@ public class SchoolServiceTest {
         assertThat(result).isNotNull();
 
     }
+    @Test
+    public void testGetSchoolsByParams_params() {
+        // School
+        final SchoolEntity school = new SchoolEntity();
+        school.setMinCode("02121000");
+        school.setSchoolName("THE GATEWAY COMMUNITY LEARNING CENTRE");
+        school.setCountryCode("CA");
+        school.setProvCode("BC");
+
+        // District
+        final DistrictEntity district = new DistrictEntity();
+        district.setDistrictNumber("021");
+        district.setDistrictName("Test District");
+        district.setCountryCode("CA");
+        district.setProvCode("BC");
+
+        // Country
+        final GradCountry country = new GradCountry();
+        country.setCountryCode("CA");
+        country.setCountryName("Canada");
+
+        // Province
+        final GradProvince province = new GradProvince();
+        province.setCountryCode("CA");
+        province.setProvCode("BC");
+        province.setProvName("British Columbia");
+
+        TraxSchoolSearchCriteria searchCriteria = TraxSchoolSearchCriteria.builder()
+                .district(null)
+                .schoolName(null)
+                .minCode(school.getMinCode())
+                .build();
+        Specification<SchoolEntity> spec = new TraxSchoolSearchSpecification(searchCriteria);
+
+        Mockito.when(schoolRepository.findAll(Mockito.any(Specification.class))).thenReturn(List.of(school));
+        Mockito.when(districtRepository.findById("021")).thenReturn(Optional.of(district));
+
+        Mockito.when(codeService.getSpecificCountryCode(country.getCountryCode())).thenReturn(country);
+        Mockito.when(codeService.getSpecificProvinceCode(province.getProvCode())).thenReturn(province);
+
+        mockCommonSchool("02121000", "THE GATEWAY COMMUNITY LEARNING CENTRE");
+
+        var result = schoolService.getSchoolsByParams("TH*", null, "02*", "43","accessToken");
+        assertThat(result).isNotNull();
+
+    }
 
     @Test
     public void testExistsSchool() {
@@ -306,7 +400,6 @@ public class SchoolServiceTest {
         Mockito.when(schoolRepository.countTabSchools("02121000")).thenReturn(0L);
         mockCommonSchool("02121000", null);
         var result = schoolService.existsSchool("02121000");
-        assertThat(result).isNotNull();
         assertThat(result).isFalse();
     }
 
@@ -315,6 +408,12 @@ public class SchoolServiceTest {
         mockCommonSchool("02121000", "THE GATEWAY COMMUNITY LEARNING CENTRE");
         var result = schoolService.getCommonSchool("accessToken", "02121000");
         assertThat(result).isNotNull();
+    }
+
+    @Test
+    public void testCommonSchool_mincode_null() {
+        var result = schoolService.getCommonSchool("accessToken", null);
+        assertThat(result).isNull();
     }
 
     @Test
