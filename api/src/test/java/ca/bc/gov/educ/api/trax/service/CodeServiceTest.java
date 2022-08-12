@@ -80,8 +80,7 @@ public class CodeServiceTest {
 		GradProvinceEntity objEntity = new GradProvinceEntity();
 		objEntity.setProvCode("BC");
 		objEntity.setProvName("British Columbia");
-		Optional<GradProvinceEntity> ent = Optional.of(objEntity);
-		Mockito.when(gradProvinceRepository.findById(provCode)).thenReturn(ent);
+		Mockito.when(gradProvinceRepository.findById(provCode)).thenReturn(Optional.of(objEntity));
 		GradProvince gradProvince = codeService.getSpecificProvinceCode(provCode);
 		assertThat(gradProvince).isNotNull();
 

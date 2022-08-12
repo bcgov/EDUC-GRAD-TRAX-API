@@ -306,6 +306,7 @@ public class SchoolServiceTest {
         Mockito.when(schoolRepository.countTabSchools("02121000")).thenReturn(0L);
         mockCommonSchool("02121000", null);
         var result = schoolService.existsSchool("02121000");
+        assertThat(result).isNotNull();
         assertThat(result).isFalse();
     }
 
