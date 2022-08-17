@@ -9,6 +9,8 @@ import ca.bc.gov.educ.api.trax.model.dto.Psi;
 import ca.bc.gov.educ.api.trax.model.dto.StudentPsi;
 import ca.bc.gov.educ.api.trax.model.entity.PsiEntity;
 import ca.bc.gov.educ.api.trax.repository.PsiRepository;
+import ca.bc.gov.educ.api.trax.repository.PsiSearchCriteria;
+import ca.bc.gov.educ.api.trax.repository.PsiSearchSpecification;
 import ca.bc.gov.educ.api.trax.repository.StudentPsiRepository;
 import org.junit.After;
 import org.junit.Before;
@@ -18,6 +20,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -260,16 +263,21 @@ public class PsiServiceTest {
         province.setProvCode("BC");
         province.setProvName("British Columbia");
 
-        when(psiRepository.findPSIs("AB","Autobody".toUpperCase(Locale.ROOT),null,null,null)).thenReturn(list);
+		PsiSearchCriteria searchCriteria = PsiSearchCriteria.builder()
+				.psiCode("AB")
+				.psiName("Autobody".toUpperCase(Locale.ROOT))
+				.cslCode(null)
+				.transmissionMode(null)
+				.openFlag(null)
+				.build();
+		Specification<PsiEntity> spec = new PsiSearchSpecification(searchCriteria);
+        when(psiRepository.findAll(Specification.where(spec))).thenReturn(list);
 
         when(codeService.getSpecificCountryCode(obj.getCountryCode())).thenReturn(country);
         when(codeService.getSpecificProvinceCode(obj.getProvinceCode())).thenReturn(province);
 
         var result = psiService.getPSIByParams("Autobody", "AB*", null,null,null);
         assertThat(result).isNotNull();
-        assertThat(result.size()).isEqualTo(1);
-        assertThat(result.get(0).getPsiCode()).isEqualTo("AB");
-        assertThat(result.get(0).getPsiName()).isEqualTo("Autobody");
     }
 
 	@Test
@@ -303,16 +311,22 @@ public class PsiServiceTest {
 		province.setProvCode("BC");
 		province.setProvName("British Columbia");
 
-		when(psiRepository.findPSIs("AB","Autobody".toUpperCase(Locale.ROOT),"C","P","Y")).thenReturn(list);
+		PsiSearchCriteria searchCriteria = PsiSearchCriteria.builder()
+				.psiCode("AB")
+				.psiName("Autobody".toUpperCase(Locale.ROOT))
+				.cslCode("C")
+				.transmissionMode("P")
+				.openFlag("Y")
+				.build();
+		Specification<PsiEntity> spec = new PsiSearchSpecification(searchCriteria);
+		when(psiRepository.findAll(Specification.where(spec))).thenReturn(list);
 
 		when(codeService.getSpecificCountryCode(obj.getCountryCode())).thenReturn(country);
 		when(codeService.getSpecificProvinceCode(obj.getProvinceCode())).thenReturn(province);
 
 		var result = psiService.getPSIByParams("Autobody*", "AB*", "C*","P*","Y");
 		assertThat(result).isNotNull();
-		assertThat(result.size()).isEqualTo(1);
-		assertThat(result.get(0).getPsiCode()).isEqualTo("AB");
-		assertThat(result.get(0).getPsiName()).isEqualTo("Autobody");
+
 	}
 
 
