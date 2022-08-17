@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.trax.model.transformer;
 
 import ca.bc.gov.educ.api.trax.model.dto.TranscriptStudentCourse;
 import ca.bc.gov.educ.api.trax.model.entity.TranscriptStudentCourseEntity;
+import ca.bc.gov.educ.api.trax.util.EducGradTraxApiUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -22,11 +23,7 @@ public class TranscriptStudentCourseTransformer {
 
     public TranscriptStudentCourse transformToDTO(Optional<TranscriptStudentCourseEntity> transcriptStudentCourseEntityOptional) {
         TranscriptStudentCourseEntity entity;
-        if (transcriptStudentCourseEntityOptional.isPresent()) {
-            entity = transcriptStudentCourseEntityOptional.get();
-        } else {
-            entity = new TranscriptStudentCourseEntity();
-        }
+        entity = transcriptStudentCourseEntityOptional.orElseGet(TranscriptStudentCourseEntity::new);
 
         return modelMapper.map(entity, TranscriptStudentCourse.class);
     }
@@ -40,7 +37,7 @@ public class TranscriptStudentCourseTransformer {
             transcriptStudentCourse.setCourseCode(transcriptStudentCourseEntity.getStudentCourseKey().getCourseCode());
             transcriptStudentCourse.setCourseLevel(transcriptStudentCourseEntity.getStudentCourseKey().getCourseLevel());
             transcriptStudentCourse.setStudNo(transcriptStudentCourseEntity.getStudentCourseKey().getStudNo());
-
+            transcriptStudentCourse.setCourseSession(EducGradTraxApiUtils.parseTraxDate(transcriptStudentCourseEntity.getCourseSession()));
             transcriptStudentCourseList.add(transcriptStudentCourse);
         }
 
