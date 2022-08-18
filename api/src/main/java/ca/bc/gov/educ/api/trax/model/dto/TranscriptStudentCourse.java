@@ -42,47 +42,47 @@ public class TranscriptStudentCourse {
     }
 
     public String getFoundationReq() {
-        return foundationReq!=null?reportType.trim():null;
+        return foundationReq!=null?foundationReq.trim():null;
     }
 
     public String getSpecialCase() {
-        return specialCase!=null?reportType.trim():null;
+        return specialCase!=null?specialCase.trim():null;
     }
 
     public String getSchoolPercentage() {
-        return schoolPercentage!=null?reportType.trim():null;
+        return schoolPercentage!=null?schoolPercentage.trim():null;
     }
 
     public String getFinalPercentage() {
-        return finalPercentage!=null?reportType.trim():null;
+        return finalPercentage!=null?finalPercentage.trim():null;
     }
 
     public String getFinalLG() {
-        return finalLG!=null?reportType.trim():null;
+        return finalLG!=null?finalLG.trim():null;
     }
 
     public String getInterimMark() {
-        return interimMark!=null?reportType.trim():null;
+        return interimMark!=null?interimMark.trim():null;
     }
 
     public String getNumberOfCredits() {
-        return numberOfCredits!=null?reportType.trim():null;
+        return numberOfCredits!=null?numberOfCredits.trim():null;
     }
 
     public String getCourseType() {
-        return courseType!=null?reportType.trim():null;
+        return courseType!=null?courseType.trim():null;
     }
 
     public String getUsedForGrad() {
-        return usedForGrad!=null?reportType.trim():null;
+        return usedForGrad!=null?usedForGrad.trim():null;
     }
 
     public String getMetLitNumReqt() {
-        return metLitNumReqt!=null?reportType.trim():null;
+        return metLitNumReqt!=null?metLitNumReqt.trim():null;
     }
 
     public String getRelatedCourseLevel() {
-        return relatedCourseLevel!=null?reportType.trim():null;
+        return relatedCourseLevel!=null?relatedCourseLevel.trim():null;
     }
 
     public String getStudNo() {
