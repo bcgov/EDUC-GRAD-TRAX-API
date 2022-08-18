@@ -70,23 +70,24 @@ public class EducGradTraxApiUtils {
             return null;
         }       
     }
-    
+
     public static String parseTraxDate (String sessionDate) {
         if (sessionDate == null)
             return null;
+        return parseDateByFormat(sessionDate, EducGradTraxApiConstants.TRAX_TSW_DATE_FORMAT);
+    }
 
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(EducGradTraxApiConstants.DEFAULT_DATE_FORMAT);
-        Date date = new Date();
-
+    private static String parseDateByFormat(final String sessionDate, final String dateFormat) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormat);
         try {
-            date = simpleDateFormat.parse(sessionDate);
+            Date date = simpleDateFormat.parse(sessionDate);
             LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
             return localDate.getYear() +"/"+ String.format("%02d", localDate.getMonthValue());
-            
+
         } catch (ParseException e) {
             e.printStackTrace();
             return null;
-        }       
+        }
     }
 
 	public static HttpHeaders getHeaders (String accessToken)

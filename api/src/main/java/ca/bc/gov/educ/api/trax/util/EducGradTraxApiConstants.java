@@ -76,6 +76,7 @@ public class EducGradTraxApiConstants {
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
     
     public static final String TRAX_DATE_FORMAT = "yyyyMMdd";
+    public static final String TRAX_TSW_DATE_FORMAT = "yyyyMM";
 
     //NAT
     /**
