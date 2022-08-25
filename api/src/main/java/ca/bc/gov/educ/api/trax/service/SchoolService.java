@@ -168,7 +168,6 @@ public class SchoolService {
     	if(school != null) {
     		school.setDistrictNumber(commonSchool.getDistNo());
     		school.setSchoolType(commonSchool.getSchoolTypeCode());
-    		school.setReportingFlag(commonSchool.getClosedDate() != null ? "N" : "Y");
     		school.setOpenDate(commonSchool.getOpenedDate());
     		school.setClosedDate(commonSchool.getClosedDate());
     		school.setAuthorityNumber(commonSchool.getAuthNumber());

@@ -38,7 +38,6 @@ public class School implements Comparable<School> {
 
     private String districtNumber;
 	private String schoolType;
-	private String reportingFlag;
 	private String openDate;
 	private String closedDate;
 	private String authorityNumber;
@@ -97,6 +96,10 @@ public class School implements Comparable<School> {
 	
 	public String getOpenFlag() {
 		return openFlag != null ? openFlag.trim(): "";
+	}
+
+	public String getReportingFlag() {
+		return getOpenFlag();
 	}
 	
 	public String getSignatureDistrict() {
