@@ -6,6 +6,7 @@ import ca.bc.gov.educ.api.trax.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.trax.model.dto.*;
 import ca.bc.gov.educ.api.trax.model.entity.GradCourseEntity;
 import ca.bc.gov.educ.api.trax.model.entity.GradCourseKey;
+import ca.bc.gov.educ.api.trax.model.entity.TranscriptStudentDemogEntity;
 import ca.bc.gov.educ.api.trax.model.entity.TraxStudentNoEntity;
 import ca.bc.gov.educ.api.trax.model.transformer.GradCourseTransformer;
 import ca.bc.gov.educ.api.trax.model.transformer.TraxStudentNoTransformer;
@@ -24,12 +25,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.math.BigDecimal;
 import java.util.*;
 
-import static ca.bc.gov.educ.api.trax.constant.EventStatus.DB_COMMITTED;
-import static ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants.DEFAULT_CREATED_BY;
-import static ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants.DEFAULT_UPDATED_BY;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNoException;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
@@ -55,6 +52,9 @@ public class TraxCommonServiceTest {
 
     @MockBean
     TraxStudentNoRepository traxStudentNoRepository;
+
+    @MockBean
+    TranscriptStudentDemogRepository transcriptStudentDemogRepository;
 
     // NATS
     @MockBean
@@ -216,6 +216,91 @@ public class TraxCommonServiceTest {
         assertThat(result).isNotNull();
         assertThat(traxStudentNo.getStudNo()).isEqualTo(result.getStudNo());
         assertThat(traxStudentNo.getStatus()).isEqualTo(result.getStatus());
+    }
+
+
+    @Test
+    public void testStudentIsNotGraduated() {
+        // Student is graduated or not
+
+        final TranscriptStudentDemogEntity transcriptStudentDemogEntity = new TranscriptStudentDemogEntity();
+        transcriptStudentDemogEntity.setStudNo("123456789");
+        transcriptStudentDemogEntity.setFirstName("Test");
+        transcriptStudentDemogEntity.setLastName("QA");
+        transcriptStudentDemogEntity.setMincode("7654321");
+        transcriptStudentDemogEntity.setSchoolName("Test2 School");
+        transcriptStudentDemogEntity.setGradDate(0L);
+
+        when(transcriptStudentDemogRepository.countGradDateByPen(eq("123456789"))).thenReturn(0);
+        when(traxStudentsLoadRepository.countSccDateByPen(eq("123456789"))).thenReturn(0);
+
+        Boolean result = traxCommonService.isGraduatedStudent(transcriptStudentDemogEntity.getStudNo());
+
+        assertThat(result).isNotNull();
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    public void testStudentIsGraduatedByGradDate() {
+        // Student is graduated or not
+
+        final TranscriptStudentDemogEntity transcriptStudentDemogEntity = new TranscriptStudentDemogEntity();
+        transcriptStudentDemogEntity.setStudNo("123456789");
+        transcriptStudentDemogEntity.setFirstName("Test");
+        transcriptStudentDemogEntity.setLastName("QA");
+        transcriptStudentDemogEntity.setMincode("7654321");
+        transcriptStudentDemogEntity.setSchoolName("Test2 School");
+        transcriptStudentDemogEntity.setGradDate(20201031L);
+
+        when(transcriptStudentDemogRepository.countGradDateByPen(eq("123456789"))).thenReturn(1);
+        when(traxStudentsLoadRepository.countSccDateByPen(eq("123456789"))).thenReturn(0);
+
+        Boolean result = traxCommonService.isGraduatedStudent(transcriptStudentDemogEntity.getStudNo());
+
+        assertThat(result).isNotNull();
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    public void testStudentIsGraduatedBySccDate() {
+        // Student is graduated or not
+
+        final TranscriptStudentDemogEntity transcriptStudentDemogEntity = new TranscriptStudentDemogEntity();
+        transcriptStudentDemogEntity.setStudNo("123456789");
+        transcriptStudentDemogEntity.setFirstName("Test");
+        transcriptStudentDemogEntity.setLastName("QA");
+        transcriptStudentDemogEntity.setMincode("7654321");
+        transcriptStudentDemogEntity.setSchoolName("Test2 School");
+        transcriptStudentDemogEntity.setGradDate(20201031L);
+
+        when(transcriptStudentDemogRepository.countGradDateByPen(eq("123456789"))).thenReturn(0);
+        when(traxStudentsLoadRepository.countSccDateByPen(eq("123456789"))).thenReturn(1);
+
+        Boolean result = traxCommonService.isGraduatedStudent(transcriptStudentDemogEntity.getStudNo());
+
+        assertThat(result).isNotNull();
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    public void testStudentIsGraduatedByBothGradDateAndSccDate() {
+        // Student is graduated or not
+
+        final TranscriptStudentDemogEntity transcriptStudentDemogEntity = new TranscriptStudentDemogEntity();
+        transcriptStudentDemogEntity.setStudNo("123456789");
+        transcriptStudentDemogEntity.setFirstName("Test");
+        transcriptStudentDemogEntity.setLastName("QA");
+        transcriptStudentDemogEntity.setMincode("7654321");
+        transcriptStudentDemogEntity.setSchoolName("Test2 School");
+        transcriptStudentDemogEntity.setGradDate(20201031L);
+
+        when(transcriptStudentDemogRepository.countGradDateByPen(eq("123456789"))).thenReturn(1);
+        when(traxStudentsLoadRepository.countSccDateByPen(eq("123456789"))).thenReturn(1);
+
+        Boolean result = traxCommonService.isGraduatedStudent(transcriptStudentDemogEntity.getStudNo());
+
+        assertThat(result).isNotNull();
+        assertThat(result).isTrue();
     }
 
 }

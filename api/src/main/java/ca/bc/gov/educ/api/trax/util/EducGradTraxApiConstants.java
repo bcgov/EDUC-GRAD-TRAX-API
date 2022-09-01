@@ -56,8 +56,8 @@ public class EducGradTraxApiConstants {
 
     public static final String GET_TRANSCRIPT_DEMOG_BY_PEN_MAPPING = "/tran-demog/{pen}";
     public static final String GET_TRANSCRIPT_COURSE_BY_PEN_MAPPING = "/tran-courses/{pen}";
-    public static final String GET_TRANSCRIPT_STUDENT_GRADUATED_BY_PEN_MAPPING = "/student/{pen}";
 
+    public static final String GET_TRAX_STUDENT_GRADUATED_BY_PEN_MAPPING = "/student/graduated/{pen}";
     public static final String GET_TRAX_STUDENT_MASTER_MAPPING = "/student-master/{pen}";
     public static final String GET_TRAX_STUDENT_DEMOG_MAPPING = "/student-demog/{pen}";
     public static final String GET_TRAX_STUDENT_NO_LIST_BY_PAGING_MAPPING = "/student-no-list/paginated";
