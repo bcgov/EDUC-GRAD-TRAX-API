@@ -48,13 +48,6 @@ public class TswControllerTest {
     }
 
     @Test
-    public void testGetTranscriptStudentGraduatedByPen() {
-        Mockito.when(tswService.isGraduated("123456789")).thenReturn(true);
-        tswController.getTranscriptStudentGraduatedByPen("123456789");
-        Mockito.verify(tswService).isGraduated("123456789");
-    }
-
-    @Test
     public void testGetTranscriptStudentCoursesByPen() {
         TranscriptStudentCourse transcriptStudentCourse = new TranscriptStudentCourse();
         transcriptStudentCourse.setStudNo("123456789");

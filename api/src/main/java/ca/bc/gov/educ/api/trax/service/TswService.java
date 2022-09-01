@@ -37,12 +37,6 @@ public class TswService {
     }
 
     @Transactional(readOnly = true)
-    public boolean isGraduated(String studNo) {
-        Integer count = transcriptStudentDemogRepository.countGradDateByPen(studNo);
-        return count != null && count.intValue() > 0;
-    }
-
-    @Transactional(readOnly = true)
     public List<TranscriptStudentCourse> getTranscriptStudentCourses(String studNo) {
         return transcriptStudentCourseTransformer.transformToDTO(transcriptStudentCourseRepository.findByPen(studNo));
     }
