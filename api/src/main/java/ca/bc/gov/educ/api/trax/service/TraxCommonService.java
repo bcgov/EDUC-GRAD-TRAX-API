@@ -6,6 +6,7 @@ import ca.bc.gov.educ.api.trax.model.entity.TraxStudentNoEntity;
 import ca.bc.gov.educ.api.trax.model.transformer.GradCourseTransformer;
 import ca.bc.gov.educ.api.trax.model.transformer.TraxStudentNoTransformer;
 import ca.bc.gov.educ.api.trax.repository.GradCourseRepository;
+import ca.bc.gov.educ.api.trax.repository.TranscriptStudentDemogRepository;
 import ca.bc.gov.educ.api.trax.repository.TraxStudentNoRepository;
 import ca.bc.gov.educ.api.trax.repository.TraxStudentsLoadRepository;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiUtils;
@@ -34,7 +35,7 @@ public class TraxCommonService {
     private final TraxStudentNoTransformer traxStudentNoTransformer;
     private final GradCourseTransformer gradCourseTransformer;
 
-    private final TswService tswService;
+    private TranscriptStudentDemogRepository transcriptStudentDemogRepository;
 
     @Autowired
     public TraxCommonService(TraxStudentsLoadRepository traxStudentsLoadRepository,
@@ -42,13 +43,14 @@ public class TraxCommonService {
                              GradCourseRepository gradCourseRepository,
                              TraxStudentNoTransformer traxStudentNoTransformer,
                              GradCourseTransformer gradCourseTransformer,
-                             TswService tswService) {
+                             TranscriptStudentDemogRepository transcriptStudentDemogRepository) {
         this.traxStudentsLoadRepository = traxStudentsLoadRepository;
         this.traxStudentNoRepository = traxStudentNoRepository;
         this.gradCourseRepository = gradCourseRepository;
         this.traxStudentNoTransformer = traxStudentNoTransformer;
         this.gradCourseTransformer = gradCourseTransformer;
-        this.tswService = tswService;
+
+        this.transcriptStudentDemogRepository = transcriptStudentDemogRepository;
     }
 
     // Pagination
@@ -66,7 +68,7 @@ public class TraxCommonService {
     // Student Master from TRAX
     @Transactional(readOnly = true)
     public List<ConvGradStudent> getStudentMasterDataFromTrax(String pen) {
-        boolean isGraduated = tswService.isGraduated(pen);
+        boolean isGraduated = isGraduatedStudent(pen);
         List<Object[]> results;
         if (isGraduated) {
             results = traxStudentsLoadRepository.loadTraxGraduatedStudent(pen);
@@ -287,5 +289,19 @@ public class TraxCommonService {
             ex.printStackTrace();
         }
         return student;
+    }
+
+    @Transactional(readOnly = true)
+    public boolean isGraduatedStudent(String studNo) {
+        Integer gradDateCount = transcriptStudentDemogRepository.countGradDateByPen(studNo);
+        if (gradDateCount != null && gradDateCount.intValue() > 0) {
+            return true;
+        }
+        Integer sccDateCount = traxStudentsLoadRepository.countSccDateByPen(studNo);
+        if (sccDateCount != null && sccDateCount.intValue() > 0) {
+            return true;
+        }
+
+        return false;
     }
 }

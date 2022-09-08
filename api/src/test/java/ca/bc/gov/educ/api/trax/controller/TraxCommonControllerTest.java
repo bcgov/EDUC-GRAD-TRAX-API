@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.trax.controller;
 
 import ca.bc.gov.educ.api.trax.model.dto.*;
+import ca.bc.gov.educ.api.trax.model.entity.TranscriptStudentDemogEntity;
 import ca.bc.gov.educ.api.trax.service.CodeService;
 import ca.bc.gov.educ.api.trax.service.TraxCommonService;
 import ca.bc.gov.educ.api.trax.util.GradValidation;
@@ -19,6 +20,10 @@ import org.springframework.data.domain.Sort;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -145,5 +150,12 @@ public class TraxCommonControllerTest {
 		Mockito.when(traxCommonService.saveTraxStudentNo(obj)).thenReturn(obj);
 		traxCommonController.saveTraxStudentNo(obj);
 		Mockito.verify(traxCommonService).saveTraxStudentNo(obj);
+	}
+
+	@Test
+	public void testGetStudentIsGraduatedByPen() {
+		Mockito.when(traxCommonService.isGraduatedStudent("123456789")).thenReturn(true);
+		traxCommonController.getStudentIsGraduatedByPen("123456789");
+		Mockito.verify(traxCommonService).isGraduatedStudent("123456789");
 	}
 }
