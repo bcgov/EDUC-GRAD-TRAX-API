@@ -336,7 +336,7 @@ public class SchoolServiceTest {
 
         mockCommonSchool("02121000", "THE GATEWAY COMMUNITY LEARNING CENTRE");
 
-        var result = schoolService.getSchoolsByParams(null, searchCriteria.getMinCode(), null, null,"accessToken");
+        var result = schoolService.getSchoolsByParams(null, searchCriteria.getMinCode(), null, "accessToken");
         assertThat(result).isNotNull();
 
     }
@@ -382,7 +382,7 @@ public class SchoolServiceTest {
 
         mockCommonSchool("02121000", "THE GATEWAY COMMUNITY LEARNING CENTRE");
 
-        var result = schoolService.getSchoolsByParams("TH*", null, "02*", "43","accessToken");
+        var result = schoolService.getSchoolsByParams("TH*", null, "02*", "accessToken");
         assertThat(result).isNotNull();
 
     }

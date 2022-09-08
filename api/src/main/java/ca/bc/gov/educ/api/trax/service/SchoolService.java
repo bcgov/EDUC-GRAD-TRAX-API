@@ -19,7 +19,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 
 @Service
 public class SchoolService {
@@ -95,11 +98,10 @@ public class SchoolService {
 	}
 
 	@Transactional
-	public List<School> getSchoolsByParams(String schoolName, String minCode, String district, String authorityNumber, String accessToken) {
+	public List<School> getSchoolsByParams(String schoolName, String minCode, String district, String accessToken) {
 		String sName = !StringUtils.isBlank(schoolName) ? StringUtils.strip(schoolName.toUpperCase(Locale.ROOT),"*"):null;
 		String sCode = !StringUtils.isBlank(minCode) ? StringUtils.strip(minCode,"*"):null;
 		String sDist = !StringUtils.isBlank(district) ? StringUtils.strip(district,"*"):null;
-		String sAuth = !StringUtils.isBlank(authorityNumber) ? StringUtils.strip(authorityNumber,"*"):null;
 		TraxSchoolSearchCriteria searchCriteria = TraxSchoolSearchCriteria.builder()
 				.district(sDist)
 				.schoolName(sName)
@@ -116,9 +118,8 @@ public class SchoolService {
     		CommonSchool commonSchool = getCommonSchool(accessToken, sL.getMinCode());
     		adaptSchool(sL, commonSchool);
     	});
-		List<School> result = filterByAuthorityNumber(schoolList, sAuth);
-		sortSchools(result);
-		return result;
+		sortSchools(schoolList);
+		return schoolList;
 	}
 
 	private void sortSchools(List<School> result) {
@@ -147,37 +148,14 @@ public class SchoolService {
 		}
 	}
 
-	private List<School> filterByAuthorityNumber(List<School> schools, String authorityNumber) {
-    	if(StringUtils.isBlank(authorityNumber)) {
-    		return schools;
-		}
-		List<School> result = new ArrayList<>();
-		for (School sL : schools) {
-			String sLAuthorityNumber = sL.getAuthorityNumber();
-			if (!StringUtils.isBlank(sLAuthorityNumber) && StringUtils.startsWith(sLAuthorityNumber, authorityNumber)) {
-				result.add(sL);
-			}
-		}
-		return result;
-	}
-
 	private void adaptSchool(School school, CommonSchool commonSchool) {
     	if(commonSchool == null) {
 			return;
 		}
     	if(school != null) {
-    		school.setDistrictNumber(commonSchool.getDistNo());
-    		school.setSchoolType(commonSchool.getSchoolTypeCode());
-    		school.setOpenDate(commonSchool.getOpenedDate());
-    		school.setClosedDate(commonSchool.getClosedDate());
-    		school.setAuthorityNumber(commonSchool.getAuthNumber());
     		school.setSchoolCategory(commonSchool.getSchoolCategoryCode());
-    		school.setPrincipalTitle(commonSchool.getPrTitleCode());
-    		school.setPrincipalFirstName(commonSchool.getPrGivenName());
-    		school.setPrincipalLastName(commonSchool.getPrSurname());
-    		school.setPrincipalName(commonSchool.getPrSurname() + ", " + commonSchool.getPrGivenName() + " " + commonSchool.getPrMiddleName());
 
-			if(StringUtils.isNotBlank(school.getCountryCode())) {
+    		if(StringUtils.isNotBlank(school.getCountryCode())) {
 				GradCountry country = codeService.getSpecificCountryCode(school.getCountryCode());
 				if(country != null) {
 					school.setCountryName(country.getCountryName());

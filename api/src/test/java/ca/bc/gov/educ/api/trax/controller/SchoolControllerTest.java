@@ -85,9 +85,9 @@ public class SchoolControllerTest {
         final School school = new School();
         school.setMinCode("1234567");
         school.setSchoolName("Test School");
-        Mockito.when(schoolService.getSchoolsByParams("1234567", "123", null, null,"accessToken")).thenReturn(Arrays.asList(school));
-        schoolController.getSchoolsByParams("1234567", "123", null, null,"accessToken");
-        Mockito.verify(schoolService).getSchoolsByParams("1234567", "123", null, null,"accessToken");
+        Mockito.when(schoolService.getSchoolsByParams("1234567", "123", null, "accessToken")).thenReturn(Arrays.asList(school));
+        schoolController.getSchoolsByParams("1234567", "123", null,"accessToken");
+        Mockito.verify(schoolService).getSchoolsByParams("1234567", "123", null, "accessToken");
     }
 
     @Test
