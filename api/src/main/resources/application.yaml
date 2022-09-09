@@ -115,3 +115,9 @@ trax:
 splunk:
   log-helper:
     enabled: ${ENABLE_SPLUNK_LOG_HELPER}
+
+#Endpoint properties
+endpoint:
+  educ-school-api:
+    get-school-by-mincode:
+      url: ${EDUC_SCHOOL_API}api/v1/schools/%s

@@ -56,21 +56,6 @@ public class TswController {
 		return response.GET(tswService.getTranscriptStudentDemog(pen));
     }
 
-    @GetMapping(EducGradTraxApiConstants.GET_TRANSCRIPT_STUDENT_GRADUATED_BY_PEN_MAPPING)
-    @PreAuthorize(PermissionsConstants.READ_GRAD_TRAX_STUDENT_DATA)
-    @Operation(summary = "Get student is graduated or not from TSW", description = "Find a student graduated or not", tags = { "TSW" })
-    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
-            @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-    public ResponseEntity<Boolean> getTranscriptStudentGraduatedByPen(@PathVariable String pen) {
-        logger.debug("getTranscriptStudentGraduatedByPen : ");
-        validation.requiredField(pen, "Pen #");
-        if (validation.hasErrors()) {
-            validation.stopOnErrors();
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        return response.GET(tswService.isGraduated(pen));
-    }
-
     @GetMapping(EducGradTraxApiConstants.GET_TRANSCRIPT_COURSE_BY_PEN_MAPPING)
     @PreAuthorize(PermissionsConstants.READ_GRAD_TRAX_STUDENT_DATA)
     @Operation(summary = "Get transcript student courses from TSW", description = "Find transcript student courses", tags = { "TSW" })

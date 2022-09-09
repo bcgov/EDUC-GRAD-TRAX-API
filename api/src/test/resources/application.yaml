@@ -30,6 +30,9 @@ spring:
         jwt:
           issuer-uri: https://soam-dev.apps.silver.devops.gov.bc.ca/auth/realms/master
           jwk-set-uri: https://soam-dev.apps.silver.devops.gov.bc.ca/auth/realms/master/protocol/openid-connect/certs
+  sql:
+    init:
+      data-locations: classpath:schema.sql
 
 #Logging properties
 logging:
@@ -80,3 +83,9 @@ trax:
 splunk:
   log-helper:
     enabled: false
+
+#Endpoint properties
+endpoint:
+  educ-school-api:
+    get-school-by-mincode:
+      url: https://school-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/schools/%s

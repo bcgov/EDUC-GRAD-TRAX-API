@@ -8,11 +8,14 @@ import ca.bc.gov.educ.api.trax.model.dto.StudentPsi;
 import ca.bc.gov.educ.api.trax.model.entity.PsiEntity;
 import ca.bc.gov.educ.api.trax.model.transformer.PsiTransformer;
 import ca.bc.gov.educ.api.trax.repository.PsiRepository;
+import ca.bc.gov.educ.api.trax.repository.PsiSearchCriteria;
+import ca.bc.gov.educ.api.trax.repository.PsiSearchSpecification;
 import ca.bc.gov.educ.api.trax.repository.StudentPsiRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -71,7 +74,16 @@ public class PsiService {
         String pName = psiName != null ?StringUtils.strip(psiName.toUpperCase(Locale.ROOT), "*"):null;
         String pcCode = cslCode != null ?StringUtils.strip(cslCode.toUpperCase(Locale.ROOT), "*"):null;
         String ptMode = transmissionMode != null ?StringUtils.strip(transmissionMode.toUpperCase(Locale.ROOT), "*"):null;
-        return psiTransformer.transformToDTO(psiRepository.findPSIs(pCode,pName,pcCode,ptMode,openFlag));
+        PsiSearchCriteria searchCriteria = PsiSearchCriteria.builder()
+                .psiCode(pCode)
+                .psiName(pName)
+                .cslCode(pcCode)
+                .transmissionMode(ptMode)
+                .openFlag(openFlag)
+                .build();
+        Specification<PsiEntity> spec = new PsiSearchSpecification(searchCriteria);
+        List<PsiEntity> psiEntities = psiRepository.findAll(Specification.where(spec));
+        return psiTransformer.transformToDTO(psiEntities);
 	}
 
     public List<StudentPsi> getStudentPSIDetails(String transmissionMode, String psiYear, String psiCode) {

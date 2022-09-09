@@ -30,6 +30,8 @@ public class SchoolController {
 
     private static Logger logger = LoggerFactory.getLogger(SchoolController.class);
 
+    private static final String BEARER = "Bearer ";
+
     @Autowired
     SchoolService schoolService;
     
@@ -43,7 +45,7 @@ public class SchoolController {
     @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
     @Operation(summary = "Find All Schools", description = "Get All Schools", tags = { "School" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
-    public List<School> getAllSchools() { 
+    public List<School> getAllSchools() {
     	logger.debug("getAllSchools : ");
         return schoolService.getSchoolList();
     }
@@ -54,9 +56,9 @@ public class SchoolController {
     @Operation(summary = "Find a School by Mincode", description = "Get a School by Mincode", tags = { "School" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
 			@ApiResponse(responseCode = "204", description = "NO CONTENT")})
-    public ResponseEntity<School> getSchoolDetails(@PathVariable String minCode) { 
+    public ResponseEntity<School> getSchoolDetails(@PathVariable String minCode, @RequestHeader(name="Authorization") String accessToken) {
     	logger.debug("getSchoolDetails : ");
-    	School schoolResponse = schoolService.getSchoolDetails(minCode);
+    	School schoolResponse = schoolService.getSchoolDetails(minCode, accessToken.replace(BEARER, ""));
     	if(schoolResponse != null) {
     		return response.GET(schoolResponse);
     	}else {
@@ -71,8 +73,10 @@ public class SchoolController {
 			@ApiResponse(responseCode = "400", description = "BAD REQUEST")})
     public ResponseEntity<List<School>> getSchoolsByParams(
     		@RequestParam(value = "schoolName", required = false) String schoolName,
-    		@RequestParam(value = "mincode", required = false) String mincode) {
-		return response.GET(schoolService.getSchoolsByParams(schoolName,mincode));
+    		@RequestParam(value = "mincode", required = false) String mincode,
+            @RequestParam(value = "district", required = false) String district,
+            @RequestHeader(name="Authorization") String accessToken) {
+		return response.GET(schoolService.getSchoolsByParams(schoolName, mincode, district, accessToken.replace(BEARER, "")));
     }
 
     @GetMapping(EducGradTraxApiConstants.CHECK_SCHOOL_BY_CODE_MAPPING)
