@@ -9,6 +9,7 @@ import ca.bc.gov.educ.api.trax.repository.GradCourseRepository;
 import ca.bc.gov.educ.api.trax.repository.TranscriptStudentDemogRepository;
 import ca.bc.gov.educ.api.trax.repository.TraxStudentNoRepository;
 import ca.bc.gov.educ.api.trax.repository.TraxStudentsLoadRepository;
+import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -36,6 +37,7 @@ public class TraxCommonService {
     private final GradCourseTransformer gradCourseTransformer;
 
     private TranscriptStudentDemogRepository transcriptStudentDemogRepository;
+    private EducGradTraxApiConstants constants;
 
     @Autowired
     public TraxCommonService(TraxStudentsLoadRepository traxStudentsLoadRepository,
@@ -43,7 +45,8 @@ public class TraxCommonService {
                              GradCourseRepository gradCourseRepository,
                              TraxStudentNoTransformer traxStudentNoTransformer,
                              GradCourseTransformer gradCourseTransformer,
-                             TranscriptStudentDemogRepository transcriptStudentDemogRepository) {
+                             TranscriptStudentDemogRepository transcriptStudentDemogRepository,
+                             EducGradTraxApiConstants constants) {
         this.traxStudentsLoadRepository = traxStudentsLoadRepository;
         this.traxStudentNoRepository = traxStudentNoRepository;
         this.gradCourseRepository = gradCourseRepository;
@@ -51,6 +54,7 @@ public class TraxCommonService {
         this.gradCourseTransformer = gradCourseTransformer;
 
         this.transcriptStudentDemogRepository = transcriptStudentDemogRepository;
+        this.constants = constants;
     }
 
     // Pagination
@@ -68,7 +72,7 @@ public class TraxCommonService {
     // Student Master from TRAX
     @Transactional(readOnly = true)
     public List<ConvGradStudent> getStudentMasterDataFromTrax(String pen) {
-        boolean isGraduated = isGraduatedStudent(pen);
+        boolean isGraduated = !constants.isEnableStudentMasterOnly() && isGraduatedStudent(pen);
         List<Object[]> results;
         if (isGraduated) {
             results = traxStudentsLoadRepository.loadTraxGraduatedStudent(pen);
