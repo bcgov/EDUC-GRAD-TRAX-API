@@ -36,23 +36,7 @@ public class School implements Comparable<School> {
     private String schoolFax;
     private String schoolEmail;
 
-    private String districtNumber;
-	private String schoolType;
-	private String openDate;
-	private String closedDate;
-	private String authorityNumber;
-	private String gradeRange;
 	private String schoolCategory;
-	private String fundingGroups;
-	private String enrolmentAsOf;
-	private String grade10Enrolment;
-	private String grade11Emrolment;
-	private String grade12Enrolment;
-
-	private String principalTitle;
-	private String principalFirstName;
-	private String principalLastName;
-
 
 	public String getSchoolName() {
 		return  schoolName != null ? schoolName.trim(): "";
@@ -126,28 +110,18 @@ public class School implements Comparable<School> {
 		return minCode != null ? minCode.trim(): "";
 	}
 
-	public String getDistrictNumber() {
-		return districtNumber != null ? districtNumber.trim(): "";
-	}
-
-	public String getAuthorityNumber() {
-		return authorityNumber != null ? authorityNumber.trim(): "";
-	}
-
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		School school = (School) o;
 		return getMinCode().equals(school.getMinCode())
-				&& getSchoolName().equals(school.getSchoolName())
-				&& getDistrictNumber().equals(school.getDistrictNumber())
-				&& getAuthorityNumber().equals(school.getAuthorityNumber());
+				&& getSchoolName().equals(school.getSchoolName());
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(getMinCode(), getSchoolName(), getDistrictNumber(), getAuthorityNumber());
+		return Objects.hash(getMinCode(), getSchoolName());
 	}
 
 	@Override
@@ -169,16 +143,10 @@ public class School implements Comparable<School> {
 		int result = 0;
 		{
 			if (result == 0) {
-				result = getDistrictNumber().compareToIgnoreCase(o.getDistrictNumber());
-			}
-			if (result == 0) {
 				result = getMinCode().compareToIgnoreCase(o.getMinCode());
 			}
 			if (result == 0) {
 				result = getSchoolName().compareToIgnoreCase(o.getSchoolName());
-			}
-			if (result == 0) {
-				result = getAuthorityNumber().compareToIgnoreCase(o.getAuthorityNumber());
 			}
 		}
 		return result;

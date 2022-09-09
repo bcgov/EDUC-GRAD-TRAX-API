@@ -75,9 +75,8 @@ public class SchoolController {
     		@RequestParam(value = "schoolName", required = false) String schoolName,
     		@RequestParam(value = "mincode", required = false) String mincode,
             @RequestParam(value = "district", required = false) String district,
-            @RequestParam(value = "authorityNumber", required = false) String authorityNumber,
             @RequestHeader(name="Authorization") String accessToken) {
-		return response.GET(schoolService.getSchoolsByParams(schoolName, mincode, district, authorityNumber, accessToken.replace(BEARER, "")));
+		return response.GET(schoolService.getSchoolsByParams(schoolName, mincode, district, accessToken.replace(BEARER, "")));
     }
 
     @GetMapping(EducGradTraxApiConstants.CHECK_SCHOOL_BY_CODE_MAPPING)
