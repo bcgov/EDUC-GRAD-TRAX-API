@@ -78,6 +78,9 @@ cron:
 trax:
   update:
     enabled: true
+  get:
+    student-master-only:
+      enabled: false
 
 #Splunk LogHelper
 splunk:

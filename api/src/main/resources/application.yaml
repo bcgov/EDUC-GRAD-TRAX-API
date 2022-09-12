@@ -110,6 +110,9 @@ cron:
 trax:
   update:
     enabled: ${ENABLE_TRAX_UPDATE}
+  get:
+    student-master-only:
+      enabled: ${ENABLE_GET_STUDENT_MASTER_ONLY}
 
 #Splunk LogHelper
 splunk:
