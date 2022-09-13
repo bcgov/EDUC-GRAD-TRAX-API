@@ -103,6 +103,10 @@ public class EducGradTraxApiConstants {
     @Value("${splunk.log-helper.enabled}")
     private boolean splunkLogHelperEnabled;
 
+    // Forced to read student master only
+    @Value("${trax.get.student-master-only.enabled}")
+    private boolean enableStudentMasterOnly;
+
     @Value("${endpoint.educ-school-api.get-school-by-mincode.url}")
     private String schoolByMincodeSchoolApiUrl;
 }
