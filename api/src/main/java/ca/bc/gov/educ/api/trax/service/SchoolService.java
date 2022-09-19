@@ -21,7 +21,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -99,13 +98,19 @@ public class SchoolService {
 
 	@Transactional
 	public List<School> getSchoolsByParams(String schoolName, String minCode, String district, String accessToken) {
-		String sName = !StringUtils.isBlank(schoolName) ? StringUtils.strip(schoolName.toUpperCase(Locale.ROOT),"*"):null;
+		String sName = !StringUtils.isBlank(schoolName) ? StringUtils.strip(schoolName,"*"):null;
 		String sCode = !StringUtils.isBlank(minCode) ? StringUtils.strip(minCode,"*"):null;
 		String sDist = !StringUtils.isBlank(district) ? StringUtils.strip(district,"*"):null;
+		boolean sNameWc = StringUtils.endsWith(schoolName, "*");
+		boolean sCodeWc = StringUtils.endsWith(minCode, "*");
+		boolean sDistWc = StringUtils.endsWith(district, "*");
 		TraxSchoolSearchCriteria searchCriteria = TraxSchoolSearchCriteria.builder()
 				.district(sDist)
+				.districtWildCard(sDistWc)
 				.schoolName(sName)
+				.schoolNameWildCard(sNameWc)
 				.minCode(sCode)
+				.minCodeWildCard(sCodeWc)
 				.build();
 		Specification<SchoolEntity> spec = new TraxSchoolSearchSpecification(searchCriteria);
 		List<SchoolEntity> schoolEntities = schoolRepository.findAll(Specification.where(spec));

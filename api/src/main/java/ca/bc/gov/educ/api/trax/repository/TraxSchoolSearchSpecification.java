@@ -11,6 +11,9 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 public class TraxSchoolSearchSpecification implements Specification<SchoolEntity> {
 
@@ -26,13 +29,28 @@ public class TraxSchoolSearchSpecification implements Specification<SchoolEntity
     @Nullable
     public Predicate toPredicate(Root<SchoolEntity> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
         logger.debug("toPredicate()");
+        List<Predicate> predicates = new ArrayList<>();
         if (StringUtils.isNotBlank(searchCriteria.getSchoolName())) {
-            return criteriaBuilder.like(root.get("schoolName"), "%" + searchCriteria.getSchoolName() + "%");
-        } else if (StringUtils.isNotBlank(searchCriteria.getMinCode())) {
-            return criteriaBuilder.like(root.get("minCode"), searchCriteria.getMinCode() + "%");
-        } else if (StringUtils.isNotBlank(searchCriteria.getDistrict())) {
-            return criteriaBuilder.like(root.get("minCode"), searchCriteria.getDistrict() + "%");
+            Predicate schoolNamePredicate;
+            if(searchCriteria.isSchoolNameWildCard()) {
+                schoolNamePredicate = criteriaBuilder.like(criteriaBuilder.upper(root.get("schoolName")), "%" + searchCriteria.getSchoolName().toUpperCase(Locale.ROOT) + "%");
+            } else {
+                schoolNamePredicate = criteriaBuilder.equal(criteriaBuilder.upper(root.get("schoolName")), searchCriteria.getSchoolName().toUpperCase(Locale.ROOT));
+            }
+            predicates.add(schoolNamePredicate);
         }
-        return criteriaBuilder.and();
+        if (StringUtils.isNotBlank(searchCriteria.getMinCode())) {
+            Predicate minCodePredicate;
+            if(searchCriteria.isMinCodeWildCard()) {
+                minCodePredicate = criteriaBuilder.like(root.get("minCode"), searchCriteria.getMinCode() + "%");
+            } else {
+                minCodePredicate = criteriaBuilder.equal(root.get("minCode"), searchCriteria.getMinCode());
+            }
+            predicates.add(minCodePredicate);
+        } else if (StringUtils.isNotBlank(searchCriteria.getDistrict())) {
+            Predicate districtPredicate = criteriaBuilder.like(root.get("minCode"), searchCriteria.getDistrict() + "%");
+            predicates.add(districtPredicate);
+        }
+        return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
     }
 }
