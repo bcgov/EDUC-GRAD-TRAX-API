@@ -16,7 +16,10 @@ public class TraxSchoolSearchCriteria implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String district;
+    private boolean districtWildCard;
     private String minCode;
+    private boolean minCodeWildCard;
     private String schoolName;
+    private boolean schoolNameWildCard;
 
 }
