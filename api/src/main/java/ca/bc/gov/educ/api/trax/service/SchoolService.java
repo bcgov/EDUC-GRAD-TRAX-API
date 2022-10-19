@@ -15,9 +15,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.util.Arrays;
 import java.util.List;
@@ -49,7 +51,7 @@ public class SchoolService {
     
 
     @SuppressWarnings("unused")
-	private static Logger logger = LoggerFactory.getLogger(SchoolService.class);
+	private static final Logger logger = LoggerFactory.getLogger(SchoolService.class);
 
      /**
      * Get all Schools in School DTO
@@ -148,7 +150,14 @@ public class SchoolService {
 					})
 					.retrieve().bodyToMono(CommonSchool.class).block();
 		} catch (Exception e) {
-			logger.warn(String.format("Common School not exists for Ministry Code: %s", mincode));
+			if(e instanceof WebClientResponseException){
+				HttpStatus status = ((WebClientResponseException) e).getStatusCode();
+				if(status == HttpStatus.NOT_FOUND){
+					logger.warn(String.format("Common School not exists for Ministry Code: %s", mincode));
+				} else {
+					logger.error(String.format("Could not reach school-api. Response was: %s", ((WebClientResponseException) e).getStatusCode()));
+				}
+			}
     		return null;
 		}
 	}
