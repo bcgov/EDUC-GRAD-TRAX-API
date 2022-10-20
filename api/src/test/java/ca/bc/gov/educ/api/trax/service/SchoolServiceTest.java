@@ -13,19 +13,24 @@ import ca.bc.gov.educ.api.trax.repository.TraxSchoolSearchCriteria;
 import ca.bc.gov.educ.api.trax.repository.TraxSchoolSearchSpecification;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
+
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
@@ -37,7 +42,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.MockitoAnnotations.openMocks;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
 @ActiveProfiles("test")
 public class SchoolServiceTest {
@@ -79,14 +83,36 @@ public class SchoolServiceTest {
     @Autowired
     private DistrictTransformer districtTransformer;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
     }
 
-    @After
-    public void tearDown() {
 
+    @ExtendWith(OutputCaptureExtension.class)
+    @Test
+    public void testGetCommonSchool_GivenAPICalloutNotFoundError_ExpectNullAndLoggedError(CapturedOutput output){
+        final String MESSAGE = "Common School not exists for Ministry Code";
+        WebClientResponseException webClientException  = new WebClientResponseException("Not Found", 404, "404 NOT FOUND", null, null, null);
+        // mock webclient
+        Mockito.when(this.webClient.get()).thenThrow(webClientException);
+        CommonSchool commonSchool = schoolService.getCommonSchool(null, "12345678");
+        Assertions.assertNull(commonSchool);
+        // assert logging
+        Assertions.assertTrue(output.getOut().contains(MESSAGE));
+    }
+
+    @ExtendWith(OutputCaptureExtension.class)
+    @Test
+    public void testGetCommonSchool_GivenAPICalloutServiceUnavailableError_ExpectNullAndLoggedError(CapturedOutput output){
+        final String MESSAGE = "Response error while calling school-api";
+        WebClientResponseException webClientException  = new WebClientResponseException("Service Unavailable", 503, "503 SERVICE UNAVAILABLE", null, null, null);
+        // mock webclient
+        Mockito.when(this.webClient.get()).thenThrow(webClientException);
+        CommonSchool commonSchool = schoolService.getCommonSchool(null, "12345678");
+        Assertions.assertNull(commonSchool);
+        // assert logging
+        Assertions.assertTrue(output.getOut().contains(MESSAGE));
     }
 
     @Test
