@@ -15,9 +15,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.util.Arrays;
 import java.util.List;
@@ -49,7 +51,7 @@ public class SchoolService {
     
 
     @SuppressWarnings("unused")
-	private static Logger logger = LoggerFactory.getLogger(SchoolService.class);
+	private final Logger logger = LoggerFactory.getLogger(SchoolService.class);
 
      /**
      * Get all Schools in School DTO
@@ -147,10 +149,16 @@ public class SchoolService {
 						h.set(EducGradTraxApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
 					})
 					.retrieve().bodyToMono(CommonSchool.class).block();
+		} catch (WebClientResponseException e) {
+			if(e.getStatusCode() == HttpStatus.NOT_FOUND){
+				logger.warn(String.format("Common School not exists for Ministry Code: %s", mincode));
+			} else {
+				logger.error(String.format("Response error while calling school-api. Status was: %s", e.getStatusCode()));
+			}
 		} catch (Exception e) {
-			logger.warn(String.format("Common School not exists for Ministry Code: %s", mincode));
-    		return null;
+			logger.error(String.format("Error while calling school-api: %s", e.getMessage()));
 		}
+		return null;
 	}
 
 	private void adaptSchool(School school, CommonSchool commonSchool) {
