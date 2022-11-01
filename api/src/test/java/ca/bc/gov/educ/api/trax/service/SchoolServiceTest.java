@@ -13,19 +13,24 @@ import ca.bc.gov.educ.api.trax.repository.TraxSchoolSearchCriteria;
 import ca.bc.gov.educ.api.trax.repository.TraxSchoolSearchSpecification;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
+
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
@@ -37,10 +42,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.MockitoAnnotations.openMocks;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
 @ActiveProfiles("test")
-public class SchoolServiceTest {
+class SchoolServiceTest {
 
     @Autowired
     private SchoolService schoolService;
@@ -79,18 +83,40 @@ public class SchoolServiceTest {
     @Autowired
     private DistrictTransformer districtTransformer;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         openMocks(this);
     }
 
-    @After
-    public void tearDown() {
 
+    @ExtendWith(OutputCaptureExtension.class)
+    @Test
+    void testGetCommonSchool_GivenAPICalloutNotFoundError_ExpectNullAndLoggedError(CapturedOutput output){
+        final String MESSAGE = "Common School not exists for Ministry Code";
+        WebClientResponseException webClientException  = new WebClientResponseException("Not Found", 404, "404 NOT FOUND", null, null, null);
+        // mock webclient
+        Mockito.when(this.webClient.get()).thenThrow(webClientException);
+        CommonSchool commonSchool = schoolService.getCommonSchool(null, "12345678");
+        Assertions.assertNull(commonSchool);
+        // assert logging
+        Assertions.assertTrue(output.getOut().contains(MESSAGE));
+    }
+
+    @ExtendWith(OutputCaptureExtension.class)
+    @Test
+    void testGetCommonSchool_GivenAPICalloutServiceUnavailableError_ExpectNullAndLoggedError(CapturedOutput output){
+        final String MESSAGE = "Response error while calling school-api";
+        WebClientResponseException webClientException  = new WebClientResponseException("Service Unavailable", 503, "503 SERVICE UNAVAILABLE", null, null, null);
+        // mock webclient
+        Mockito.when(this.webClient.get()).thenThrow(webClientException);
+        CommonSchool commonSchool = schoolService.getCommonSchool(null, "12345678");
+        Assertions.assertNull(commonSchool);
+        // assert logging
+        Assertions.assertTrue(output.getOut().contains(MESSAGE));
     }
 
     @Test
-    public void testGetSchoolList() {
+    void testGetSchoolList() {
         // School data
         final List<SchoolEntity> gradSchoolList = new ArrayList<>();
         final SchoolEntity school1 = new SchoolEntity();
@@ -134,7 +160,7 @@ public class SchoolServiceTest {
     }
 
     @Test
-    public void testGetSchoolList_null() {
+    void testGetSchoolList_null() {
         // School data
         final List<SchoolEntity> gradSchoolList = new ArrayList<>();
         final SchoolEntity school1 = new SchoolEntity();
@@ -170,7 +196,7 @@ public class SchoolServiceTest {
     }
 
     @Test
-    public void testGetSchoolDetails() {
+    void testGetSchoolDetails() {
         // School
         final SchoolEntity school = new SchoolEntity();
         school.setMinCode("02121000");
@@ -216,7 +242,7 @@ public class SchoolServiceTest {
     }
 
     @Test
-    public void testGetSchoolDetails_empty() {
+    void testGetSchoolDetails_empty() {
         // School
         final SchoolEntity school = new SchoolEntity();
         school.setMinCode("02121000");
@@ -255,7 +281,7 @@ public class SchoolServiceTest {
     }
 
     @Test
-    public void testGetSchoolDetails_not_empty_null() {
+    void testGetSchoolDetails_not_empty_null() {
         // School
         final SchoolEntity school = new SchoolEntity();
         school.setMinCode("02121000");
@@ -295,7 +321,7 @@ public class SchoolServiceTest {
     }
 
     @Test
-    public void testGetSchoolsByParams() {
+    void testGetSchoolsByParams() {
         // School
         final SchoolEntity school = new SchoolEntity();
         school.setMinCode("02121000");
@@ -341,7 +367,7 @@ public class SchoolServiceTest {
 
     }
     @Test
-    public void testGetSchoolsByParams_params() {
+    void testGetSchoolsByParams_params() {
         // School
         final SchoolEntity school = new SchoolEntity();
         school.setMinCode("02121000");
@@ -388,7 +414,7 @@ public class SchoolServiceTest {
     }
 
     @Test
-    public void testExistsSchool() {
+    void testExistsSchool() {
         Mockito.when(schoolRepository.countTabSchools("02121000")).thenReturn(1L);
         mockCommonSchool("02121000", null);
         var result = schoolService.existsSchool("02121000");
@@ -396,7 +422,7 @@ public class SchoolServiceTest {
     }
 
     @Test
-    public void testNotExistsSchool() {
+    void testNotExistsSchool() {
         Mockito.when(schoolRepository.countTabSchools("02121000")).thenReturn(0L);
         mockCommonSchool("02121000", null);
         var result = schoolService.existsSchool("02121000");
@@ -404,26 +430,26 @@ public class SchoolServiceTest {
     }
 
     @Test
-    public void testCommonSchool() {
+    void testCommonSchool() {
         mockCommonSchool("02121000", "THE GATEWAY COMMUNITY LEARNING CENTRE");
         var result = schoolService.getCommonSchool("accessToken", "02121000");
         assertThat(result).isNotNull();
     }
 
     @Test
-    public void testCommonSchool_mincode_null() {
+    void testCommonSchool_mincode_null() {
         var result = schoolService.getCommonSchool("accessToken", null);
         assertThat(result).isNull();
     }
 
     @Test
-    public void testCommonSchoolIsNull() {
+    void testCommonSchoolIsNull() {
         mockCommonSchool("02121000", "THE GATEWAY COMMUNITY LEARNING CENTRE");
         var result = schoolService.getCommonSchool("accessToken", "12345678");
         assertThat(result).isNull();
     }
 
-    public void mockCommonSchool(String minCode, String schoolName) {
+    void mockCommonSchool(String minCode, String schoolName) {
         CommonSchool commonSchool = new CommonSchool();
         commonSchool.setSchlNo(minCode);
         commonSchool.setSchoolName(schoolName);
