@@ -111,7 +111,7 @@ public class TraxUpdateServiceTest {
         String jsonString = JsonUtil.getJsonStringFromObject(traxUpdateInGrad);
 
         TraxUpdatedPubEvent traxUpdatedPubEvent = TraxUpdatedPubEvent.builder()
-                .eventType(EventType.UPDATE_TRAX_STUDENT_MASTER.toString())
+                .eventType(EventType.TRAX_STUDENT_UPDATED.toString())
                 .eventId(UUID.randomUUID())
                 .eventOutcome(EventOutcome.TRAX_STUDENT_MASTER_UPDATED.toString())
                 .activityCode(traxUpdateInGradEntity.getUpdateType())
@@ -144,7 +144,7 @@ public class TraxUpdateServiceTest {
         String jsonString = JsonUtil.getJsonStringFromObject(traxUpdateInGrad);
 
         TraxUpdatedPubEvent traxUpdatedPubEvent = TraxUpdatedPubEvent.builder()
-                .eventType(EventType.UPDATE_TRAX_STUDENT_MASTER.toString())
+                .eventType(EventType.TRAX_STUDENT_UPDATED.toString())
                 .eventId(UUID.randomUUID())
                 .eventOutcome(EventOutcome.TRAX_STUDENT_MASTER_UPDATED.toString())
                 .activityCode(traxUpdateInGradEntity.getUpdateType())

@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.trax.service;
 
+import ca.bc.gov.educ.api.trax.constant.EventType;
 import ca.bc.gov.educ.api.trax.messaging.NatsConnection;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Subscriber;
@@ -22,12 +23,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ActiveProfiles("test")
-public class GradStatusUpdateServiceTest {
+public class GradStudentUpdatedServiceTest {
     @Autowired
-    private GradStatusCreateService gradStatusCreateService;
+    private GradStudentUpdatedService gradStudentUpdatedService;
 
     @Autowired
-    private GradStatusUpdateService gradStatusUpdateService;
+    private GradStudentUpdatedService gradStatusUpdateService;
 
     @Autowired
     private EventRepository eventRepository;
@@ -48,14 +49,14 @@ public class GradStatusUpdateServiceTest {
     @Before
     public void setUp() throws JsonProcessingException {
         final var request = TestUtils.createGraduationStatus();
-        final var event = TestUtils.createEvent("CREATE_GRAD_STATUS", request, eventRepository);
-        this.gradStatusCreateService.processEvent(request, event);
+        final var event = TestUtils.createEvent(EventType.GRAD_STUDENT_UNDO_COMPLETION.name(), request, eventRepository);
+        this.gradStudentUpdatedService.processEvent(request, event);
     }
 
     @Test
     public void testProcessEvent_givenUPDATE_GRAD_STATUS_Event() throws JsonProcessingException {
         final var request = TestUtils.createGraduationStatus();
-        final var event = TestUtils.createEvent("UPDATE_GRAD_STATUS", request, eventRepository);
+        final var event = TestUtils.createEvent(EventType.GRAD_STUDENT_GRADUATED.name(), request, eventRepository);
         this.gradStatusUpdateService.processEvent(request, event);
 
         final var traxStudent = this.traxStudentRepository.findById(StringUtils.rightPad(request.getPen(), 10));

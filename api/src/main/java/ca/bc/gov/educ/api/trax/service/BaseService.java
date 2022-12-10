@@ -1,6 +1,6 @@
 package ca.bc.gov.educ.api.trax.service;
 
-import ca.bc.gov.educ.api.trax.model.dto.GraduationStatus;
+import ca.bc.gov.educ.api.trax.model.dto.GradStatusEventPayloadDTO;
 import ca.bc.gov.educ.api.trax.model.entity.TraxStudentEntity;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiUtils;
@@ -8,8 +8,27 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public abstract class BaseService implements EventService {
+
+    public static final String FIELD_GRAD_REQT_YEAR = "GRAD_REQT_YEAR";
+    public static final String FIELD_GRAD_DATE = "GRAD_DATE";
+    public static final String FIELD_MINCODE = "MINCODE";
+    public static final String FIELD_MINCODE_GRAD = "MINCODE_GRAD";
+    public static final String FIELD_STUD_GRADE = "STUD_GRADE";
+    public static final String FIELD_STUD_STATUS = "STUD_STATUS";
+    public static final String FIELD_ARCHIVE_FLAG = "ARCHIVE_FLAG";
+    public static final String FIELD_HONOUR_FLAG = "HONOUR_FLAG";
+    public static final String FIELD_XCRIPT_ACTV_DATE = "XCRIPT_ACTV_DATE";
+
+//    abstract Map<String, Object> validateUpdateFieldsMap(Map<String, Object> updateFieldsMap);
+//
+//    protected  void processTransaction() {
+//
+//    }
 
     protected String convertProgramToYear(String program) {
         String ret = null;
@@ -30,96 +49,175 @@ public abstract class BaseService implements EventService {
         return ret;
     }
 
-    protected boolean validateAndSetTraxStudentUpdate(TraxStudentEntity traxStudentEntity, GraduationStatus gradStatus) {
-        boolean isUpdated = false;
+    protected String buildUpdateQuery(String pen, Map<String, Object> updateFieldsMap) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("UPDATE STUDENT_MASTER SET ");
+
+        Set<String> fields = updateFieldsMap.keySet();
+        // GRAD_REQT_YEAR
+        if (fields.contains(FIELD_GRAD_REQT_YEAR)) {
+            String value = (String) updateFieldsMap.get(FIELD_GRAD_REQT_YEAR);
+            sb.append(getUpdateFieldForString(FIELD_GRAD_REQT_YEAR, value, false));
+        }
+        // GRAD_DATE
+        if (fields.contains(FIELD_GRAD_DATE)) {
+            Long value = (Long) updateFieldsMap.get(FIELD_GRAD_DATE);
+            sb.append(getUpdateFieldForLong(FIELD_GRAD_DATE, value, false));
+        }
+        // MINCODE
+        if (fields.contains(FIELD_MINCODE)) {
+            String value = (String) updateFieldsMap.get(FIELD_MINCODE);
+            sb.append(getUpdateFieldForString(FIELD_MINCODE, value, false));
+        }
+        // MINCODE_GRAD
+        if (fields.contains(FIELD_MINCODE_GRAD)) {
+            String value = (String) updateFieldsMap.get(FIELD_MINCODE_GRAD);
+            sb.append(getUpdateFieldForString(FIELD_MINCODE_GRAD, value, false));
+        }
+        // STUD_GRADE
+        if (fields.contains(FIELD_STUD_GRADE)) {
+            String value = (String) updateFieldsMap.get(FIELD_STUD_GRADE);
+            sb.append(getUpdateFieldForString(FIELD_STUD_GRADE, value, false));
+        }
+        // STUD_STATUS
+        if (fields.contains(FIELD_STUD_STATUS)) {
+            String value = (String) updateFieldsMap.get(FIELD_STUD_STATUS);
+            sb.append(getUpdateFieldForString(FIELD_STUD_STATUS, value, false));
+        }
+        // ARCHIVE_FLAG
+        if (fields.contains(FIELD_ARCHIVE_FLAG)) {
+            String value = (String) updateFieldsMap.get(FIELD_ARCHIVE_FLAG);
+            sb.append(getUpdateFieldForString(FIELD_ARCHIVE_FLAG, value, false));
+        }
+        // HONOUR_FLAG
+        if (fields.contains(FIELD_HONOUR_FLAG)) {
+            String value = (String) updateFieldsMap.get(FIELD_HONOUR_FLAG);
+            sb.append(getUpdateFieldForString(FIELD_HONOUR_FLAG, value, false));
+        }
+        // XCRIPT_ACTV_DATE
+        if (fields.contains(FIELD_XCRIPT_ACTV_DATE)) {
+            Long value = (Long) updateFieldsMap.get(FIELD_XCRIPT_ACTV_DATE);
+            sb.append(getUpdateFieldForLong(FIELD_XCRIPT_ACTV_DATE, value, true));
+        }
+
+        sb.append(" WHERE STUD_NO=" + "'" + StringUtils.rightPad(pen, 10) + "'"); // a space is appended CAREFUL not to remove.
+
+//        log.debug("Update Student_Master: " + sb.toString());
+        return sb.toString();
+
+    }
+
+    protected Map<String, Object> buildUpdateFieldsMap(TraxStudentEntity traxStudentEntity, GradStatusEventPayloadDTO gradStatus) {
         // Needs to update required fields from GraduationStatus to TraxStudentEntity
+        Map<String, Object> updateFieldsMap = new HashMap<>();
+
         // GRAD Requested Year
         if (StringUtils.isNotBlank(gradStatus.getProgram())) {
             String year = convertProgramToYear(gradStatus.getProgram());
             if (!StringUtils.equalsIgnoreCase(year, traxStudentEntity.getGradReqtYear())) {
-                isUpdated = true;
-                traxStudentEntity.setGradReqtYear(year);
+                updateFieldsMap.put(FIELD_GRAD_REQT_YEAR, year);
             }
         }
         // GRAD Date
         if (StringUtils.isNotBlank(gradStatus.getProgramCompletionDate())) {
             String gradDateStr = gradStatus.getProgramCompletionDate().replace("/", "");
             if (NumberUtils.isDigits(gradDateStr) && NumberUtils.compare(Long.valueOf(gradDateStr), traxStudentEntity.getGradDate()) != 0) {
-                isUpdated = true;
-                traxStudentEntity.setGradDate(Long.valueOf(gradDateStr));
+                updateFieldsMap.put(FIELD_GRAD_DATE, Long.valueOf(gradDateStr));
             }
         } else if (traxStudentEntity.getGradDate() != null && traxStudentEntity.getGradDate() != 0L) {
-            isUpdated = true;
-            traxStudentEntity.setGradDate(0L);
+            updateFieldsMap.put(FIELD_GRAD_DATE, Long.valueOf("0"));
         }
 
         // Mincode
         if (!StringUtils.equalsIgnoreCase(gradStatus.getSchoolOfRecord(), traxStudentEntity.getMincode())) {
-            isUpdated = true;
-            traxStudentEntity.setMincode(gradStatus.getSchoolOfRecord());
+            updateFieldsMap.put(FIELD_MINCODE, gradStatus.getSchoolOfRecord());
         }
 
         // Mincode_Grad
         if (!StringUtils.equalsIgnoreCase(gradStatus.getSchoolAtGrad(), traxStudentEntity.getMincodeGrad())) {
-            isUpdated = true;
-            traxStudentEntity.setMincodeGrad(gradStatus.getSchoolAtGrad());
+            updateFieldsMap.put(FIELD_MINCODE_GRAD, gradStatus.getSchoolAtGrad());
         }
 
         // Student Grade
         if (!StringUtils.equalsIgnoreCase(gradStatus.getStudentGrade(), traxStudentEntity.getStudGrade())) {
-            isUpdated = true;
-            traxStudentEntity.setStudGrade(gradStatus.getStudentGrade());
+            updateFieldsMap.put(FIELD_STUD_GRADE, gradStatus.getStudentGrade());
         }
 
         // Student Status
-        if (validateAndSetTraxStudentStatus(traxStudentEntity, gradStatus.getStudentStatus())) {
-            isUpdated = true;
-        }
+        checkAndPopulateTraxStudentStatus(traxStudentEntity, gradStatus.getStudentStatus(), updateFieldsMap);
 
         // Honour Flag
         if (!StringUtils.equalsIgnoreCase(gradStatus.getHonoursStanding(), traxStudentEntity.getHonourFlag())) {
-            isUpdated = true;
+            updateFieldsMap.put(FIELD_HONOUR_FLAG, gradStatus.getHonoursStanding());
             traxStudentEntity.setHonourFlag(gradStatus.getHonoursStanding());
         }
 
-        // Current Date
-        String currentDateStr = EducGradTraxApiUtils.formatDate(new Date(), EducGradTraxApiConstants.TRAX_DATE_FORMAT);
-        if (NumberUtils.isDigits(currentDateStr)) {
-            traxStudentEntity.setXcriptActvDate(Long.valueOf(currentDateStr));
+
+        if (!updateFieldsMap.isEmpty()) {
+            // Current Date
+            String currentDateStr = EducGradTraxApiUtils.formatDate(new Date(), EducGradTraxApiConstants.TRAX_DATE_FORMAT);
+            if (NumberUtils.isDigits(currentDateStr)) {
+                updateFieldsMap.put(FIELD_XCRIPT_ACTV_DATE, Long.valueOf(currentDateStr));
+            }
+            // Update User
         }
 
-        return isUpdated;
+        return updateFieldsMap;
     }
 
-    private boolean validateAndSetTraxStudentStatus(TraxStudentEntity traxStudentEntity, String gradStudentStatus) {
+    private void checkAndPopulateTraxStudentStatus(TraxStudentEntity traxStudentEntity, String gradStudentStatus, Map<String, Object> updateFieldsMap) {
         String studStatus = traxStudentEntity.getStudStatus();
         String archivedFlag = traxStudentEntity.getArchiveFlag();
 
+        String newStudStatus = null;
+        String newArchiveFlag = null;
+
         if (StringUtils.equals(gradStudentStatus, "CUR")) {
-            traxStudentEntity.setStudStatus("A");
-            traxStudentEntity.setArchiveFlag("A");
+            newStudStatus = "A";
+            newArchiveFlag = "A";
         } else if (StringUtils.equals(gradStudentStatus, "ARC")) {
-            traxStudentEntity.setStudStatus("A");
-            traxStudentEntity.setArchiveFlag("I");
+            newStudStatus = "A";
+            newArchiveFlag = "I";
         } else if (StringUtils.equals(gradStudentStatus, "DEC")) {
-            traxStudentEntity.setStudStatus("D");
-            traxStudentEntity.setArchiveFlag("I");
+            newStudStatus = "D";
+            newArchiveFlag = "I";
         } else if (StringUtils.equals(gradStudentStatus, "MER")) {
-            traxStudentEntity.setStudStatus("M");
-            traxStudentEntity.setArchiveFlag("I");
+            newStudStatus = "M";
+            newArchiveFlag = "I";
         } else if (StringUtils.equals(gradStudentStatus, "TER")) {
-            traxStudentEntity.setStudStatus("T");
-            traxStudentEntity.setArchiveFlag("I");
+            newStudStatus = "T";
+            newArchiveFlag = "I";
         }
 
-        if (!StringUtils.equalsIgnoreCase(studStatus, traxStudentEntity.getStudStatus())) {
-            return true;
+        if (!StringUtils.equalsIgnoreCase(studStatus, newStudStatus)) {
+            updateFieldsMap.put(FIELD_STUD_STATUS, newStudStatus);
         }
 
-        if (!StringUtils.equalsIgnoreCase(archivedFlag, traxStudentEntity.getArchiveFlag())) {
-            return true;
+        if (!StringUtils.equalsIgnoreCase(archivedFlag, newArchiveFlag)) {
+            updateFieldsMap.put(FIELD_ARCHIVE_FLAG, newArchiveFlag);
         }
+    }
 
-        return false; // status is not updated at all
+    private String getUpdateFieldForString(String key, String value, boolean isLastField) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(key);
+        sb.append("='");
+        sb.append(value);
+        sb.append("'");
+        if (!isLastField) {
+            sb.append(",");
+        }
+        return sb.toString();
+    }
+
+    private String getUpdateFieldForLong(String key, Long value, boolean isLastField) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(key);
+        sb.append("=");
+        sb.append(value);
+        if (!isLastField) {
+            sb.append(",");
+        }
+        return sb.toString();
     }
 }

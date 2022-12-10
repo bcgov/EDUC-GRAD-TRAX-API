@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.trax.service;
 
+import ca.bc.gov.educ.api.trax.model.dto.GradStatusEventPayloadDTO;
 import ca.bc.gov.educ.api.trax.model.dto.GraduationStatus;
 import ca.bc.gov.educ.api.trax.model.entity.Event;
 import ca.bc.gov.educ.api.trax.model.entity.TraxStudentEntity;
@@ -16,23 +17,24 @@ import org.springframework.stereotype.Service;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import java.time.LocalDateTime;
+import java.util.Map;
 
 import static ca.bc.gov.educ.api.trax.constant.EventStatus.PROCESSED;
-import static ca.bc.gov.educ.api.trax.constant.EventType.UPDATE_GRAD_STATUS;
+import static ca.bc.gov.educ.api.trax.constant.EventType.*;
 
 @Service
 @Slf4j
-public class GradStatusUpdateService extends BaseService {
+public class GradStudentUpdatedService extends BaseService {
     private final EntityManagerFactory emf;
     private final TraxStudentRepository traxStudentRepository;
     private final EventRepository eventRepository;
     private final EducGradTraxApiConstants constants;
 
     @Autowired
-    public GradStatusUpdateService( EntityManagerFactory emf,
-                                    TraxStudentRepository traxStudentRepository,
-                                    EventRepository eventRepository,
-                                    EducGradTraxApiConstants constants) {
+    public GradStudentUpdatedService(EntityManagerFactory emf,
+                                     TraxStudentRepository traxStudentRepository,
+                                     EventRepository eventRepository,
+                                     EducGradTraxApiConstants constants) {
         this.emf = emf;
         this.traxStudentRepository = traxStudentRepository;
         this.eventRepository = eventRepository;
@@ -42,7 +44,7 @@ public class GradStatusUpdateService extends BaseService {
     @Override
     public <T extends Object> void processEvent(T request, Event event) {
         val em = this.emf.createEntityManager();
-        GraduationStatus gradStatusUpdate = (GraduationStatus) request;
+        GradStatusEventPayloadDTO gradStatusUpdate = (GradStatusEventPayloadDTO) request;
 
         var existingStudent = traxStudentRepository.findById(gradStatusUpdate.getPen());
 
@@ -53,15 +55,12 @@ public class GradStatusUpdateService extends BaseService {
                 log.info("==========> Start - Trax Incremental Update: pen# [{}]", gradStatusUpdate.getPen());
                 TraxStudentEntity traxStudentEntity = existingStudent.get();
                 // Needs to update required fields from GraduationStatus to TraxStudentEntity
-                boolean isUpdated = validateAndSetTraxStudentUpdate(traxStudentEntity, gradStatusUpdate);
-                if (isUpdated) {
+                Map<String, Object> updateFieldsMap = buildUpdateFieldsMap(traxStudentEntity, gradStatusUpdate);
+                if (!updateFieldsMap.isEmpty()) {
                     // below timeout is in milli seconds, so it is 10 seconds.
                     tx.begin();
-                    em.createNativeQuery(this.buildUpdate(traxStudentEntity.getGradReqtYear(),
-                            traxStudentEntity.getGradDate(), traxStudentEntity.getMincode(), traxStudentEntity.getMincodeGrad(),
-                            traxStudentEntity.getStudGrade(), traxStudentEntity.getStudStatus(), traxStudentEntity.getArchiveFlag(),
-                            traxStudentEntity.getHonourFlag(), traxStudentEntity.getXcriptActvDate(),
-                            traxStudentEntity.getStudNo())).setHint("javax.persistence.query.timeout", 10000).executeUpdate();
+                    em.createNativeQuery(this.buildUpdateQuery(traxStudentEntity.getStudNo(), updateFieldsMap))
+                            .setHint("javax.persistence.query.timeout", 10000).executeUpdate();
                     tx.commit();
                     log.info("  === Update Transaction is committed! ===");
                 } else {
@@ -86,26 +85,8 @@ public class GradStatusUpdateService extends BaseService {
         }
     }
 
-    private String buildUpdate(final String gradReqtYear, final Long gradDate, final String mincode, final String mincodeGrad,
-                               final String studGrade, final String studStatus, final String archiveFlag, final String honourFlag,
-                               final Long activeDate, final String studNo) {
-        String update = "UPDATE STUDENT_MASTER SET "
-                + "GRAD_REQT_YEAR=" + "'" + gradReqtYear + "'" + ","
-                + "GRAD_DATE=" + gradDate + ","
-                + "MINCODE=" + "'" + (mincode == null ? "" :mincode) + "'" + ","
-                + "MINCODE_GRAD=" + "'" + (mincodeGrad == null ? "" :mincodeGrad) + "'" + ","
-                + "STUD_GRADE=" + "'" + ReplicationUtils.getBlankWhenNull(studGrade) + "'" + ","
-                + "STUD_STATUS=" + "'" + (studStatus == null ? "" : studStatus) + "'" + ","
-                + "ARCHIVE_FLAG=" + "'" + (archiveFlag == null ? "" : archiveFlag) + "'" + ","
-                + "HONOUR_FLAG=" + "'" + (honourFlag == null ? "" : honourFlag) + "'" + ","
-                + "XCRIPT_ACTV_DATE=" + activeDate
-                + " WHERE STUD_NO=" + "'" + StringUtils.rightPad(studNo, 10) + "'"; // a space is appended CAREFUL not to remove.
-        log.debug("Update Student_Master: " + update);
-        return update;
-    }
-
     @Override
     public String getEventType() {
-        return UPDATE_GRAD_STATUS.toString();
+        return GRAD_STUDENT_UPDATED.toString();
     }
 }

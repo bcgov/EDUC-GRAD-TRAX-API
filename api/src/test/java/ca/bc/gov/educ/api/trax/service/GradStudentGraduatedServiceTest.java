@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.trax.service;
 
+import ca.bc.gov.educ.api.trax.constant.EventType;
 import ca.bc.gov.educ.api.trax.messaging.NatsConnection;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Subscriber;
@@ -22,9 +23,9 @@ import static org.mockito.MockitoAnnotations.openMocks;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ActiveProfiles("test")
-public class GradStatusCreateServiceTest {
+public class GradStudentGraduatedServiceTest {
     @Autowired
-    private GradStatusCreateService gradStatusCreateService;
+    private GradStudentGraduatedService gradStudentGraduatedService;
 
     @Autowired
     private EventRepository eventRepository;
@@ -117,8 +118,8 @@ public class GradStatusCreateServiceTest {
         final var request = TestUtils.createGraduationStatus();
         request.setProgram(program);
         request.setStudentStatus(studentStatus);
-        final var event = TestUtils.createEvent("CREATE_GRAD_STATUS", request, eventRepository);
-        this.gradStatusCreateService.processEvent(request, event);
+        final var event = TestUtils.createEvent(EventType.GRAD_STUDENT_GRADUATED.name(), request, eventRepository);
+        this.gradStudentGraduatedService.processEvent(request, event);
     }
 
 }

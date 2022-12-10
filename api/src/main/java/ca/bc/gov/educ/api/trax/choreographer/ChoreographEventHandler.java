@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.trax.choreographer;
 
+import ca.bc.gov.educ.api.trax.model.dto.GradStatusEventPayloadDTO;
 import ca.bc.gov.educ.api.trax.model.dto.GraduationStatus;
 import ca.bc.gov.educ.api.trax.model.entity.Event;
 import ca.bc.gov.educ.api.trax.service.EventService;
@@ -42,15 +43,25 @@ public class ChoreographEventHandler {
     this.singleTaskExecutor.execute(() -> {
       try {
         switch (event.getEventType()) {
-          case "CREATE_GRAD_STATUS":
-            log.debug("Processing CREATE_GRAD_STATUS event record :: {} ", event);
-            final GraduationStatus gradStatusCreate = JsonUtil.getJsonObjectFromString(GraduationStatus.class, event.getEventPayload());
-            this.eventServiceMap.get(CREATE_GRAD_STATUS.toString()).processEvent(gradStatusCreate, event);
+          case "GRAD_STUDENT_GRADUATED":
+            log.debug("Processing GRAD_STUDENT_GRADUATED event record :: {} ", event);
+            final GradStatusEventPayloadDTO eventPayload1 = JsonUtil.getJsonObjectFromString(GradStatusEventPayloadDTO.class, event.getEventPayload());
+            this.eventServiceMap.get(GRAD_STUDENT_GRADUATED.toString()).processEvent(eventPayload1, event);
             break;
-          case "UPDATE_GRAD_STATUS":
-            log.debug("Processing UPDATE_GRAD_STATUS event record :: {} ", event);
-            final GraduationStatus gradStatusUpdate = JsonUtil.getJsonObjectFromString(GraduationStatus.class, event.getEventPayload());
-            this.eventServiceMap.get(UPDATE_GRAD_STATUS.toString()).processEvent(gradStatusUpdate, event);
+          case "GRAD_STUDENT_UPDATED":
+            log.debug("Processing GRAD_STUDENT_UPDATED event record :: {} ", event);
+            final GradStatusEventPayloadDTO eventPayload2 = JsonUtil.getJsonObjectFromString(GradStatusEventPayloadDTO.class, event.getEventPayload());
+            this.eventServiceMap.get(GRAD_STUDENT_UPDATED.toString()).processEvent(eventPayload2, event);
+            break;
+          case "GRAD_STUDENT_UNDO_COMPLETION":
+            log.debug("Processing GRAD_STUDENT_UNDO_COMPLETION event record :: {} ", event);
+            final GradStatusEventPayloadDTO eventPayload3 = JsonUtil.getJsonObjectFromString(GradStatusEventPayloadDTO.class, event.getEventPayload());
+            this.eventServiceMap.get(GRAD_STUDENT_UNDO_COMPLETION.toString()).processEvent(eventPayload3, event);
+            break;
+          case "STUDENT_CERTIFICATE_DISTRIBUTED":
+            log.debug("Processing STUDENT_CERTIFICATE_DISTRIBUTED event record :: {} ", event);
+            final GradStatusEventPayloadDTO eventPayload4 = JsonUtil.getJsonObjectFromString(GradStatusEventPayloadDTO.class, event.getEventPayload());
+            this.eventServiceMap.get(STUDENT_CERTIFICATE_DISTRIBUTED.toString()).processEvent(eventPayload4, event);
             break;
           default:
             log.warn("Silently ignoring event: {}", event);
