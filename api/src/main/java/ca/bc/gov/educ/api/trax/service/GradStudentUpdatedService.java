@@ -71,17 +71,17 @@ public class GradStudentUpdatedService extends BaseService {
     @Override
     public Map<String, Pair<FieldType, Object>> initializeUpdateFieldsMap() {
         Map<String, Pair<FieldType, Object>> updateFieldsMap = new HashMap<>();
-        //grad_reqt_year
+        // grad_reqt_year
         updateFieldsMap.put(FIELD_GRAD_REQT_YEAR, null);
-        //slp_date (SCCP)
+        // slp_date (SCCP)
         updateFieldsMap.put(FIELD_SLP_DATE, null);
-        //mincode
+        // mincode
         updateFieldsMap.put(FIELD_MINCODE, null);
-        //mincode_grad
+        // mincode_grad
         updateFieldsMap.put(FIELD_MINCODE_GRAD, null);
-        //stud_grade
+        // stud_grade
         updateFieldsMap.put(FIELD_STUD_GRADE, null);
-        //stud_status, archive_flag
+        // stud_status, archive_flag
         updateFieldsMap.put(FIELD_STUD_STATUS, null);
         updateFieldsMap.put(FIELD_ARCHIVE_FLAG, null);
 
@@ -94,6 +94,8 @@ public class GradStudentUpdatedService extends BaseService {
         // SCCP
         if (isSCCP && !updateFieldsMap.containsKey(FIELD_SLP_DATE)) {
             updateFieldsMap.put(FIELD_SLP_DATE, null);
+        } else if (!isSCCP && updateFieldsMap.containsKey(FIELD_SLP_DATE)) {
+            updateFieldsMap.remove(FIELD_SLP_DATE);
         }
 
         // when grad program is updated from SCCP to something else

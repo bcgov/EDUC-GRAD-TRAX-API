@@ -63,18 +63,20 @@ public abstract class BaseService implements EventService {
         Set<String> fields = updateFieldsMap.keySet();
         // GRAD Requested Year
         if (fields.contains(FIELD_GRAD_REQT_YEAR)) {
-            String year = convertProgramToYear(gradStatus.getProgram());
-            if (!StringUtils.equalsIgnoreCase(year, traxStudentEntity.getGradReqtYear())) {
-                updateFieldsMap.put(FIELD_GRAD_REQT_YEAR, Pair.of(FieldType.TRAX_STRING, year));
+            String newGradReqtYear = convertProgramToYear(gradStatus.getProgram());
+            String curGradReqtYear = ReplicationUtils.getBlankWhenNull(traxStudentEntity.getGradReqtYear());
+            if (!StringUtils.equalsIgnoreCase(newGradReqtYear, curGradReqtYear)) {
+                updateFieldsMap.put(FIELD_GRAD_REQT_YEAR, Pair.of(FieldType.TRAX_STRING, newGradReqtYear));
             } else {
                 updateFieldsMap.remove(FIELD_GRAD_REQT_YEAR);
             }
         }
         // GRAD Requested Year At Grad
         if (fields.contains(FIELD_GRAD_REQT_YEAR_AT_GRAD)) {
-            String year = convertProgramToYear(gradStatus.getProgram());
-            if (!StringUtils.equalsIgnoreCase(year, traxStudentEntity.getGradReqtYearAtGrad())) {
-                updateFieldsMap.put(FIELD_GRAD_REQT_YEAR_AT_GRAD, Pair.of(FieldType.TRAX_STRING, year));
+            String newGradReqtYearAtGrad = convertProgramToYear(gradStatus.getProgram());
+            String curGradReqtYearAtGrad = ReplicationUtils.getBlankWhenNull(traxStudentEntity.getGradReqtYearAtGrad());
+            if (!StringUtils.equalsIgnoreCase(newGradReqtYearAtGrad, curGradReqtYearAtGrad)) {
+                updateFieldsMap.put(FIELD_GRAD_REQT_YEAR_AT_GRAD, Pair.of(FieldType.TRAX_STRING, newGradReqtYearAtGrad));
             } else {
                 updateFieldsMap.remove(FIELD_GRAD_REQT_YEAR_AT_GRAD);
             }
