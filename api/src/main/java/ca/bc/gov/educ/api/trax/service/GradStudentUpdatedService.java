@@ -1,22 +1,23 @@
 package ca.bc.gov.educ.api.trax.service;
 
+import ca.bc.gov.educ.api.trax.constant.FieldType;
 import ca.bc.gov.educ.api.trax.model.dto.GradStatusEventPayloadDTO;
-import ca.bc.gov.educ.api.trax.model.dto.GraduationStatus;
 import ca.bc.gov.educ.api.trax.model.entity.Event;
 import ca.bc.gov.educ.api.trax.model.entity.TraxStudentEntity;
 import ca.bc.gov.educ.api.trax.repository.EventRepository;
 import ca.bc.gov.educ.api.trax.repository.TraxStudentRepository;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
-import ca.bc.gov.educ.api.trax.util.ReplicationUtils;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 
 import static ca.bc.gov.educ.api.trax.constant.EventStatus.PROCESSED;
@@ -43,37 +44,19 @@ public class GradStudentUpdatedService extends BaseService {
 
     @Override
     public <T extends Object> void processEvent(T request, Event event) {
-        val em = this.emf.createEntityManager();
         GradStatusEventPayloadDTO gradStatusUpdate = (GradStatusEventPayloadDTO) request;
 
+        val em = this.emf.createEntityManager();
         var existingStudent = traxStudentRepository.findById(gradStatusUpdate.getPen());
-
         final EntityTransaction tx = em.getTransaction();
         try {
-            if (existingStudent.isPresent()
-                && constants.isTraxUpdateEnabled()) {
-                log.info("==========> Start - Trax Incremental Update: pen# [{}]", gradStatusUpdate.getPen());
-                TraxStudentEntity traxStudentEntity = existingStudent.get();
-                // Needs to update required fields from GraduationStatus to TraxStudentEntity
-                Map<String, Object> updateFieldsMap = buildUpdateFieldsMap(traxStudentEntity, gradStatusUpdate);
-                if (!updateFieldsMap.isEmpty()) {
-                    // below timeout is in milli seconds, so it is 10 seconds.
-                    tx.begin();
-                    em.createNativeQuery(this.buildUpdateQuery(traxStudentEntity.getStudNo(), updateFieldsMap))
-                            .setHint("javax.persistence.query.timeout", 10000).executeUpdate();
-                    tx.commit();
-                    log.info("  === Update Transaction is committed! ===");
-                } else {
-                    log.info("  === Skip Transaction as no changes are detected!!! ===");
-                }
-                log.info("==========> End - Trax Incremental Update: pen# [{}]", gradStatusUpdate.getPen());
-            }
+            process(existingStudent, gradStatusUpdate, em, tx, constants.isTraxUpdateEnabled());
 
             var existingEvent = eventRepository.findByEventId(event.getEventId());
             existingEvent.ifPresent(eventRecord -> {
                 eventRecord.setEventStatus(PROCESSED.toString());
                 eventRecord.setUpdateDate(LocalDateTime.now());
-                eventRepository.save(eventRecord);
+                eventRepository.saveAndFlush(eventRecord);
             });
         } catch (Exception e) {
             log.error("Error occurred saving entity " + e.getMessage());
@@ -82,6 +65,41 @@ public class GradStudentUpdatedService extends BaseService {
             if (em.isOpen()) {
                 em.close();
             }
+        }
+    }
+
+    @Override
+    public Map<String, Pair<FieldType, Object>> initializeUpdateFieldsMap() {
+        Map<String, Pair<FieldType, Object>> updateFieldsMap = new HashMap<>();
+        //grad_reqt_year
+        updateFieldsMap.put(FIELD_GRAD_REQT_YEAR, null);
+        //slp_date (SCCP)
+        updateFieldsMap.put(FIELD_SLP_DATE, null);
+        //mincode
+        updateFieldsMap.put(FIELD_MINCODE, null);
+        //mincode_grad
+        updateFieldsMap.put(FIELD_MINCODE_GRAD, null);
+        //stud_grade
+        updateFieldsMap.put(FIELD_STUD_GRADE, null);
+        //stud_status, archive_flag
+        updateFieldsMap.put(FIELD_STUD_STATUS, null);
+        updateFieldsMap.put(FIELD_ARCHIVE_FLAG, null);
+
+        return updateFieldsMap;
+    }
+
+    @Override
+    public void specialHandlingOnUpdateFieldsMap(Map<String, Pair<FieldType, Object>> updateFieldsMap, TraxStudentEntity traxStudentEntity, GradStatusEventPayloadDTO gradStatusUpdate) {
+        boolean isSCCP = StringUtils.equalsIgnoreCase(gradStatusUpdate.getProgram(), "SCCP");
+        // SCCP
+        if (isSCCP && !updateFieldsMap.containsKey(FIELD_SLP_DATE)) {
+            updateFieldsMap.put(FIELD_SLP_DATE, null);
+        }
+
+        // when grad program is updated from SCCP to something else
+        String curProgram = traxStudentEntity.getGradReqtYear();
+        if (StringUtils.equalsIgnoreCase(curProgram, "SCCP") && !isSCCP) {
+            updateFieldsMap.put(FIELD_SLP_DATE, null);
         }
     }
 

@@ -58,11 +58,6 @@ public class ChoreographEventHandler {
             final GradStatusEventPayloadDTO eventPayload3 = JsonUtil.getJsonObjectFromString(GradStatusEventPayloadDTO.class, event.getEventPayload());
             this.eventServiceMap.get(GRAD_STUDENT_UNDO_COMPLETION.toString()).processEvent(eventPayload3, event);
             break;
-          case "STUDENT_CERTIFICATE_DISTRIBUTED":
-            log.debug("Processing STUDENT_CERTIFICATE_DISTRIBUTED event record :: {} ", event);
-            final GradStatusEventPayloadDTO eventPayload4 = JsonUtil.getJsonObjectFromString(GradStatusEventPayloadDTO.class, event.getEventPayload());
-            this.eventServiceMap.get(STUDENT_CERTIFICATE_DISTRIBUTED.toString()).processEvent(eventPayload4, event);
-            break;
           default:
             log.warn("Silently ignoring event: {}", event);
             break;
