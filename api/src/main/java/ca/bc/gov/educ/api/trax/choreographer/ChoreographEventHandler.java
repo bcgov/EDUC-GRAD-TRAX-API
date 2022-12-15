@@ -1,11 +1,9 @@
 package ca.bc.gov.educ.api.trax.choreographer;
 
 import ca.bc.gov.educ.api.trax.model.dto.GradStatusEventPayloadDTO;
-import ca.bc.gov.educ.api.trax.model.dto.GraduationStatus;
 import ca.bc.gov.educ.api.trax.model.entity.Event;
 import ca.bc.gov.educ.api.trax.service.EventService;
 import ca.bc.gov.educ.api.trax.util.JsonUtil;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.jboss.threads.EnhancedQueueExecutor;
@@ -27,7 +25,6 @@ import static ca.bc.gov.educ.api.trax.constant.EventType.*;
 @Component
 @Slf4j
 public class ChoreographEventHandler {
-  private final ObjectMapper mapper = new ObjectMapper();
   private final Executor singleTaskExecutor = new EnhancedQueueExecutor.Builder()
       .setThreadFactory(new ThreadFactoryBuilder().setNameFormat("task-executor-%d").build())
       .setCorePoolSize(1).setMaximumPoolSize(1).build();
