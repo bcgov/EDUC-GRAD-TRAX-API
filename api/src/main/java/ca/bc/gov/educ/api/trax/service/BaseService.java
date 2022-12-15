@@ -215,7 +215,7 @@ public abstract class BaseService implements EventService {
 
         sb.append(" WHERE STUD_NO=" + "'" + StringUtils.rightPad(pen, 10) + "'"); // a space is appended CAREFUL not to remove.
 
-        logger.debug("Update Student_Master: " + sb.toString());
+        logger.debug("Update Student_Master: {}",  sb.toString());
         return sb.toString();
 
     }
