@@ -8,6 +8,7 @@ import ca.bc.gov.educ.api.trax.repository.EventRepository;
 import ca.bc.gov.educ.api.trax.repository.TraxStudentRepository;
 import ca.bc.gov.educ.api.trax.support.TestUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,71 +56,105 @@ public class GradStudentGraduatedServiceTest {
     }
 
     @Test
-    public void testProcessEvent_givenCREATE_GRAD_STATUS_Event_for_2018_program() throws JsonProcessingException {
+    public void testProcessEvent_givenGRAD_STUDENT_GRADUATED_Event_for_2018_program() throws JsonProcessingException {
+        createTraxStudent("2018-EN", "CUR", null, null, null, false);
         testProcessEvent("2018-EN", "CUR");
     }
 
     @Test
-    public void testProcessEvent_givenCREATE_GRAD_STATUS_Event_for_2004_program() throws JsonProcessingException {
+    public void testProcessEvent_givenGRAD_STUDENT_GRADUATED_Event_for_2004_program() throws JsonProcessingException {
+        createTraxStudent("2004-EN", "CUR", null, null, null, false);
         testProcessEvent("2004-EN", "CUR");
     }
 
     @Test
-    public void testProcessEvent_givenCREATE_GRAD_STATUS_Event_for_1996_program() throws JsonProcessingException {
+    public void testProcessEvent_givenGRAD_STUDENT_GRADUATED_Event_for_1996_program() throws JsonProcessingException {
+        createTraxStudent("1996-EN", "CUR", null, null, null, false);
         testProcessEvent("1996-EN", "CUR");
     }
 
     @Test
-    public void testProcessEvent_givenCREATE_GRAD_STATUS_Event_for_1986_program() throws JsonProcessingException {
+    public void testProcessEvent_givenGRAD_STUDENT_GRADUATED_Event_for_1986_program() throws JsonProcessingException {
+        createTraxStudent("1986-EN", "CUR", null, null, null, false);
         testProcessEvent("1986-EN", "CUR");
     }
 
     @Test
-    public void testProcessEvent_givenCREATE_GRAD_STATUS_Event_for_1950_program() throws JsonProcessingException {
+    public void testProcessEvent_givenGRAD_STUDENT_GRADUATED_Event_for_1950_program() throws JsonProcessingException {
+        createTraxStudent("1950", "CUR", null, null, null, false);
         testProcessEvent("1950", "CUR");
     }
 
     @Test
-    public void testProcessEvent_givenCREATE_GRAD_STATUS_Event_for_SCCP_program() throws JsonProcessingException {
+    public void testProcessEvent_givenGRAD_STUDENT_GRADUATED_Event_for_SCCP_program() throws JsonProcessingException {
+        createTraxStudent("SCCP", "CUR", null, null, null, false);
         testProcessEvent("SCCP", "CUR");
     }
 
     @Test
-    public void testProcessEvent_givenCREATE_GRAD_STATUS_Event_for_2018_program_withArchivedStatus() throws JsonProcessingException {
+    public void testProcessEvent_givenGRAD_STUDENT_GRADUATED_Event_for_2018_program_withArchivedStatus() throws JsonProcessingException {
+        createTraxStudent("2018-EN", "ARC", null, null, null, false);
         testProcessEvent("2018-EN", "ARC");
     }
 
     @Test
-    public void testProcessEvent_givenCREATE_GRAD_STATUS_Event_for_2018_program_withDeceasedStatus() throws JsonProcessingException {
+    public void testProcessEvent_givenGRAD_STUDENT_GRADUATED_Event_for_2018_program_withDeceasedStatus() throws JsonProcessingException {
+        createTraxStudent("2018-EN", "DEC", null, null, null, false);
         testProcessEvent("2018-EN", "DEC");
     }
 
     @Test
-    public void testProcessEvent_givenCREATE_GRAD_STATUS_Event_for_2018_program_withTerminatedStatus() throws JsonProcessingException {
+    public void testProcessEvent_givenGRAD_STUDENT_GRADUATED_Event_for_2018_program_withTerminatedStatus() throws JsonProcessingException {
+        createTraxStudent("2018-EN", "TER", null, null, null, false);
         testProcessEvent("2018-EN", "TER");
     }
 
     @Test
-    public void testProcessEvent_givenCREATE_GRAD_STATUS_Event_for_2004_program_withArchivedStatus() throws JsonProcessingException {
+    public void testProcessEvent_givenGRAD_STUDENT_GRADUATED_Event_for_2004_program_withArchivedStatus() throws JsonProcessingException {
+        createTraxStudent("2004-EN", "ARC", null, null, null, false);
         testProcessEvent("2004-EN", "ARC");
     }
 
     @Test
-    public void testProcessEvent_givenCREATE_GRAD_STATUS_Event_for_2004_program_withDeceasedStatus() throws JsonProcessingException {
+    public void testProcessEvent_givenGRAD_STUDENT_GRADUATED_Event_for_2004_program_withDeceasedStatus() throws JsonProcessingException {
+        createTraxStudent("2004-EN", "DEC", null, null, null, false);
         testProcessEvent("2004-EN", "DEC");
     }
 
     @Test
-    public void testProcessEvent_givenCREATE_GRAD_STATUS_Event_for_1996_program_withMergedStatus() throws JsonProcessingException {
+    public void testProcessEvent_givenGRAD_STUDENT_GRADUATED_Event_for_1996_program_withMergedStatus() throws JsonProcessingException {
+        createTraxStudent("1996-EN", "MER", null, null, null, false);
         testProcessEvent("1996-EN", "MER");
     }
 
     private void testProcessEvent(String program, String studentStatus) throws JsonProcessingException {
-        final var request = TestUtils.createGraduationStatus();
+        final var request = TestUtils.createGraduationStatus(false);
         request.setProgram(program);
         request.setStudentStatus(studentStatus);
         final var event = TestUtils.createEvent(EventType.GRAD_STUDENT_GRADUATED.name(), request, eventRepository);
         this.gradStudentGraduatedService.processEvent(request, event);
     }
 
+    private void createTraxStudent(String program, String studentStatus, String grade, String mincode, Long gradDate, boolean isGraduated) {
+        final var traxStudent = TestUtils.createTraxStudent(program, studentStatus, isGraduated);
+        if (grade != null) {
+            traxStudent.setStudGrade(grade);
+            if (isGraduated) {
+                traxStudent.setStudGradeAtGrad(grade);
+            }
+        }
+        if (mincode != null) {
+            traxStudent.setMincode(mincode);
+            if (isGraduated) {
+                traxStudent.setMincodeGrad(mincode);
+            }
+        }
+        if (gradDate != null) {
+            traxStudent.setGradDate(gradDate);
+            if (StringUtils.equals(program, "SCCP")) {
+                traxStudent.setSlpDate(gradDate);
+            }
+        }
+        this.traxStudentRepository.save(traxStudent);
+    }
 }
