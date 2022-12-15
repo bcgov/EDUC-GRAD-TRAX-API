@@ -63,93 +63,35 @@ public abstract class BaseService implements EventService {
         Set<String> fields = updateFieldsMap.keySet();
         // GRAD Requested Year
         if (fields.contains(FIELD_GRAD_REQT_YEAR)) {
-            String newGradReqtYear = convertProgramToYear(gradStatus.getProgram());
-            String curGradReqtYear = ReplicationUtils.getBlankWhenNull(traxStudentEntity.getGradReqtYear());
-            if (!StringUtils.equalsIgnoreCase(newGradReqtYear, curGradReqtYear)) {
-                updateFieldsMap.put(FIELD_GRAD_REQT_YEAR, Pair.of(FieldType.TRAX_STRING, newGradReqtYear));
-            } else {
-                updateFieldsMap.remove(FIELD_GRAD_REQT_YEAR);
-            }
+            handleStringField(updateFieldsMap, FIELD_GRAD_REQT_YEAR, traxStudentEntity.getGradReqtYear(), convertProgramToYear(gradStatus.getProgram()));
         }
         // GRAD Requested Year At Grad
         if (fields.contains(FIELD_GRAD_REQT_YEAR_AT_GRAD)) {
-            String newGradReqtYearAtGrad = convertProgramToYear(gradStatus.getProgram());
-            String curGradReqtYearAtGrad = ReplicationUtils.getBlankWhenNull(traxStudentEntity.getGradReqtYearAtGrad());
-            if (!StringUtils.equalsIgnoreCase(newGradReqtYearAtGrad, curGradReqtYearAtGrad)) {
-                updateFieldsMap.put(FIELD_GRAD_REQT_YEAR_AT_GRAD, Pair.of(FieldType.TRAX_STRING, newGradReqtYearAtGrad));
-            } else {
-                updateFieldsMap.remove(FIELD_GRAD_REQT_YEAR_AT_GRAD);
-            }
+            handleStringField(updateFieldsMap, FIELD_GRAD_REQT_YEAR_AT_GRAD, traxStudentEntity.getGradReqtYearAtGrad(), convertProgramToYear(gradStatus.getProgram()));
         }
         // GRAD Date
         if (fields.contains(FIELD_GRAD_DATE)) {
-            if (StringUtils.isNotBlank(gradStatus.getProgramCompletionDate())) {
-                String gradDateStr = gradStatus.getProgramCompletionDate().replace("/", "");
-                if (NumberUtils.isDigits(gradDateStr) && NumberUtils.compare(Long.valueOf(gradDateStr), traxStudentEntity.getGradDate()) != 0) {
-                    updateFieldsMap.put(FIELD_GRAD_DATE, Pair.of(FieldType.TRAX_DATE, Long.valueOf(gradDateStr)));
-                } else {
-                    updateFieldsMap.remove(FIELD_GRAD_DATE);
-                }
-            } else if (traxStudentEntity.getGradDate() != null && traxStudentEntity.getGradDate() != 0L) {
-                updateFieldsMap.put(FIELD_GRAD_DATE, Pair.of(FieldType.TRAX_DATE, Long.valueOf("0")));
-            } else {
-                updateFieldsMap.remove(FIELD_GRAD_DATE);
-            }
+            handleDateField(updateFieldsMap, FIELD_GRAD_DATE, traxStudentEntity.getGradDate(), gradStatus.getProgramCompletionDate());
         }
         // SLP Date
         if (fields.contains(FIELD_SLP_DATE)) {
-            if (StringUtils.isNotBlank(gradStatus.getProgramCompletionDate())) {
-                String slpDateStr = gradStatus.getProgramCompletionDate().replace("/", "");
-                if (NumberUtils.isDigits(slpDateStr) && NumberUtils.compare(Long.valueOf(slpDateStr), traxStudentEntity.getSlpDate()) != 0) {
-                    updateFieldsMap.put(FIELD_SLP_DATE, Pair.of(FieldType.TRAX_DATE, Long.valueOf(slpDateStr)));
-                } else {
-                    updateFieldsMap.remove(FIELD_SLP_DATE);
-                }
-            } else if (traxStudentEntity.getSlpDate() != null && traxStudentEntity.getSlpDate() != 0L) {
-                updateFieldsMap.put(FIELD_SLP_DATE,Pair.of(FieldType.TRAX_DATE, Long.valueOf("0")));
-            } else {
-                updateFieldsMap.remove(FIELD_SLP_DATE);
-            }
+            handleDateField(updateFieldsMap, FIELD_SLP_DATE, traxStudentEntity.getSlpDate(), gradStatus.getProgramCompletionDate());
         }
         // Mincode
         if (fields.contains(FIELD_MINCODE)) {
-            String newMincode = ReplicationUtils.getBlankWhenNull(gradStatus.getSchoolOfRecord());
-            String curMincode = ReplicationUtils.getBlankWhenNull(traxStudentEntity.getMincode());
-            if (!StringUtils.equalsIgnoreCase(newMincode, curMincode)) {
-                updateFieldsMap.put(FIELD_MINCODE, Pair.of(FieldType.TRAX_STRING, newMincode));
-            } else {
-                updateFieldsMap.remove(FIELD_MINCODE);
-            }
+            handleStringField(updateFieldsMap, FIELD_MINCODE, traxStudentEntity.getMincode(), gradStatus.getSchoolOfRecord());
         }
         // Mincode_Grad
         if (fields.contains(FIELD_MINCODE_GRAD)) {
-            String newMincodeGrad = ReplicationUtils.getBlankWhenNull(gradStatus.getSchoolAtGrad());
-            String curMincodeGrad = ReplicationUtils.getBlankWhenNull(traxStudentEntity.getMincodeGrad());
-            if (!StringUtils.equalsIgnoreCase(newMincodeGrad, curMincodeGrad)) {
-                updateFieldsMap.put(FIELD_MINCODE_GRAD, Pair.of(FieldType.TRAX_STRING, newMincodeGrad));
-            } else {
-                updateFieldsMap.remove(FIELD_MINCODE_GRAD);
-            }
+            handleStringField(updateFieldsMap, FIELD_MINCODE_GRAD, traxStudentEntity.getMincodeGrad(), gradStatus.getSchoolAtGrad());
         }
         // Student Grade
         if (fields.contains(FIELD_STUD_GRADE)) {
-            String newGrade = ReplicationUtils.getBlankWhenNull(gradStatus.getStudentGrade());
-            String curGrade = ReplicationUtils.getBlankWhenNull(traxStudentEntity.getStudGrade());
-            if (!StringUtils.equalsIgnoreCase(newGrade, curGrade)) {
-                updateFieldsMap.put(FIELD_STUD_GRADE, Pair.of(FieldType.TRAX_STRING, newGrade));
-            } else {
-                updateFieldsMap.remove(FIELD_STUD_GRADE);
-            }
+            handleStringField(updateFieldsMap, FIELD_STUD_GRADE, traxStudentEntity.getStudGrade(), gradStatus.getStudentGrade());
         }
         // Student Grade At Grad
         if (fields.contains(FIELD_STUD_GRADE_AT_GRAD)) {
-            String newGradeAtGrad = ReplicationUtils.getBlankWhenNull(gradStatus.getStudentGrade());
-            String curGradeAtGrad = ReplicationUtils.getBlankWhenNull(traxStudentEntity.getStudGradeAtGrad());
-            if (!StringUtils.equalsIgnoreCase(newGradeAtGrad, curGradeAtGrad)) {
-                updateFieldsMap.put(FIELD_STUD_GRADE_AT_GRAD, Pair.of(FieldType.TRAX_STRING, newGradeAtGrad));
-            } else {
-                updateFieldsMap.remove(FIELD_STUD_GRADE_AT_GRAD);
-            }
+            handleStringField(updateFieldsMap, FIELD_STUD_GRADE_AT_GRAD, traxStudentEntity.getStudGradeAtGrad(), gradStatus.getStudentGrade());
         }
         // Student Status
         if (fields.contains(FIELD_STUD_STATUS)) {
@@ -157,13 +99,7 @@ public abstract class BaseService implements EventService {
         }
         // Honour Flag
         if (fields.contains(FIELD_HONOUR_FLAG)) {
-            String newHonourFlag = ReplicationUtils.getBlankWhenNull(gradStatus.getHonoursStanding());
-            String curHonourFlag = ReplicationUtils.getBlankWhenNull(traxStudentEntity.getHonourFlag());
-            if (!StringUtils.equalsIgnoreCase(newHonourFlag, curHonourFlag)) {
-                updateFieldsMap.put(FIELD_HONOUR_FLAG, Pair.of(FieldType.TRAX_STRING, newHonourFlag));
-            } else {
-                updateFieldsMap.remove(FIELD_HONOUR_FLAG);
-            }
+            handleStringField(updateFieldsMap, FIELD_HONOUR_FLAG, traxStudentEntity.getHonourFlag(), gradStatus.getHonoursStanding());
         }
 
         if (!updateFieldsMap.isEmpty()) {
@@ -215,7 +151,7 @@ public abstract class BaseService implements EventService {
 
         sb.append(" WHERE STUD_NO=" + "'" + StringUtils.rightPad(pen, 10) + "'"); // a space is appended CAREFUL not to remove.
 
-        logger.debug("Update Student_Master: {}",  sb.toString());
+        logger.debug("Update Student_Master: {}",  sb);
         return sb.toString();
 
     }
@@ -254,6 +190,31 @@ public abstract class BaseService implements EventService {
             updateFieldsMap.put(FIELD_ARCHIVE_FLAG, Pair.of(FieldType.TRAX_STRING, newArchiveFlag));
         } else {
             updateFieldsMap.remove(FIELD_ARCHIVE_FLAG);
+        }
+    }
+
+    private void handleStringField(Map<String, Pair<FieldType, Object>> updateFieldsMap, final String fieldName, final String currentValue, final String newValue) {
+        String gradValue = ReplicationUtils.getBlankWhenNull(newValue);
+        String traxValue  = ReplicationUtils.getBlankWhenNull(currentValue);
+        if (!StringUtils.equalsIgnoreCase(gradValue, traxValue)) {
+            updateFieldsMap.put(fieldName, Pair.of(FieldType.TRAX_STRING, gradValue));
+        } else {
+            updateFieldsMap.remove(fieldName);
+        }
+    }
+
+    private void handleDateField(Map<String, Pair<FieldType, Object>> updateFieldsMap, final String fieldName, final Long currentDate, final String newDateStr) {
+        if (StringUtils.isNotBlank(newDateStr)) {
+            String gradDateStr = newDateStr.replace("/", "");
+            if (NumberUtils.isDigits(gradDateStr) && NumberUtils.compare(Long.valueOf(gradDateStr), currentDate) != 0) {
+                updateFieldsMap.put(fieldName, Pair.of(FieldType.TRAX_DATE, Long.valueOf(gradDateStr)));
+            } else {
+                updateFieldsMap.remove(fieldName);
+            }
+        } else if (currentDate != null && currentDate != 0L) {
+            updateFieldsMap.put(fieldName, Pair.of(FieldType.TRAX_DATE, Long.valueOf("0")));
+        } else {
+            updateFieldsMap.remove(fieldName);
         }
     }
 
