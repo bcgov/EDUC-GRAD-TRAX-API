@@ -63,8 +63,12 @@ public class Subscriber {
    */
   private void initializeStreamTopicMap() {
     final List<String> gradStatusEventsTopics = new ArrayList<>();
-    gradStatusEventsTopics.add(Topics.GRAD_STATUS_EVENTS_TOPIC.name());
+    gradStatusEventsTopics.add(Topics.GRAD_STATUS_EVENT_TOPIC.name());
     this.streamTopicsMap.put(EducGradTraxApiConstants.GRAD_STREAM_NAME, gradStatusEventsTopics);
+
+    final List<String> traxStatusEventsTopics = new ArrayList<>();
+    traxStatusEventsTopics.add(Topics.TRAX_UPDATE_EVENT_TOPIC.name());
+    this.streamTopicsMap.put(EducGradTraxApiConstants.TRAX_STREAM_NAME, traxStatusEventsTopics);
   }
 
   @PostConstruct

@@ -92,7 +92,7 @@ public class TraxUpdateService {
         TraxUpdateInGrad traxStudent = traxUpdateInGradTransformer.transformToDTO(traxStudentEntity);
         String jsonString = JsonUtil.getJsonStringFromObject(traxStudent);
         final TraxUpdatedPubEvent traxUpdatedPubEvent = TraxUpdatedPubEvent.builder()
-                .eventType(EventType.UPDATE_TRAX_STUDENT_MASTER.toString())
+                .eventType(EventType.TRAX_STUDENT_UPDATED.toString())
                 .eventId(UUID.randomUUID())
                 .eventOutcome(EventOutcome.TRAX_STUDENT_MASTER_UPDATED.toString())
                 .activityCode(traxStudent.getUpdateType())
