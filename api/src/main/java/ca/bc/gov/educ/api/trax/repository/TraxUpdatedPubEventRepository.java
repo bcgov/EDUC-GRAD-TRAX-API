@@ -36,13 +36,6 @@ public interface TraxUpdatedPubEventRepository extends JpaRepository<TraxUpdated
    * @param eventStatus the event status
    * @return the list
    */
-  List<TraxUpdatedPubEvent> findByEventStatus(String eventStatus);
+  List<TraxUpdatedPubEvent> findByEventStatusOrderByCreateDate(String eventStatus);
 
-  /**
-   * A pageable findByEventStatus
-   * @param eventStatus
-   * @param pageable
-   * @return
-   */
-  Slice<TraxUpdatedPubEvent> findByEventStatus(String eventStatus, Pageable pageable);
 }
