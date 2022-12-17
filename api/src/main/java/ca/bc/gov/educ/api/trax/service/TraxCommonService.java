@@ -268,6 +268,9 @@ public class TraxCommonService {
         // honour_flag
         Character honourFlag = (Character) fields[18];
 
+        // stud_citiz
+        Character citizenship = (Character) fields[19];
+
         ConvGradStudent student = null;
         try {
             student = ConvGradStudent.builder()
@@ -287,6 +290,7 @@ public class TraxCommonService {
                     .programCompletionDate(programCompletionDate)
                     .graduated(isGraduated)
                     .consumerEducationRequirementMet(StringUtils.equalsIgnoreCase(consumerEducationRequirementMet, "Y")? "Y" : null)
+                    .studentCitizenship(citizenship != null? citizenship.toString() : null)
                     .result(ConversionResultType.SUCCESS)
                     .build();
         } catch (Exception ex) {
