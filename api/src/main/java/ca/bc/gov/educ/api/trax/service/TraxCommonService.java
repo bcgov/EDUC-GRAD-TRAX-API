@@ -215,7 +215,7 @@ public class TraxCommonService {
         String studentGrade = (String) fields[3];
         Character studentStatus = (Character) fields[4];
         Character archiveFlag = (Character) fields[5];
-        String graduationRequestYear = (String) fields[6];
+        String graduationRequirementYear = (String) fields[6];
 
         // grad or non-grad
         Date programCompletionDate = null;
@@ -285,7 +285,7 @@ public class TraxCommonService {
                     .frenchCert(frenchCert)
                     .englishCert(englishCert)
                     .honoursStanding(honourFlag != null? honourFlag.toString() : null)
-                    .graduationRequestYear(graduationRequestYear)
+                    .graduationRequirementYear(graduationRequirementYear)
                     .programCodes(programCodes)
                     .programCompletionDate(programCompletionDate)
                     .graduated(isGraduated)

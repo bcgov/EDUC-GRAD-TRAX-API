@@ -63,7 +63,7 @@ public class TraxCommonControllerTest {
 		List<ConvGradStudent> studentList = new ArrayList<>();
 		ConvGradStudent obj = ConvGradStudent.builder()
 								.pen(pen)
-								.graduationRequestYear("2020")
+								.graduationRequirementYear("2020")
 								.program("2018-EN")
 								.studentGrade("12")
 								.schoolOfRecord("12345678")

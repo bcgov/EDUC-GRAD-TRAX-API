@@ -84,10 +84,10 @@ public class EventHandlerDelegatorServiceTest {
 
         ChoreographedEvent choreographedEvent = new ChoreographedEvent();
         choreographedEvent.setEventID(eventId);
-        choreographedEvent.setEventType(EventType.TRAX_STUDENT_UPDATED);
+        choreographedEvent.setEventType(EventType.UPD_GRAD);
 
         TraxUpdatedPubEvent savedEvent = new TraxUpdatedPubEvent();
-        savedEvent.setEventType(EventType.TRAX_STUDENT_UPDATED.toString());
+        savedEvent.setEventType(EventType.UPD_GRAD.toString());
         savedEvent.setEventStatus(DB_COMMITTED.toString());
         savedEvent.setEventId(eventId);
         savedEvent.setEventOutcome(EventOutcome.TRAX_STUDENT_MASTER_UPDATED.toString());

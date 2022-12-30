@@ -104,12 +104,12 @@ public class ChoreographedEventPersistenceServiceTest {
 
         ChoreographedEvent choreographedEvent = new ChoreographedEvent();
         choreographedEvent.setEventID(eventId);
-        choreographedEvent.setEventType(EventType.TRAX_STUDENT_UPDATED);
+        choreographedEvent.setEventType(EventType.UPD_GRAD);
         choreographedEvent.setEventOutcome(EventOutcome.TRAX_STUDENT_MASTER_UPDATED);
         choreographedEvent.setEventPayload("{ test: 'event'}");
 
         TraxUpdatedPubEvent event = new TraxUpdatedPubEvent();
-        event.setEventType(EventType.TRAX_STUDENT_UPDATED.toString());
+        event.setEventType(EventType.UPD_GRAD.toString());
         event.setEventStatus(DB_COMMITTED.toString());
         event.setEventId(eventId);
         event.setEventOutcome(EventOutcome.TRAX_STUDENT_MASTER_UPDATED.toString());
