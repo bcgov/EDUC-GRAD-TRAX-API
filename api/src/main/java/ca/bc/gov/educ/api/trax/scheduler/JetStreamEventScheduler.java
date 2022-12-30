@@ -14,10 +14,6 @@ import java.time.LocalDateTime;
 
 import static ca.bc.gov.educ.api.trax.constant.EventStatus.DB_COMMITTED;
 
-/**
- * This class is responsible to check the PEN_MATCH_EVENT table periodically and publish messages to Jet Stream, if some them are not yet published
- * this is a very edge case scenario which will occur.
- */
 @Component
 @Slf4j
 public class JetStreamEventScheduler {

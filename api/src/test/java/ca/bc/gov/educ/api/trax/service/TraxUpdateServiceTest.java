@@ -147,7 +147,8 @@ public class TraxUpdateServiceTest {
         when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
         when(traxCommonService.getStudentMasterDataFromTrax(pen)).thenReturn(Arrays.asList(traxStudent));
 
-        traxUpdateService.scheduledRunForTraxUpdates();
+        traxUpdateService.publishTraxUpdatedEvent(traxUpdateInGradEntity);
+        traxUpdateService.updateStatus(traxUpdateInGradEntity);
 
         assertThatNoException();
     }
@@ -195,7 +196,8 @@ public class TraxUpdateServiceTest {
         when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
         when(traxCommonService.getStudentMasterDataFromTrax(pen)).thenReturn(Arrays.asList(traxStudent));
 
-        traxUpdateService.process(Arrays.asList(traxUpdateInGradEntity));
+        traxUpdateService.publishTraxUpdatedEvent(traxUpdateInGradEntity);
+        traxUpdateService.updateStatus(traxUpdateInGradEntity);
 
         assertThatNoException();
     }
@@ -241,7 +243,8 @@ public class TraxUpdateServiceTest {
         when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
         when(traxCommonService.getStudentMasterDataFromTrax(pen)).thenReturn(Arrays.asList(traxStudent));
 
-        traxUpdateService.process(Arrays.asList(traxUpdateInGradEntity));
+        traxUpdateService.publishTraxUpdatedEvent(traxUpdateInGradEntity);
+        traxUpdateService.updateStatus(traxUpdateInGradEntity);
 
         assertThatNoException();
     }
@@ -287,7 +290,8 @@ public class TraxUpdateServiceTest {
         when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
         when(traxCommonService.getStudentMasterDataFromTrax(pen)).thenReturn(Arrays.asList(traxStudent));
 
-        traxUpdateService.process(Arrays.asList(traxUpdateInGradEntity));
+        traxUpdateService.publishTraxUpdatedEvent(traxUpdateInGradEntity);
+        traxUpdateService.updateStatus(traxUpdateInGradEntity);
 
         assertThatNoException();
     }
@@ -332,7 +336,8 @@ public class TraxUpdateServiceTest {
         when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
         when(traxCommonService.getStudentMasterDataFromTrax(pen)).thenReturn(Arrays.asList(traxStudent));
 
-        traxUpdateService.process(Arrays.asList(traxUpdateInGradEntity));
+        traxUpdateService.publishTraxUpdatedEvent(traxUpdateInGradEntity);
+        traxUpdateService.updateStatus(traxUpdateInGradEntity);
 
         assertThatNoException();
     }
@@ -377,7 +382,8 @@ public class TraxUpdateServiceTest {
         when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
         when(traxCommonService.getStudentMasterDataFromTrax(pen)).thenReturn(Arrays.asList(traxStudent));
 
-        traxUpdateService.process(Arrays.asList(traxUpdateInGradEntity));
+        traxUpdateService.publishTraxUpdatedEvent(traxUpdateInGradEntity);
+        traxUpdateService.updateStatus(traxUpdateInGradEntity);
 
         assertThatNoException();
     }
@@ -425,7 +431,8 @@ public class TraxUpdateServiceTest {
         when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
         when(traxCommonService.getStudentMasterDataFromTrax(pen)).thenReturn(Arrays.asList(traxStudent));
 
-        traxUpdateService.process(Arrays.asList(traxUpdateInGradEntity));
+        traxUpdateService.publishTraxUpdatedEvent(traxUpdateInGradEntity);
+        traxUpdateService.updateStatus(traxUpdateInGradEntity);
 
         assertThatNoException();
     }
