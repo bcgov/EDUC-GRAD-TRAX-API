@@ -154,6 +154,107 @@ public class TraxUpdateServiceTest {
     }
 
     @Test
+    public void testProcess_whenNewStudent_isAdded() throws JsonProcessingException {
+        String pen = "123456789";
+
+        TraxUpdateInGradEntity traxUpdateInGradEntity = new TraxUpdateInGradEntity();
+        traxUpdateInGradEntity.setPen(pen);
+        traxUpdateInGradEntity.setUpdateType("NEWSTUDENT");
+        traxUpdateInGradEntity.setStatus("OUTSTANDING");
+        traxUpdateInGradEntity.setUpdateDate(DateUtils.addDays(new Date(), -1));
+
+        TraxDemographicsUpdateDTO payload = new TraxDemographicsUpdateDTO();
+        payload.setPen(pen);
+        payload.setLastName("Test");
+        payload.setFirstName("QA");
+        String jsonString = JsonUtil.getJsonStringFromObject(payload);
+
+        ConvGradStudent traxStudent = new ConvGradStudent();
+        traxStudent.setPen(pen);
+        traxStudent.setStudentGrade("12");
+        traxStudent.setSchoolOfRecord("12345678");
+        traxStudent.setGraduationRequirementYear("2018");
+        traxStudent.setStudentStatus("A");
+        traxStudent.setArchiveFlag("A");
+        traxStudent.setStudentCitizenship("C");
+
+        TraxUpdatedPubEvent traxUpdatedPubEvent = TraxUpdatedPubEvent.builder()
+                .eventType(EventType.NEWSTUDENT.toString())
+                .eventId(UUID.randomUUID())
+                .eventOutcome(EventOutcome.TRAX_STUDENT_MASTER_UPDATED.toString())
+                .activityCode(traxUpdateInGradEntity.getUpdateType())
+                .eventPayload(jsonString)
+                .eventStatus(DB_COMMITTED.toString())
+                .createUser(DEFAULT_CREATED_BY)
+                .updateUser(DEFAULT_UPDATED_BY)
+                .createDate(LocalDateTime.now())
+                .updateDate(LocalDateTime.now())
+                .build();
+
+        when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
+        when(traxCommonService.getStudentMasterDataFromTrax(pen)).thenReturn(Arrays.asList(traxStudent));
+
+        traxUpdateService.publishTraxUpdatedEvent(traxUpdateInGradEntity);
+        traxUpdateService.updateStatus(traxUpdateInGradEntity);
+
+        assertThatNoException();
+    }
+
+    @Test
+    public void testProcess_whenStudentDemographicInfo_isUpdated() throws JsonProcessingException {
+        String pen = "123456789";
+
+        TraxUpdateInGradEntity traxUpdateInGradEntity = new TraxUpdateInGradEntity();
+        traxUpdateInGradEntity.setPen(pen);
+        traxUpdateInGradEntity.setUpdateType("UPD_DEMOG");
+        traxUpdateInGradEntity.setStatus("OUTSTANDING");
+        traxUpdateInGradEntity.setUpdateDate(DateUtils.addDays(new Date(), -1));
+
+        TraxDemographicsUpdateDTO payload = new TraxDemographicsUpdateDTO();
+        payload.setPen(pen);
+        payload.setLastName("Test");
+        payload.setFirstName("QA");
+        String jsonString = JsonUtil.getJsonStringFromObject(payload);
+
+        ConvGradStudent traxStudent = new ConvGradStudent();
+        traxStudent.setPen(pen);
+        traxStudent.setStudentGrade("12");
+        traxStudent.setSchoolOfRecord("12345678");
+        traxStudent.setGraduationRequirementYear("2018");
+        traxStudent.setStudentStatus("A");
+        traxStudent.setArchiveFlag("A");
+        traxStudent.setStudentCitizenship("C");
+
+        Student penStudent = new Student();
+        penStudent.setPen(pen);
+        penStudent.setStudentID(UUID.randomUUID().toString());
+        penStudent.setLegalLastName("Test");
+        penStudent.setLegalFirstName("QA");
+
+        TraxUpdatedPubEvent traxUpdatedPubEvent = TraxUpdatedPubEvent.builder()
+                .eventType(EventType.UPD_DEMOG.toString())
+                .eventId(UUID.randomUUID())
+                .eventOutcome(EventOutcome.TRAX_STUDENT_MASTER_UPDATED.toString())
+                .activityCode(traxUpdateInGradEntity.getUpdateType())
+                .eventPayload(jsonString)
+                .eventStatus(DB_COMMITTED.toString())
+                .createUser(DEFAULT_CREATED_BY)
+                .updateUser(DEFAULT_UPDATED_BY)
+                .createDate(LocalDateTime.now())
+                .updateDate(LocalDateTime.now())
+                .build();
+
+        when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
+        when(traxCommonService.getStudentMasterDataFromTrax(pen)).thenReturn(Arrays.asList(traxStudent));
+        when(traxCommonService.getStudentDemographicsDataFromTrax(pen)).thenReturn(Arrays.asList(penStudent));
+
+        traxUpdateService.publishTraxUpdatedEvent(traxUpdateInGradEntity);
+        traxUpdateService.updateStatus(traxUpdateInGradEntity);
+
+        assertThatNoException();
+    }
+
+    @Test
     public void testProcess_whenGraduation_isUpdated() throws JsonProcessingException {
         String pen = "123456789";
 
