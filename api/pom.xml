@@ -18,6 +18,8 @@
             src/main/java/ca/bc/gov/educ/api/trax/config/**,
             src/main/java/ca/bc/gov/educ/api/trax/constant/**,
             src/main/java/ca/bc/gov/educ/api/trax/choreographer/**,
+            src/main/java/ca/bc/gov/educ/api/trax/messaging/**,
+            src/main/java/ca/bc/gov/educ/api/trax/scheduler/**,
             src/main/java/ca/bc/gov/educ/api/trax/exception/**,
             src/main/java/ca/bc/gov/educ/api/trax/model/**,
             src/main/java/ca/bc/gov/educ/api/trax/util/**,

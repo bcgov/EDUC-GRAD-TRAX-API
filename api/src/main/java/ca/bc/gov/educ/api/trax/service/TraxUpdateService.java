@@ -1,22 +1,18 @@
 package ca.bc.gov.educ.api.trax.service;
 
 import ca.bc.gov.educ.api.trax.constant.EventOutcome;
-import ca.bc.gov.educ.api.trax.constant.EventType;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Publisher;
-import ca.bc.gov.educ.api.trax.model.dto.TraxUpdateInGrad;
+import ca.bc.gov.educ.api.trax.model.dto.*;
 import ca.bc.gov.educ.api.trax.model.entity.TraxUpdatedPubEvent;
 import ca.bc.gov.educ.api.trax.model.entity.TraxUpdateInGradEntity;
-import ca.bc.gov.educ.api.trax.model.transformer.TraxUpdateInGradTransformer;
 import ca.bc.gov.educ.api.trax.repository.TraxUpdatedPubEventRepository;
 import ca.bc.gov.educ.api.trax.repository.TraxUpdateInGradRepository;
 import ca.bc.gov.educ.api.trax.util.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import net.javacrumbs.shedlock.core.LockAssert;
-import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +30,7 @@ public class TraxUpdateService {
     private static Logger logger = LoggerFactory.getLogger(TraxUpdateService.class);
 
     @Autowired
-    private TraxUpdateInGradTransformer traxUpdateInGradTransformer;
+    private TraxCommonService traxCommonService;
 
     @Autowired
     private TraxUpdateInGradRepository traxUpdateInGradRepository;
@@ -50,36 +46,19 @@ public class TraxUpdateService {
         return traxUpdateInGradRepository.findOutstandingUpdates(new Date(System.currentTimeMillis()));
     }
 
-    @Scheduled(cron = "${cron.scheduled.process.jobs.stan.run}") // every 5 minute
-    @SchedulerLock(name = "PROCESS_TRAX_UPDATE_IN_GRAD_RECORDS", lockAtLeastFor = "${cron.scheduled.process.events.stan.lockAtLeastFor}", lockAtMostFor = "${cron.scheduled.process.events.stan.lockAtMostFor}")
-    @Transactional(propagation = Propagation.REQUIRED)
-    public void scheduledRunForTraxUpdates() {
-        LockAssert.assertLocked();
-        try {
-            List<TraxUpdateInGradEntity> list = getOutstandingList();
-            process(list);
-        } catch (Exception ex) {
-            logger.error("Unknown exception : {}", ex.getMessage());
-        }
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void updateStatus(TraxUpdateInGradEntity traxUpdateInGradEntity) {
+        // update status to PUBLISHED
+        traxUpdateInGradEntity.setStatus("PUBLISHED");
+        traxUpdateInGradRepository.save(traxUpdateInGradEntity);
     }
 
-    @Transactional(propagation = Propagation.REQUIRED)
-    public void process(List<TraxUpdateInGradEntity> traxStudents) {
-        traxStudents.forEach(entity -> {
-            publishTraxUpdatedEvent(entity);
-
-            // update status to PUBLISHED
-            entity.setStatus("PUBLISHED");
-            traxUpdateInGradRepository.save(entity);
-        });
-    }
-
-    @Transactional(propagation = Propagation.REQUIRED)
-    public void publishTraxUpdatedEvent(TraxUpdateInGradEntity traxStudentEntity) {
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void publishTraxUpdatedEvent(TraxUpdateInGradEntity traxUpdateInGradEntity) {
         // Save TraxUpdatedPubEvent
         TraxUpdatedPubEvent traxUpdatedPubEvent = null;
         try {
-            traxUpdatedPubEvent = persistTraxUpdatedEvent(traxStudentEntity);
+            traxUpdatedPubEvent = persistTraxUpdatedEvent(traxUpdateInGradEntity);
         } catch (JsonProcessingException ex) {
             logger.error("JSON Processing exception : {}", ex.getMessage());
         }
@@ -89,13 +68,24 @@ public class TraxUpdateService {
     }
 
     private TraxUpdatedPubEvent persistTraxUpdatedEvent(TraxUpdateInGradEntity traxStudentEntity) throws JsonProcessingException {
-        TraxUpdateInGrad traxStudent = traxUpdateInGradTransformer.transformToDTO(traxStudentEntity);
-        String jsonString = JsonUtil.getJsonStringFromObject(traxStudent);
+        String jsonString = null;
+        String updateType = traxStudentEntity.getUpdateType() != null? traxStudentEntity.getUpdateType().trim() : null;
+        if (StringUtils.equalsIgnoreCase(updateType, "NEWSTUDENT")) {
+            ConvGradStudent newStudent = populateNewStudent(traxStudentEntity.getPen().trim());
+            if (newStudent != null) {
+                jsonString = JsonUtil.getJsonStringFromObject(newStudent);
+            }
+        } else {
+            TraxStudentUpdateDTO studentUpdate = populateEventPayload(updateType, traxStudentEntity.getPen().trim());
+            if (studentUpdate != null) {
+                jsonString = JsonUtil.getJsonStringFromObject(studentUpdate);
+            }
+        }
+
         final TraxUpdatedPubEvent traxUpdatedPubEvent = TraxUpdatedPubEvent.builder()
-                .eventType(EventType.TRAX_STUDENT_UPDATED.toString())
+                .eventType(updateType)
                 .eventId(UUID.randomUUID())
                 .eventOutcome(EventOutcome.TRAX_STUDENT_MASTER_UPDATED.toString())
-                .activityCode(traxStudent.getUpdateType())
                 .eventPayload(jsonString)
                 .eventStatus(DB_COMMITTED.toString())
                 .createUser(DEFAULT_CREATED_BY)
@@ -104,6 +94,87 @@ public class TraxUpdateService {
                 .updateDate(LocalDateTime.now())
                 .build();
         return traxUpdatedPubEventRepository.save(traxUpdatedPubEvent);
+    }
+
+    private ConvGradStudent populateNewStudent(String pen) {
+        ConvGradStudent payload = null;
+        List<ConvGradStudent> results = traxCommonService.getStudentMasterDataFromTrax(pen);
+        if (results != null && !results.isEmpty()) {
+            payload = results.get(0);
+        }
+        return payload;
+    }
+
+    private TraxDemographicsUpdateDTO populateDemographicsInfo(String pen) {
+        TraxDemographicsUpdateDTO dto = null;
+        Student student = null;
+        List<Student> students = traxCommonService.getStudentDemographicsDataFromTrax(pen);
+        if (students != null && !students.isEmpty()) {
+            student = students.get(0);
+        }
+        if (student != null) {
+            dto = new TraxDemographicsUpdateDTO();
+            dto.setPen(pen);
+            dto.setLastName(student.getLegalLastName());
+            dto.setFirstName(student.getLegalFirstName());
+            dto.setMiddleNames(student.getLegalMiddleNames());
+            dto.setBirthday(student.getDob());
+        }
+        return dto;
+    }
+
+    private TraxStudentUpdateDTO populateEventPayload(String updateType, String pen) {
+        TraxStudentUpdateDTO result = null;
+        ConvGradStudent traxStudent = null;
+        List<ConvGradStudent> results = traxCommonService.getStudentMasterDataFromTrax(pen);
+        if (results != null && !results.isEmpty()) {
+            traxStudent = results.get(0);
+            switch(updateType) {
+                case "UPD_DEMOG":
+                    result = populateDemographicsInfo(pen);
+                    break;
+                case "UPD_GRAD":
+                    TraxGraduationUpdateDTO gradUpdate = new TraxGraduationUpdateDTO();
+                    gradUpdate.setPen(pen);
+                    gradUpdate.setGraduationRequirementYear(traxStudent.getGraduationRequirementYear());
+                    gradUpdate.setStudentGrade(traxStudent.getStudentGrade());
+                    gradUpdate.setSchoolOfRecord(traxStudent.getSchoolOfRecord());
+                    gradUpdate.setSlpDate(traxStudent.getSlpDate());
+                    gradUpdate.setCitizenship(traxStudent.getStudentCitizenship());
+                    result = gradUpdate;
+                    break;
+                case "UPD_STD_STATUS":
+                    TraxStudentStatusUpdateDTO studentStatus = new TraxStudentStatusUpdateDTO();
+                    studentStatus.setPen(pen);
+                    studentStatus.setStudentStatus(traxStudent.getStudentStatus());
+                    studentStatus.setArchiveFlag(traxStudent.getArchiveFlag());
+                    result = studentStatus;
+                    break;
+                case "XPROGRAM":
+                    TraxXProgramDTO xprogram = new TraxXProgramDTO();
+                    xprogram.setPen(pen);
+                    xprogram.setProgramList(traxStudent.getProgramCodes());
+                    result = xprogram;
+                    break;
+                case "ASSESSMENT":
+                case "COURSE":
+                    TraxStudentUpdateDTO studentUpdate = new TraxStudentUpdateDTO();
+                    studentUpdate.setPen(pen);
+                    result = studentUpdate;
+                    break;
+                case "FI10ADD":
+                    TraxFrenchImmersionUpdateDTO fi10Add = new TraxFrenchImmersionUpdateDTO();
+                    fi10Add.setPen(pen);
+                    fi10Add.setGraduationRequirementYear(traxStudent.getGraduationRequirementYear());
+                    fi10Add.setCourseCode("FRAL");
+                    fi10Add.setCourseLevel("10");
+                    result = fi10Add;
+                    break;
+                default:
+                    break;
+            }
+        }
+        return result;
     }
 
     private void publishToJetStream(final TraxUpdatedPubEvent traxUpdatedPubEvent) {

@@ -14,33 +14,33 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ConvGradStudent {
-  private String pen;
-  private String program; // inc
-  private Date programCompletionDate; // inc
-  private String slpDate; // inc
-  private String sccDate;
-  private String gpa;
-  private String honoursStanding; // inc
-  private String studentGradData;
-  private String schoolOfRecord; // inc
-  private String schoolAtGrad; // inc
-  private String studentGrade; // inc
-  private String studentStatus; // inc
-  private String archiveFlag; // inc
-  private String frenchCert;
-  private String englishCert;
-  private String consumerEducationRequirementMet;
-  private String studentCitizenship;
+    private String pen;
+    private String program; // inc
+    private Date programCompletionDate; // inc
+    private String slpDate; // inc
+    private String sccDate;
+    private String gpa;
+    private String honoursStanding; // inc
+    private String studentGradData;
+    private String schoolOfRecord; // inc
+    private String schoolAtGrad; // inc
+    private String studentGrade; // inc
+    private String studentStatus; // inc
+    private String archiveFlag; // inc
+    private String frenchCert;
+    private String englishCert;
+    private String consumerEducationRequirementMet;
+    private String studentCitizenship;
 
-  // extra
-  private String graduationRequestYear;
+    // extra
+    private String graduationRequirementYear;
 
-  // program codes for optional / career program
-  private List<String> programCodes;
+    // program codes for optional / career program
+    private List<String> programCodes;
 
-  // grad or non-grad
-  private boolean graduated;
+    // grad or non-grad
+    private boolean graduated;
 
-  // data conversion status after being processed.
-  private ConversionResultType result;
+    // data conversion status after being processed.
+    private ConversionResultType result;
 }
