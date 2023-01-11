@@ -1,8 +1,6 @@
 package ca.bc.gov.educ.api.trax.controller;
 
 import ca.bc.gov.educ.api.trax.model.dto.*;
-import ca.bc.gov.educ.api.trax.model.entity.TranscriptStudentDemogEntity;
-import ca.bc.gov.educ.api.trax.service.CodeService;
 import ca.bc.gov.educ.api.trax.service.TraxCommonService;
 import ca.bc.gov.educ.api.trax.util.GradValidation;
 import ca.bc.gov.educ.api.trax.util.MessageHelper;
@@ -20,11 +18,6 @@ import org.springframework.data.domain.Sort;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-
 
 @ExtendWith(MockitoExtension.class)
 public class TraxCommonControllerTest {
@@ -70,7 +63,7 @@ public class TraxCommonControllerTest {
 		List<ConvGradStudent> studentList = new ArrayList<>();
 		ConvGradStudent obj = ConvGradStudent.builder()
 								.pen(pen)
-								.graduationRequestYear("2020")
+								.graduationRequirementYear("2020")
 								.program("2018-EN")
 								.studentGrade("12")
 								.schoolOfRecord("12345678")

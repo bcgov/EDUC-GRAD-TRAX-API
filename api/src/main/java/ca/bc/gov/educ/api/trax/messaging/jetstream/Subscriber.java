@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.jboss.threads.EnhancedQueueExecutor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -33,6 +34,7 @@ import java.util.concurrent.Executor;
  * The type Subscriber.
  */
 @Component
+@DependsOn("publisher")
 @Slf4j
 public class Subscriber {
 
@@ -63,8 +65,12 @@ public class Subscriber {
    */
   private void initializeStreamTopicMap() {
     final List<String> gradStatusEventsTopics = new ArrayList<>();
-    gradStatusEventsTopics.add(Topics.GRAD_STATUS_EVENTS_TOPIC.name());
+    gradStatusEventsTopics.add(Topics.GRAD_STATUS_EVENT_TOPIC.name());
     this.streamTopicsMap.put(EducGradTraxApiConstants.GRAD_STREAM_NAME, gradStatusEventsTopics);
+
+    final List<String> traxStatusEventsTopics = new ArrayList<>();
+    traxStatusEventsTopics.add(Topics.TRAX_UPDATE_EVENT_TOPIC.name());
+    this.streamTopicsMap.put(EducGradTraxApiConstants.TRAX_STREAM_NAME, traxStatusEventsTopics);
   }
 
   @PostConstruct

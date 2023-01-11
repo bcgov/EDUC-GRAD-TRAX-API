@@ -5,10 +5,6 @@ package ca.bc.gov.educ.api.trax.constant;
  */
 public enum EventOutcome {
   /**
-   * Student created event outcome.
-   */
-  GRAD_STATUS_CREATED,
-  /**
    * Student updated event outcome.
    */
   GRAD_STATUS_UPDATED,

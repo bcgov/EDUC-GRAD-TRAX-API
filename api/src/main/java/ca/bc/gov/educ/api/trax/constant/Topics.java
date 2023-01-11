@@ -5,12 +5,12 @@ package ca.bc.gov.educ.api.trax.constant;
  */
 public enum Topics {
   /**
-   * GradStatus events topic topics.
+   * GradStatus events topic.
    */
-  GRAD_STATUS_EVENTS_TOPIC,
+  GRAD_STATUS_EVENT_TOPIC,
   /**
-   * TraxUpdate events topic topics.
+   * TraxUpdate events topic.
    */
-  TRAX_UPDATE_EVENTS_TOPIC,
+  TRAX_UPDATE_EVENT_TOPIC
 
 }

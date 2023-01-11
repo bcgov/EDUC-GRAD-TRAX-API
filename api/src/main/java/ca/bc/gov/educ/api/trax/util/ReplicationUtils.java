@@ -5,7 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 public class ReplicationUtils {
 
     public static String getBlankWhenNull(final String s){
-        if(StringUtils.isNotEmpty(s)){
+        if(StringUtils.isNotBlank(s)){
             return s;
         }
         // Return a blank

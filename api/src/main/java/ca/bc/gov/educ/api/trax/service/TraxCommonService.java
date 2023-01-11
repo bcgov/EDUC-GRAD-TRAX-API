@@ -215,22 +215,18 @@ public class TraxCommonService {
         String studentGrade = (String) fields[3];
         Character studentStatus = (Character) fields[4];
         Character archiveFlag = (Character) fields[5];
-        String graduationRequestYear = (String) fields[6];
+        String graduationRequirementYear = (String) fields[6];
 
-        Character recalculateGradStatus = (Character) fields[7];
-        if (studentStatus != null && (studentStatus == 'M' || studentStatus == 'D')) {
-            recalculateGradStatus = null;
-        }
         // grad or non-grad
         Date programCompletionDate = null;
         String gradDateStr = null;
         if (isGraduated) {
-            gradDateStr = (String) fields[8];
+            gradDateStr = (String) fields[7]; // from tsw_tran_demog in tsw
             if (gradDateStr != null) {
                 gradDateStr = gradDateStr.trim();
             }
         } else {
-            BigDecimal gradDate = (BigDecimal) fields[8];
+            BigDecimal gradDate = (BigDecimal) fields[7]; // from student_master in trax
             if (gradDate != null && !gradDate.equals(BigDecimal.ZERO)) {
                 gradDateStr = gradDate.toString();
             }
@@ -244,17 +240,21 @@ public class TraxCommonService {
             }
         }
 
+        // slp date
+        BigDecimal slpDate = (BigDecimal) fields[8];
+        String slpDateStr = slpDate != null && !slpDate.equals(BigDecimal.ZERO) ? slpDate.toString() : null;
+
+        // scc date
+        BigDecimal sccDate = (BigDecimal) fields[9];
+        String sccDateStr = sccDate != null && !sccDate.equals(BigDecimal.ZERO) ? sccDate.toString() : null;
+
         List<String> programCodes = new ArrayList<>();
-        // student optional programs
-        populateProgramCode((String) fields[9], programCodes);
+        // student optional/career programs
         populateProgramCode((String) fields[10], programCodes);
         populateProgramCode((String) fields[11], programCodes);
         populateProgramCode((String) fields[12], programCodes);
         populateProgramCode((String) fields[13], programCodes);
-
-        // slp date
-        BigDecimal slpDate = (BigDecimal) fields[14];
-        String slpDateStr = slpDate != null && !slpDate.equals(BigDecimal.ZERO) ? slpDate.toString() : null;
+        populateProgramCode((String) fields[14], programCodes);
 
         // french cert
         String frenchCert = (String) fields[15];
@@ -268,12 +268,15 @@ public class TraxCommonService {
         // honour_flag
         Character honourFlag = (Character) fields[18];
 
+        // stud_citiz
+        Character citizenship = (Character) fields[19];
+
         ConvGradStudent student = null;
         try {
             student = ConvGradStudent.builder()
                     .pen(pen)
                     .slpDate(slpDateStr)
-                    .recalculateGradStatus(recalculateGradStatus != null ? recalculateGradStatus.toString() : null)
+                    .sccDate(sccDateStr)
                     .schoolOfRecord(schoolOfRecord)
                     .schoolAtGrad(schoolAtGrad)
                     .studentGrade(studentGrade)
@@ -282,11 +285,12 @@ public class TraxCommonService {
                     .frenchCert(frenchCert)
                     .englishCert(englishCert)
                     .honoursStanding(honourFlag != null? honourFlag.toString() : null)
-                    .graduationRequestYear(graduationRequestYear)
+                    .graduationRequirementYear(graduationRequirementYear)
                     .programCodes(programCodes)
                     .programCompletionDate(programCompletionDate)
                     .graduated(isGraduated)
                     .consumerEducationRequirementMet(StringUtils.equalsIgnoreCase(consumerEducationRequirementMet, "Y")? "Y" : null)
+                    .studentCitizenship(citizenship != null? citizenship.toString() : null)
                     .result(ConversionResultType.SUCCESS)
                     .build();
         } catch (Exception ex) {

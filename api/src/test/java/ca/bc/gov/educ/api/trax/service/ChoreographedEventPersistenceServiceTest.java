@@ -56,11 +56,11 @@ public class ChoreographedEventPersistenceServiceTest {
 
         ChoreographedEvent choreographedEvent = new ChoreographedEvent();
         choreographedEvent.setEventID(eventId);
-        choreographedEvent.setEventType(EventType.UPDATE_GRAD_STATUS);
+        choreographedEvent.setEventType(EventType.GRAD_STUDENT_UPDATED);
         choreographedEvent.setEventOutcome(EventOutcome.GRAD_STATUS_UPDATED);
 
         Event event = new Event();
-        event.setEventType(EventType.UPDATE_GRAD_STATUS.toString());
+        event.setEventType(EventType.GRAD_STUDENT_UPDATED.toString());
         event.setEventStatus(DB_COMMITTED.toString());
         event.setEventId(eventId);
         event.setEventOutcome(EventOutcome.GRAD_STATUS_UPDATED.toString());
@@ -79,12 +79,12 @@ public class ChoreographedEventPersistenceServiceTest {
 
         ChoreographedEvent choreographedEvent = new ChoreographedEvent();
         choreographedEvent.setEventID(eventId);
-        choreographedEvent.setEventType(EventType.UPDATE_GRAD_STATUS);
+        choreographedEvent.setEventType(EventType.GRAD_STUDENT_UPDATED);
         choreographedEvent.setEventOutcome(EventOutcome.GRAD_STATUS_UPDATED);
         choreographedEvent.setEventPayload("{ test: 'event'}");
 
         Event event = new Event();
-        event.setEventType(EventType.UPDATE_GRAD_STATUS.toString());
+        event.setEventType(EventType.GRAD_STUDENT_UPDATED.toString());
         event.setEventStatus(DB_COMMITTED.toString());
         event.setEventId(eventId);
         event.setEventOutcome(EventOutcome.GRAD_STATUS_UPDATED.toString());
@@ -104,12 +104,12 @@ public class ChoreographedEventPersistenceServiceTest {
 
         ChoreographedEvent choreographedEvent = new ChoreographedEvent();
         choreographedEvent.setEventID(eventId);
-        choreographedEvent.setEventType(EventType.UPDATE_TRAX_STUDENT_MASTER);
+        choreographedEvent.setEventType(EventType.UPD_GRAD);
         choreographedEvent.setEventOutcome(EventOutcome.TRAX_STUDENT_MASTER_UPDATED);
         choreographedEvent.setEventPayload("{ test: 'event'}");
 
         TraxUpdatedPubEvent event = new TraxUpdatedPubEvent();
-        event.setEventType(EventType.UPDATE_TRAX_STUDENT_MASTER.toString());
+        event.setEventType(EventType.UPD_GRAD.toString());
         event.setEventStatus(DB_COMMITTED.toString());
         event.setEventId(eventId);
         event.setEventOutcome(EventOutcome.TRAX_STUDENT_MASTER_UPDATED.toString());

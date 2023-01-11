@@ -58,10 +58,10 @@ public class EventHandlerDelegatorServiceTest {
 
         ChoreographedEvent choreographedEvent = new ChoreographedEvent();
         choreographedEvent.setEventID(eventId);
-        choreographedEvent.setEventType(EventType.UPDATE_GRAD_STATUS);
+        choreographedEvent.setEventType(EventType.GRAD_STUDENT_UPDATED);
 
         Event savedEvent = new Event();
-        savedEvent.setEventType(EventType.UPDATE_GRAD_STATUS.toString());
+        savedEvent.setEventType(EventType.GRAD_STUDENT_UPDATED.toString());
         savedEvent.setEventStatus(DB_COMMITTED.toString());
         savedEvent.setEventId(eventId);
         savedEvent.setEventOutcome(EventOutcome.GRAD_STATUS_UPDATED.toString());
@@ -70,7 +70,7 @@ public class EventHandlerDelegatorServiceTest {
         Mockito.when(choreographedEventPersistenceService.persistEventToDB(choreographedEvent)).thenReturn(savedEvent);
 
         Message reply = NatsMessage.builder()
-                .subject(Topics.GRAD_STATUS_EVENTS_TOPIC.toString())
+                .subject(Topics.GRAD_STATUS_EVENT_TOPIC.toString())
                 .data(savedEvent.getEventPayloadBytes())
                 .build();
 
@@ -84,10 +84,10 @@ public class EventHandlerDelegatorServiceTest {
 
         ChoreographedEvent choreographedEvent = new ChoreographedEvent();
         choreographedEvent.setEventID(eventId);
-        choreographedEvent.setEventType(EventType.UPDATE_TRAX_STUDENT_MASTER);
+        choreographedEvent.setEventType(EventType.UPD_GRAD);
 
         TraxUpdatedPubEvent savedEvent = new TraxUpdatedPubEvent();
-        savedEvent.setEventType(EventType.UPDATE_TRAX_STUDENT_MASTER.toString());
+        savedEvent.setEventType(EventType.UPD_GRAD.toString());
         savedEvent.setEventStatus(DB_COMMITTED.toString());
         savedEvent.setEventId(eventId);
         savedEvent.setEventOutcome(EventOutcome.TRAX_STUDENT_MASTER_UPDATED.toString());
@@ -95,7 +95,7 @@ public class EventHandlerDelegatorServiceTest {
         Mockito.doNothing().when(choreographedEventPersistenceService).updateEventStatus(choreographedEvent);
 
         Message reply = NatsMessage.builder()
-                .subject(Topics.TRAX_UPDATE_EVENTS_TOPIC.toString())
+                .subject(Topics.TRAX_UPDATE_EVENT_TOPIC.toString())
                 .data(savedEvent.getEventPayloadBytes())
                 .build();
 
