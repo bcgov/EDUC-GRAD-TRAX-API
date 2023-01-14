@@ -271,6 +271,9 @@ public class TraxCommonService {
         // stud_citiz
         Character citizenship = (Character) fields[19];
 
+        // french dogwood
+        Character frenchDogwood = (Character) fields[20];
+
         ConvGradStudent student = null;
         try {
             student = ConvGradStudent.builder()
@@ -291,6 +294,7 @@ public class TraxCommonService {
                     .graduated(isGraduated)
                     .consumerEducationRequirementMet(StringUtils.equalsIgnoreCase(consumerEducationRequirementMet, "Y")? "Y" : null)
                     .studentCitizenship(citizenship != null? citizenship.toString() : null)
+                    .frenchDogwood(frenchDogwood != null? frenchDogwood.toString() : null)
                     .result(ConversionResultType.SUCCESS)
                     .build();
         } catch (Exception ex) {
