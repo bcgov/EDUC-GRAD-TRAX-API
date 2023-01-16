@@ -17,7 +17,7 @@ public interface TraxStudentsLoadRepository extends JpaRepository<TraxStudentsLo
             "m.archive_flag as ARCHIVE_FLAG, m.grad_reqt_year as GRAD_REQT_YEAR, m.grad_date as GRAD_DATE, m.slp_date as SLP_DATE, m.scc_date as SCC_DATE,\n" +
             "trim(m.prgm_code) as PRGM_CODE1, trim(m.prgm_code2) as PRGM_CODE2, trim(m.prgm_code3) as PRGM_CODE3, trim(m.prgm_code4) as PRGM_CODE4, trim(m.prgm_code5) as PRGM_CODE5,\n" +
             "trim(m.french_cert) as FRENCH_CERT, trim(m.stud_consed_flag) as STUD_CONSED_FLAG, trim(m.english_cert) as ENGLISH_CERT, m.honour_flag as HONOUR_FLAG, \n" +
-            "m.stud_citiz as CITIZENSHIP \n" +
+            "m.stud_citiz as CITIZENSHIP, m.french_dogwood as FRENCH_DOGWOOD \n" +
             "from student_master m\n" +
             "where m.stud_no = :pen", nativeQuery=true)
     @Transactional(readOnly = true)
@@ -28,7 +28,7 @@ public interface TraxStudentsLoadRepository extends JpaRepository<TraxStudentsLo
             "m.archive_flag as ARCHIVE_FLAG, gs.grad_reqt_year as GRAD_REQT_YEAR, gs.grad_date as GRAD_DATE, m.slp_date as SLP_DATE, m.scc_date as SCC_DATE,\n" +
             "trim(m.prgm_code) as PRGM_CODE1, trim(m.prgm_code2) as PRGM_CODE2, trim(m.prgm_code3) as PRGM_CODE3, trim(m.prgm_code4) as PRGM_CODE4, trim(m.prgm_code5) as PRGM_CODE5,\n" +
             "trim(m.french_cert) as FRENCH_CERT, trim(m.stud_consed_flag) as STUD_CONSED_FLAG, trim(m.english_cert) as ENGLISH_CERT, m.honour_flag as HONOUR_FLAG, \n" +
-            "m.stud_citiz as CITIZENSHIP \n" +
+            "m.stud_citiz as CITIZENSHIP, m.french_dogwood as FRENCH_DOGWOOD \n" +
             "from student_master m, tsw_tran_demog gs\n" +
             "where 1 = 1\n" +
             "and m.stud_no = gs.stud_no\n" +
