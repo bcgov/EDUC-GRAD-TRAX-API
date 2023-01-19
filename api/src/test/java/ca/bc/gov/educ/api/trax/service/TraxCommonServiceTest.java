@@ -80,7 +80,7 @@ public class TraxCommonServiceTest {
     public void testGetStudentMasterDataFromTrax() {
         Object[] obj = new Object[] {
                 "123456789", "12345678", "12345678", "12", Character.valueOf('A'),Character.valueOf('A'), "2020", BigDecimal.ZERO,
-                BigDecimal.ZERO, null, null, null, null, null, null, null, null, null, null, Character.valueOf('C')
+                BigDecimal.ZERO, null, null, null, null, null, null, null, null, null, null, Character.valueOf('C'), Character.valueOf('N')
         };
         List<Object[]> results = new ArrayList<>();
         results.add(obj);
