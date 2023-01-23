@@ -38,6 +38,9 @@ public abstract class EventCommonService implements EventService {
     public static final String FIELD_STUD_GRADE_AT_GRAD = "STUD_GRADE_AT_GRAD";
     public static final String FIELD_STUD_STATUS = "STUD_STATUS";
     public static final String FIELD_ARCHIVE_FLAG = "ARCHIVE_FLAG";
+    public static final String FIELD_DOGWOOD_FLAG = "DOGWOOD_FLAG";
+    public static final String FIELD_ENGLISH_CERT = "ENGLISH_CERT";
+    public static final String FIELD_FRENCH_CERT = "FRENCH_CERT";
     public static final String FIELD_HONOUR_FLAG = "HONOUR_FLAG";
     public static final String FIELD_XCRIPT_ACTV_DATE = "XCRIPT_ACTV_DATE";
 
@@ -77,7 +80,7 @@ public abstract class EventCommonService implements EventService {
     private void process(Optional<TraxStudentEntity> existingStudent, GradStatusEventPayloadDTO gradStatusUpdate, EntityManager em, EntityTransaction tx, boolean updateTrax) {
         if (updateTrax && existingStudent.isPresent()) {
             logger.info("==========> Start - Trax Incremental Update: pen# [{}]", gradStatusUpdate.getPen());
-            Map<String, Pair<FieldType, Object>> updateFieldsMap = initializeUpdateFieldsMap();
+            Map<String, Pair<FieldType, Object>> updateFieldsMap = setupUpdateFieldsMap();
             specialHandlingOnUpdateFieldsMap(updateFieldsMap, existingStudent.get(), gradStatusUpdate);
             // Needs to update required fields from GraduationStatus to TraxStudentEntity
             validateAndPopulateUpdateFieldsMap(updateFieldsMap, existingStudent.get(), gradStatusUpdate);
@@ -95,9 +98,38 @@ public abstract class EventCommonService implements EventService {
         }
     }
 
-    private Map<String, Pair<FieldType, Object>> initializeUpdateFieldsMap() {
+    // UpdateFieldsMap to keep which TRAX fields need to be updated by Event Type
+    private Map<String, Pair<FieldType, Object>> setupUpdateFieldsMap() {
         Map<String, Pair<FieldType, Object>> updateFieldsMap = new HashMap<>();
-        if (StringUtils.equalsIgnoreCase(getEventType(), "GRAD_STUDENT_UPDATED")) {
+        if (StringUtils.equalsIgnoreCase(getEventType(), "GRAD_STUDENT_GRADUATED")) {
+            // grad_reqt_year_at_grad
+            updateFieldsMap.put(FIELD_GRAD_REQT_YEAR_AT_GRAD, null);
+            // grad_date
+            updateFieldsMap.put(FIELD_GRAD_DATE, null);
+            // mincode_grad
+            updateFieldsMap.put(FIELD_MINCODE_GRAD, null);
+            // stud_grade_at_grad
+            updateFieldsMap.put(FIELD_STUD_GRADE_AT_GRAD, null);
+            // honour_flag
+            updateFieldsMap.put(FIELD_HONOUR_FLAG, null);
+        } else if (StringUtils.equalsIgnoreCase(getEventType(), "GRAD_STUDENT_UNDO_COMPLETION")) {
+            // grad_reqt_year_at_grad
+            updateFieldsMap.put(FIELD_GRAD_REQT_YEAR_AT_GRAD, null);
+            // grad_date
+            updateFieldsMap.put(FIELD_GRAD_DATE, null);
+            // mincode_grad
+            updateFieldsMap.put(FIELD_MINCODE_GRAD, null);
+            // stud_grade_at_grad
+            updateFieldsMap.put(FIELD_STUD_GRADE_AT_GRAD, null);
+            // honour_flag
+            updateFieldsMap.put(FIELD_HONOUR_FLAG, null);
+            // dogwood_flag
+            updateFieldsMap.put(FIELD_DOGWOOD_FLAG, null);
+            // english_cert
+            updateFieldsMap.put(FIELD_ENGLISH_CERT, null);
+            // french_cert
+            updateFieldsMap.put(FIELD_FRENCH_CERT, null);
+        } else if (StringUtils.equalsIgnoreCase(getEventType(), "GRAD_STUDENT_UPDATED")) {
             // grad_reqt_year
             updateFieldsMap.put(FIELD_GRAD_REQT_YEAR, null);
             // slp_date (SCCP)
@@ -111,28 +143,20 @@ public abstract class EventCommonService implements EventService {
             // stud_status, archive_flag
             updateFieldsMap.put(FIELD_STUD_STATUS, null);
             updateFieldsMap.put(FIELD_ARCHIVE_FLAG, null);
-        } else {
-            // grad_reqt_year_at_grad
-            updateFieldsMap.put(FIELD_GRAD_REQT_YEAR_AT_GRAD, null);
-            // grad_date, slp_date (SCCP)
-            updateFieldsMap.put(FIELD_GRAD_DATE, null);
-            updateFieldsMap.put(FIELD_SLP_DATE, null);
-            // mincode_grad
-            updateFieldsMap.put(FIELD_MINCODE_GRAD, null);
-            // stud_grade_at_grad
-            updateFieldsMap.put(FIELD_STUD_GRADE_AT_GRAD, null);
-            // honour_flag
-            updateFieldsMap.put(FIELD_HONOUR_FLAG, null);
         }
         return updateFieldsMap;
     }
 
-    // remove
+    // initialization or removal
     public abstract void specialHandlingOnUpdateFieldsMap(Map<String, Pair<FieldType, Object>> updateFieldsMap, TraxStudentEntity traxStudentEntity, GradStatusEventPayloadDTO gradStatusUpdate);
 
     public abstract EntityManager getEntityManager();
 
+    // validate the updated fields by comparing the values between GRAD and TRAX
     protected void validateAndPopulateUpdateFieldsMap(Map<String, Pair<FieldType, Object>> updateFieldsMap, TraxStudentEntity traxStudentEntity, GradStatusEventPayloadDTO gradStatus) {
+        if (updateFieldsMap.isEmpty()) {
+            return;
+        }
         Set<String> fields = updateFieldsMap.keySet();
         // GRAD Requested Year
         if (fields.contains(FIELD_GRAD_REQT_YEAR)) {
@@ -224,7 +248,7 @@ public abstract class EventCommonService implements EventService {
 
         sb.append(" WHERE STUD_NO=" + "'" + StringUtils.rightPad(pen, 10) + "'"); // a space is appended CAREFUL not to remove.
 
-        logger.debug("Update Student_Master: {}",  sb);
+        logger.info("Update Query: {}",  sb);
         return sb.toString();
 
     }

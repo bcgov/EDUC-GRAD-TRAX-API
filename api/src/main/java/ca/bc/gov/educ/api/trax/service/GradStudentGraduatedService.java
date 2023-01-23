@@ -27,12 +27,10 @@ public class GradStudentGraduatedService extends EventCommonService {
 
     @Override
     public void specialHandlingOnUpdateFieldsMap(Map<String, Pair<FieldType, Object>> updateFieldsMap, TraxStudentEntity traxStudentEntity, GradStatusEventPayloadDTO gradStatusUpdate) {
-        boolean isSCCP = StringUtils.equalsIgnoreCase(gradStatusUpdate.getProgram(), "SCCP");
-        // SCCP
-        if (isSCCP && !updateFieldsMap.containsKey(FIELD_SLP_DATE)) {
-            updateFieldsMap.put(FIELD_SLP_DATE, null);
-        } else if (!isSCCP && updateFieldsMap.containsKey(FIELD_SLP_DATE)) {
-            updateFieldsMap.remove(FIELD_SLP_DATE);
+        // skip SCCP -------------------------------------------------------------------------
+        if (StringUtils.equalsIgnoreCase(gradStatusUpdate.getProgram(), "SCCP")) {
+            updateFieldsMap.clear();
+            log.info("  Skip the graduation update against SCCP student in TRAX");
         }
     }
 

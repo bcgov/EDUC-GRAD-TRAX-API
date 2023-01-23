@@ -27,10 +27,10 @@ public class GradStudentUndoCompletionService extends EventCommonService {
 
     @Override
     public void specialHandlingOnUpdateFieldsMap(Map<String, Pair<FieldType, Object>> updateFieldsMap, TraxStudentEntity traxStudentEntity, GradStatusEventPayloadDTO gradStatusUpdate) {
-        boolean isSCCP = StringUtils.equalsIgnoreCase(gradStatusUpdate.getProgram(), "SCCP");
-        // For SCCP -------------------------------------------------------------------------
-        if (!isSCCP && updateFieldsMap.containsKey(FIELD_SLP_DATE)) {
-            updateFieldsMap.remove(FIELD_SLP_DATE);
+        // skip SCCP -------------------------------------------------------------------------
+        if (StringUtils.equalsIgnoreCase(gradStatusUpdate.getProgram(), "SCCP")) {
+            updateFieldsMap.clear();
+            log.info("  Skip the undo completion update against SCCP student in TRAX.");
         }
 
         // When a student is un-graduated ---------------------------------------------------
@@ -38,11 +38,9 @@ public class GradStudentUndoCompletionService extends EventCommonService {
         gradStatusUpdate.setProgram(null);
         updateFieldsMap.put(FIELD_GRAD_REQT_YEAR_AT_GRAD, Pair.of(FieldType.TRAX_STRING, " "));
 
-        if (isSCCP) {
-            // slp_date(= zero for SCCP)
-            gradStatusUpdate.setProgramCompletionDate(null);
-            updateFieldsMap.put(FIELD_SLP_DATE, Pair.of(FieldType.TRAX_DATE, Long.valueOf("0")));
-        }
+        // grad_date or slp_date(= zero)
+        gradStatusUpdate.setProgramCompletionDate(null);
+        updateFieldsMap.put(FIELD_GRAD_DATE, Pair.of(FieldType.TRAX_DATE, Long.valueOf("0")));
 
         // mincode_grad(= blank)
         gradStatusUpdate.setSchoolAtGrad(null);
@@ -55,6 +53,11 @@ public class GradStudentUndoCompletionService extends EventCommonService {
         // honour_flag(= blank)
         gradStatusUpdate.setHonoursStanding(null);
         updateFieldsMap.put(FIELD_HONOUR_FLAG, Pair.of(FieldType.TRAX_STRING, " "));
+
+        // extra
+        updateFieldsMap.put(FIELD_DOGWOOD_FLAG, Pair.of(FieldType.TRAX_STRING, " "));
+        updateFieldsMap.put(FIELD_ENGLISH_CERT, Pair.of(FieldType.TRAX_STRING, " "));
+        updateFieldsMap.put(FIELD_FRENCH_CERT, Pair.of(FieldType.TRAX_STRING, " "));
     }
 
     @Override
