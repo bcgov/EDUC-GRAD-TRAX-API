@@ -231,7 +231,7 @@ public class TraxCommonServiceTest {
         transcriptStudentDemogEntity.setSchoolName("Test2 School");
         transcriptStudentDemogEntity.setGradDate(0L);
 
-        when(transcriptStudentDemogRepository.countGradDateByPen(eq("123456789"))).thenReturn(0);
+        when(traxStudentsLoadRepository.countGradDateByPen(eq("123456789"))).thenReturn(0);
         when(traxStudentsLoadRepository.countSccDateByPen(eq("123456789"))).thenReturn(0);
 
         Boolean result = traxCommonService.isGraduatedStudent(transcriptStudentDemogEntity.getStudNo());
@@ -252,7 +252,7 @@ public class TraxCommonServiceTest {
         transcriptStudentDemogEntity.setSchoolName("Test2 School");
         transcriptStudentDemogEntity.setGradDate(20201031L);
 
-        when(transcriptStudentDemogRepository.countGradDateByPen(eq("123456789"))).thenReturn(1);
+        when(traxStudentsLoadRepository.countGradDateByPen(eq("123456789"))).thenReturn(1);
         when(traxStudentsLoadRepository.countSccDateByPen(eq("123456789"))).thenReturn(0);
 
         Boolean result = traxCommonService.isGraduatedStudent(transcriptStudentDemogEntity.getStudNo());
@@ -273,7 +273,7 @@ public class TraxCommonServiceTest {
         transcriptStudentDemogEntity.setSchoolName("Test2 School");
         transcriptStudentDemogEntity.setGradDate(20201031L);
 
-        when(transcriptStudentDemogRepository.countGradDateByPen(eq("123456789"))).thenReturn(0);
+        when(traxStudentsLoadRepository.countGradDateByPen(eq("123456789"))).thenReturn(0);
         when(traxStudentsLoadRepository.countSccDateByPen(eq("123456789"))).thenReturn(1);
 
         Boolean result = traxCommonService.isGraduatedStudent(transcriptStudentDemogEntity.getStudNo());
@@ -294,7 +294,7 @@ public class TraxCommonServiceTest {
         transcriptStudentDemogEntity.setSchoolName("Test2 School");
         transcriptStudentDemogEntity.setGradDate(20201031L);
 
-        when(transcriptStudentDemogRepository.countGradDateByPen(eq("123456789"))).thenReturn(1);
+        when(traxStudentsLoadRepository.countGradDateByPen(eq("123456789"))).thenReturn(1);
         when(traxStudentsLoadRepository.countSccDateByPen(eq("123456789"))).thenReturn(1);
 
         Boolean result = traxCommonService.isGraduatedStudent(transcriptStudentDemogEntity.getStudNo());
