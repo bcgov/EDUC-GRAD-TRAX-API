@@ -231,8 +231,8 @@ public class TraxCommonServiceTest {
         transcriptStudentDemogEntity.setSchoolName("Test2 School");
         transcriptStudentDemogEntity.setGradDate(0L);
 
-        when(traxStudentsLoadRepository.countGradDateByPen(eq("123456789"))).thenReturn(0);
-        when(traxStudentsLoadRepository.countSccDateByPen(eq("123456789"))).thenReturn(0);
+        when(traxStudentsLoadRepository.countGradDateByPen("123456789")).thenReturn(0);
+        when(traxStudentsLoadRepository.countSccDateByPen("123456789")).thenReturn(0);
 
         Boolean result = traxCommonService.isGraduatedStudent(transcriptStudentDemogEntity.getStudNo());
 
@@ -243,19 +243,7 @@ public class TraxCommonServiceTest {
     @Test
     public void testStudentIsGraduatedByGradDate() {
         // Student is graduated or not
-
-        final TranscriptStudentDemogEntity transcriptStudentDemogEntity = new TranscriptStudentDemogEntity();
-        transcriptStudentDemogEntity.setStudNo("123456789");
-        transcriptStudentDemogEntity.setFirstName("Test");
-        transcriptStudentDemogEntity.setLastName("QA");
-        transcriptStudentDemogEntity.setMincode("7654321");
-        transcriptStudentDemogEntity.setSchoolName("Test2 School");
-        transcriptStudentDemogEntity.setGradDate(20201031L);
-
-        when(traxStudentsLoadRepository.countGradDateByPen(eq("123456789"))).thenReturn(1);
-        when(traxStudentsLoadRepository.countSccDateByPen(eq("123456789"))).thenReturn(0);
-
-        Boolean result = traxCommonService.isGraduatedStudent(transcriptStudentDemogEntity.getStudNo());
+        Boolean result = isStudentGraduated(1,0);
 
         assertThat(result).isNotNull();
         assertThat(result).isTrue();
@@ -264,19 +252,7 @@ public class TraxCommonServiceTest {
     @Test
     public void testStudentIsGraduatedBySccDate() {
         // Student is graduated or not
-
-        final TranscriptStudentDemogEntity transcriptStudentDemogEntity = new TranscriptStudentDemogEntity();
-        transcriptStudentDemogEntity.setStudNo("123456789");
-        transcriptStudentDemogEntity.setFirstName("Test");
-        transcriptStudentDemogEntity.setLastName("QA");
-        transcriptStudentDemogEntity.setMincode("7654321");
-        transcriptStudentDemogEntity.setSchoolName("Test2 School");
-        transcriptStudentDemogEntity.setGradDate(20201031L);
-
-        when(traxStudentsLoadRepository.countGradDateByPen(eq("123456789"))).thenReturn(0);
-        when(traxStudentsLoadRepository.countSccDateByPen(eq("123456789"))).thenReturn(1);
-
-        Boolean result = traxCommonService.isGraduatedStudent(transcriptStudentDemogEntity.getStudNo());
+        Boolean result = isStudentGraduated(0,1);
 
         assertThat(result).isNotNull();
         assertThat(result).isTrue();
@@ -284,6 +260,14 @@ public class TraxCommonServiceTest {
 
     @Test
     public void testStudentIsGraduatedByBothGradDateAndSccDate() {
+        // Student is graduated or not
+        Boolean result = isStudentGraduated(1,1);
+
+        assertThat(result).isNotNull();
+        assertThat(result).isTrue();
+    }
+
+    private Boolean isStudentGraduated(int gradDateCount, int sccDateCount) {
         // Student is graduated or not
 
         final TranscriptStudentDemogEntity transcriptStudentDemogEntity = new TranscriptStudentDemogEntity();
@@ -294,13 +278,10 @@ public class TraxCommonServiceTest {
         transcriptStudentDemogEntity.setSchoolName("Test2 School");
         transcriptStudentDemogEntity.setGradDate(20201031L);
 
-        when(traxStudentsLoadRepository.countGradDateByPen(eq("123456789"))).thenReturn(1);
-        when(traxStudentsLoadRepository.countSccDateByPen(eq("123456789"))).thenReturn(1);
+        when(traxStudentsLoadRepository.countGradDateByPen("123456789")).thenReturn(gradDateCount);
+        when(traxStudentsLoadRepository.countSccDateByPen("123456789")).thenReturn(sccDateCount);
 
-        Boolean result = traxCommonService.isGraduatedStudent(transcriptStudentDemogEntity.getStudNo());
-
-        assertThat(result).isNotNull();
-        assertThat(result).isTrue();
+       return traxCommonService.isGraduatedStudent(transcriptStudentDemogEntity.getStudNo());
     }
 
 }
