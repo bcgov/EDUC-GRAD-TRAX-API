@@ -60,7 +60,10 @@ public interface TraxStudentsLoadRepository extends JpaRepository<TraxStudentsLo
             "where sc.mincode = :minCode \n", nativeQuery=true)
     long countTabSchools(@Param("minCode") String minCode);
 
-    @Query(value = "SELECT COUNT(*) FROM student_master WHERE stud_no = :pen AND scc_date > 0", nativeQuery = true)
+    @Query(value = "SELECT COUNT(*) FROM student_master WHERE stud_no = :pen AND grad_reqt_year = 'SCCP' AND scc_date > 0", nativeQuery = true)
     Integer countSccDateByPen(@Param("pen")String pen);
+
+    @Query(value = "SELECT COUNT(*) FROM student_master WHERE stud_no = :pen AND grad_reqt_year <> 'SCCP' AND grad_date > 0 AND (slp_date is null OR slp_date = 0)", nativeQuery = true)
+    Integer countGradDateByPen(@Param("pen")String pen);
 
 }

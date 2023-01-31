@@ -6,7 +6,6 @@ import ca.bc.gov.educ.api.trax.model.entity.TraxStudentNoEntity;
 import ca.bc.gov.educ.api.trax.model.transformer.GradCourseTransformer;
 import ca.bc.gov.educ.api.trax.model.transformer.TraxStudentNoTransformer;
 import ca.bc.gov.educ.api.trax.repository.GradCourseRepository;
-import ca.bc.gov.educ.api.trax.repository.TranscriptStudentDemogRepository;
 import ca.bc.gov.educ.api.trax.repository.TraxStudentNoRepository;
 import ca.bc.gov.educ.api.trax.repository.TraxStudentsLoadRepository;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
@@ -36,7 +35,8 @@ public class TraxCommonService {
     private final TraxStudentNoTransformer traxStudentNoTransformer;
     private final GradCourseTransformer gradCourseTransformer;
 
-    private TranscriptStudentDemogRepository transcriptStudentDemogRepository;
+    private final TswService tswService;
+
     private EducGradTraxApiConstants constants;
 
     @Autowired
@@ -45,15 +45,15 @@ public class TraxCommonService {
                              GradCourseRepository gradCourseRepository,
                              TraxStudentNoTransformer traxStudentNoTransformer,
                              GradCourseTransformer gradCourseTransformer,
-                             TranscriptStudentDemogRepository transcriptStudentDemogRepository,
+                             TswService tswService,
                              EducGradTraxApiConstants constants) {
         this.traxStudentsLoadRepository = traxStudentsLoadRepository;
         this.traxStudentNoRepository = traxStudentNoRepository;
         this.gradCourseRepository = gradCourseRepository;
         this.traxStudentNoTransformer = traxStudentNoTransformer;
         this.gradCourseTransformer = gradCourseTransformer;
+        this.tswService = tswService;
 
-        this.transcriptStudentDemogRepository = transcriptStudentDemogRepository;
         this.constants = constants;
     }
 
@@ -191,6 +191,12 @@ public class TraxCommonService {
         List<ConvGradStudent> students = new ArrayList<>();
         traxStudents.forEach(result -> {
             ConvGradStudent student = populateConvGradStudent(result, isGraduated);
+            if (isGraduated) {
+                TranscriptStudentDemog transcriptStudentDemog = tswService.getTranscriptStudentDemog(student.getPen());
+                student.setTranscriptStudentDemog(transcriptStudentDemog);
+                List<TranscriptStudentCourse> transcriptStudentCourses = tswService.getTranscriptStudentCourses(student.getPen());
+                student.setTranscriptStudentCourses(transcriptStudentCourses);
+            }
             if (student != null) {
                 students.add(student);
             }
@@ -305,7 +311,7 @@ public class TraxCommonService {
 
     @Transactional(readOnly = true)
     public boolean isGraduatedStudent(String studNo) {
-        Integer gradDateCount = transcriptStudentDemogRepository.countGradDateByPen(studNo);
+        Integer gradDateCount = traxStudentsLoadRepository.countGradDateByPen(studNo);
         if (gradDateCount != null && gradDateCount.intValue() > 0) {
             return true;
         }
