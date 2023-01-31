@@ -197,6 +197,10 @@ public class TraxCommonService {
                 List<TranscriptStudentCourse> transcriptStudentCourses = tswService.getTranscriptStudentCourses(student.getPen());
                 student.setTranscriptStudentCourses(transcriptStudentCourses);
             }
+            // 1950 / AD
+            if ("1950".equalsIgnoreCase(student.getGraduationRequirementYear()) && "AD".equalsIgnoreCase(student.getStudentGrade())) {
+                student.setAdult19Rule(isAdult19Rule(student.getPen()));
+            }
             if (student != null) {
                 students.add(student);
             }
@@ -321,5 +325,10 @@ public class TraxCommonService {
         }
 
         return false;
+    }
+
+    @Transactional(readOnly = true)
+    public boolean isAdult19Rule(String studNo) {
+        return traxStudentsLoadRepository.countAdult19RuleByPen(studNo) > 0;
     }
 }
