@@ -26,7 +26,6 @@ import java.math.BigDecimal;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
@@ -54,7 +53,7 @@ public class TraxCommonServiceTest {
     TraxStudentNoRepository traxStudentNoRepository;
 
     @MockBean
-    TranscriptStudentDemogRepository transcriptStudentDemogRepository;
+    TswService tswService;
 
     // NATS
     @MockBean
@@ -97,6 +96,100 @@ public class TraxCommonServiceTest {
         ConvGradStudent responseObject = result.get(0);
         assertThat(responseObject.getPen()).isEqualTo(pen);
         assertThat(responseObject.getStudentStatus()).isEqualTo(status.toString());
+    }
+
+    @Test
+    public void testGetGraduatedStudentMasterDataFromTrax() {
+        Object[] obj = new Object[] {
+                "123456789", "1234567", "1234567", "12", Character.valueOf('A'),Character.valueOf('A'), "2020", "202201",
+                BigDecimal.ZERO, BigDecimal.ZERO, null, null, null, null, null, "S", null, "E", null, Character.valueOf('C'), Character.valueOf('N')
+        };
+        List<Object[]> results = new ArrayList<>();
+        results.add(obj);
+
+        final String pen = (String) obj[0];
+        final String mincode = (String) obj[1];
+        Character status = (Character)obj[4];
+
+        // TSW Demographics
+        TranscriptStudentDemog transcriptStudentDemog = new TranscriptStudentDemog();
+        transcriptStudentDemog.setStudNo(pen);
+        transcriptStudentDemog.setFirstName("Test");
+        transcriptStudentDemog.setLastName("QA");
+        transcriptStudentDemog.setMincode(mincode);
+        transcriptStudentDemog.setSchoolName("Test School");
+        transcriptStudentDemog.setGradDate(202201L);
+
+        // TSW Courses
+        TranscriptStudentCourse tswCourse1 = new TranscriptStudentCourse();
+        tswCourse1.setStudNo(pen);
+        tswCourse1.setReportType("1");
+        tswCourse1.setCourseCode("Generic");
+        tswCourse1.setCourseName("Generic Course Name");
+        tswCourse1.setCourseLevel("12");
+        tswCourse1.setFinalPercentage("91.00");
+        tswCourse1.setFinalLG("A");
+        tswCourse1.setCourseSession("202206");
+        tswCourse1.setNumberOfCredits("4");
+        tswCourse1.setUsedForGrad("4");
+        tswCourse1.setFoundationReq("10");
+        tswCourse1.setUpdateDate(20220601L);
+
+        TranscriptStudentCourse tswCourse2 = new TranscriptStudentCourse();
+        tswCourse2.setStudNo(pen);
+        tswCourse2.setReportType("2");
+        tswCourse2.setCourseCode("TestCourse");
+        tswCourse2.setCourseName("Test Course Name");
+        tswCourse2.setCourseLevel("12");
+        tswCourse2.setFinalPercentage("92.00");
+        tswCourse2.setFinalLG("A");
+        tswCourse2.setCourseSession("202206");
+        tswCourse2.setNumberOfCredits("4");
+        tswCourse2.setUsedForGrad("4");
+        tswCourse2.setFoundationReq("11");
+        tswCourse2.setSpecialCase("E");
+        tswCourse2.setUpdateDate(20220601L);
+
+        TranscriptStudentCourse tswCourse3 = new TranscriptStudentCourse();
+        tswCourse2.setStudNo(pen);
+        tswCourse2.setReportType("2");
+        tswCourse2.setCourseCode("TestCourse2");
+        tswCourse2.setCourseName("Test Course2 Name");
+        tswCourse2.setCourseLevel("12");
+        tswCourse2.setFinalPercentage("XMT");
+        tswCourse2.setFinalLG("A");
+        tswCourse2.setCourseSession("202206");
+        tswCourse2.setNumberOfCredits("4");
+        tswCourse2.setUsedForGrad("4");
+        tswCourse2.setFoundationReq("11");
+        tswCourse2.setUpdateDate(20220601L);
+
+        TranscriptStudentCourse tswAssessment = new TranscriptStudentCourse();
+        tswAssessment.setStudNo(pen);
+        tswAssessment.setReportType("3");
+        tswAssessment.setCourseCode("TestAssmt");
+        tswAssessment.setCourseName("Test Assessment Name");
+        tswAssessment.setCourseLevel("12");
+        tswAssessment.setFinalPercentage("XMT");
+        tswAssessment.setCourseSession("202206");
+        tswAssessment.setFoundationReq("15");
+        tswAssessment.setUpdateDate(new Date(System.currentTimeMillis() - 100000L).getTime());
+
+        when(this.traxStudentsLoadRepository.loadTraxGraduatedStudent(pen)).thenReturn(results);
+        when(this.traxStudentsLoadRepository.countGradDateByPen(pen)).thenReturn(Integer.valueOf(1));
+        when(this.tswService.getTranscriptStudentDemog(pen)).thenReturn(transcriptStudentDemog);
+        when(this.tswService.getTranscriptStudentCourses(pen)).thenReturn(Arrays.asList(tswCourse1, tswCourse2, tswCourse3, tswAssessment));
+
+        var result = traxCommonService.getStudentMasterDataFromTrax(pen);
+
+        assertThat(result).isNotNull();
+        assertThat(result).hasSize(1);
+        ConvGradStudent responseObject = result.get(0);
+        assertThat(responseObject.getPen()).isEqualTo(pen);
+        assertThat(responseObject.getStudentStatus()).isEqualTo(status.toString());
+        assertThat(responseObject.isGraduated()).isTrue();
+        assertThat(responseObject.getTranscriptStudentDemog()).isNotNull();
+        assertThat(responseObject.getTranscriptStudentCourses()).hasSize(4);
     }
 
     @Test
@@ -222,19 +315,7 @@ public class TraxCommonServiceTest {
     @Test
     public void testStudentIsNotGraduated() {
         // Student is graduated or not
-
-        final TranscriptStudentDemogEntity transcriptStudentDemogEntity = new TranscriptStudentDemogEntity();
-        transcriptStudentDemogEntity.setStudNo("123456789");
-        transcriptStudentDemogEntity.setFirstName("Test");
-        transcriptStudentDemogEntity.setLastName("QA");
-        transcriptStudentDemogEntity.setMincode("7654321");
-        transcriptStudentDemogEntity.setSchoolName("Test2 School");
-        transcriptStudentDemogEntity.setGradDate(0L);
-
-        when(traxStudentsLoadRepository.countGradDateByPen("123456789")).thenReturn(0);
-        when(traxStudentsLoadRepository.countSccDateByPen("123456789")).thenReturn(0);
-
-        Boolean result = traxCommonService.isGraduatedStudent(transcriptStudentDemogEntity.getStudNo());
+        Boolean result = isStudentGraduated(0,0);
 
         assertThat(result).isNotNull();
         assertThat(result).isFalse();
