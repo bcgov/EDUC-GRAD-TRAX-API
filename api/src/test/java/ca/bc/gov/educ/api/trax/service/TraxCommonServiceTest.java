@@ -323,7 +323,7 @@ public class TraxCommonServiceTest {
             "0, 1",
             "1, 1"
     })
-    public void testStudentIsGraduated(int gradDateCount, int sccDateCount) {
+    void testStudentIsGraduated(int gradDateCount, int sccDateCount) {
         // Student is graduated or not
         Boolean result = isStudentGraduated(gradDateCount, sccDateCount);
 
@@ -332,8 +332,6 @@ public class TraxCommonServiceTest {
     }
 
     private Boolean isStudentGraduated(int gradDateCount, int sccDateCount) {
-        // Student is graduated or not
-
         final TranscriptStudentDemogEntity transcriptStudentDemogEntity = new TranscriptStudentDemogEntity();
         transcriptStudentDemogEntity.setStudNo("123456789");
         transcriptStudentDemogEntity.setFirstName("Test");
