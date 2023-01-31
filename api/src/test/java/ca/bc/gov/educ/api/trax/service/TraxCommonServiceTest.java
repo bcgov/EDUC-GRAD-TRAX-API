@@ -14,6 +14,8 @@ import ca.bc.gov.educ.api.trax.repository.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -182,7 +184,6 @@ public class TraxCommonServiceTest {
 
         var result = traxCommonService.getStudentMasterDataFromTrax(pen);
 
-        assertThat(result).isNotNull();
         assertThat(result).hasSize(1);
         ConvGradStudent responseObject = result.get(0);
         assertThat(responseObject.getPen()).isEqualTo(pen);
@@ -207,7 +208,6 @@ public class TraxCommonServiceTest {
 
         var result = traxCommonService.getStudentDemographicsDataFromTrax(pen);
 
-        assertThat(result).isNotNull();
         assertThat(result).hasSize(1);
         Student responseObject = result.get(0);
         assertThat(responseObject.getPen()).isEqualTo(pen);
@@ -229,7 +229,6 @@ public class TraxCommonServiceTest {
 
         var result = traxCommonService.loadTraxStudentNoByPage(pageable);
 
-        assertThat(result).isNotNull();
         assertThat(result).hasSize(1);
         TraxStudentNo responseObject = result.get(0);
         assertThat(responseObject.getStudNo()).isEqualTo(traxStudentNoEntity.getStudNo());
@@ -261,7 +260,6 @@ public class TraxCommonServiceTest {
 
         var result = traxCommonService.loadGradCourseRestrictionsDataFromTrax();
 
-        assertThat(result).isNotNull();
         assertThat(result).hasSize(1);
         CourseRestriction responseObject = result.get(0);
         assertThat(responseObject.getMainCourse()).isEqualTo("main");
@@ -285,7 +283,6 @@ public class TraxCommonServiceTest {
 
         var result = traxCommonService.loadGradCourseRequirementsDataFromTrax();
 
-        assertThat(result).isNotNull();
         assertThat(result).hasSize(1);
         GradCourse responseObject = result.get(0);
         assertThat(responseObject.getCourseCode()).isEqualTo("main");
@@ -311,38 +308,24 @@ public class TraxCommonServiceTest {
         assertThat(traxStudentNo.getStatus()).isEqualTo(result.getStatus());
     }
 
-
     @Test
     public void testStudentIsNotGraduated() {
         // Student is graduated or not
-        Boolean result = isStudentGraduated(0,0);
+        Boolean result = isStudentGraduated(0, 0);
 
         assertThat(result).isNotNull();
         assertThat(result).isFalse();
     }
 
-    @Test
-    public void testStudentIsGraduatedByGradDate() {
+    @ParameterizedTest
+    @CsvSource({
+            "1, 0",
+            "0, 1",
+            "1, 1"
+    })
+    public void testStudentIsGraduated(int gradDateCount, int sccDateCount) {
         // Student is graduated or not
-        Boolean result = isStudentGraduated(1,0);
-
-        assertThat(result).isNotNull();
-        assertThat(result).isTrue();
-    }
-
-    @Test
-    public void testStudentIsGraduatedBySccDate() {
-        // Student is graduated or not
-        Boolean result = isStudentGraduated(0,1);
-
-        assertThat(result).isNotNull();
-        assertThat(result).isTrue();
-    }
-
-    @Test
-    public void testStudentIsGraduatedByBothGradDateAndSccDate() {
-        // Student is graduated or not
-        Boolean result = isStudentGraduated(1,1);
+        Boolean result = isStudentGraduated(gradDateCount, sccDateCount);
 
         assertThat(result).isNotNull();
         assertThat(result).isTrue();
