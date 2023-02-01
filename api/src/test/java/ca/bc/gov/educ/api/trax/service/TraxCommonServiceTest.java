@@ -49,7 +49,7 @@ public class TraxCommonServiceTest {
     GradCourseRepository gradCourseRepository;
 
     @MockBean
-    TraxStudentsLoadRepository traxStudentsLoadRepository;
+    TraxStudentRepository traxStudentRepository;
 
     @MockBean
     TraxStudentNoRepository traxStudentNoRepository;
@@ -89,7 +89,7 @@ public class TraxCommonServiceTest {
         String pen = (String) obj[0];
         Character status = (Character)obj[4];
 
-        when(this.traxStudentsLoadRepository.loadTraxStudent(pen)).thenReturn(results);
+        when(this.traxStudentRepository.loadTraxStudent(pen)).thenReturn(results);
 
         var result = traxCommonService.getStudentMasterDataFromTrax(pen);
 
@@ -177,8 +177,8 @@ public class TraxCommonServiceTest {
         tswAssessment.setFoundationReq("15");
         tswAssessment.setUpdateDate(new Date(System.currentTimeMillis() - 100000L).getTime());
 
-        when(this.traxStudentsLoadRepository.loadTraxGraduatedStudent(pen)).thenReturn(results);
-        when(this.traxStudentsLoadRepository.countGradDateByPen(pen)).thenReturn(Integer.valueOf(1));
+        when(this.traxStudentRepository.loadTraxGraduatedStudent(pen)).thenReturn(results);
+        when(this.traxStudentRepository.countGradDateByPen(pen)).thenReturn(Integer.valueOf(1));
         when(this.tswService.getTranscriptStudentDemog(pen)).thenReturn(transcriptStudentDemog);
         when(this.tswService.getTranscriptStudentCourses(pen)).thenReturn(Arrays.asList(tswCourse1, tswCourse2, tswCourse3, tswAssessment));
 
@@ -204,7 +204,7 @@ public class TraxCommonServiceTest {
         String pen = (String) obj[0];
         Character status = (Character)obj[4];
 
-        when(this.traxStudentsLoadRepository.loadStudentDemographicsData(pen)).thenReturn(results);
+        when(this.traxStudentRepository.loadStudentDemographicsData(pen)).thenReturn(results);
 
         var result = traxCommonService.getStudentDemographicsDataFromTrax(pen);
 
@@ -256,7 +256,7 @@ public class TraxCommonServiceTest {
         String pen = (String) obj[0];
         Character status = (Character)obj[4];
 
-        when(this.traxStudentsLoadRepository.loadInitialCourseRestrictionRawData()).thenReturn(results);
+        when(this.traxStudentRepository.loadInitialCourseRestrictionRawData()).thenReturn(results);
 
         var result = traxCommonService.loadGradCourseRestrictionsDataFromTrax();
 
@@ -340,8 +340,8 @@ public class TraxCommonServiceTest {
         transcriptStudentDemogEntity.setSchoolName("Test2 School");
         transcriptStudentDemogEntity.setGradDate(20201031L);
 
-        when(traxStudentsLoadRepository.countGradDateByPen("123456789")).thenReturn(gradDateCount);
-        when(traxStudentsLoadRepository.countSccDateByPen("123456789")).thenReturn(sccDateCount);
+        when(traxStudentRepository.countGradDateByPen("123456789")).thenReturn(gradDateCount);
+        when(traxStudentRepository.countSccDateByPen("123456789")).thenReturn(sccDateCount);
 
        return traxCommonService.isGraduatedStudent(transcriptStudentDemogEntity.getStudNo());
     }

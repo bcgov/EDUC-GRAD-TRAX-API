@@ -7,7 +7,7 @@ import ca.bc.gov.educ.api.trax.model.transformer.GradCourseTransformer;
 import ca.bc.gov.educ.api.trax.model.transformer.TraxStudentNoTransformer;
 import ca.bc.gov.educ.api.trax.repository.GradCourseRepository;
 import ca.bc.gov.educ.api.trax.repository.TraxStudentNoRepository;
-import ca.bc.gov.educ.api.trax.repository.TraxStudentsLoadRepository;
+import ca.bc.gov.educ.api.trax.repository.TraxStudentRepository;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +28,7 @@ import java.util.Optional;
 @Service
 @Slf4j
 public class TraxCommonService {
-    private final TraxStudentsLoadRepository traxStudentsLoadRepository;
+    private final TraxStudentRepository traxStudentRepository;
     private final TraxStudentNoRepository traxStudentNoRepository;
     private final GradCourseRepository gradCourseRepository;
 
@@ -40,14 +40,14 @@ public class TraxCommonService {
     private EducGradTraxApiConstants constants;
 
     @Autowired
-    public TraxCommonService(TraxStudentsLoadRepository traxStudentsLoadRepository,
+    public TraxCommonService(TraxStudentRepository traxStudentRepository,
                              TraxStudentNoRepository traxStudentNoRepository,
                              GradCourseRepository gradCourseRepository,
                              TraxStudentNoTransformer traxStudentNoTransformer,
                              GradCourseTransformer gradCourseTransformer,
                              TswService tswService,
                              EducGradTraxApiConstants constants) {
-        this.traxStudentsLoadRepository = traxStudentsLoadRepository;
+        this.traxStudentRepository = traxStudentRepository;
         this.traxStudentNoRepository = traxStudentNoRepository;
         this.gradCourseRepository = gradCourseRepository;
         this.traxStudentNoTransformer = traxStudentNoTransformer;
@@ -75,9 +75,9 @@ public class TraxCommonService {
         boolean isGraduated = !constants.isEnableStudentMasterOnly() && isGraduatedStudent(pen);
         List<Object[]> results;
         if (isGraduated) {
-            results = traxStudentsLoadRepository.loadTraxGraduatedStudent(pen);
+            results = traxStudentRepository.loadTraxGraduatedStudent(pen);
         } else {
-            results = traxStudentsLoadRepository.loadTraxStudent(pen);
+            results = traxStudentRepository.loadTraxStudent(pen);
         }
 
         return buildConversionGradStudents(results, isGraduated);
@@ -86,7 +86,7 @@ public class TraxCommonService {
     @Transactional(readOnly = true)
     public List<Student> getStudentDemographicsDataFromTrax(String pen) {
         List<Student> students = new ArrayList<>();
-        List<Object[]> results = traxStudentsLoadRepository.loadStudentDemographicsData(pen);
+        List<Object[]> results = traxStudentRepository.loadStudentDemographicsData(pen);
         results.forEach(result -> {
             String legalFirstName = (String) result[1];
             legalFirstName = StringUtils.isNotBlank(legalFirstName)? legalFirstName.trim() : null;
@@ -148,7 +148,7 @@ public class TraxCommonService {
     @Transactional(readOnly = true)
     public List<CourseRestriction> loadGradCourseRestrictionsDataFromTrax() {
         List<CourseRestriction> courseRestrictions = new ArrayList<>();
-        List<Object[]> results = traxStudentsLoadRepository.loadInitialCourseRestrictionRawData();
+        List<Object[]> results = traxStudentRepository.loadInitialCourseRestrictionRawData();
         results.forEach(result -> {
             String mainCourse = (String) result[0];
             String mainCourseLevel = (String) result[1];
@@ -196,16 +196,18 @@ public class TraxCommonService {
                 student.setTranscriptStudentDemog(transcriptStudentDemog);
                 List<TranscriptStudentCourse> transcriptStudentCourses = tswService.getTranscriptStudentCourses(student.getPen());
                 student.setTranscriptStudentCourses(transcriptStudentCourses);
-            }
-            // 1950 / AD
-            if ("1950".equalsIgnoreCase(student.getGraduationRequirementYear()) && "AD".equalsIgnoreCase(student.getStudentGrade())) {
-                student.setAdult19Rule(isAdult19Rule(student.getPen()));
+                student.setDistributionDate(traxStudentRepository.getTheLatestDistributionDate(student.getPen()));
+            } else {
+                // 1950 / AD
+                if ("1950".equalsIgnoreCase(student.getGraduationRequirementYear()) && "AD".equalsIgnoreCase(student.getStudentGrade())) {
+                    student.setAdult19Rule(isAdult19Rule(student.getPen()));
+                }
             }
             if (student != null) {
                 students.add(student);
             }
         });
-        return students; // .subList(0,10);
+        return students;
     }
 
     private void populateProgramCode(String code, List<String> optionalProgramCodes) {
@@ -315,11 +317,11 @@ public class TraxCommonService {
 
     @Transactional(readOnly = true)
     public boolean isGraduatedStudent(String studNo) {
-        Integer gradDateCount = traxStudentsLoadRepository.countGradDateByPen(studNo);
+        Integer gradDateCount = traxStudentRepository.countGradDateByPen(studNo);
         if (gradDateCount != null && gradDateCount.intValue() > 0) {
             return true;
         }
-        Integer sccDateCount = traxStudentsLoadRepository.countSccDateByPen(studNo);
+        Integer sccDateCount = traxStudentRepository.countSccDateByPen(studNo);
         if (sccDateCount != null && sccDateCount.intValue() > 0) {
             return true;
         }
@@ -329,6 +331,7 @@ public class TraxCommonService {
 
     @Transactional(readOnly = true)
     public boolean isAdult19Rule(String studNo) {
-        return traxStudentsLoadRepository.countAdult19RuleByPen(studNo) > 0;
+        return traxStudentRepository.countAdult19RuleByPen(studNo) > 0;
     }
+
 }
