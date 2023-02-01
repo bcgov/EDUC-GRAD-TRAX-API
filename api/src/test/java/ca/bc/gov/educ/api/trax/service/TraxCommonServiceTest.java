@@ -80,7 +80,7 @@ public class TraxCommonServiceTest {
     @Test
     public void testGetStudentMasterDataFromTrax() {
         Object[] obj = new Object[] {
-                "123456789", "12345678", "12345678", "12", Character.valueOf('A'),Character.valueOf('A'), "2020", BigDecimal.ZERO,
+                "123456789", "12345678", "12345678", "AD", Character.valueOf('A'),Character.valueOf('A'), "1950", BigDecimal.ZERO,
                 BigDecimal.ZERO, null, null, null, null, null, null, null, null, null, null, Character.valueOf('C'), Character.valueOf('N')
         };
         List<Object[]> results = new ArrayList<>();
@@ -90,6 +90,7 @@ public class TraxCommonServiceTest {
         Character status = (Character)obj[4];
 
         when(this.traxStudentRepository.loadTraxStudent(pen)).thenReturn(results);
+        when(this.traxStudentRepository.countAdult19RuleByPen(pen)).thenReturn(1);
 
         var result = traxCommonService.getStudentMasterDataFromTrax(pen);
 
@@ -103,7 +104,7 @@ public class TraxCommonServiceTest {
     @Test
     public void testGetGraduatedStudentMasterDataFromTrax() {
         Object[] obj = new Object[] {
-                "123456789", "1234567", "1234567", "12", Character.valueOf('A'),Character.valueOf('A'), "2020", "202201",
+                "123456789", "1234567", "1234567", "12", Character.valueOf('A'),Character.valueOf('A'), "2018", "202201",
                 BigDecimal.ZERO, BigDecimal.ZERO, null, null, null, null, null, "S", null, "E", null, Character.valueOf('C'), Character.valueOf('N')
         };
         List<Object[]> results = new ArrayList<>();
@@ -317,6 +318,20 @@ public class TraxCommonServiceTest {
         assertThat(result).isFalse();
     }
 
+    @Test
+    public void testStudentIsNotGraduated_whenCountQuery_returns_null() {
+        // Student is graduated or not
+        final String pen = "123456789";
+
+        when(traxStudentRepository.countGradDateByPen("123456789")).thenReturn(null);
+        when(traxStudentRepository.countSccDateByPen("123456789")).thenReturn(null);
+
+        Boolean result = traxCommonService.isGraduatedStudent(pen);
+
+        assertThat(result).isNotNull();
+        assertThat(result).isFalse();
+    }
+
     @ParameterizedTest
     @CsvSource({
             "1, 0",
@@ -332,18 +347,12 @@ public class TraxCommonServiceTest {
     }
 
     private Boolean isStudentGraduated(int gradDateCount, int sccDateCount) {
-        final TranscriptStudentDemogEntity transcriptStudentDemogEntity = new TranscriptStudentDemogEntity();
-        transcriptStudentDemogEntity.setStudNo("123456789");
-        transcriptStudentDemogEntity.setFirstName("Test");
-        transcriptStudentDemogEntity.setLastName("QA");
-        transcriptStudentDemogEntity.setMincode("7654321");
-        transcriptStudentDemogEntity.setSchoolName("Test2 School");
-        transcriptStudentDemogEntity.setGradDate(20201031L);
+        final String pen = "123456789";
 
         when(traxStudentRepository.countGradDateByPen("123456789")).thenReturn(gradDateCount);
         when(traxStudentRepository.countSccDateByPen("123456789")).thenReturn(sccDateCount);
 
-       return traxCommonService.isGraduatedStudent(transcriptStudentDemogEntity.getStudNo());
+       return traxCommonService.isGraduatedStudent(pen);
     }
 
 }
