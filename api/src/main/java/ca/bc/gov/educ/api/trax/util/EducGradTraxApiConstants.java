@@ -77,6 +77,7 @@ public class EducGradTraxApiConstants {
     
     public static final String TRAX_DATE_FORMAT = "yyyyMMdd";
     public static final String TRAX_TSW_DATE_FORMAT = "yyyyMM";
+    public static final Date ADULT_18_RULE_VALID_DATE = EducGradTraxApiUtils.parseDate("2012-07-01");
 
     //NAT
     /**

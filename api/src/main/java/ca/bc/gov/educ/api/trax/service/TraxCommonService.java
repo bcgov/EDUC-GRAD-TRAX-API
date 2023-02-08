@@ -13,6 +13,7 @@ import ca.bc.gov.educ.api.trax.util.EducGradTraxApiUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -191,23 +192,33 @@ public class TraxCommonService {
         List<ConvGradStudent> students = new ArrayList<>();
         traxStudents.forEach(result -> {
             ConvGradStudent student = populateConvGradStudent(result, isGraduated);
+            handleAdult19Rule(student, isGraduated);
             if (isGraduated) {
                 TranscriptStudentDemog transcriptStudentDemog = tswService.getTranscriptStudentDemog(student.getPen());
                 student.setTranscriptStudentDemog(transcriptStudentDemog);
                 List<TranscriptStudentCourse> transcriptStudentCourses = tswService.getTranscriptStudentCourses(student.getPen());
                 student.setTranscriptStudentCourses(transcriptStudentCourses);
                 student.setDistributionDate(traxStudentRepository.getTheLatestDistributionDate(student.getPen()));
-            } else {
-                // 1950 / AD
-                if ("1950".equalsIgnoreCase(student.getGraduationRequirementYear()) && "AD".equalsIgnoreCase(student.getStudentGrade())) {
-                    student.setAdult19Rule(isAdult19Rule(student.getPen()));
-                }
             }
             if (student != null) {
                 students.add(student);
             }
         });
         return students;
+    }
+
+    private void handleAdult19Rule(ConvGradStudent student, boolean isGraduated) {
+        if ("1950".equalsIgnoreCase(student.getGraduationRequirementYear()) && "AD".equalsIgnoreCase(student.getStudentGrade())) {
+            if (isGraduated) {
+                if (student.isAllowedAdult() || EducGradTraxApiConstants.ADULT_18_RULE_VALID_DATE.compareTo(student.getProgramCompletionDate()) <= 0) {
+                    student.setAdult19Rule(false);
+                } else {
+                    student.setAdult19Rule(true);
+                }
+            } else {
+                student.setAdult19Rule(isAdult19Rule(student.getPen()));
+            }
+        }
     }
 
     private void populateProgramCode(String code, List<String> optionalProgramCodes) {
@@ -286,6 +297,9 @@ public class TraxCommonService {
         // french dogwood
         Character frenchDogwood = (Character) fields[20];
 
+        // allowed adult
+        Character allowedAdult = (Character) fields[21];
+
         ConvGradStudent student = null;
         try {
             student = ConvGradStudent.builder()
@@ -307,6 +321,7 @@ public class TraxCommonService {
                     .consumerEducationRequirementMet(StringUtils.equalsIgnoreCase(consumerEducationRequirementMet, "Y")? "Y" : null)
                     .studentCitizenship(citizenship != null? citizenship.toString() : null)
                     .frenchDogwood(frenchDogwood != null? frenchDogwood.toString() : null)
+                    .allowedAdult(allowedAdult != null? StringUtils.equalsIgnoreCase(allowedAdult.toString(), "Y") : false)
                     .result(ConversionResultType.SUCCESS)
                     .build();
         } catch (Exception ex) {
