@@ -302,14 +302,28 @@ public abstract class EventCommonService implements EventService {
 
     private void handleDateField(Map<String, Pair<FieldType, Object>> updateFieldsMap, final String fieldName, final Long currentDate, final String newDateStr) {
         if (StringUtils.isNotBlank(newDateStr)) {
-            String gradDateStr = newDateStr.replace("/", "");
-            if (NumberUtils.isDigits(gradDateStr) && NumberUtils.compare(Long.valueOf(gradDateStr), currentDate) != 0) {
-                updateFieldsMap.put(fieldName, Pair.of(FieldType.TRAX_DATE, Long.valueOf(gradDateStr)));
-            } else {
-                updateFieldsMap.remove(fieldName);
-            }
+            compareAndSetDate(updateFieldsMap, fieldName, currentDate, newDateStr);
         } else if (currentDate != null && currentDate != 0L) {
             updateFieldsMap.put(fieldName, Pair.of(FieldType.TRAX_DATE, Long.valueOf("0")));
+        } else {
+            updateFieldsMap.remove(fieldName);
+        }
+    }
+
+    /**
+     *
+     * @param updateFieldsMap
+     * @param fieldName
+     * @param currentDate       trax date as long value
+     * @param newDateStr        date string as format of "yyyy-MM-DD"
+     */
+    private void compareAndSetDate(Map<String, Pair<FieldType, Object>> updateFieldsMap, final String fieldName, final Long currentDate, final String newDateStr) {
+        String gradDateStr = newDateStr.replace("-", "");
+        if (updateFieldsMap.keySet().contains(FIELD_GRAD_DATE)) { // grad_date is yyyyMM, otherwise yyyyMMDD
+            gradDateStr = gradDateStr.substring(0,6);
+        }
+        if (NumberUtils.isDigits(gradDateStr) && NumberUtils.compare(Long.valueOf(gradDateStr), currentDate) != 0) {
+            updateFieldsMap.put(fieldName, Pair.of(FieldType.TRAX_DATE, Long.valueOf(gradDateStr)));
         } else {
             updateFieldsMap.remove(fieldName);
         }
