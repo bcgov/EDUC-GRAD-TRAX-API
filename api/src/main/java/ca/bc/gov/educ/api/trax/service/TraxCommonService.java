@@ -192,32 +192,33 @@ public class TraxCommonService {
         List<ConvGradStudent> students = new ArrayList<>();
         traxStudents.forEach(result -> {
             ConvGradStudent student = populateConvGradStudent(result, isGraduated);
+            handleAdult19Rule(student, isGraduated);
             if (isGraduated) {
                 TranscriptStudentDemog transcriptStudentDemog = tswService.getTranscriptStudentDemog(student.getPen());
                 student.setTranscriptStudentDemog(transcriptStudentDemog);
                 List<TranscriptStudentCourse> transcriptStudentCourses = tswService.getTranscriptStudentCourses(student.getPen());
                 student.setTranscriptStudentCourses(transcriptStudentCourses);
                 student.setDistributionDate(traxStudentRepository.getTheLatestDistributionDate(student.getPen()));
-                // 1950 / AD
-                if (student.getProgramCompletionDate() != null &&
-                    "1950".equalsIgnoreCase(student.getGraduationRequirementYear()) && "AD".equalsIgnoreCase(student.getStudentGrade())) {
-                    if (student.isAllowedAdult() || EducGradTraxApiConstants.ADULT_18_RULE_VALID_DATE.compareTo(student.getProgramCompletionDate()) <= 0) {
-                        student.setAdult19Rule(false);
-                    } else {
-                        student.setAdult19Rule(true);
-                    }
-                }
-            } else {
-                // 1950 / AD
-                if ("1950".equalsIgnoreCase(student.getGraduationRequirementYear()) && "AD".equalsIgnoreCase(student.getStudentGrade())) {
-                    student.setAdult19Rule(isAdult19Rule(student.getPen()));
-                }
             }
             if (student != null) {
                 students.add(student);
             }
         });
         return students;
+    }
+
+    private void handleAdult19Rule(ConvGradStudent student, boolean isGraudated) {
+        if ("1950".equalsIgnoreCase(student.getGraduationRequirementYear()) && "AD".equalsIgnoreCase(student.getStudentGrade())) {
+            if (isGraudated) {
+                if (student.isAllowedAdult() || EducGradTraxApiConstants.ADULT_18_RULE_VALID_DATE.compareTo(student.getProgramCompletionDate()) <= 0) {
+                    student.setAdult19Rule(false);
+                } else {
+                    student.setAdult19Rule(true);
+                }
+            } else {
+                student.setAdult19Rule(isAdult19Rule(student.getPen()));
+            }
+        }
     }
 
     private void populateProgramCode(String code, List<String> optionalProgramCodes) {
