@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.trax.model.dto;
 
 import ca.bc.gov.educ.api.trax.constant.ConversionResultType;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,6 +14,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ConvGradStudent {
     private String pen;
     private String program; // inc
@@ -47,6 +49,7 @@ public class ConvGradStudent {
     private List<TranscriptStudentCourse> transcriptStudentCourses;
     // 1950 "AD"
     private boolean adult19Rule;
+    private boolean allowedAdult;
 
     // data conversion status after being processed.
     private ConversionResultType result;

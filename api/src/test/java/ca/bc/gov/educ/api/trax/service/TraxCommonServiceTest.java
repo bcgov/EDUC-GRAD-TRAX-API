@@ -6,7 +6,6 @@ import ca.bc.gov.educ.api.trax.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.trax.model.dto.*;
 import ca.bc.gov.educ.api.trax.model.entity.GradCourseEntity;
 import ca.bc.gov.educ.api.trax.model.entity.GradCourseKey;
-import ca.bc.gov.educ.api.trax.model.entity.TranscriptStudentDemogEntity;
 import ca.bc.gov.educ.api.trax.model.entity.TraxStudentNoEntity;
 import ca.bc.gov.educ.api.trax.model.transformer.GradCourseTransformer;
 import ca.bc.gov.educ.api.trax.model.transformer.TraxStudentNoTransformer;
@@ -81,7 +80,7 @@ public class TraxCommonServiceTest {
     public void testGetStudentMasterDataFromTrax() {
         Object[] obj = new Object[] {
                 "123456789", "12345678", "12345678", "AD", Character.valueOf('A'),Character.valueOf('A'), "1950", BigDecimal.ZERO,
-                BigDecimal.ZERO, null, null, null, null, null, null, null, null, null, null, Character.valueOf('C'), Character.valueOf('N')
+                BigDecimal.ZERO, null, null, null, null, null, null, null, null, null, null, Character.valueOf('C'), Character.valueOf('N'), null
         };
         List<Object[]> results = new ArrayList<>();
         results.add(obj);
@@ -105,7 +104,7 @@ public class TraxCommonServiceTest {
     public void testGetGraduatedStudentMasterDataFromTrax() {
         Object[] obj = new Object[] {
                 "123456789", "1234567", "1234567", "12", Character.valueOf('A'),Character.valueOf('A'), "2018", "202201",
-                BigDecimal.ZERO, BigDecimal.ZERO, null, null, null, null, null, "S", null, "E", null, Character.valueOf('C'), Character.valueOf('N')
+                BigDecimal.ZERO, BigDecimal.ZERO, null, null, null, null, null, "S", null, "E", null, Character.valueOf('C'), Character.valueOf('N'), null
         };
         List<Object[]> results = new ArrayList<>();
         results.add(obj);
@@ -192,6 +191,194 @@ public class TraxCommonServiceTest {
         assertThat(responseObject.isGraduated()).isTrue();
         assertThat(responseObject.getTranscriptStudentDemog()).isNotNull();
         assertThat(responseObject.getTranscriptStudentCourses()).hasSize(4);
+    }
+
+    @Test
+    public void testGetGraduatedStudentMasterDataFromTraxFor1950AdultProgram_whenAllowedAdult_isYes_thenReturns_adult19RuleAsFalse() {
+        Object[] obj = new Object[] {
+                "123456789", "1234567", "1234567", "AD", Character.valueOf('A'),Character.valueOf('A'), "1950", "202201",
+                BigDecimal.ZERO, BigDecimal.ZERO, null, null, null, null, null, "S", null, "E", null, Character.valueOf('C'), Character.valueOf('N'), Character.valueOf('Y')
+        };
+        List<Object[]> results = new ArrayList<>();
+        results.add(obj);
+
+        final String pen = (String) obj[0];
+        final String mincode = (String) obj[1];
+        Character status = (Character)obj[4];
+
+        // TSW Demographics
+        TranscriptStudentDemog transcriptStudentDemog = new TranscriptStudentDemog();
+        transcriptStudentDemog.setStudNo(pen);
+        transcriptStudentDemog.setFirstName("Test");
+        transcriptStudentDemog.setLastName("QA");
+        transcriptStudentDemog.setMincode(mincode);
+        transcriptStudentDemog.setSchoolName("Test School");
+        transcriptStudentDemog.setGradDate(202201L);
+
+        // TSW Courses
+        TranscriptStudentCourse tswCourse1 = new TranscriptStudentCourse();
+        tswCourse1.setStudNo(pen);
+        tswCourse1.setReportType("1");
+        tswCourse1.setCourseCode("Generic");
+        tswCourse1.setCourseName("Generic Course Name");
+        tswCourse1.setCourseLevel("12");
+        tswCourse1.setFinalPercentage("91.00");
+        tswCourse1.setFinalLG("A");
+        tswCourse1.setCourseSession("202206");
+        tswCourse1.setNumberOfCredits("4");
+        tswCourse1.setUsedForGrad("4");
+        tswCourse1.setFoundationReq("10");
+        tswCourse1.setUpdateDate(20220601L);
+
+        TranscriptStudentCourse tswCourse2 = new TranscriptStudentCourse();
+        tswCourse2.setStudNo(pen);
+        tswCourse2.setReportType("2");
+        tswCourse2.setCourseCode("TestCourse");
+        tswCourse2.setCourseName("Test Course Name");
+        tswCourse2.setCourseLevel("12");
+        tswCourse2.setFinalPercentage("92.00");
+        tswCourse2.setFinalLG("A");
+        tswCourse2.setCourseSession("202206");
+        tswCourse2.setNumberOfCredits("4");
+        tswCourse2.setUsedForGrad("4");
+        tswCourse2.setFoundationReq("11");
+        tswCourse2.setSpecialCase("E");
+        tswCourse2.setUpdateDate(20220601L);
+
+        TranscriptStudentCourse tswCourse3 = new TranscriptStudentCourse();
+        tswCourse2.setStudNo(pen);
+        tswCourse2.setReportType("2");
+        tswCourse2.setCourseCode("TestCourse2");
+        tswCourse2.setCourseName("Test Course2 Name");
+        tswCourse2.setCourseLevel("12");
+        tswCourse2.setFinalPercentage("XMT");
+        tswCourse2.setFinalLG("A");
+        tswCourse2.setCourseSession("202206");
+        tswCourse2.setNumberOfCredits("4");
+        tswCourse2.setUsedForGrad("4");
+        tswCourse2.setFoundationReq("11");
+        tswCourse2.setUpdateDate(20220601L);
+
+        TranscriptStudentCourse tswAssessment = new TranscriptStudentCourse();
+        tswAssessment.setStudNo(pen);
+        tswAssessment.setReportType("3");
+        tswAssessment.setCourseCode("TestAssmt");
+        tswAssessment.setCourseName("Test Assessment Name");
+        tswAssessment.setCourseLevel("12");
+        tswAssessment.setFinalPercentage("XMT");
+        tswAssessment.setCourseSession("202206");
+        tswAssessment.setFoundationReq("15");
+        tswAssessment.setUpdateDate(new Date(System.currentTimeMillis() - 100000L).getTime());
+
+        when(this.traxStudentRepository.loadTraxGraduatedStudent(pen)).thenReturn(results);
+        when(this.traxStudentRepository.countGradDateByPen(pen)).thenReturn(Integer.valueOf(1));
+        when(this.tswService.getTranscriptStudentDemog(pen)).thenReturn(transcriptStudentDemog);
+        when(this.tswService.getTranscriptStudentCourses(pen)).thenReturn(Arrays.asList(tswCourse1, tswCourse2, tswCourse3, tswAssessment));
+
+        var result = traxCommonService.getStudentMasterDataFromTrax(pen);
+
+        assertThat(result).hasSize(1);
+        ConvGradStudent responseObject = result.get(0);
+        assertThat(responseObject.getPen()).isEqualTo(pen);
+        assertThat(responseObject.getStudentStatus()).isEqualTo(status.toString());
+        assertThat(responseObject.isGraduated()).isTrue();
+        assertThat(responseObject.getTranscriptStudentDemog()).isNotNull();
+        assertThat(responseObject.getTranscriptStudentCourses()).hasSize(4);
+        assertThat(responseObject.isAdult19Rule()).isFalse();
+    }
+
+    @Test
+    public void testGetGraduatedStudentMasterDataFromTraxFor1950AdultProgram_whenAllowedAdult_isNull_andGradDate_isBefore201207_thenReturns_adult19RuleAsTrue() {
+        Object[] obj = new Object[] {
+                "123456789", "1234567", "1234567", "AD", Character.valueOf('A'),Character.valueOf('A'), "1950", "201206",
+                BigDecimal.ZERO, BigDecimal.ZERO, null, null, null, null, null, "S", null, "E", null, Character.valueOf('C'), Character.valueOf('N'), null
+        };
+        List<Object[]> results = new ArrayList<>();
+        results.add(obj);
+
+        final String pen = (String) obj[0];
+        final String mincode = (String) obj[1];
+        Character status = (Character)obj[4];
+
+        // TSW Demographics
+        TranscriptStudentDemog transcriptStudentDemog = new TranscriptStudentDemog();
+        transcriptStudentDemog.setStudNo(pen);
+        transcriptStudentDemog.setFirstName("Test");
+        transcriptStudentDemog.setLastName("QA");
+        transcriptStudentDemog.setMincode(mincode);
+        transcriptStudentDemog.setSchoolName("Test School");
+        transcriptStudentDemog.setGradDate(202201L);
+
+        // TSW Courses
+        TranscriptStudentCourse tswCourse1 = new TranscriptStudentCourse();
+        tswCourse1.setStudNo(pen);
+        tswCourse1.setReportType("1");
+        tswCourse1.setCourseCode("Generic");
+        tswCourse1.setCourseName("Generic Course Name");
+        tswCourse1.setCourseLevel("12");
+        tswCourse1.setFinalPercentage("91.00");
+        tswCourse1.setFinalLG("A");
+        tswCourse1.setCourseSession("202206");
+        tswCourse1.setNumberOfCredits("4");
+        tswCourse1.setUsedForGrad("4");
+        tswCourse1.setFoundationReq("10");
+        tswCourse1.setUpdateDate(20220601L);
+
+        TranscriptStudentCourse tswCourse2 = new TranscriptStudentCourse();
+        tswCourse2.setStudNo(pen);
+        tswCourse2.setReportType("2");
+        tswCourse2.setCourseCode("TestCourse");
+        tswCourse2.setCourseName("Test Course Name");
+        tswCourse2.setCourseLevel("12");
+        tswCourse2.setFinalPercentage("92.00");
+        tswCourse2.setFinalLG("A");
+        tswCourse2.setCourseSession("202206");
+        tswCourse2.setNumberOfCredits("4");
+        tswCourse2.setUsedForGrad("4");
+        tswCourse2.setFoundationReq("11");
+        tswCourse2.setSpecialCase("E");
+        tswCourse2.setUpdateDate(20220601L);
+
+        TranscriptStudentCourse tswCourse3 = new TranscriptStudentCourse();
+        tswCourse2.setStudNo(pen);
+        tswCourse2.setReportType("2");
+        tswCourse2.setCourseCode("TestCourse2");
+        tswCourse2.setCourseName("Test Course2 Name");
+        tswCourse2.setCourseLevel("12");
+        tswCourse2.setFinalPercentage("XMT");
+        tswCourse2.setFinalLG("A");
+        tswCourse2.setCourseSession("202206");
+        tswCourse2.setNumberOfCredits("4");
+        tswCourse2.setUsedForGrad("4");
+        tswCourse2.setFoundationReq("11");
+        tswCourse2.setUpdateDate(20220601L);
+
+        TranscriptStudentCourse tswAssessment = new TranscriptStudentCourse();
+        tswAssessment.setStudNo(pen);
+        tswAssessment.setReportType("3");
+        tswAssessment.setCourseCode("TestAssmt");
+        tswAssessment.setCourseName("Test Assessment Name");
+        tswAssessment.setCourseLevel("12");
+        tswAssessment.setFinalPercentage("XMT");
+        tswAssessment.setCourseSession("202206");
+        tswAssessment.setFoundationReq("15");
+        tswAssessment.setUpdateDate(new Date(System.currentTimeMillis() - 100000L).getTime());
+
+        when(this.traxStudentRepository.loadTraxGraduatedStudent(pen)).thenReturn(results);
+        when(this.traxStudentRepository.countGradDateByPen(pen)).thenReturn(Integer.valueOf(1));
+        when(this.tswService.getTranscriptStudentDemog(pen)).thenReturn(transcriptStudentDemog);
+        when(this.tswService.getTranscriptStudentCourses(pen)).thenReturn(Arrays.asList(tswCourse1, tswCourse2, tswCourse3, tswAssessment));
+
+        var result = traxCommonService.getStudentMasterDataFromTrax(pen);
+
+        assertThat(result).hasSize(1);
+        ConvGradStudent responseObject = result.get(0);
+        assertThat(responseObject.getPen()).isEqualTo(pen);
+        assertThat(responseObject.getStudentStatus()).isEqualTo(status.toString());
+        assertThat(responseObject.isGraduated()).isTrue();
+        assertThat(responseObject.getTranscriptStudentDemog()).isNotNull();
+        assertThat(responseObject.getTranscriptStudentCourses()).hasSize(4);
+        assertThat(responseObject.isAdult19Rule()).isTrue();
     }
 
     @Test
