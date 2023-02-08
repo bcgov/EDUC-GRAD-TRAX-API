@@ -128,7 +128,7 @@ public class GradStudentUndoCompletionServiceTest {
     }
 
     private void testProcessEvent(String program, String studentStatus) throws JsonProcessingException {
-        final var request = TestUtils.createGraduationStatus(true);
+        final var request = TestUtils.createGraduationStatus(false);
         request.setProgram(program);
         request.setStudentStatus(studentStatus);
         final var event = TestUtils.createEvent(EventType.GRAD_STUDENT_UNDO_COMPLETION.name(), request, eventRepository);

@@ -26,7 +26,7 @@ public class TestUtils {
         graduationStatus.setStudentGrade("12");
         if (isGraduated) {
             graduationStatus.setSchoolAtGrad("111222333");
-            graduationStatus.setProgramCompletionDate("2022/06");
+            graduationStatus.setProgramCompletionDate("2022-06-30");
         }
         return graduationStatus;
     }
@@ -62,7 +62,7 @@ public class TestUtils {
             entity.setStudGradeAtGrad("12");
             entity.setGradDate(Long.valueOf("202206"));
             if (StringUtils.equals(entity.getGradReqtYear(), "SCCP")) {
-                entity.setSlpDate(Long.valueOf("202206"));
+                entity.setSlpDate(Long.valueOf("20220601"));
             }
         }
         return entity;
@@ -92,7 +92,7 @@ public class TestUtils {
                 traxStudent.setMincodeGrad("111222333");
                 traxStudent.setStudGradeAtGrad("12");
                 traxStudent.setGradDate(Long.valueOf("202206"));
-                traxStudent.setSlpDate(Long.valueOf("202206"));
+                traxStudent.setSlpDate(Long.valueOf("20220601"));
             } else {
                 traxStudent.setGradReqtYearAtGrad(reqtYear);
             }
