@@ -207,9 +207,9 @@ public class TraxCommonService {
         return students;
     }
 
-    private void handleAdult19Rule(ConvGradStudent student, boolean isGraudated) {
+    private void handleAdult19Rule(ConvGradStudent student, boolean isGraduated) {
         if ("1950".equalsIgnoreCase(student.getGraduationRequirementYear()) && "AD".equalsIgnoreCase(student.getStudentGrade())) {
-            if (isGraudated) {
+            if (isGraduated) {
                 if (student.isAllowedAdult() || EducGradTraxApiConstants.ADULT_18_RULE_VALID_DATE.compareTo(student.getProgramCompletionDate()) <= 0) {
                     student.setAdult19Rule(false);
                 } else {
