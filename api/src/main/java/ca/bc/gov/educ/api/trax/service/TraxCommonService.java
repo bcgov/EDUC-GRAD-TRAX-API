@@ -13,6 +13,7 @@ import ca.bc.gov.educ.api.trax.util.EducGradTraxApiUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -197,6 +198,15 @@ public class TraxCommonService {
                 List<TranscriptStudentCourse> transcriptStudentCourses = tswService.getTranscriptStudentCourses(student.getPen());
                 student.setTranscriptStudentCourses(transcriptStudentCourses);
                 student.setDistributionDate(traxStudentRepository.getTheLatestDistributionDate(student.getPen()));
+                // 1950 / AD
+                if (student.getProgramCompletionDate() != null &&
+                    "1950".equalsIgnoreCase(student.getGraduationRequirementYear()) && "AD".equalsIgnoreCase(student.getStudentGrade())) {
+                    if (student.isAllowedAdult() || EducGradTraxApiConstants.ADULT_18_RULE_VALID_DATE.compareTo(student.getProgramCompletionDate()) <= 0) {
+                        student.setAdult19Rule(false);
+                    } else {
+                        student.setAdult19Rule(true);
+                    }
+                }
             } else {
                 // 1950 / AD
                 if ("1950".equalsIgnoreCase(student.getGraduationRequirementYear()) && "AD".equalsIgnoreCase(student.getStudentGrade())) {
@@ -286,6 +296,9 @@ public class TraxCommonService {
         // french dogwood
         Character frenchDogwood = (Character) fields[20];
 
+        // allowed adult
+        Character allowedAdult = (Character) fields[21];
+
         ConvGradStudent student = null;
         try {
             student = ConvGradStudent.builder()
@@ -307,6 +320,7 @@ public class TraxCommonService {
                     .consumerEducationRequirementMet(StringUtils.equalsIgnoreCase(consumerEducationRequirementMet, "Y")? "Y" : null)
                     .studentCitizenship(citizenship != null? citizenship.toString() : null)
                     .frenchDogwood(frenchDogwood != null? frenchDogwood.toString() : null)
+                    .allowedAdult(allowedAdult != null? StringUtils.equalsIgnoreCase(allowedAdult.toString(), "Y") : false)
                     .result(ConversionResultType.SUCCESS)
                     .build();
         } catch (Exception ex) {
