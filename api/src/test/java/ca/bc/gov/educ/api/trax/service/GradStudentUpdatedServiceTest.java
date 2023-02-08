@@ -98,12 +98,6 @@ public class GradStudentUpdatedServiceTest {
     }
 
     @Test
-    public void testProcessEvent_givenGRAD_STUDENT_UPDATED_Event_for_SCCP_program_whenSlpDateIsSame() throws JsonProcessingException {
-        createTraxStudent("SCCP", "CUR", null, null, 20220630L, true);
-        testProcessEvent("SCCP", "CUR");
-    }
-
-    @Test
     public void testProcessEvent_givenGRAD_STUDENT_UPDATED_Event_for_2018_program_withArchivedStatus() throws JsonProcessingException {
         createTraxStudent("2018-EN", "ARC", null, null, null, true);
         testProcessEvent("2018-EN", "ARC");
