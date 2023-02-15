@@ -128,7 +128,7 @@ public class GradStudentGraduatedServiceTest {
     }
 
     private void testProcessEvent(String program, String studentStatus) throws JsonProcessingException {
-        final var request = TestUtils.createGraduationStatus(false);
+        final var request = TestUtils.createGraduationStatus(true);
         request.setProgram(program);
         request.setStudentStatus(studentStatus);
         final var event = TestUtils.createEvent(EventType.GRAD_STUDENT_GRADUATED.name(), request, eventRepository);
