@@ -3,7 +3,7 @@ package ca.bc.gov.educ.api.trax.model.entity;
 import lombok.Data;
 import org.hibernate.annotations.Immutable;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Data
 @Immutable
