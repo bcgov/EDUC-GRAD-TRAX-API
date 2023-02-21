@@ -58,7 +58,7 @@ public class SchoolService {
      *
      * @return List of Schools
      */
-    @Transactional
+    @Transactional(readOnly = true)
     public List<School> getSchoolList() {
         List<School> schoolList  = schoolTransformer.transformToDTO(schoolRepository.findAll());  
     	schoolList.forEach(sL -> {
@@ -82,7 +82,7 @@ public class SchoolService {
         return schoolList;
     }
 
-	@Transactional
+	@Transactional(readOnly = true)
 	public School getSchoolDetails(String minCode, String accessToken) {
 		Optional<SchoolEntity> entOptional = schoolRepository.findById(minCode);
 		if(entOptional.isPresent()) {
@@ -98,7 +98,7 @@ public class SchoolService {
 		return null;
 	}
 
-	@Transactional
+	@Transactional(readOnly = true)
 	public List<School> getSchoolsByParams(String schoolName, String minCode, String district, String accessToken) {
 		String sName = !StringUtils.isBlank(schoolName) ? StringUtils.strip(schoolName,"*"):null;
 		String sCode = !StringUtils.isBlank(minCode) ? StringUtils.strip(minCode,"*"):null;
@@ -133,7 +133,7 @@ public class SchoolService {
 		Arrays.sort(result.toArray());
 	}
 
-	@Transactional
+	@Transactional(readOnly = true)
 	public boolean existsSchool(String minCode) {
 		return schoolRepository.countTabSchools(minCode) > 0L;
 	}

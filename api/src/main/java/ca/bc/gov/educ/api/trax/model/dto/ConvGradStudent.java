@@ -44,6 +44,10 @@ public class ConvGradStudent {
     // grad or non-grad
     private boolean graduated;
     private Date distributionDate;
+    private String transcriptSchoolCategoryCode;
+    private String certificateSchoolCategoryCode;
+    private School transcriptSchool;
+    private School certificateSchool;
     // tsw
     private TranscriptStudentDemog transcriptStudentDemog;
     private List<TranscriptStudentCourse> transcriptStudentCourses;

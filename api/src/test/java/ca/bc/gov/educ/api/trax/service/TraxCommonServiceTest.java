@@ -91,7 +91,7 @@ public class TraxCommonServiceTest {
         when(this.traxStudentRepository.loadTraxStudent(pen)).thenReturn(results);
         when(this.traxStudentRepository.countAdult19RuleByPen(pen)).thenReturn(1);
 
-        var result = traxCommonService.getStudentMasterDataFromTrax(pen);
+        var result = traxCommonService.getStudentMasterDataFromTrax(pen, "123");
 
         assertThat(result).isNotNull();
         assertThat(result).hasSize(1);
@@ -182,7 +182,7 @@ public class TraxCommonServiceTest {
         when(this.tswService.getTranscriptStudentDemog(pen)).thenReturn(transcriptStudentDemog);
         when(this.tswService.getTranscriptStudentCourses(pen)).thenReturn(Arrays.asList(tswCourse1, tswCourse2, tswCourse3, tswAssessment));
 
-        var result = traxCommonService.getStudentMasterDataFromTrax(pen);
+        var result = traxCommonService.getStudentMasterDataFromTrax(pen, "123");
 
         assertThat(result).hasSize(1);
         ConvGradStudent responseObject = result.get(0);
@@ -275,7 +275,7 @@ public class TraxCommonServiceTest {
         when(this.tswService.getTranscriptStudentDemog(pen)).thenReturn(transcriptStudentDemog);
         when(this.tswService.getTranscriptStudentCourses(pen)).thenReturn(Arrays.asList(tswCourse1, tswCourse2, tswCourse3, tswAssessment));
 
-        var result = traxCommonService.getStudentMasterDataFromTrax(pen);
+        var result = traxCommonService.getStudentMasterDataFromTrax(pen, "123");
 
         assertThat(result).hasSize(1);
         ConvGradStudent responseObject = result.get(0);
@@ -369,7 +369,7 @@ public class TraxCommonServiceTest {
         when(this.tswService.getTranscriptStudentDemog(pen)).thenReturn(transcriptStudentDemog);
         when(this.tswService.getTranscriptStudentCourses(pen)).thenReturn(Arrays.asList(tswCourse1, tswCourse2, tswCourse3, tswAssessment));
 
-        var result = traxCommonService.getStudentMasterDataFromTrax(pen);
+        var result = traxCommonService.getStudentMasterDataFromTrax(pen, "123");
 
         assertThat(result).hasSize(1);
         ConvGradStudent responseObject = result.get(0);
