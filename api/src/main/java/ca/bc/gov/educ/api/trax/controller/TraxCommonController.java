@@ -27,6 +27,7 @@ import java.util.List;
 @OpenAPIDefinition(info = @Info(title = "API for TRAX Data.", description = "This API is for TRAX.", version = "1"))
 public class TraxCommonController {
     private static Logger logger = LoggerFactory.getLogger(TraxCommonController.class);
+    private static final String BEARER = "Bearer ";
 
     @Autowired
     TraxCommonService traxCommonService;
@@ -77,7 +78,7 @@ public class TraxCommonController {
             validation.stopOnErrors();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        return response.GET(traxCommonService.getStudentMasterDataFromTrax(pen, accessToken));
+        return response.GET(traxCommonService.getStudentMasterDataFromTrax(pen, accessToken.replace(BEARER, "")));
     }
 
     @GetMapping(EducGradTraxApiConstants.GET_TRAX_STUDENT_NO_LIST_BY_PAGING_MAPPING)
