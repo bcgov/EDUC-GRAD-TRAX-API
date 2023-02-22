@@ -295,8 +295,8 @@ public class TraxCommonService {
                 gradDateStr = gradDateStr.trim();
             }
         } else {
-            BigDecimal gradDate = (BigDecimal) fields[7]; // from student_master in trax
-            if (gradDate != null && !gradDate.equals(BigDecimal.ZERO)) {
+            Integer gradDate = (Integer) fields[7]; // from student_master in trax
+            if (gradDate != null && !gradDate.equals(Integer.valueOf(0))) {
                 gradDateStr = gradDate.toString();
             }
         }
@@ -310,12 +310,12 @@ public class TraxCommonService {
         }
 
         // slp date
-        BigDecimal slpDate = (BigDecimal) fields[8];
-        String slpDateStr = slpDate != null && !slpDate.equals(BigDecimal.ZERO) ? slpDate.toString() : null;
+        Integer slpDate = (Integer) fields[8];
+        String slpDateStr = slpDate != null && !slpDate.equals(Integer.valueOf(0)) ? slpDate.toString() : null;
 
         // scc date
-        BigDecimal sccDate = (BigDecimal) fields[9];
-        String sccDateStr = sccDate != null && !sccDate.equals(BigDecimal.ZERO) ? sccDate.toString() : null;
+        Integer sccDate = (Integer) fields[9];
+        String sccDateStr = sccDate != null && !sccDate.equals(Integer.valueOf(0)) ? sccDate.toString() : null;
 
         List<String> programCodes = new ArrayList<>();
         // student optional/career programs
@@ -329,7 +329,7 @@ public class TraxCommonService {
         String frenchCert = (String) fields[15];
 
         // consumer education requirement met
-        String consumerEducationRequirementMet = (String) fields[16];
+        Character consumerEducationRequirementMet = (Character) fields[16];
 
         // english cert
         String englishCert = (String) fields[17];
@@ -364,7 +364,7 @@ public class TraxCommonService {
                     .programCodes(programCodes)
                     .programCompletionDate(programCompletionDate)
                     .graduated(isGraduated)
-                    .consumerEducationRequirementMet(StringUtils.equalsIgnoreCase(consumerEducationRequirementMet, "Y")? "Y" : null)
+                    .consumerEducationRequirementMet(consumerEducationRequirementMet != null? (StringUtils.equalsIgnoreCase(consumerEducationRequirementMet.toString(), "Y")? "Y" : null) : null)
                     .studentCitizenship(citizenship != null? citizenship.toString() : null)
                     .frenchDogwood(frenchDogwood != null? frenchDogwood.toString() : null)
                     .allowedAdult(allowedAdult != null? StringUtils.equalsIgnoreCase(allowedAdult.toString(), "Y") : false)

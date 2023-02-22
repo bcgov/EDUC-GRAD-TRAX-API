@@ -82,8 +82,8 @@ public class TraxCommonServiceTest {
     @Test
     public void testGetStudentMasterDataFromTrax() {
         Object[] obj = new Object[] {
-                "123456789", "12345678", "12345678", "AD", Character.valueOf('A'),Character.valueOf('A'), "1950", BigDecimal.ZERO,
-                BigDecimal.ZERO, null, null, null, null, null, null, null, null, null, null, Character.valueOf('C'), Character.valueOf('N'), null
+                "123456789", "12345678", "12345678", "AD", Character.valueOf('A'),Character.valueOf('A'), "1950", Integer.valueOf(0),
+                Integer.valueOf(0), null, null, null, null, null, null, null, null, null, null, Character.valueOf('C'), Character.valueOf('N'), null
         };
         List<Object[]> results = new ArrayList<>();
         results.add(obj);
@@ -107,7 +107,7 @@ public class TraxCommonServiceTest {
     public void testGetGraduatedStudentMasterDataFromTrax() {
         Object[] obj = new Object[] {
                 "123456789", "1234567", "1234567", "12", Character.valueOf('A'),Character.valueOf('A'), "2018", "202201",
-                BigDecimal.ZERO, BigDecimal.ZERO, null, null, null, null, null, "S", null, "E", null, Character.valueOf('C'), Character.valueOf('N'), null
+                Integer.valueOf(0), Integer.valueOf(0), null, null, null, null, null, "S", null, "E", null, Character.valueOf('C'), Character.valueOf('N'), null
         };
         List<Object[]> results = new ArrayList<>();
         results.add(obj);
@@ -211,7 +211,7 @@ public class TraxCommonServiceTest {
     public void testGetGraduatedStudentMasterDataFromTraxFor1950AdultProgram_whenAllowedAdult_isYes_thenReturns_adult19RuleAsFalse() {
         Object[] obj = new Object[] {
                 "123456789", "1234567", "1234568", "AD", Character.valueOf('A'),Character.valueOf('A'), "1950", "202201",
-                BigDecimal.ZERO, BigDecimal.ZERO, null, null, null, null, null, "S", null, "E", null, Character.valueOf('C'), Character.valueOf('N'), Character.valueOf('Y')
+                Integer.valueOf(0), Integer.valueOf(0), null, null, null, null, null, "S", null, "E", null, Character.valueOf('C'), Character.valueOf('N'), Character.valueOf('Y')
         };
         List<Object[]> results = new ArrayList<>();
         results.add(obj);
@@ -330,7 +330,7 @@ public class TraxCommonServiceTest {
     public void testGetGraduatedStudentMasterDataFromTraxFor1950AdultProgram_whenAllowedAdult_isNull_andGradDate_isBefore201207_thenReturns_adult19RuleAsTrue() {
         Object[] obj = new Object[] {
                 "123456789", "1234567", "1234568", "AD", Character.valueOf('A'),Character.valueOf('A'), "1950", "201206",
-                BigDecimal.ZERO, BigDecimal.ZERO, null, null, null, null, null, "S", null, "E", null, Character.valueOf('C'), Character.valueOf('N'), null
+                Integer.valueOf(0), Integer.valueOf(0), null, null, null, null, null, "S", null, "E", null, Character.valueOf('C'), Character.valueOf('N'), null
         };
         List<Object[]> results = new ArrayList<>();
         results.add(obj);
