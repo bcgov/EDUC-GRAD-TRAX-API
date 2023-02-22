@@ -13,7 +13,6 @@ import ca.bc.gov.educ.api.trax.util.EducGradTraxApiUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -37,6 +36,7 @@ public class TraxCommonService {
     private final GradCourseTransformer gradCourseTransformer;
 
     private final TswService tswService;
+    private final SchoolService schoolService;
 
     private EducGradTraxApiConstants constants;
 
@@ -47,6 +47,7 @@ public class TraxCommonService {
                              TraxStudentNoTransformer traxStudentNoTransformer,
                              GradCourseTransformer gradCourseTransformer,
                              TswService tswService,
+                             SchoolService schoolService,
                              EducGradTraxApiConstants constants) {
         this.traxStudentRepository = traxStudentRepository;
         this.traxStudentNoRepository = traxStudentNoRepository;
@@ -54,6 +55,7 @@ public class TraxCommonService {
         this.traxStudentNoTransformer = traxStudentNoTransformer;
         this.gradCourseTransformer = gradCourseTransformer;
         this.tswService = tswService;
+        this.schoolService = schoolService;
 
         this.constants = constants;
     }
@@ -72,7 +74,7 @@ public class TraxCommonService {
 
     // Student Master from TRAX
     @Transactional(readOnly = true)
-    public List<ConvGradStudent> getStudentMasterDataFromTrax(String pen) {
+    public List<ConvGradStudent> getStudentMasterDataFromTrax(String pen, String accessToken) {
         boolean isGraduated = !constants.isEnableStudentMasterOnly() && isGraduatedStudent(pen);
         List<Object[]> results;
         if (isGraduated) {
@@ -81,7 +83,7 @@ public class TraxCommonService {
             results = traxStudentRepository.loadTraxStudent(pen);
         }
 
-        return buildConversionGradStudents(results, isGraduated);
+        return buildConversionGradStudents(results, isGraduated, accessToken);
     }
 
     @Transactional(readOnly = true)
@@ -188,7 +190,7 @@ public class TraxCommonService {
         return traxStudentNo;
     }
 
-    private List<ConvGradStudent> buildConversionGradStudents(List<Object[]> traxStudents, boolean isGraduated) {
+    private List<ConvGradStudent> buildConversionGradStudents(List<Object[]> traxStudents, boolean isGraduated, String accessToken) {
         List<ConvGradStudent> students = new ArrayList<>();
         traxStudents.forEach(result -> {
             ConvGradStudent student = populateConvGradStudent(result, isGraduated);
@@ -200,11 +202,55 @@ public class TraxCommonService {
                 student.setTranscriptStudentCourses(transcriptStudentCourses);
                 student.setDistributionDate(traxStudentRepository.getTheLatestDistributionDate(student.getPen()));
             }
+            getSchoolsData(student, isGraduated, accessToken);
             if (student != null) {
                 students.add(student);
             }
         });
         return students;
+    }
+
+    private void getSchoolsData(ConvGradStudent student, boolean isGraduated, String accessToken) {
+        if (StringUtils.isBlank(accessToken)) {
+            return;
+        }
+        School schoolOfRecord = schoolService.getSchoolDetails(student.getSchoolOfRecord(), accessToken);
+        if (schoolOfRecord != null) {
+            student.setTranscriptSchool(schoolOfRecord);
+        } else {
+            return;
+        }
+        if (isGraduated) {
+            getSchoolsDataForGraduated(student, accessToken);
+        }
+    }
+
+    private void getSchoolsDataForGraduated(ConvGradStudent student, String accessToken) {
+        CommonSchool commonSchoolOfRecord = schoolService.getCommonSchool(accessToken, student.getSchoolOfRecord());
+        if (commonSchoolOfRecord != null) {
+            student.setTranscriptSchoolCategoryCode(commonSchoolOfRecord.getSchoolCategoryCode());
+        } else {
+            return;
+        }
+
+        boolean isGradSchoolDifferent = student.getSchoolAtGrad() != null && !StringUtils.equals(student.getSchoolAtGrad(), student.getSchoolOfRecord());
+        if (isGradSchoolDifferent) {
+            School schoolAtGrad = schoolService.getSchoolDetails(student.getSchoolAtGrad(), accessToken);
+            if (schoolAtGrad != null) {
+                student.setCertificateSchool(schoolAtGrad);
+            } else {
+                student.setCertificateSchool(student.getTranscriptSchool());
+            }
+            CommonSchool commonSchoolAtGrad = schoolService.getCommonSchool(accessToken, student.getSchoolAtGrad());
+            if (commonSchoolAtGrad != null) {
+                student.setCertificateSchoolCategoryCode(commonSchoolAtGrad.getSchoolCategoryCode());
+            } else {
+                student.setCertificateSchoolCategoryCode(student.getTranscriptSchoolCategoryCode());
+            }
+        } else {
+            student.setCertificateSchool(student.getTranscriptSchool());
+            student.setCertificateSchoolCategoryCode(student.getTranscriptSchoolCategoryCode());
+        }
     }
 
     private void handleAdult19Rule(ConvGradStudent student, boolean isGraduated) {
@@ -249,8 +295,8 @@ public class TraxCommonService {
                 gradDateStr = gradDateStr.trim();
             }
         } else {
-            BigDecimal gradDate = (BigDecimal) fields[7]; // from student_master in trax
-            if (gradDate != null && !gradDate.equals(BigDecimal.ZERO)) {
+            Integer gradDate = (Integer) fields[7]; // from student_master in trax
+            if (gradDate != null && !gradDate.equals(Integer.valueOf(0))) {
                 gradDateStr = gradDate.toString();
             }
         }
@@ -264,12 +310,12 @@ public class TraxCommonService {
         }
 
         // slp date
-        BigDecimal slpDate = (BigDecimal) fields[8];
-        String slpDateStr = slpDate != null && !slpDate.equals(BigDecimal.ZERO) ? slpDate.toString() : null;
+        Integer slpDate = (Integer) fields[8];
+        String slpDateStr = slpDate != null && !slpDate.equals(Integer.valueOf(0)) ? slpDate.toString() : null;
 
         // scc date
-        BigDecimal sccDate = (BigDecimal) fields[9];
-        String sccDateStr = sccDate != null && !sccDate.equals(BigDecimal.ZERO) ? sccDate.toString() : null;
+        Integer sccDate = (Integer) fields[9];
+        String sccDateStr = sccDate != null && !sccDate.equals(Integer.valueOf(0)) ? sccDate.toString() : null;
 
         List<String> programCodes = new ArrayList<>();
         // student optional/career programs
@@ -283,7 +329,7 @@ public class TraxCommonService {
         String frenchCert = (String) fields[15];
 
         // consumer education requirement met
-        String consumerEducationRequirementMet = (String) fields[16];
+        Character consumerEducationRequirementMet = (Character) fields[16];
 
         // english cert
         String englishCert = (String) fields[17];
@@ -318,7 +364,7 @@ public class TraxCommonService {
                     .programCodes(programCodes)
                     .programCompletionDate(programCompletionDate)
                     .graduated(isGraduated)
-                    .consumerEducationRequirementMet(StringUtils.equalsIgnoreCase(consumerEducationRequirementMet, "Y")? "Y" : null)
+                    .consumerEducationRequirementMet(consumerEducationRequirementMet != null? (StringUtils.equalsIgnoreCase(consumerEducationRequirementMet.toString(), "Y")? "Y" : null) : null)
                     .studentCitizenship(citizenship != null? citizenship.toString() : null)
                     .frenchDogwood(frenchDogwood != null? frenchDogwood.toString() : null)
                     .allowedAdult(allowedAdult != null? StringUtils.equalsIgnoreCase(allowedAdult.toString(), "Y") : false)

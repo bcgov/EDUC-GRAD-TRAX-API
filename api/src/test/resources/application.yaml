@@ -6,8 +6,11 @@ spring:
     hikari:
       pool-name: gradtraxapi-api-cp
       maximum-pool-size: 2
-      connection-timeout: 6000
-      max-lifetime: 600000
+      connection-timeout: 60000
+      max-lifetime: 580000
+      minimum-idle: 2
+      keepalive-time: 150000
+      idle-timeout: 400000
     driver-class: org.h2.Driver
     url: jdbc:h2:mem:test;INIT=CREATE SCHEMA IF NOT EXISTS shedlock;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
   jpa:

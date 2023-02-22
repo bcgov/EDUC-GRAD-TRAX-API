@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.trax.util;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpHeaders;
 
 import java.text.ParseException;
@@ -72,7 +73,7 @@ public class EducGradTraxApiUtils {
     }
 
     public static String parseTraxDate (String sessionDate) {
-        if (sessionDate == null)
+        if (sessionDate == null || StringUtils.isBlank(sessionDate))
             return null;
         return parseDateByFormat(sessionDate, EducGradTraxApiConstants.TRAX_TSW_DATE_FORMAT);
     }

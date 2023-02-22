@@ -56,6 +56,9 @@ public class TraxCommonServiceTest {
     @MockBean
     TswService tswService;
 
+    @MockBean
+    SchoolService schoolService;
+
     // NATS
     @MockBean
     private NatsConnection natsConnection;
@@ -79,8 +82,8 @@ public class TraxCommonServiceTest {
     @Test
     public void testGetStudentMasterDataFromTrax() {
         Object[] obj = new Object[] {
-                "123456789", "12345678", "12345678", "AD", Character.valueOf('A'),Character.valueOf('A'), "1950", BigDecimal.ZERO,
-                BigDecimal.ZERO, null, null, null, null, null, null, null, null, null, null, Character.valueOf('C'), Character.valueOf('N'), null
+                "123456789", "12345678", "12345678", "AD", Character.valueOf('A'),Character.valueOf('A'), "1950", Integer.valueOf(0),
+                Integer.valueOf(0), null, null, null, null, null, null, null, null, null, null, Character.valueOf('C'), Character.valueOf('N'), null
         };
         List<Object[]> results = new ArrayList<>();
         results.add(obj);
@@ -91,7 +94,7 @@ public class TraxCommonServiceTest {
         when(this.traxStudentRepository.loadTraxStudent(pen)).thenReturn(results);
         when(this.traxStudentRepository.countAdult19RuleByPen(pen)).thenReturn(1);
 
-        var result = traxCommonService.getStudentMasterDataFromTrax(pen);
+        var result = traxCommonService.getStudentMasterDataFromTrax(pen, "123");
 
         assertThat(result).isNotNull();
         assertThat(result).hasSize(1);
@@ -104,7 +107,7 @@ public class TraxCommonServiceTest {
     public void testGetGraduatedStudentMasterDataFromTrax() {
         Object[] obj = new Object[] {
                 "123456789", "1234567", "1234567", "12", Character.valueOf('A'),Character.valueOf('A'), "2018", "202201",
-                BigDecimal.ZERO, BigDecimal.ZERO, null, null, null, null, null, "S", null, "E", null, Character.valueOf('C'), Character.valueOf('N'), null
+                Integer.valueOf(0), Integer.valueOf(0), null, null, null, null, null, "S", null, "E", null, Character.valueOf('C'), Character.valueOf('N'), null
         };
         List<Object[]> results = new ArrayList<>();
         results.add(obj);
@@ -177,12 +180,23 @@ public class TraxCommonServiceTest {
         tswAssessment.setFoundationReq("15");
         tswAssessment.setUpdateDate(new Date(System.currentTimeMillis() - 100000L).getTime());
 
+        School school = new School();
+        school.setMinCode(mincode);
+        school.setSchoolCategory("02");
+
+        CommonSchool commonSchool = new CommonSchool();
+        commonSchool.setSchlNo(mincode);
+        commonSchool.setSchoolName("Test School");
+        commonSchool.setSchoolCategoryCode("02");
+
         when(this.traxStudentRepository.loadTraxGraduatedStudent(pen)).thenReturn(results);
         when(this.traxStudentRepository.countGradDateByPen(pen)).thenReturn(Integer.valueOf(1));
         when(this.tswService.getTranscriptStudentDemog(pen)).thenReturn(transcriptStudentDemog);
         when(this.tswService.getTranscriptStudentCourses(pen)).thenReturn(Arrays.asList(tswCourse1, tswCourse2, tswCourse3, tswAssessment));
+        when(this.schoolService.getSchoolDetails(mincode, "123")).thenReturn(school);
+        when(this.schoolService.getCommonSchool("123", mincode)).thenReturn(commonSchool);
 
-        var result = traxCommonService.getStudentMasterDataFromTrax(pen);
+        var result = traxCommonService.getStudentMasterDataFromTrax(pen, "123");
 
         assertThat(result).hasSize(1);
         ConvGradStudent responseObject = result.get(0);
@@ -196,14 +210,15 @@ public class TraxCommonServiceTest {
     @Test
     public void testGetGraduatedStudentMasterDataFromTraxFor1950AdultProgram_whenAllowedAdult_isYes_thenReturns_adult19RuleAsFalse() {
         Object[] obj = new Object[] {
-                "123456789", "1234567", "1234567", "AD", Character.valueOf('A'),Character.valueOf('A'), "1950", "202201",
-                BigDecimal.ZERO, BigDecimal.ZERO, null, null, null, null, null, "S", null, "E", null, Character.valueOf('C'), Character.valueOf('N'), Character.valueOf('Y')
+                "123456789", "1234567", "1234568", "AD", Character.valueOf('A'),Character.valueOf('A'), "1950", "202201",
+                Integer.valueOf(0), Integer.valueOf(0), null, null, null, null, null, "S", null, "E", null, Character.valueOf('C'), Character.valueOf('N'), Character.valueOf('Y')
         };
         List<Object[]> results = new ArrayList<>();
         results.add(obj);
 
         final String pen = (String) obj[0];
         final String mincode = (String) obj[1];
+        final String mincodeAtGrad = (String) obj[2];
         Character status = (Character)obj[4];
 
         // TSW Demographics
@@ -270,12 +285,36 @@ public class TraxCommonServiceTest {
         tswAssessment.setFoundationReq("15");
         tswAssessment.setUpdateDate(new Date(System.currentTimeMillis() - 100000L).getTime());
 
+        School school = new School();
+        school.setMinCode(mincode);
+        school.setSchoolCategory("02");
+
+        CommonSchool commonSchool = new CommonSchool();
+        commonSchool.setSchlNo(mincode);
+        commonSchool.setSchoolName("Test School");
+        commonSchool.setSchoolCategoryCode("02");
+
+        School schoolAtGrad = new School();
+        schoolAtGrad.setMinCode(mincodeAtGrad);
+        schoolAtGrad.setSchoolCategory("02");
+
+        CommonSchool commonSchoolAtGrad = new CommonSchool();
+        commonSchoolAtGrad.setSchlNo(mincodeAtGrad);
+        commonSchoolAtGrad.setSchoolName("Test GRAD School");
+        commonSchoolAtGrad.setSchoolCategoryCode("02");
+
+        when(this.schoolService.getSchoolDetails(mincode, "123")).thenReturn(school);
+        when(this.schoolService.getCommonSchool("123", mincode)).thenReturn(commonSchool);
+
+        when(this.schoolService.getSchoolDetails(mincodeAtGrad, "123")).thenReturn(schoolAtGrad);
+        when(this.schoolService.getCommonSchool("123", mincode)).thenReturn(commonSchoolAtGrad);
+
         when(this.traxStudentRepository.loadTraxGraduatedStudent(pen)).thenReturn(results);
         when(this.traxStudentRepository.countGradDateByPen(pen)).thenReturn(Integer.valueOf(1));
         when(this.tswService.getTranscriptStudentDemog(pen)).thenReturn(transcriptStudentDemog);
         when(this.tswService.getTranscriptStudentCourses(pen)).thenReturn(Arrays.asList(tswCourse1, tswCourse2, tswCourse3, tswAssessment));
 
-        var result = traxCommonService.getStudentMasterDataFromTrax(pen);
+        var result = traxCommonService.getStudentMasterDataFromTrax(pen, "123");
 
         assertThat(result).hasSize(1);
         ConvGradStudent responseObject = result.get(0);
@@ -290,14 +329,15 @@ public class TraxCommonServiceTest {
     @Test
     public void testGetGraduatedStudentMasterDataFromTraxFor1950AdultProgram_whenAllowedAdult_isNull_andGradDate_isBefore201207_thenReturns_adult19RuleAsTrue() {
         Object[] obj = new Object[] {
-                "123456789", "1234567", "1234567", "AD", Character.valueOf('A'),Character.valueOf('A'), "1950", "201206",
-                BigDecimal.ZERO, BigDecimal.ZERO, null, null, null, null, null, "S", null, "E", null, Character.valueOf('C'), Character.valueOf('N'), null
+                "123456789", "1234567", "1234568", "AD", Character.valueOf('A'),Character.valueOf('A'), "1950", "201206",
+                Integer.valueOf(0), Integer.valueOf(0), null, null, null, null, null, "S", null, "E", null, Character.valueOf('C'), Character.valueOf('N'), null
         };
         List<Object[]> results = new ArrayList<>();
         results.add(obj);
 
         final String pen = (String) obj[0];
         final String mincode = (String) obj[1];
+        final String mincodeAtGrad = (String) obj[2];
         Character status = (Character)obj[4];
 
         // TSW Demographics
@@ -364,12 +404,35 @@ public class TraxCommonServiceTest {
         tswAssessment.setFoundationReq("15");
         tswAssessment.setUpdateDate(new Date(System.currentTimeMillis() - 100000L).getTime());
 
+        School school = new School();
+        school.setMinCode(mincode);
+        school.setSchoolCategory("02");
+
+        CommonSchool commonSchool = new CommonSchool();
+        commonSchool.setSchlNo(mincode);
+        commonSchool.setSchoolName("Test School");
+        commonSchool.setSchoolCategoryCode("02");
+
+        School schoolAtGrad = new School();
+        schoolAtGrad.setMinCode(mincodeAtGrad);
+        schoolAtGrad.setSchoolCategory("02");
+
+        CommonSchool commonSchoolAtGrad = new CommonSchool();
+        commonSchoolAtGrad.setSchlNo(mincodeAtGrad);
+        commonSchoolAtGrad.setSchoolName("Test GRAD School");
+        commonSchoolAtGrad.setSchoolCategoryCode("02");
+
+        when(this.schoolService.getSchoolDetails(mincode, "123")).thenReturn(school);
+        when(this.schoolService.getCommonSchool("123", mincode)).thenReturn(commonSchool);
+        when(this.schoolService.getSchoolDetails(mincodeAtGrad, "123")).thenReturn(schoolAtGrad);
+        when(this.schoolService.getCommonSchool("123", mincode)).thenReturn(commonSchoolAtGrad);
+
         when(this.traxStudentRepository.loadTraxGraduatedStudent(pen)).thenReturn(results);
         when(this.traxStudentRepository.countGradDateByPen(pen)).thenReturn(Integer.valueOf(1));
         when(this.tswService.getTranscriptStudentDemog(pen)).thenReturn(transcriptStudentDemog);
         when(this.tswService.getTranscriptStudentCourses(pen)).thenReturn(Arrays.asList(tswCourse1, tswCourse2, tswCourse3, tswAssessment));
 
-        var result = traxCommonService.getStudentMasterDataFromTrax(pen);
+        var result = traxCommonService.getStudentMasterDataFromTrax(pen, "123");
 
         assertThat(result).hasSize(1);
         ConvGradStudent responseObject = result.get(0);

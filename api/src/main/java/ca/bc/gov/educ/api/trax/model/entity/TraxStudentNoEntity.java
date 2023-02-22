@@ -21,6 +21,9 @@ public class TraxStudentNoEntity {
   @Column(name = "STUD_NO", unique = true, updatable = false)
   private String studNo;
 
-  @Column(name = "STATUS", nullable = false)
+  @Column(name = "STATUS")
   private String status;
+
+  @Column(name = "REASON")
+  private String reason;
 }
