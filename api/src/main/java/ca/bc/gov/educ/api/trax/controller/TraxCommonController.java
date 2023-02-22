@@ -27,6 +27,7 @@ import java.util.List;
 @OpenAPIDefinition(info = @Info(title = "API for TRAX Data.", description = "This API is for TRAX.", version = "1"))
 public class TraxCommonController {
     private static Logger logger = LoggerFactory.getLogger(TraxCommonController.class);
+    private static final String BEARER = "Bearer ";
 
     @Autowired
     TraxCommonService traxCommonService;
@@ -70,14 +71,14 @@ public class TraxCommonController {
     @PreAuthorize(PermissionsConstants.READ_GRAD_TRAX_STUDENT_DATA)
     @Operation(summary = "Find Student Master Record from TRAX", description = "Find Student Master Record from TRAX", tags = {"Student"})
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),  @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-    public ResponseEntity<List<ConvGradStudent>> getStudentMasterDataFromTrax(@PathVariable String pen) {
+    public ResponseEntity<List<ConvGradStudent>> getStudentMasterDataFromTrax(@PathVariable String pen, @RequestHeader(name="Authorization") String accessToken) {
         logger.debug("getStudentMasterDataFromTrax : ");
         validation.requiredField(pen, "Pen #");
         if (validation.hasErrors()) {
             validation.stopOnErrors();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        return response.GET(traxCommonService.getStudentMasterDataFromTrax(pen));
+        return response.GET(traxCommonService.getStudentMasterDataFromTrax(pen, accessToken.replace(BEARER, "")));
     }
 
     @GetMapping(EducGradTraxApiConstants.GET_TRAX_STUDENT_NO_LIST_BY_PAGING_MAPPING)

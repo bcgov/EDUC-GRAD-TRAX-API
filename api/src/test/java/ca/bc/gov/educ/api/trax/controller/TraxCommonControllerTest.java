@@ -69,9 +69,9 @@ public class TraxCommonControllerTest {
 								.schoolOfRecord("12345678")
 							.build();
 		studentList.add(obj);
-		Mockito.when(traxCommonService.getStudentMasterDataFromTrax(pen)).thenReturn(studentList);
-		traxCommonController.getStudentMasterDataFromTrax(pen);
-		Mockito.verify(traxCommonService).getStudentMasterDataFromTrax(pen);
+		Mockito.when(traxCommonService.getStudentMasterDataFromTrax(pen, "123")).thenReturn(studentList);
+		traxCommonController.getStudentMasterDataFromTrax(pen, "123");
+		Mockito.verify(traxCommonService).getStudentMasterDataFromTrax(pen, "123");
 	}
 
 	@Test

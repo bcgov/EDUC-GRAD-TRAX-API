@@ -98,7 +98,7 @@ public class TraxUpdateService {
 
     private ConvGradStudent populateNewStudent(String pen) {
         ConvGradStudent payload = null;
-        List<ConvGradStudent> results = traxCommonService.getStudentMasterDataFromTrax(pen);
+        List<ConvGradStudent> results = traxCommonService.getStudentMasterDataFromTrax(pen, null);
         if (results != null && !results.isEmpty()) {
             payload = results.get(0);
         }
@@ -126,7 +126,7 @@ public class TraxUpdateService {
     private TraxStudentUpdateDTO populateEventPayload(String updateType, String pen) {
         TraxStudentUpdateDTO result = null;
         ConvGradStudent traxStudent = null;
-        List<ConvGradStudent> results = traxCommonService.getStudentMasterDataFromTrax(pen);
+        List<ConvGradStudent> results = traxCommonService.getStudentMasterDataFromTrax(pen, null);
         if (results != null && !results.isEmpty()) {
             traxStudent = results.get(0);
             switch(updateType) {

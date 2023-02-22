@@ -145,7 +145,7 @@ public class TraxUpdateServiceTest {
 
         when(traxUpdateInGradRepository.findOutstandingUpdates(any())).thenReturn(Arrays.asList(traxUpdateInGradEntity));
         when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
-        when(traxCommonService.getStudentMasterDataFromTrax(pen)).thenReturn(Arrays.asList(traxStudent));
+        when(traxCommonService.getStudentMasterDataFromTrax(pen, null)).thenReturn(Arrays.asList(traxStudent));
 
         traxUpdateService.publishTraxUpdatedEvent(traxUpdateInGradEntity);
         traxUpdateService.updateStatus(traxUpdateInGradEntity);
@@ -192,7 +192,7 @@ public class TraxUpdateServiceTest {
                 .build();
 
         when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
-        when(traxCommonService.getStudentMasterDataFromTrax(pen)).thenReturn(Arrays.asList(traxStudent));
+        when(traxCommonService.getStudentMasterDataFromTrax(pen, null)).thenReturn(Arrays.asList(traxStudent));
 
         traxUpdateService.publishTraxUpdatedEvent(traxUpdateInGradEntity);
         traxUpdateService.updateStatus(traxUpdateInGradEntity);
@@ -245,7 +245,7 @@ public class TraxUpdateServiceTest {
                 .build();
 
         when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
-        when(traxCommonService.getStudentMasterDataFromTrax(pen)).thenReturn(Arrays.asList(traxStudent));
+        when(traxCommonService.getStudentMasterDataFromTrax(pen, null)).thenReturn(Arrays.asList(traxStudent));
         when(traxCommonService.getStudentDemographicsDataFromTrax(pen)).thenReturn(Arrays.asList(penStudent));
 
         traxUpdateService.publishTraxUpdatedEvent(traxUpdateInGradEntity);
@@ -295,7 +295,7 @@ public class TraxUpdateServiceTest {
                 .build();
 
         when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
-        when(traxCommonService.getStudentMasterDataFromTrax(pen)).thenReturn(Arrays.asList(traxStudent));
+        when(traxCommonService.getStudentMasterDataFromTrax(pen, null)).thenReturn(Arrays.asList(traxStudent));
 
         traxUpdateService.publishTraxUpdatedEvent(traxUpdateInGradEntity);
         traxUpdateService.updateStatus(traxUpdateInGradEntity);
@@ -342,7 +342,7 @@ public class TraxUpdateServiceTest {
                 .build();
 
         when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
-        when(traxCommonService.getStudentMasterDataFromTrax(pen)).thenReturn(Arrays.asList(traxStudent));
+        when(traxCommonService.getStudentMasterDataFromTrax(pen, null)).thenReturn(Arrays.asList(traxStudent));
 
         traxUpdateService.publishTraxUpdatedEvent(traxUpdateInGradEntity);
         traxUpdateService.updateStatus(traxUpdateInGradEntity);
@@ -389,7 +389,7 @@ public class TraxUpdateServiceTest {
                 .build();
 
         when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
-        when(traxCommonService.getStudentMasterDataFromTrax(pen)).thenReturn(Arrays.asList(traxStudent));
+        when(traxCommonService.getStudentMasterDataFromTrax(pen, null)).thenReturn(Arrays.asList(traxStudent));
 
         traxUpdateService.publishTraxUpdatedEvent(traxUpdateInGradEntity);
         traxUpdateService.updateStatus(traxUpdateInGradEntity);
@@ -435,7 +435,7 @@ public class TraxUpdateServiceTest {
                 .build();
 
         when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
-        when(traxCommonService.getStudentMasterDataFromTrax(pen)).thenReturn(Arrays.asList(traxStudent));
+        when(traxCommonService.getStudentMasterDataFromTrax(pen, null)).thenReturn(Arrays.asList(traxStudent));
 
         traxUpdateService.publishTraxUpdatedEvent(traxUpdateInGradEntity);
         traxUpdateService.updateStatus(traxUpdateInGradEntity);
@@ -481,7 +481,7 @@ public class TraxUpdateServiceTest {
                 .build();
 
         when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
-        when(traxCommonService.getStudentMasterDataFromTrax(pen)).thenReturn(Arrays.asList(traxStudent));
+        when(traxCommonService.getStudentMasterDataFromTrax(pen, null)).thenReturn(Arrays.asList(traxStudent));
 
         traxUpdateService.publishTraxUpdatedEvent(traxUpdateInGradEntity);
         traxUpdateService.updateStatus(traxUpdateInGradEntity);
@@ -530,7 +530,7 @@ public class TraxUpdateServiceTest {
                 .build();
 
         when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
-        when(traxCommonService.getStudentMasterDataFromTrax(pen)).thenReturn(Arrays.asList(traxStudent));
+        when(traxCommonService.getStudentMasterDataFromTrax(pen, null)).thenReturn(Arrays.asList(traxStudent));
 
         traxUpdateService.publishTraxUpdatedEvent(traxUpdateInGradEntity);
         traxUpdateService.updateStatus(traxUpdateInGradEntity);
