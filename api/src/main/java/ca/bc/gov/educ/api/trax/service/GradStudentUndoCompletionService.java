@@ -30,7 +30,7 @@ public class GradStudentUndoCompletionService extends EventCommonService {
         // skip SCCP -------------------------------------------------------------------------
         if (StringUtils.equalsIgnoreCase(gradStatusUpdate.getProgram(), "SCCP")) {
             updateFieldsMap.clear();
-            log.info("  Skip the undo completion update against SCCP student in TRAX.");
+            log.debug("  Skip the undo completion update against SCCP student in TRAX.");
         }
 
         // When a student is un-graduated ---------------------------------------------------
