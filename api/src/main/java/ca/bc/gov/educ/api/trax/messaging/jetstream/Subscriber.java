@@ -97,7 +97,7 @@ public class Subscriber {
    */
   public void onMessage(final Message message) {
     if (message != null) {
-      log.info("Received message Subject:: {} , SID :: {} , sequence :: {}, pending :: {} ", message.getSubject(), message.getSID(), message.metaData().consumerSequence(), message.metaData().pendingCount());
+      log.debug("Received message Subject:: {} , SID :: {} , sequence :: {}, pending :: {} ", message.getSubject(), message.getSID(), message.metaData().consumerSequence(), message.metaData().pendingCount());
       try {
         val eventString = new String(message.getData());
         LogHelper.logMessagingEventDetails(eventString, constants.isSplunkLogHelperEnabled());

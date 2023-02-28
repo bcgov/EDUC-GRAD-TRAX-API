@@ -79,7 +79,7 @@ public abstract class EventCommonService implements EventService {
 
     private void process(Optional<TraxStudentEntity> existingStudent, GradStatusEventPayloadDTO gradStatusUpdate, EntityManager em, EntityTransaction tx, boolean updateTrax) {
         if (updateTrax && existingStudent.isPresent()) {
-            logger.info("==========> Start - Trax Incremental Update: pen# [{}]", gradStatusUpdate.getPen());
+            logger.debug("==========> Start - Trax Incremental Update: pen# [{}]", gradStatusUpdate.getPen());
             Map<String, Pair<FieldType, Object>> updateFieldsMap = setupUpdateFieldsMap();
             specialHandlingOnUpdateFieldsMap(updateFieldsMap, existingStudent.get(), gradStatusUpdate);
             // Needs to update required fields from GraduationStatus to TraxStudentEntity
@@ -90,11 +90,11 @@ public abstract class EventCommonService implements EventService {
                 em.createNativeQuery(buildUpdateQuery(gradStatusUpdate.getPen(), updateFieldsMap))
                         .setHint("javax.persistence.query.timeout", 10000).executeUpdate();
                 tx.commit();
-                logger.info("  === Update Transaction is committed! ===");
+                logger.debug("  === Update Transaction is committed! ===");
             } else {
-                logger.info("  === Skip Transaction as no changes are detected!!! ===");
+                logger.debug("  === Skip Transaction as no changes are detected!!! ===");
             }
-            logger.info("==========> End - Trax Incremental Update: pen# [{}]", gradStatusUpdate.getPen());
+            logger.debug("==========> End - Trax Incremental Update: pen# [{}]", gradStatusUpdate.getPen());
         }
     }
 
@@ -248,7 +248,7 @@ public abstract class EventCommonService implements EventService {
 
         sb.append(" WHERE STUD_NO=" + "'" + StringUtils.rightPad(pen, 10) + "'"); // a space is appended CAREFUL not to remove.
 
-        logger.info("Update Query: {}",  sb);
+        logger.debug("Update Query: {}",  sb);
         return sb.toString();
 
     }
