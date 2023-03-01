@@ -30,7 +30,7 @@ public class GradStudentGraduatedService extends EventCommonService {
         // skip SCCP -------------------------------------------------------------------------
         if (StringUtils.equalsIgnoreCase(gradStatusUpdate.getProgram(), "SCCP")) {
             updateFieldsMap.clear();
-            log.info("  Skip the graduation update against SCCP student in TRAX");
+            log.debug("  Skip the graduation update against SCCP student in TRAX");
         }
     }
 

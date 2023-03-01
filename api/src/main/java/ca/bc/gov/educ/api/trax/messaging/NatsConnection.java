@@ -77,14 +77,14 @@ public class NatsConnection implements Closeable {
     @Override
     public void close() {
         if (this.natsCon != null) {
-            log.info("closing nats connection...");
+            log.debug("closing nats connection...");
             try {
                 this.natsCon.close();
             } catch (final InterruptedException e) {
                 log.error("error while closing nats connection...", e);
                 Thread.currentThread().interrupt();
             }
-            log.info("nats connection closed...");
+            log.debug("nats connection closed...");
         }
     }
 
