@@ -36,10 +36,7 @@ public class TswControllerTest {
     public void testGetTranscriptStudentDemogByPen() {
         TranscriptStudentDemog transcriptStudentDemog = new TranscriptStudentDemog();
         transcriptStudentDemog.setStudNo("123456789");
-        transcriptStudentDemog.setFirstName("Test");
-        transcriptStudentDemog.setLastName("QA");
         transcriptStudentDemog.setMincode("7654321");
-        transcriptStudentDemog.setSchoolName("Test2 School");
 
         Mockito.when(tswService.getTranscriptStudentDemog("123456789")).thenReturn(transcriptStudentDemog);
         tswController.getTranscriptStudentDemogByPen("123456789");

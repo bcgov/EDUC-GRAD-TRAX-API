@@ -69,17 +69,14 @@ public class TswServiceTest {
 
         final TranscriptStudentDemogEntity transcriptStudentDemogEntity = new TranscriptStudentDemogEntity();
         transcriptStudentDemogEntity.setStudNo("123456789");
-        transcriptStudentDemogEntity.setFirstName("Test");
-        transcriptStudentDemogEntity.setLastName("QA");
         transcriptStudentDemogEntity.setMincode("7654321");
-        transcriptStudentDemogEntity.setSchoolName("Test2 School");
 
         when(transcriptStudentDemogRepository.findById(eq("123456789"))).thenReturn(Optional.of(transcriptStudentDemogEntity));
 
         TranscriptStudentDemog result = tswService.getTranscriptStudentDemog(transcriptStudentDemogEntity.getStudNo());
 
         assertThat(result).isNotNull();
-        assertThat(result.getSchoolName()).isEqualTo(transcriptStudentDemogEntity.getSchoolName());
+        assertThat(result.getMincode()).isEqualTo(transcriptStudentDemogEntity.getMincode());
         assertThat(result.getStudNo()).isEqualTo(transcriptStudentDemogEntity.getStudNo());
     }
 
