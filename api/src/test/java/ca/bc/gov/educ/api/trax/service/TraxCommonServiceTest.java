@@ -119,10 +119,7 @@ public class TraxCommonServiceTest {
         // TSW Demographics
         TranscriptStudentDemog transcriptStudentDemog = new TranscriptStudentDemog();
         transcriptStudentDemog.setStudNo(pen);
-        transcriptStudentDemog.setFirstName("Test");
-        transcriptStudentDemog.setLastName("QA");
         transcriptStudentDemog.setMincode(mincode);
-        transcriptStudentDemog.setSchoolName("Test School");
         transcriptStudentDemog.setGradDate(202201L);
 
         // TSW Courses
@@ -224,10 +221,7 @@ public class TraxCommonServiceTest {
         // TSW Demographics
         TranscriptStudentDemog transcriptStudentDemog = new TranscriptStudentDemog();
         transcriptStudentDemog.setStudNo(pen);
-        transcriptStudentDemog.setFirstName("Test");
-        transcriptStudentDemog.setLastName("QA");
         transcriptStudentDemog.setMincode(mincode);
-        transcriptStudentDemog.setSchoolName("Test School");
         transcriptStudentDemog.setGradDate(202201L);
 
         // TSW Courses
@@ -343,10 +337,7 @@ public class TraxCommonServiceTest {
         // TSW Demographics
         TranscriptStudentDemog transcriptStudentDemog = new TranscriptStudentDemog();
         transcriptStudentDemog.setStudNo(pen);
-        transcriptStudentDemog.setFirstName("Test");
-        transcriptStudentDemog.setLastName("QA");
         transcriptStudentDemog.setMincode(mincode);
-        transcriptStudentDemog.setSchoolName("Test School");
         transcriptStudentDemog.setGradDate(202201L);
 
         // TSW Courses

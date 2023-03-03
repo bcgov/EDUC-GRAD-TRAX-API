@@ -19,7 +19,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -256,7 +255,8 @@ public class TraxCommonService {
     private void handleAdult19Rule(ConvGradStudent student, boolean isGraduated) {
         if ("1950".equalsIgnoreCase(student.getGraduationRequirementYear()) && "AD".equalsIgnoreCase(student.getStudentGrade())) {
             if (isGraduated) {
-                if (student.isAllowedAdult() || EducGradTraxApiConstants.ADULT_18_RULE_VALID_DATE.compareTo(student.getProgramCompletionDate()) <= 0) {
+                if (student.isAllowedAdult() ||
+                    (student.getProgramCompletionDate() != null && EducGradTraxApiConstants.ADULT_18_RULE_VALID_DATE.compareTo(student.getProgramCompletionDate()) <= 0)) {
                     student.setAdult19Rule(false);
                 } else {
                     student.setAdult19Rule(true);

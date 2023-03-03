@@ -58,7 +58,7 @@ public class JetStreamEventScheduler {
                     try {
                         choreographer.handleEvent(el);
                     } catch (final Exception ex) {
-                        log.error("Exception while trying to handle message", ex);
+                        log.error("Exception while trying to handle GRAD updated message", ex);
                     }
                 });
         }
@@ -76,7 +76,7 @@ public class JetStreamEventScheduler {
                     try {
                         publisher.dispatchChoreographyEvent(el);
                     } catch (final Exception ex) {
-                        log.error("Exception while trying to handle message", ex);
+                        log.error("Exception while trying to handle TRAX updated message", ex);
                     }
                 });
         }
