@@ -20,10 +20,11 @@ env:
   REPO_NAME: "educ-grad-trax-api"
   APP_DOMAIN: ${{ secrets.APP_DOMAIN }}
   TAG: "latest"
+  #GRAD2-1947 Resource optimization
   MIN_CPU: "50m"
-  MAX_CPU: "200m"
+  MAX_CPU: "300m"
   MIN_MEM: "1024Mi"
-  MAX_MEM: "3072Mi"
+  MAX_MEM: "2200Mi"
   MIN_REPLICAS: "3"
   MAX_REPLICAS: "5"
 
