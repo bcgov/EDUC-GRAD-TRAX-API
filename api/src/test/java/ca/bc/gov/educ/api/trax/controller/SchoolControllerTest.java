@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 @ExtendWith(MockitoExtension.class)
-@SuppressWarnings("rawtypes")
+@SuppressWarnings("ALL")
 public class SchoolControllerTest {
 
     @Mock
