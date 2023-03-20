@@ -100,13 +100,19 @@ cron:
   scheduled:
     process:
       events:
-        stan:
-          run: ${CRON_SCHEDULED_PROCESS_EVENTS_STAN}
-          lockAtLeastFor: ${CRON_SCHEDULED_PROCESS_EVENTS_STAN_LOCK_AT_LEAST_FOR}
-          lockAtMostFor: ${CRON_SCHEDULED_PROCESS_EVENTS_STAN_LOCK_AT_MOST_FOR}
-      jobs:
-        stan:
-          run: ${CRON_SCHEDULED_PROCESS_JOBS_STAN}
+        grad-to-trax:
+          run: ${CRON_SCHEDULED_GRAD_TO_TRAX_EVENTS}
+          lockAtLeastFor: ${CRON_SCHEDULED_GRAD_TO_TRAX_EVENTS_LOCK_AT_LEAST_FOR}
+          lockAtMostFor: ${CRON_SCHEDULED_GRAD_TO_TRAX_EVENTS_LOCK_AT_MOST_FOR}
+        trax-to-grad:
+          run: ${CRON_SCHEDULED_TRAX_TO_GRAD_EVENTS}
+          lockAtLeastFor: ${CRON_SCHEDULED_TRAX_TO_GRAD_EVENTS}
+          lockAtMostFor: ${CRON_SCHEDULED_TRAX_TO_GRAD_EVENTS}
+      trigger-jobs:
+        read-trax-update:
+          run: ${CRON_SCHEDULED_TRIGGER_TRAX_UPDATES}
+          lockAtLeastFor: ${CRON_SCHEDULED_TRIGGER_TRAX_UPDATES_LOCK_AT_LEAST_FOR}
+          lockAtMostFor: ${CRON_SCHEDULED_TRIGGER_TRAX_UPDATES_LOCK_AT_MOST_FOR}
 
 #Incremental Trax Update
 trax:

@@ -46,8 +46,8 @@ public class JetStreamEventScheduler {
         this.publisher = publisher;
     }
     
-    @Scheduled(cron = "${cron.scheduled.process.events.stan.run}") // every 5 minutes
-    @SchedulerLock(name = "PROCESS_CHOREOGRAPHED_EVENTS_FROM_JET_STREAM", lockAtLeastFor = "${cron.scheduled.process.events.stan.lockAtLeastFor}", lockAtMostFor = "${cron.scheduled.process.events.stan.lockAtMostFor}")
+    @Scheduled(cron = "${cron.scheduled.process.events.grad-to-trax.run}") // minimum = every 5 minutes
+    @SchedulerLock(name = "PROCESS_CHOREOGRAPHED_EVENTS_FROM_JET_STREAM", lockAtLeastFor = "${cron.scheduled.process.events.grad-to-trax.lockAtLeastFor}", lockAtMostFor = "${cron.scheduled.process.events.grad-to-trax.lockAtMostFor}")
     public void findAndProcessEvents() {
         LockAssert.assertLocked();
         final var results = this.eventRepository.findAllByEventStatusOrderByCreateDate(DB_COMMITTED.toString());
@@ -64,8 +64,8 @@ public class JetStreamEventScheduler {
         }
     }
 
-    @Scheduled(cron = "${cron.scheduled.process.events.stan.run}") // every 5 minutes
-    @SchedulerLock(name = "PUBLISH_TRAX_UPDATED_EVENTS_TO_JET_STREAM", lockAtLeastFor = "${cron.scheduled.process.events.stan.lockAtLeastFor}", lockAtMostFor = "${cron.scheduled.process.events.stan.lockAtMostFor}")
+    @Scheduled(cron = "${cron.scheduled.process.events.trax-to-grad.run}") // minimum = every 5 minutes
+    @SchedulerLock(name = "PUBLISH_TRAX_UPDATED_EVENTS_TO_JET_STREAM", lockAtLeastFor = "${cron.scheduled.process.events.trax-to-grad.lockAtLeastFor}", lockAtMostFor = "${cron.scheduled.process.events.trax-to-grad.lockAtMostFor}")
     public void findAndPublishGradStatusEventsToJetStream() {
         LockAssert.assertLocked();
         final var results = this.traxUpdatedPubEventRepository.findByEventStatusOrderByCreateDate(DB_COMMITTED.toString());
