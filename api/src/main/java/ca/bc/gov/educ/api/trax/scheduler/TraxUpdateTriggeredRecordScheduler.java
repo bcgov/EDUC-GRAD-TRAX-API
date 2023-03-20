@@ -16,8 +16,8 @@ public class TraxUpdateTriggeredRecordScheduler {
         this.traxUpdateService = traxUpdateService;
     }
 
-    @Scheduled(cron = "${cron.scheduled.process.jobs.stan.run}") // every 5 minute
-    @SchedulerLock(name = "PROCESS_TRAX_UPDATE_IN_GRAD_RECORDS", lockAtLeastFor = "${cron.scheduled.process.events.stan.lockAtLeastFor}", lockAtMostFor = "${cron.scheduled.process.events.stan.lockAtMostFor}")
+    @Scheduled(cron = "${cron.scheduled.process.trigger-jobs.read-trax-update.run}") // every 5 minute
+    @SchedulerLock(name = "PROCESS_TRAX_UPDATE_IN_GRAD_RECORDS", lockAtLeastFor = "${cron.scheduled.process.trigger-jobs.read-trax-update.lockAtLeastFor}", lockAtMostFor = "${cron.scheduled.process.trigger-jobs.read-trax-update.lockAtMostFor}")
     public void scheduledRunForTraxUpdates() {
         LockAssert.assertLocked();
         final var results = traxUpdateService.getOutstandingList();
