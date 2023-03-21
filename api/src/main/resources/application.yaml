@@ -106,8 +106,8 @@ cron:
           lockAtMostFor: ${CRON_SCHEDULED_GRAD_TO_TRAX_EVENTS_LOCK_AT_MOST_FOR}
         trax-to-grad:
           run: ${CRON_SCHEDULED_TRAX_TO_GRAD_EVENTS}
-          lockAtLeastFor: ${CRON_SCHEDULED_TRAX_TO_GRAD_EVENTS}
-          lockAtMostFor: ${CRON_SCHEDULED_TRAX_TO_GRAD_EVENTS}
+          lockAtLeastFor: ${CRON_SCHEDULED_TRAX_TO_GRAD_EVENTS_LOCK_AT_LEAST_FOR}
+          lockAtMostFor: ${CRON_SCHEDULED_TRAX_TO_GRAD_EVENTS_LOCK_AT_MOST_FOR}
       trigger-jobs:
         read-trax-update:
           run: ${CRON_SCHEDULED_TRIGGER_TRAX_UPDATES}
