@@ -32,6 +32,7 @@ public abstract class EventCommonService implements EventService {
     public static final String FIELD_GRAD_REQT_YEAR_AT_GRAD = "GRAD_REQT_YEAR_AT_GRAD";
     public static final String FIELD_GRAD_DATE = "GRAD_DATE";
     public static final String FIELD_SLP_DATE = "SLP_DATE";
+    public static final String FIELD_SCC_DATE = "SCC_DATE";
     public static final String FIELD_MINCODE = "MINCODE";
     public static final String FIELD_MINCODE_GRAD = "MINCODE_GRAD";
     public static final String FIELD_STUD_GRADE = "STUD_GRADE";
@@ -117,6 +118,10 @@ public abstract class EventCommonService implements EventService {
             updateFieldsMap.put(FIELD_GRAD_REQT_YEAR_AT_GRAD, null);
             // grad_date
             updateFieldsMap.put(FIELD_GRAD_DATE, null);
+            // slp_date (SCCP)
+            updateFieldsMap.put(FIELD_SLP_DATE, null);
+            // scc_date (SCCP)
+            updateFieldsMap.put(FIELD_SCC_DATE, null);
             // mincode_grad
             updateFieldsMap.put(FIELD_MINCODE_GRAD, null);
             // stud_grade_at_grad
@@ -173,6 +178,10 @@ public abstract class EventCommonService implements EventService {
         // SLP Date
         if (fields.contains(FIELD_SLP_DATE)) {
             handleDateField(updateFieldsMap, FIELD_SLP_DATE, traxStudentEntity.getSlpDate(), gradStatus.getProgramCompletionDate());
+        }
+        // SCC Date
+        if (fields.contains(FIELD_SCC_DATE)) {
+            handleDateField(updateFieldsMap, FIELD_SCC_DATE, traxStudentEntity.getSccDate(), gradStatus.getProgramCompletionDate());
         }
         // Mincode
         if (fields.contains(FIELD_MINCODE)) {
