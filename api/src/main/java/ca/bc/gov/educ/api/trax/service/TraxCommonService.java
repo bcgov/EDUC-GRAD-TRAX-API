@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.trax.service;
 
 import ca.bc.gov.educ.api.trax.constant.ConversionResultType;
+import ca.bc.gov.educ.api.trax.constant.StudentLoadType;
 import ca.bc.gov.educ.api.trax.model.dto.*;
 import ca.bc.gov.educ.api.trax.model.entity.TraxStudentNoEntity;
 import ca.bc.gov.educ.api.trax.model.transformer.GradCourseTransformer;
@@ -19,10 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -71,18 +69,38 @@ public class TraxCommonService {
         return traxStudentNoRepository.countAllByStatus(null);
     }
 
+    @Transactional(readOnly = true)
+    public boolean isGraduatedStudent(String pen) {
+        StudentLoadType loadType = getStudentLoadType(pen);
+        if (loadType == StudentLoadType.UNGRAD || loadType == StudentLoadType.NONE) {
+            return false;
+        }
+        return true;
+    }
+
     // Student Master from TRAX
     @Transactional(readOnly = true)
     public List<ConvGradStudent> getStudentMasterDataFromTrax(String pen, String accessToken) {
-        boolean isGraduated = !constants.isEnableStudentMasterOnly() && isGraduatedStudent(pen);
+        List<ConvGradStudent> students;
+        StudentLoadType studentLoadType = constants.isEnableStudentMasterOnly()? StudentLoadType.UNGRAD : getStudentLoadType(pen);
         List<Object[]> results;
-        if (isGraduated) {
-            results = traxStudentRepository.loadTraxGraduatedStudent(pen);
-        } else {
-            results = traxStudentRepository.loadTraxStudent(pen);
+        switch(studentLoadType) {
+            case UNGRAD:
+                results = traxStudentRepository.loadTraxStudent(pen);
+                students = buildConversionGradStudents(results, studentLoadType, accessToken);
+                break;
+            case GRAD_ONE:
+                results = traxStudentRepository.loadTraxGraduatedStudent(pen);
+                students = buildConversionGradStudents(results, studentLoadType, accessToken);
+                break;
+            case GRAD_TWO:
+            case NONE:
+            default:
+                students = Arrays.asList(buildErroredStudent(pen, studentLoadType));
+                break;
         }
 
-        return buildConversionGradStudents(results, isGraduated, accessToken);
+        return students;
     }
 
     @Transactional(readOnly = true)
@@ -189,19 +207,19 @@ public class TraxCommonService {
         return traxStudentNo;
     }
 
-    private List<ConvGradStudent> buildConversionGradStudents(List<Object[]> traxStudents, boolean isGraduated, String accessToken) {
+    private List<ConvGradStudent> buildConversionGradStudents(List<Object[]> traxStudents, StudentLoadType studentLoadType, String accessToken) {
         List<ConvGradStudent> students = new ArrayList<>();
         traxStudents.forEach(result -> {
-            ConvGradStudent student = populateConvGradStudent(result, isGraduated);
-            handleAdult19Rule(student, isGraduated);
-            if (isGraduated) {
+            ConvGradStudent student = populateConvGradStudent(result, studentLoadType);
+            handleAdult19Rule(student, studentLoadType);
+            if (studentLoadType == StudentLoadType.GRAD_ONE) {
                 TranscriptStudentDemog transcriptStudentDemog = tswService.getTranscriptStudentDemog(student.getPen());
                 student.setTranscriptStudentDemog(transcriptStudentDemog);
                 List<TranscriptStudentCourse> transcriptStudentCourses = tswService.getTranscriptStudentCourses(student.getPen());
                 student.setTranscriptStudentCourses(transcriptStudentCourses);
                 student.setDistributionDate(traxStudentRepository.getTheLatestDistributionDate(student.getPen()));
             }
-            getSchoolsData(student, isGraduated, accessToken);
+            getSchoolsData(student, studentLoadType, accessToken);
             if (student != null) {
                 students.add(student);
             }
@@ -209,7 +227,7 @@ public class TraxCommonService {
         return students;
     }
 
-    private void getSchoolsData(ConvGradStudent student, boolean isGraduated, String accessToken) {
+    private void getSchoolsData(ConvGradStudent student, StudentLoadType studentLoadType, String accessToken) {
         if (StringUtils.isBlank(accessToken)) {
             return;
         }
@@ -219,7 +237,7 @@ public class TraxCommonService {
         } else {
             return;
         }
-        if (isGraduated) {
+        if (studentLoadType == StudentLoadType.GRAD_ONE) {
             getSchoolsDataForGraduated(student, accessToken);
         }
     }
@@ -252,9 +270,9 @@ public class TraxCommonService {
         }
     }
 
-    private void handleAdult19Rule(ConvGradStudent student, boolean isGraduated) {
+    private void handleAdult19Rule(ConvGradStudent student, StudentLoadType studentLoadType) {
         if ("1950".equalsIgnoreCase(student.getGraduationRequirementYear()) && "AD".equalsIgnoreCase(student.getStudentGrade())) {
-            if (isGraduated) {
+            if (studentLoadType == StudentLoadType.GRAD_ONE) {
                 if (student.isAllowedAdult() ||
                     (student.getProgramCompletionDate() != null && EducGradTraxApiConstants.ADULT_18_RULE_VALID_DATE.compareTo(student.getProgramCompletionDate()) <= 0)) {
                     student.setAdult19Rule(false);
@@ -277,7 +295,7 @@ public class TraxCommonService {
         }
     }
 
-    private ConvGradStudent populateConvGradStudent(Object[] fields, boolean isGraduated) {
+    private ConvGradStudent populateConvGradStudent(Object[] fields, StudentLoadType studentLoadType) {
         String pen = (String) fields[0];
         String schoolOfRecord = (String) fields[1];
         String schoolAtGrad = (String) fields[2];
@@ -289,7 +307,7 @@ public class TraxCommonService {
         // grad or non-grad
         Date programCompletionDate = null;
         String gradDateStr = null;
-        if (isGraduated) {
+        if (studentLoadType == StudentLoadType.GRAD_ONE) {
             gradDateStr = (String) fields[7]; // from tsw_tran_demog in tsw
             if (gradDateStr != null) {
                 gradDateStr = gradDateStr.trim();
@@ -363,7 +381,7 @@ public class TraxCommonService {
                     .graduationRequirementYear(graduationRequirementYear)
                     .programCodes(programCodes)
                     .programCompletionDate(programCompletionDate)
-                    .graduated(isGraduated)
+                    .studentLoadType(studentLoadType)
                     .consumerEducationRequirementMet(consumerEducationRequirementMet != null? (StringUtils.equalsIgnoreCase(consumerEducationRequirementMet.toString(), "Y")? "Y" : null) : null)
                     .studentCitizenship(citizenship != null? citizenship.toString() : null)
                     .frenchDogwood(frenchDogwood != null? frenchDogwood.toString() : null)
@@ -377,22 +395,50 @@ public class TraxCommonService {
     }
 
     @Transactional(readOnly = true)
-    public boolean isGraduatedStudent(String studNo) {
-        Integer gradDateCount = traxStudentRepository.countGradDateByPen(studNo);
-        if (gradDateCount != null && gradDateCount.intValue() > 0) {
-            return true;
-        }
-        Integer sccDateCount = traxStudentRepository.countSccDateByPen(studNo);
-        if (sccDateCount != null && sccDateCount.intValue() > 0) {
-            return true;
-        }
+    public StudentLoadType getStudentLoadType(String studNo) {
+        StudentLoadType loadType = StudentLoadType.NONE;
+        List<Object[]> list = traxStudentRepository.getGraduationData(studNo);
+        if (list != null && !list.isEmpty()) {
+            for (Object[] col : list) {
+                String graduationRequirementYear = (String) col[0];
+                Integer gradDate = (Integer) col[1];
+                Integer sccDate = (Integer) col[2];
+                Integer slpDate = (Integer) col[3];
 
-        return false;
+                loadType = determineStudentLoadType(graduationRequirementYear, gradDate, sccDate, slpDate);
+                break;
+            }
+        }
+        return loadType;
+    }
+
+    private StudentLoadType determineStudentLoadType(String gradReqtYear, Integer gradDate, Integer sccDate, Integer slpDate) {
+        StudentLoadType result;
+        if (!"SCCP".equalsIgnoreCase(gradReqtYear) && sccDate > 0) {
+            result = StudentLoadType.GRAD_TWO;
+        } else if ((!"SCCP".equalsIgnoreCase(gradReqtYear) && gradDate > 0) && (slpDate == 0 || slpDate == null)) {
+            result = StudentLoadType.GRAD_ONE;
+        } else if ("SCCP".equalsIgnoreCase(gradReqtYear) && sccDate > 0) {
+            result = StudentLoadType.GRAD_ONE;
+        } else if (gradDate == 0 && (sccDate == 0 || sccDate == null)) {
+            result = StudentLoadType.UNGRAD;
+        } else {
+            result = StudentLoadType.NONE;
+        }
+        return result;
     }
 
     @Transactional(readOnly = true)
     public boolean isAdult19Rule(String studNo) {
         return traxStudentRepository.countAdult19RuleByPen(studNo) > 0;
+    }
+
+    private ConvGradStudent buildErroredStudent(String pen, StudentLoadType studentLoadType) {
+        return ConvGradStudent.builder()
+                .pen(pen)
+                .studentLoadType(studentLoadType)
+                .result(ConversionResultType.FAILURE)
+                .build();
     }
 
 }
