@@ -60,15 +60,8 @@ public interface TraxStudentRepository extends CrudRepository<TraxStudentEntity,
     @Transactional(readOnly = true)
     List<Object[]> loadInitialCourseRestrictionRawData();
 
-    @Query(value="select count(*) from TAB_SCHOOL sc \n" +
-            "where sc.mincode = :minCode \n", nativeQuery=true)
-    long countTabSchools(@Param("minCode") String minCode);
-
-    @Query(value = "SELECT COUNT(*) FROM student_master WHERE stud_no = :pen AND grad_reqt_year = 'SCCP' AND scc_date > 0", nativeQuery = true)
-    Integer countSccDateByPen(@Param("pen")String pen);
-
-    @Query(value = "SELECT COUNT(*) FROM student_master WHERE stud_no = :pen AND grad_reqt_year <> 'SCCP' AND grad_date > 0 AND (slp_date is null OR slp_date = 0)", nativeQuery = true)
-    Integer countGradDateByPen(@Param("pen")String pen);
+    @Query(value = "SELECT grad_reqt_year, grad_date, scc_date, slp_date FROM student_master WHERE stud_no = :pen", nativeQuery = true)
+    List<Object[]> getGraduationData(@Param("pen") String pen);
 
     @Query(value = "SELECT COUNT(*) FROM tsw_tran_nongrad WHERE stud_no = :pen AND non_grad_code = 'T'", nativeQuery = true)
     Integer countAdult19RuleByPen(@Param("pen")String pen);
