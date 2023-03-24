@@ -93,8 +93,7 @@ public class TraxCommonService {
                 results = traxStudentRepository.loadTraxGraduatedStudent(pen);
                 students = buildConversionGradStudents(results, studentLoadType, accessToken);
                 break;
-            case GRAD_TWO:
-            case NONE:
+            case GRAD_TWO,NONE:
             default:
                 students = Arrays.asList(buildErroredStudent(pen, studentLoadType));
                 break;
@@ -406,7 +405,6 @@ public class TraxCommonService {
                 Integer slpDate = (Integer) col[3];
 
                 loadType = determineStudentLoadType(graduationRequirementYear, gradDate, sccDate, slpDate);
-                break;
             }
         }
         return loadType;
