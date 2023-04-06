@@ -652,6 +652,7 @@ public class TraxCommonServiceTest {
         commonSchool.setSchoolName("Test School");
         commonSchool.setSchoolCategoryCode("02");
 
+        // grad_reqt_year, grad_date, scc_date, slp_date
         Object[] cols = new Object[] {
                 "2018", Integer.valueOf(0), Integer.valueOf(202206), Integer.valueOf(202206)
         };
@@ -671,7 +672,7 @@ public class TraxCommonServiceTest {
         ConvGradStudent responseObject = result.get(0);
         assertThat(responseObject.getPen()).isEqualTo(pen);
         assertThat(responseObject.getStudentLoadType()).isEqualTo(StudentLoadType.GRAD_TWO);
-        assertThat(responseObject.getResult()).isEqualTo(ConversionResultType.FAILURE);
+        assertThat(responseObject.getResult()).isEqualTo(ConversionResultType.SUCCESS);
     }
 
     @Test
