@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
+@SuppressWarnings("ALL")
 @Service
 @Slf4j
 public class TraxCommonService {
@@ -35,7 +36,7 @@ public class TraxCommonService {
     private final TswService tswService;
     private final SchoolService schoolService;
 
-    private EducGradTraxApiConstants constants;
+    private final EducGradTraxApiConstants constants;
 
     @Autowired
     public TraxCommonService(TraxStudentRepository traxStudentRepository,
@@ -72,10 +73,7 @@ public class TraxCommonService {
     @Transactional(readOnly = true)
     public boolean isGraduatedStudent(String pen) {
         StudentLoadType loadType = getStudentLoadType(pen);
-        if (loadType == StudentLoadType.UNGRAD || loadType == StudentLoadType.NONE) {
-            return false;
-        }
-        return true;
+        return loadType != StudentLoadType.UNGRAD && loadType != StudentLoadType.NONE;
     }
 
     // Student Master from TRAX
@@ -84,19 +82,16 @@ public class TraxCommonService {
         List<ConvGradStudent> students;
         StudentLoadType studentLoadType = constants.isEnableStudentMasterOnly()? StudentLoadType.UNGRAD : getStudentLoadType(pen);
         List<Object[]> results;
-        switch(studentLoadType) {
-            case UNGRAD:
+        switch (studentLoadType) {
+            case UNGRAD -> {
                 results = traxStudentRepository.loadTraxStudent(pen);
                 students = buildConversionGradStudents(results, studentLoadType, accessToken);
-                break;
-            case GRAD_ONE:
+            }
+            case GRAD_ONE, GRAD_TWO -> {
                 results = traxStudentRepository.loadTraxGraduatedStudent(pen);
                 students = buildConversionGradStudents(results, studentLoadType, accessToken);
-                break;
-            case GRAD_TWO,NONE:
-            default:
-                students = Arrays.asList(buildErroredStudent(pen, studentLoadType));
-                break;
+            }
+            default -> students = Arrays.asList(buildErroredStudent(pen, studentLoadType));
         }
 
         return students;
@@ -211,7 +206,7 @@ public class TraxCommonService {
         traxStudents.forEach(result -> {
             ConvGradStudent student = populateConvGradStudent(result, studentLoadType);
             handleAdult19Rule(student, studentLoadType);
-            if (studentLoadType == StudentLoadType.GRAD_ONE) {
+            if (studentLoadType != StudentLoadType.UNGRAD) {
                 TranscriptStudentDemog transcriptStudentDemog = tswService.getTranscriptStudentDemog(student.getPen());
                 student.setTranscriptStudentDemog(transcriptStudentDemog);
                 List<TranscriptStudentCourse> transcriptStudentCourses = tswService.getTranscriptStudentCourses(student.getPen());
@@ -219,9 +214,7 @@ public class TraxCommonService {
                 student.setDistributionDate(traxStudentRepository.getTheLatestDistributionDate(student.getPen()));
             }
             getSchoolsData(student, studentLoadType, accessToken);
-            if (student != null) {
-                students.add(student);
-            }
+            students.add(student);
         });
         return students;
     }
@@ -236,7 +229,7 @@ public class TraxCommonService {
         } else {
             return;
         }
-        if (studentLoadType == StudentLoadType.GRAD_ONE) {
+        if (studentLoadType != StudentLoadType.UNGRAD) {
             getSchoolsDataForGraduated(student, accessToken);
         }
     }
@@ -271,15 +264,15 @@ public class TraxCommonService {
 
     private void handleAdult19Rule(ConvGradStudent student, StudentLoadType studentLoadType) {
         if ("1950".equalsIgnoreCase(student.getGraduationRequirementYear()) && "AD".equalsIgnoreCase(student.getStudentGrade())) {
-            if (studentLoadType == StudentLoadType.GRAD_ONE) {
+            if (studentLoadType == StudentLoadType.UNGRAD) {
+                student.setAdult19Rule(isAdult19Rule(student.getPen()));
+            } else {
                 if (student.isAllowedAdult() ||
-                    (student.getProgramCompletionDate() != null && EducGradTraxApiConstants.ADULT_18_RULE_VALID_DATE.compareTo(student.getProgramCompletionDate()) <= 0)) {
+                        (student.getProgramCompletionDate() != null && EducGradTraxApiConstants.ADULT_18_RULE_VALID_DATE.compareTo(student.getProgramCompletionDate()) <= 0)) {
                     student.setAdult19Rule(false);
                 } else {
                     student.setAdult19Rule(true);
                 }
-            } else {
-                student.setAdult19Rule(isAdult19Rule(student.getPen()));
             }
         }
     }
@@ -306,15 +299,15 @@ public class TraxCommonService {
         // grad or non-grad
         Date programCompletionDate = null;
         String gradDateStr = null;
-        if (studentLoadType == StudentLoadType.GRAD_ONE) {
-            gradDateStr = (String) fields[7]; // from tsw_tran_demog in tsw
-            if (gradDateStr != null) {
-                gradDateStr = gradDateStr.trim();
-            }
-        } else {
+        if (studentLoadType == StudentLoadType.UNGRAD) {
             Integer gradDate = (Integer) fields[7]; // from student_master in trax
             if (gradDate != null && !gradDate.equals(Integer.valueOf(0))) {
                 gradDateStr = gradDate.toString();
+            }
+        } else {
+            gradDateStr = (String) fields[7]; // from tsw_tran_demog in tsw
+            if (gradDateStr != null) {
+                gradDateStr = gradDateStr.trim();
             }
         }
 
@@ -412,13 +405,13 @@ public class TraxCommonService {
 
     private StudentLoadType determineStudentLoadType(String gradReqtYear, Integer gradDate, Integer sccDate, Integer slpDate) {
         StudentLoadType result;
-        if (!"SCCP".equalsIgnoreCase(gradReqtYear) && sccDate > 0) {
+        if (!"SCCP".equalsIgnoreCase(gradReqtYear) && (sccDate != null && sccDate > 0)) {
             result = StudentLoadType.GRAD_TWO;
-        } else if ((!"SCCP".equalsIgnoreCase(gradReqtYear) && gradDate > 0) && (slpDate == 0 || slpDate == null)) {
+        } else if ((!"SCCP".equalsIgnoreCase(gradReqtYear) && gradDate > 0) && (slpDate == null || slpDate == 0)) {
             result = StudentLoadType.GRAD_ONE;
-        } else if ("SCCP".equalsIgnoreCase(gradReqtYear) && sccDate > 0) {
+        } else if ("SCCP".equalsIgnoreCase(gradReqtYear) && (sccDate != null && sccDate > 0)) {
             result = StudentLoadType.GRAD_ONE;
-        } else if (gradDate == 0 && (sccDate == 0 || sccDate == null)) {
+        } else if (gradDate == 0 && (sccDate == null || sccDate == 0)) {
             result = StudentLoadType.UNGRAD;
         } else {
             result = StudentLoadType.NONE;
