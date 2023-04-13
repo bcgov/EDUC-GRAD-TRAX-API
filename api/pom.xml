@@ -6,7 +6,7 @@
 
     <groupId>ca.bc.gov.educ</groupId>
     <artifactId>educ-grad-trax-api</artifactId>
-    <version>1.8.26</version>
+    <version>1.8.32</version>
     <name>educ-grad-trax-api</name>
     <description>Ministry of Education GRAD TRAX API</description>
 
@@ -42,7 +42,7 @@
         <nats.version>2.11.0</nats.version>
         <guava.version>30.1.1-jre</guava.version>
         <log4j.version>2.18.0</log4j.version>
-
+        <resilience4j.version>1.7.1</resilience4j.version>
     </properties>
 
     <parent>
@@ -151,6 +151,11 @@
             <groupId>org.modelmapper</groupId>
             <artifactId>modelmapper</artifactId>
             <version>3.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.resilience4j</groupId>
+            <artifactId>resilience4j-spring-boot2</artifactId>
+            <version>${resilience4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
