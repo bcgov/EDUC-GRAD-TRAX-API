@@ -81,20 +81,22 @@ public class TraxCommonService {
     public List<ConvGradStudent> getStudentMasterDataFromTrax(String pen, String accessToken) {
         List<ConvGradStudent> students;
         StudentLoadType studentLoadType = constants.isEnableStudentMasterOnly()? StudentLoadType.UNGRAD : getStudentLoadType(pen);
-        List<Object[]> results;
         switch (studentLoadType) {
-            case UNGRAD -> {
-                results = traxStudentRepository.loadTraxStudent(pen);
-                students = buildConversionGradStudents(results, studentLoadType, accessToken);
-            }
+            case UNGRAD -> students = getStudentMasterAsNonGrad(pen, false, accessToken);
             case GRAD_ONE, GRAD_TWO -> {
-                results = traxStudentRepository.loadTraxGraduatedStudent(pen);
-                students = buildConversionGradStudents(results, studentLoadType, accessToken);
+                List<Object[]> results = traxStudentRepository.loadTraxGraduatedStudent(pen);
+                students = buildConversionGradStudents(results, studentLoadType, false, accessToken);
             }
             default -> students = Arrays.asList(buildErroredStudent(pen, studentLoadType));
         }
 
         return students;
+    }
+
+    @Transactional(readOnly = true)
+    public List<ConvGradStudent> getStudentMasterAsNonGrad(String pen, boolean ongoingUpdate, String accessToken) {
+        List<Object[]> results = traxStudentRepository.loadTraxStudent(pen);
+        return buildConversionGradStudents(results, StudentLoadType.UNGRAD, ongoingUpdate, accessToken);
     }
 
     @Transactional(readOnly = true)
@@ -201,11 +203,11 @@ public class TraxCommonService {
         return traxStudentNo;
     }
 
-    private List<ConvGradStudent> buildConversionGradStudents(List<Object[]> traxStudents, StudentLoadType studentLoadType, String accessToken) {
+    private List<ConvGradStudent> buildConversionGradStudents(List<Object[]> traxStudents, StudentLoadType studentLoadType, boolean ongoingUpdate, String accessToken) {
         List<ConvGradStudent> students = new ArrayList<>();
         traxStudents.forEach(result -> {
             ConvGradStudent student = populateConvGradStudent(result, studentLoadType);
-            handleAdult19Rule(student, studentLoadType);
+            handleAdultStartDateRule(student, studentLoadType, ongoingUpdate);
             if (studentLoadType != StudentLoadType.UNGRAD) {
                 TranscriptStudentDemog transcriptStudentDemog = tswService.getTranscriptStudentDemog(student.getPen());
                 student.setTranscriptStudentDemog(transcriptStudentDemog);
@@ -262,10 +264,14 @@ public class TraxCommonService {
         }
     }
 
-    private void handleAdult19Rule(ConvGradStudent student, StudentLoadType studentLoadType) {
+    private void handleAdultStartDateRule(ConvGradStudent student, StudentLoadType studentLoadType, boolean ongoingUpdate) {
         if ("1950".equalsIgnoreCase(student.getGraduationRequirementYear()) && "AD".equalsIgnoreCase(student.getStudentGrade())) {
             if (studentLoadType == StudentLoadType.UNGRAD) {
-                student.setAdult19Rule(isAdult19Rule(student.getPen()));
+                if (ongoingUpdate) {
+                    student.setAdult19Rule(false);
+                } else {
+                    student.setAdult19Rule(isAdult19Rule(student.getPen()));
+                }
             } else {
                 if (student.isAllowedAdult() ||
                         (student.getProgramCompletionDate() != null && EducGradTraxApiConstants.ADULT_18_RULE_VALID_DATE.compareTo(student.getProgramCompletionDate()) <= 0)) {

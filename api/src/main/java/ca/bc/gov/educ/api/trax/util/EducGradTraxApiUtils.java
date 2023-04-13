@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.trax.util;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -96,6 +97,14 @@ public class EducGradTraxApiUtils {
 		HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add("Content-Type", "application/json");
         httpHeaders.setBearerAuth(accessToken);
+        return httpHeaders;
+    }
+
+    public static HttpHeaders getHeaders (String username,String password)
+    {
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        httpHeaders.setBasicAuth(username, password);
         return httpHeaders;
     }
 }
