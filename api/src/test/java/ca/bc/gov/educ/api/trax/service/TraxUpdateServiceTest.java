@@ -12,6 +12,7 @@ import ca.bc.gov.educ.api.trax.model.transformer.TraxUpdateInGradTransformer;
 import ca.bc.gov.educ.api.trax.repository.TraxUpdateInGradRepository;
 import ca.bc.gov.educ.api.trax.repository.TraxUpdatedPubEventRepository;
 import ca.bc.gov.educ.api.trax.util.JsonUtil;
+import ca.bc.gov.educ.api.trax.util.RestUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import net.javacrumbs.shedlock.core.LockAssert;
 import org.apache.commons.lang3.time.DateUtils;
@@ -61,6 +62,9 @@ public class TraxUpdateServiceTest {
 
     @MockBean
     TraxUpdatedPubEventRepository traxUpdatedPubEventRepository;
+
+    @MockBean
+    RestUtils restUtils;
 
     // NATS
     @MockBean
@@ -143,9 +147,12 @@ public class TraxUpdateServiceTest {
                 .updateDate(LocalDateTime.now())
                 .build();
 
+        ResponseObj tokenObj = new ResponseObj();
+        tokenObj.setAccess_token("123");
+        when(restUtils.getTokenResponseObject()).thenReturn(tokenObj);
         when(traxUpdateInGradRepository.findOutstandingUpdates(any())).thenReturn(Arrays.asList(traxUpdateInGradEntity));
         when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
-        when(traxCommonService.getStudentMasterDataFromTrax(pen, null)).thenReturn(Arrays.asList(traxStudent));
+        when(traxCommonService.getStudentMasterAsNonGrad(pen, true,"123")).thenReturn(Arrays.asList(traxStudent));
 
         traxUpdateService.publishTraxUpdatedEvent(traxUpdateInGradEntity);
         traxUpdateService.updateStatus(traxUpdateInGradEntity);
@@ -191,8 +198,11 @@ public class TraxUpdateServiceTest {
                 .updateDate(LocalDateTime.now())
                 .build();
 
+        ResponseObj tokenObj = new ResponseObj();
+        tokenObj.setAccess_token("123");
+        when(restUtils.getTokenResponseObject()).thenReturn(tokenObj);
         when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
-        when(traxCommonService.getStudentMasterDataFromTrax(pen, null)).thenReturn(Arrays.asList(traxStudent));
+        when(traxCommonService.getStudentMasterAsNonGrad(pen, true,"123")).thenReturn(Arrays.asList(traxStudent));
 
         traxUpdateService.publishTraxUpdatedEvent(traxUpdateInGradEntity);
         traxUpdateService.updateStatus(traxUpdateInGradEntity);
@@ -244,8 +254,11 @@ public class TraxUpdateServiceTest {
                 .updateDate(LocalDateTime.now())
                 .build();
 
+        ResponseObj tokenObj = new ResponseObj();
+        tokenObj.setAccess_token("123");
+        when(restUtils.getTokenResponseObject()).thenReturn(tokenObj);
         when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
-        when(traxCommonService.getStudentMasterDataFromTrax(pen, null)).thenReturn(Arrays.asList(traxStudent));
+        when(traxCommonService.getStudentMasterAsNonGrad(pen, true,"123")).thenReturn(Arrays.asList(traxStudent));
         when(traxCommonService.getStudentDemographicsDataFromTrax(pen)).thenReturn(Arrays.asList(penStudent));
 
         traxUpdateService.publishTraxUpdatedEvent(traxUpdateInGradEntity);
@@ -294,8 +307,11 @@ public class TraxUpdateServiceTest {
                 .updateDate(LocalDateTime.now())
                 .build();
 
+        ResponseObj tokenObj = new ResponseObj();
+        tokenObj.setAccess_token("123");
+        when(restUtils.getTokenResponseObject()).thenReturn(tokenObj);
         when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
-        when(traxCommonService.getStudentMasterDataFromTrax(pen, null)).thenReturn(Arrays.asList(traxStudent));
+        when(traxCommonService.getStudentMasterAsNonGrad(pen, true,"123")).thenReturn(Arrays.asList(traxStudent));
 
         traxUpdateService.publishTraxUpdatedEvent(traxUpdateInGradEntity);
         traxUpdateService.updateStatus(traxUpdateInGradEntity);
@@ -341,8 +357,11 @@ public class TraxUpdateServiceTest {
                 .updateDate(LocalDateTime.now())
                 .build();
 
+        ResponseObj tokenObj = new ResponseObj();
+        tokenObj.setAccess_token("123");
+        when(restUtils.getTokenResponseObject()).thenReturn(tokenObj);
         when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
-        when(traxCommonService.getStudentMasterDataFromTrax(pen, null)).thenReturn(Arrays.asList(traxStudent));
+        when(traxCommonService.getStudentMasterAsNonGrad(pen, true,"123")).thenReturn(Arrays.asList(traxStudent));
 
         traxUpdateService.publishTraxUpdatedEvent(traxUpdateInGradEntity);
         traxUpdateService.updateStatus(traxUpdateInGradEntity);
@@ -388,8 +407,11 @@ public class TraxUpdateServiceTest {
                 .updateDate(LocalDateTime.now())
                 .build();
 
+        ResponseObj tokenObj = new ResponseObj();
+        tokenObj.setAccess_token("123");
+        when(restUtils.getTokenResponseObject()).thenReturn(tokenObj);
         when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
-        when(traxCommonService.getStudentMasterDataFromTrax(pen, null)).thenReturn(Arrays.asList(traxStudent));
+        when(traxCommonService.getStudentMasterAsNonGrad(pen, true,"123")).thenReturn(Arrays.asList(traxStudent));
 
         traxUpdateService.publishTraxUpdatedEvent(traxUpdateInGradEntity);
         traxUpdateService.updateStatus(traxUpdateInGradEntity);
@@ -434,8 +456,11 @@ public class TraxUpdateServiceTest {
                 .updateDate(LocalDateTime.now())
                 .build();
 
+        ResponseObj tokenObj = new ResponseObj();
+        tokenObj.setAccess_token("123");
+        when(restUtils.getTokenResponseObject()).thenReturn(tokenObj);
         when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
-        when(traxCommonService.getStudentMasterDataFromTrax(pen, null)).thenReturn(Arrays.asList(traxStudent));
+        when(traxCommonService.getStudentMasterAsNonGrad(pen, true,"123")).thenReturn(Arrays.asList(traxStudent));
 
         traxUpdateService.publishTraxUpdatedEvent(traxUpdateInGradEntity);
         traxUpdateService.updateStatus(traxUpdateInGradEntity);
@@ -480,8 +505,11 @@ public class TraxUpdateServiceTest {
                 .updateDate(LocalDateTime.now())
                 .build();
 
+        ResponseObj tokenObj = new ResponseObj();
+        tokenObj.setAccess_token("123");
+        when(restUtils.getTokenResponseObject()).thenReturn(tokenObj);
         when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
-        when(traxCommonService.getStudentMasterDataFromTrax(pen, null)).thenReturn(Arrays.asList(traxStudent));
+        when(traxCommonService.getStudentMasterAsNonGrad(pen, true,"123")).thenReturn(Arrays.asList(traxStudent));
 
         traxUpdateService.publishTraxUpdatedEvent(traxUpdateInGradEntity);
         traxUpdateService.updateStatus(traxUpdateInGradEntity);
@@ -529,8 +557,11 @@ public class TraxUpdateServiceTest {
                 .updateDate(LocalDateTime.now())
                 .build();
 
+        ResponseObj tokenObj = new ResponseObj();
+        tokenObj.setAccess_token("123");
+        when(restUtils.getTokenResponseObject()).thenReturn(tokenObj);
         when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
-        when(traxCommonService.getStudentMasterDataFromTrax(pen, null)).thenReturn(Arrays.asList(traxStudent));
+        when(traxCommonService.getStudentMasterAsNonGrad(pen, true,"123")).thenReturn(Arrays.asList(traxStudent));
 
         traxUpdateService.publishTraxUpdatedEvent(traxUpdateInGradEntity);
         traxUpdateService.updateStatus(traxUpdateInGradEntity);

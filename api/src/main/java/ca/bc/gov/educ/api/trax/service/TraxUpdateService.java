@@ -8,6 +8,7 @@ import ca.bc.gov.educ.api.trax.model.entity.TraxUpdateInGradEntity;
 import ca.bc.gov.educ.api.trax.repository.TraxUpdatedPubEventRepository;
 import ca.bc.gov.educ.api.trax.repository.TraxUpdateInGradRepository;
 import ca.bc.gov.educ.api.trax.util.JsonUtil;
+import ca.bc.gov.educ.api.trax.util.RestUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -37,6 +38,9 @@ public class TraxUpdateService {
 
     @Autowired
     private TraxUpdatedPubEventRepository traxUpdatedPubEventRepository;
+
+    @Autowired
+    private RestUtils restUtils;
 
     @Autowired
     Publisher publisher;
@@ -98,7 +102,8 @@ public class TraxUpdateService {
 
     private ConvGradStudent populateNewStudent(String pen) {
         ConvGradStudent payload = null;
-        List<ConvGradStudent> results = traxCommonService.getStudentMasterDataFromTrax(pen, null);
+        String accessToken = fetchAccessToken();
+        List<ConvGradStudent> results = traxCommonService.getStudentMasterAsNonGrad(pen, true, accessToken);
         if (results != null && !results.isEmpty()) {
             payload = results.get(0);
         }
@@ -125,8 +130,9 @@ public class TraxUpdateService {
 
     private TraxStudentUpdateDTO populateEventPayload(String updateType, String pen) {
         TraxStudentUpdateDTO result = null;
-        ConvGradStudent traxStudent = null;
-        List<ConvGradStudent> results = traxCommonService.getStudentMasterDataFromTrax(pen, null);
+        ConvGradStudent traxStudent;
+        String accessToken = fetchAccessToken();
+        List<ConvGradStudent> results = traxCommonService.getStudentMasterAsNonGrad(pen, true, accessToken);
         if (results != null && !results.isEmpty()) {
             traxStudent = results.get(0);
             switch(updateType) {
@@ -181,5 +187,13 @@ public class TraxUpdateService {
         if (traxUpdatedPubEvent != null) {
             publisher.dispatchChoreographyEvent(traxUpdatedPubEvent);
         }
+    }
+
+    private String fetchAccessToken() {
+        ResponseObj res = restUtils.getTokenResponseObject();
+        if (res != null) {
+            return res.getAccess_token();
+        }
+        return null;
     }
 }

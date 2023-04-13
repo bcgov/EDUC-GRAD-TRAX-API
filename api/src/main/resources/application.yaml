@@ -89,6 +89,21 @@ springdoc:
     path: /api/v1/api-docs-ui.html
     operationsSorter: alpha
 
+#Resilience
+resilience4j.retry:
+  instances:
+    rt-getToken:
+      maxAttempts: 10
+      waitDuration: 5s
+      retryExceptions:
+        - org.springframework.web.client.HttpServerErrorException
+      ignoreExceptions:
+        - java.lang.NullPointerException
+
+authorization:
+  user: ${GRAD_CLIENT_NAME}
+  password: ${GRAD_CLIENT_SECRET}
+
 #NATS
 nats:
   url: ${NATS}
@@ -129,6 +144,8 @@ splunk:
 
 #Endpoint properties
 endpoint:
+  keycloak:
+    getToken: ${KEYCLOAK_TOKEN_URL}auth/realms/master/protocol/openid-connect/token
   educ-school-api:
     get-school-by-mincode:
       url: ${EDUC_SCHOOL_API}api/v1/schools/%s
