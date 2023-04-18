@@ -13,11 +13,9 @@ import ca.bc.gov.educ.api.trax.repository.TraxSchoolSearchCriteria;
 import ca.bc.gov.educ.api.trax.repository.TraxSchoolSearchSpecification;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import org.apache.commons.lang3.StringUtils;
-
-
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -28,7 +26,6 @@ import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.context.ActiveProfiles;
-
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
@@ -434,6 +431,8 @@ class SchoolServiceTest {
         mockCommonSchool("02121000", "THE GATEWAY COMMUNITY LEARNING CENTRE");
         var result = schoolService.getCommonSchool("accessToken", "02121000");
         assertThat(result).isNotNull();
+        List<CommonSchool> commonSchools = schoolService.getCommonSchools("accessToken");
+        assertThat(commonSchools).isNotNull();
     }
 
     @Test
@@ -457,6 +456,12 @@ class SchoolServiceTest {
 
         Mockito.when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
         Mockito.when(this.requestHeadersUriMock.uri(String.format(constants.getSchoolByMincodeSchoolApiUrl(), minCode))).thenReturn(this.requestHeadersMock);
+        Mockito.when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+        Mockito.when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+        Mockito.when(this.responseMock.bodyToMono(CommonSchool.class)).thenReturn(Mono.just(commonSchool));
+
+        Mockito.when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+        Mockito.when(this.requestHeadersUriMock.uri(constants.getAllSchoolSchoolApiUrl())).thenReturn(this.requestHeadersMock);
         Mockito.when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
         Mockito.when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
         Mockito.when(this.responseMock.bodyToMono(CommonSchool.class)).thenReturn(Mono.just(commonSchool));
