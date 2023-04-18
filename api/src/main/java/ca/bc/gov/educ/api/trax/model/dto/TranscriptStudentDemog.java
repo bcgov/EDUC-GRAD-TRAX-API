@@ -6,8 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
+import jakarta.persistence.Column;
+import jakarta.persistence.Id;
 
 /**
  * The type TSW Transcript Demographics.
@@ -19,33 +19,11 @@ import javax.persistence.Id;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TranscriptStudentDemog {
     private String studNo;
-    private String logoType;
-    private String archiveFlag;
-    // School info
     private String mincode;
-    private String schoolName;
-    private String address1;
-    private String city;
-    private String provCode;
-    private String postal;
-    private String localId;
-    private String earlyAdmission;
-
-    // Student Demographics
     private String birthDate;  // yyyymmdd
     private String gradReqtYear; // yyyy
     private String studentGrade;
-    private String studCitiz;
-    private String studGender;
-    private String programCode;
-    private String lastName;
-    private String firstName;
-    private String middleName;
     private Long gradDate; // yyyymm
-    private String gradFlag;
-    private String totalCredits;
     private String gradMessage;
-    private String gradTextMessage;
-    private String currentFormerFlag;
     private Long updateDate; // yyyymmdd
 }

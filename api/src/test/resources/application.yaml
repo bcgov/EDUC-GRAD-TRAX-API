@@ -6,8 +6,11 @@ spring:
     hikari:
       pool-name: gradtraxapi-api-cp
       maximum-pool-size: 2
-      connection-timeout: 6000
-      max-lifetime: 600000
+      connection-timeout: 60000
+      max-lifetime: 580000
+      minimum-idle: 2
+      keepalive-time: 150000
+      idle-timeout: 400000
     driver-class: org.h2.Driver
     url: jdbc:h2:mem:test;INIT=CREATE SCHEMA IF NOT EXISTS shedlock;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
   jpa:
@@ -56,6 +59,10 @@ logging:
             logging: INFO
       hibernate: ERROR
 
+authorization:
+  user: batch-api
+  password: abc
+
 #NATS
 nats:
   url: test
@@ -67,13 +74,20 @@ cron:
   scheduled:
     process:
       events:
-        stan:
-          run: 0 0/5 * * * *
+        grad-to-trax:
+          run: 0 0/10 * * * *
+          lockAtLeastFor: PT1M
+          lockAtMostFor: PT4M
+        trax-to-grad:
+          run: 0 0/10 * * * *
+          lockAtLeastFor: PT1M
+          lockAtMostFor: PT4M
+      trigger-jobs:
+        read-trax-update:
+          run: 0 0/2 * * * *
           lockAtLeastFor: 800ms
           lockAtMostFor: 900ms
-      jobs:
-        stan:
-          run: 0 0/10 * * * *
+
 #Incremental Trax Update
 trax:
   update:
@@ -89,6 +103,8 @@ splunk:
 
 #Endpoint properties
 endpoint:
+  keycloak:
+    getToken: https://soam-tools.apps.silver.devops.gov.bc.ca/auth/realms/master/protocol/openid-connect/token
   educ-school-api:
     get-school-by-mincode:
       url: https://school-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/schools/%s

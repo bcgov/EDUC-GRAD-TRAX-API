@@ -5,13 +5,14 @@ import ca.bc.gov.educ.api.trax.constant.EventType;
 import ca.bc.gov.educ.api.trax.messaging.NatsConnection;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Subscriber;
-import ca.bc.gov.educ.api.trax.model.dto.TraxUpdateInGrad;
+import ca.bc.gov.educ.api.trax.model.dto.*;
 import ca.bc.gov.educ.api.trax.model.entity.TraxUpdateInGradEntity;
 import ca.bc.gov.educ.api.trax.model.entity.TraxUpdatedPubEvent;
 import ca.bc.gov.educ.api.trax.model.transformer.TraxUpdateInGradTransformer;
 import ca.bc.gov.educ.api.trax.repository.TraxUpdateInGradRepository;
 import ca.bc.gov.educ.api.trax.repository.TraxUpdatedPubEventRepository;
 import ca.bc.gov.educ.api.trax.util.JsonUtil;
+import ca.bc.gov.educ.api.trax.util.RestUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import net.javacrumbs.shedlock.core.LockAssert;
 import org.apache.commons.lang3.time.DateUtils;
@@ -50,6 +51,9 @@ public class TraxUpdateServiceTest {
     @Autowired
     TraxUpdateService traxUpdateService;
 
+    @MockBean
+    TraxCommonService traxCommonService;
+
     @Autowired
     TraxUpdateInGradTransformer traxUpdateInGradTransformer;
 
@@ -58,6 +62,9 @@ public class TraxUpdateServiceTest {
 
     @MockBean
     TraxUpdatedPubEventRepository traxUpdatedPubEventRepository;
+
+    @MockBean
+    RestUtils restUtils;
 
     // NATS
     @MockBean
@@ -84,7 +91,7 @@ public class TraxUpdateServiceTest {
         TraxUpdateInGradEntity traxUpdateInGradEntity = new TraxUpdateInGradEntity();
         traxUpdateInGradEntity.setId(BigDecimal.valueOf(1000));
         traxUpdateInGradEntity.setPen("123456789");
-        traxUpdateInGradEntity.setUpdateType("STUDENT");
+        traxUpdateInGradEntity.setUpdateType("UPD_GRAD");
         traxUpdateInGradEntity.setStatus("OUTSTANDING");
         traxUpdateInGradEntity.setUpdateDate(DateUtils.addDays(new Date(), -1));
 
@@ -100,18 +107,35 @@ public class TraxUpdateServiceTest {
     }
 
     @Test
-    public void testProcess() throws JsonProcessingException {
+    public void testScheduledRunForTraxUpdates() throws JsonProcessingException {
+        String pen = "123456789";
+        LockAssert.TestHelper.makeAllAssertsPass(true);
+
         TraxUpdateInGradEntity traxUpdateInGradEntity = new TraxUpdateInGradEntity();
-        traxUpdateInGradEntity.setPen("123456789");
-        traxUpdateInGradEntity.setUpdateType("STUDENT");
+        traxUpdateInGradEntity.setPen(pen);
+        traxUpdateInGradEntity.setUpdateType("UPD_GRAD");
         traxUpdateInGradEntity.setStatus("OUTSTANDING");
         traxUpdateInGradEntity.setUpdateDate(DateUtils.addDays(new Date(), -1));
 
-        TraxUpdateInGrad traxUpdateInGrad = traxUpdateInGradTransformer.transformToDTO(traxUpdateInGradEntity);
-        String jsonString = JsonUtil.getJsonStringFromObject(traxUpdateInGrad);
+        TraxGraduationUpdateDTO payload = new TraxGraduationUpdateDTO();
+        payload.setPen(pen);
+        payload.setStudentGrade("12");
+        payload.setSchoolOfRecord("12345678");
+        payload.setCitizenship("C");
+        payload.setGraduationRequirementYear("2018");
+        String jsonString = JsonUtil.getJsonStringFromObject(payload);
+
+        ConvGradStudent traxStudent = new ConvGradStudent();
+        traxStudent.setPen(pen);
+        traxStudent.setStudentGrade("12");
+        traxStudent.setSchoolOfRecord("12345678");
+        traxStudent.setGraduationRequirementYear("2018");
+        traxStudent.setStudentStatus("A");
+        traxStudent.setArchiveFlag("A");
+        traxStudent.setStudentCitizenship("C");
 
         TraxUpdatedPubEvent traxUpdatedPubEvent = TraxUpdatedPubEvent.builder()
-                .eventType(EventType.UPDATE_TRAX_STUDENT_MASTER.toString())
+                .eventType(EventType.UPD_GRAD.toString())
                 .eventId(UUID.randomUUID())
                 .eventOutcome(EventOutcome.TRAX_STUDENT_MASTER_UPDATED.toString())
                 .activityCode(traxUpdateInGradEntity.getUpdateType())
@@ -123,28 +147,46 @@ public class TraxUpdateServiceTest {
                 .updateDate(LocalDateTime.now())
                 .build();
 
+        ResponseObj tokenObj = new ResponseObj();
+        tokenObj.setAccess_token("123");
+        when(restUtils.getTokenResponseObject()).thenReturn(tokenObj);
+        when(traxUpdateInGradRepository.findOutstandingUpdates(any())).thenReturn(Arrays.asList(traxUpdateInGradEntity));
         when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
+        when(traxCommonService.getStudentMasterAsNonGrad(pen, true,"123")).thenReturn(Arrays.asList(traxStudent));
 
-        traxUpdateService.process(Arrays.asList(traxUpdateInGradEntity));
+        traxUpdateService.publishTraxUpdatedEvent(traxUpdateInGradEntity);
+        traxUpdateService.updateStatus(traxUpdateInGradEntity);
 
         assertThatNoException();
     }
 
     @Test
-    public void testScheduledRunForTraxUpdates() throws JsonProcessingException {
-        LockAssert.TestHelper.makeAllAssertsPass(true);
+    public void testProcess_whenNewStudent_isAdded() throws JsonProcessingException {
+        String pen = "123456789";
 
         TraxUpdateInGradEntity traxUpdateInGradEntity = new TraxUpdateInGradEntity();
-        traxUpdateInGradEntity.setPen("123456789");
-        traxUpdateInGradEntity.setUpdateType("STUDENT");
+        traxUpdateInGradEntity.setPen(pen);
+        traxUpdateInGradEntity.setUpdateType("NEWSTUDENT");
         traxUpdateInGradEntity.setStatus("OUTSTANDING");
         traxUpdateInGradEntity.setUpdateDate(DateUtils.addDays(new Date(), -1));
 
-        TraxUpdateInGrad traxUpdateInGrad = traxUpdateInGradTransformer.transformToDTO(traxUpdateInGradEntity);
-        String jsonString = JsonUtil.getJsonStringFromObject(traxUpdateInGrad);
+        TraxDemographicsUpdateDTO payload = new TraxDemographicsUpdateDTO();
+        payload.setPen(pen);
+        payload.setLastName("Test");
+        payload.setFirstName("QA");
+        String jsonString = JsonUtil.getJsonStringFromObject(payload);
+
+        ConvGradStudent traxStudent = new ConvGradStudent();
+        traxStudent.setPen(pen);
+        traxStudent.setStudentGrade("12");
+        traxStudent.setSchoolOfRecord("12345678");
+        traxStudent.setGraduationRequirementYear("2018");
+        traxStudent.setStudentStatus("A");
+        traxStudent.setArchiveFlag("A");
+        traxStudent.setStudentCitizenship("C");
 
         TraxUpdatedPubEvent traxUpdatedPubEvent = TraxUpdatedPubEvent.builder()
-                .eventType(EventType.UPDATE_TRAX_STUDENT_MASTER.toString())
+                .eventType(EventType.NEWSTUDENT.toString())
                 .eventId(UUID.randomUUID())
                 .eventOutcome(EventOutcome.TRAX_STUDENT_MASTER_UPDATED.toString())
                 .activityCode(traxUpdateInGradEntity.getUpdateType())
@@ -156,10 +198,373 @@ public class TraxUpdateServiceTest {
                 .updateDate(LocalDateTime.now())
                 .build();
 
-        when(traxUpdateInGradRepository.findOutstandingUpdates(any())).thenReturn(Arrays.asList(traxUpdateInGradEntity));
+        ResponseObj tokenObj = new ResponseObj();
+        tokenObj.setAccess_token("123");
+        when(restUtils.getTokenResponseObject()).thenReturn(tokenObj);
         when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
+        when(traxCommonService.getStudentMasterAsNonGrad(pen, true,"123")).thenReturn(Arrays.asList(traxStudent));
 
-        traxUpdateService.scheduledRunForTraxUpdates();
+        traxUpdateService.publishTraxUpdatedEvent(traxUpdateInGradEntity);
+        traxUpdateService.updateStatus(traxUpdateInGradEntity);
+
+        assertThatNoException();
+    }
+
+    @Test
+    public void testProcess_whenStudentDemographicInfo_isUpdated() throws JsonProcessingException {
+        String pen = "123456789";
+
+        TraxUpdateInGradEntity traxUpdateInGradEntity = new TraxUpdateInGradEntity();
+        traxUpdateInGradEntity.setPen(pen);
+        traxUpdateInGradEntity.setUpdateType("UPD_DEMOG");
+        traxUpdateInGradEntity.setStatus("OUTSTANDING");
+        traxUpdateInGradEntity.setUpdateDate(DateUtils.addDays(new Date(), -1));
+
+        TraxDemographicsUpdateDTO payload = new TraxDemographicsUpdateDTO();
+        payload.setPen(pen);
+        payload.setLastName("Test");
+        payload.setFirstName("QA");
+        String jsonString = JsonUtil.getJsonStringFromObject(payload);
+
+        ConvGradStudent traxStudent = new ConvGradStudent();
+        traxStudent.setPen(pen);
+        traxStudent.setStudentGrade("12");
+        traxStudent.setSchoolOfRecord("12345678");
+        traxStudent.setGraduationRequirementYear("2018");
+        traxStudent.setStudentStatus("A");
+        traxStudent.setArchiveFlag("A");
+        traxStudent.setStudentCitizenship("C");
+
+        Student penStudent = new Student();
+        penStudent.setPen(pen);
+        penStudent.setStudentID(UUID.randomUUID().toString());
+        penStudent.setLegalLastName("Test");
+        penStudent.setLegalFirstName("QA");
+
+        TraxUpdatedPubEvent traxUpdatedPubEvent = TraxUpdatedPubEvent.builder()
+                .eventType(EventType.UPD_DEMOG.toString())
+                .eventId(UUID.randomUUID())
+                .eventOutcome(EventOutcome.TRAX_STUDENT_MASTER_UPDATED.toString())
+                .activityCode(traxUpdateInGradEntity.getUpdateType())
+                .eventPayload(jsonString)
+                .eventStatus(DB_COMMITTED.toString())
+                .createUser(DEFAULT_CREATED_BY)
+                .updateUser(DEFAULT_UPDATED_BY)
+                .createDate(LocalDateTime.now())
+                .updateDate(LocalDateTime.now())
+                .build();
+
+        ResponseObj tokenObj = new ResponseObj();
+        tokenObj.setAccess_token("123");
+        when(restUtils.getTokenResponseObject()).thenReturn(tokenObj);
+        when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
+        when(traxCommonService.getStudentMasterAsNonGrad(pen, true,"123")).thenReturn(Arrays.asList(traxStudent));
+        when(traxCommonService.getStudentDemographicsDataFromTrax(pen)).thenReturn(Arrays.asList(penStudent));
+
+        traxUpdateService.publishTraxUpdatedEvent(traxUpdateInGradEntity);
+        traxUpdateService.updateStatus(traxUpdateInGradEntity);
+
+        assertThatNoException();
+    }
+
+    @Test
+    public void testProcess_whenGraduation_isUpdated() throws JsonProcessingException {
+        String pen = "123456789";
+
+        TraxUpdateInGradEntity traxUpdateInGradEntity = new TraxUpdateInGradEntity();
+        traxUpdateInGradEntity.setPen(pen);
+        traxUpdateInGradEntity.setUpdateType("UPD_GRAD");
+        traxUpdateInGradEntity.setStatus("OUTSTANDING");
+        traxUpdateInGradEntity.setUpdateDate(DateUtils.addDays(new Date(), -1));
+
+        TraxGraduationUpdateDTO payload = new TraxGraduationUpdateDTO();
+        payload.setPen(pen);
+        payload.setStudentGrade("12");
+        payload.setSchoolOfRecord("12345678");
+        payload.setCitizenship("C");
+        payload.setGraduationRequirementYear("2018");
+        String jsonString = JsonUtil.getJsonStringFromObject(payload);
+
+        ConvGradStudent traxStudent = new ConvGradStudent();
+        traxStudent.setPen(pen);
+        traxStudent.setStudentGrade("12");
+        traxStudent.setSchoolOfRecord("12345678");
+        traxStudent.setGraduationRequirementYear("2018");
+        traxStudent.setStudentStatus("A");
+        traxStudent.setArchiveFlag("A");
+        traxStudent.setStudentCitizenship("C");
+
+        TraxUpdatedPubEvent traxUpdatedPubEvent = TraxUpdatedPubEvent.builder()
+                .eventType(EventType.UPD_GRAD.toString())
+                .eventId(UUID.randomUUID())
+                .eventOutcome(EventOutcome.TRAX_STUDENT_MASTER_UPDATED.toString())
+                .activityCode(traxUpdateInGradEntity.getUpdateType())
+                .eventPayload(jsonString)
+                .eventStatus(DB_COMMITTED.toString())
+                .createUser(DEFAULT_CREATED_BY)
+                .updateUser(DEFAULT_UPDATED_BY)
+                .createDate(LocalDateTime.now())
+                .updateDate(LocalDateTime.now())
+                .build();
+
+        ResponseObj tokenObj = new ResponseObj();
+        tokenObj.setAccess_token("123");
+        when(restUtils.getTokenResponseObject()).thenReturn(tokenObj);
+        when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
+        when(traxCommonService.getStudentMasterAsNonGrad(pen, true,"123")).thenReturn(Arrays.asList(traxStudent));
+
+        traxUpdateService.publishTraxUpdatedEvent(traxUpdateInGradEntity);
+        traxUpdateService.updateStatus(traxUpdateInGradEntity);
+
+        assertThatNoException();
+    }
+
+    @Test
+    public void testProcess_whenStudentStatus_isUpdated() throws JsonProcessingException {
+        String pen = "123456789";
+
+        TraxUpdateInGradEntity traxUpdateInGradEntity = new TraxUpdateInGradEntity();
+        traxUpdateInGradEntity.setPen(pen);
+        traxUpdateInGradEntity.setUpdateType("UPD_STD_STATUS");
+        traxUpdateInGradEntity.setStatus("OUTSTANDING");
+        traxUpdateInGradEntity.setUpdateDate(DateUtils.addDays(new Date(), -1));
+
+        TraxStudentStatusUpdateDTO payload = new TraxStudentStatusUpdateDTO();
+        payload.setPen(pen);
+        payload.setStudentStatus("A");
+        payload.setStudentStatus("A");
+        String jsonString = JsonUtil.getJsonStringFromObject(payload);
+
+        ConvGradStudent traxStudent = new ConvGradStudent();
+        traxStudent.setPen(pen);
+        traxStudent.setStudentGrade("12");
+        traxStudent.setSchoolOfRecord("12345678");
+        traxStudent.setGraduationRequirementYear("2018");
+        traxStudent.setStudentStatus("A");
+        traxStudent.setArchiveFlag("A");
+        traxStudent.setStudentCitizenship("C");
+
+        TraxUpdatedPubEvent traxUpdatedPubEvent = TraxUpdatedPubEvent.builder()
+                .eventType(EventType.UPD_STD_STATUS.toString())
+                .eventId(UUID.randomUUID())
+                .eventOutcome(EventOutcome.TRAX_STUDENT_MASTER_UPDATED.toString())
+                .activityCode(traxUpdateInGradEntity.getUpdateType())
+                .eventPayload(jsonString)
+                .eventStatus(DB_COMMITTED.toString())
+                .createUser(DEFAULT_CREATED_BY)
+                .updateUser(DEFAULT_UPDATED_BY)
+                .createDate(LocalDateTime.now())
+                .updateDate(LocalDateTime.now())
+                .build();
+
+        ResponseObj tokenObj = new ResponseObj();
+        tokenObj.setAccess_token("123");
+        when(restUtils.getTokenResponseObject()).thenReturn(tokenObj);
+        when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
+        when(traxCommonService.getStudentMasterAsNonGrad(pen, true,"123")).thenReturn(Arrays.asList(traxStudent));
+
+        traxUpdateService.publishTraxUpdatedEvent(traxUpdateInGradEntity);
+        traxUpdateService.updateStatus(traxUpdateInGradEntity);
+
+        assertThatNoException();
+    }
+
+    @Test
+    public void testProcess_whenXProgram_isUpdated() throws JsonProcessingException {
+        String pen = "123456789";
+
+        TraxUpdateInGradEntity traxUpdateInGradEntity = new TraxUpdateInGradEntity();
+        traxUpdateInGradEntity.setPen(pen);
+        traxUpdateInGradEntity.setUpdateType("XPROGRAM");
+        traxUpdateInGradEntity.setStatus("OUTSTANDING");
+        traxUpdateInGradEntity.setUpdateDate(DateUtils.addDays(new Date(), -1));
+
+        TraxXProgramDTO payload = new TraxXProgramDTO();
+        payload.setPen(pen);
+        payload.setProgramList(Arrays.asList("XC"));
+        String jsonString = JsonUtil.getJsonStringFromObject(payload);
+
+        ConvGradStudent traxStudent = new ConvGradStudent();
+        traxStudent.setPen(pen);
+        traxStudent.setStudentGrade("12");
+        traxStudent.setSchoolOfRecord("12345678");
+        traxStudent.setGraduationRequirementYear("2018");
+        traxStudent.setStudentStatus("A");
+        traxStudent.setArchiveFlag("A");
+        traxStudent.setStudentCitizenship("C");
+        traxStudent.setProgramCodes(Arrays.asList("XC"));
+
+        TraxUpdatedPubEvent traxUpdatedPubEvent = TraxUpdatedPubEvent.builder()
+                .eventType(EventType.XPROGRAM.toString())
+                .eventId(UUID.randomUUID())
+                .eventOutcome(EventOutcome.TRAX_STUDENT_MASTER_UPDATED.toString())
+                .activityCode(traxUpdateInGradEntity.getUpdateType())
+                .eventPayload(jsonString)
+                .eventStatus(DB_COMMITTED.toString())
+                .createUser(DEFAULT_CREATED_BY)
+                .updateUser(DEFAULT_UPDATED_BY)
+                .createDate(LocalDateTime.now())
+                .updateDate(LocalDateTime.now())
+                .build();
+
+        ResponseObj tokenObj = new ResponseObj();
+        tokenObj.setAccess_token("123");
+        when(restUtils.getTokenResponseObject()).thenReturn(tokenObj);
+        when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
+        when(traxCommonService.getStudentMasterAsNonGrad(pen, true,"123")).thenReturn(Arrays.asList(traxStudent));
+
+        traxUpdateService.publishTraxUpdatedEvent(traxUpdateInGradEntity);
+        traxUpdateService.updateStatus(traxUpdateInGradEntity);
+
+        assertThatNoException();
+    }
+
+    @Test
+    public void testProcess_whenAssessment_isUpdated() throws JsonProcessingException {
+        String pen = "123456789";
+
+        TraxUpdateInGradEntity traxUpdateInGradEntity = new TraxUpdateInGradEntity();
+        traxUpdateInGradEntity.setPen(pen);
+        traxUpdateInGradEntity.setUpdateType("ASSESSMENT");
+        traxUpdateInGradEntity.setStatus("OUTSTANDING");
+        traxUpdateInGradEntity.setUpdateDate(DateUtils.addDays(new Date(), -1));
+
+        TraxStudentUpdateDTO payload = new TraxStudentUpdateDTO();
+        payload.setPen(pen);
+        String jsonString = JsonUtil.getJsonStringFromObject(payload);
+
+        ConvGradStudent traxStudent = new ConvGradStudent();
+        traxStudent.setPen(pen);
+        traxStudent.setStudentGrade("12");
+        traxStudent.setSchoolOfRecord("12345678");
+        traxStudent.setGraduationRequirementYear("2018");
+        traxStudent.setStudentStatus("A");
+        traxStudent.setArchiveFlag("A");
+        traxStudent.setStudentCitizenship("C");
+        traxStudent.setProgramCodes(Arrays.asList("XC"));
+
+        TraxUpdatedPubEvent traxUpdatedPubEvent = TraxUpdatedPubEvent.builder()
+                .eventType(EventType.ASSESSMENT.toString())
+                .eventId(UUID.randomUUID())
+                .eventOutcome(EventOutcome.TRAX_STUDENT_MASTER_UPDATED.toString())
+                .activityCode(traxUpdateInGradEntity.getUpdateType())
+                .eventPayload(jsonString)
+                .eventStatus(DB_COMMITTED.toString())
+                .createUser(DEFAULT_CREATED_BY)
+                .updateUser(DEFAULT_UPDATED_BY)
+                .createDate(LocalDateTime.now())
+                .updateDate(LocalDateTime.now())
+                .build();
+
+        ResponseObj tokenObj = new ResponseObj();
+        tokenObj.setAccess_token("123");
+        when(restUtils.getTokenResponseObject()).thenReturn(tokenObj);
+        when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
+        when(traxCommonService.getStudentMasterAsNonGrad(pen, true,"123")).thenReturn(Arrays.asList(traxStudent));
+
+        traxUpdateService.publishTraxUpdatedEvent(traxUpdateInGradEntity);
+        traxUpdateService.updateStatus(traxUpdateInGradEntity);
+
+        assertThatNoException();
+    }
+
+    @Test
+    public void testProcess_whenCourse_isUpdated() throws JsonProcessingException {
+        String pen = "123456789";
+
+        TraxUpdateInGradEntity traxUpdateInGradEntity = new TraxUpdateInGradEntity();
+        traxUpdateInGradEntity.setPen(pen);
+        traxUpdateInGradEntity.setUpdateType("COURSE");
+        traxUpdateInGradEntity.setStatus("OUTSTANDING");
+        traxUpdateInGradEntity.setUpdateDate(DateUtils.addDays(new Date(), -1));
+
+        TraxStudentUpdateDTO payload = new TraxStudentUpdateDTO();
+        payload.setPen(pen);
+        String jsonString = JsonUtil.getJsonStringFromObject(payload);
+
+        ConvGradStudent traxStudent = new ConvGradStudent();
+        traxStudent.setPen(pen);
+        traxStudent.setStudentGrade("12");
+        traxStudent.setSchoolOfRecord("12345678");
+        traxStudent.setGraduationRequirementYear("2018");
+        traxStudent.setStudentStatus("A");
+        traxStudent.setArchiveFlag("A");
+        traxStudent.setStudentCitizenship("C");
+        traxStudent.setProgramCodes(Arrays.asList("XC"));
+
+        TraxUpdatedPubEvent traxUpdatedPubEvent = TraxUpdatedPubEvent.builder()
+                .eventType(EventType.COURSE.toString())
+                .eventId(UUID.randomUUID())
+                .eventOutcome(EventOutcome.TRAX_STUDENT_MASTER_UPDATED.toString())
+                .activityCode(traxUpdateInGradEntity.getUpdateType())
+                .eventPayload(jsonString)
+                .eventStatus(DB_COMMITTED.toString())
+                .createUser(DEFAULT_CREATED_BY)
+                .updateUser(DEFAULT_UPDATED_BY)
+                .createDate(LocalDateTime.now())
+                .updateDate(LocalDateTime.now())
+                .build();
+
+        ResponseObj tokenObj = new ResponseObj();
+        tokenObj.setAccess_token("123");
+        when(restUtils.getTokenResponseObject()).thenReturn(tokenObj);
+        when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
+        when(traxCommonService.getStudentMasterAsNonGrad(pen, true,"123")).thenReturn(Arrays.asList(traxStudent));
+
+        traxUpdateService.publishTraxUpdatedEvent(traxUpdateInGradEntity);
+        traxUpdateService.updateStatus(traxUpdateInGradEntity);
+
+        assertThatNoException();
+    }
+
+    @Test
+    public void testProcess_whenFrenchImmersion_forGrade10_isAdded() throws JsonProcessingException {
+        String pen = "123456789";
+
+        TraxUpdateInGradEntity traxUpdateInGradEntity = new TraxUpdateInGradEntity();
+        traxUpdateInGradEntity.setPen(pen);
+        traxUpdateInGradEntity.setUpdateType("FI10ADD");
+        traxUpdateInGradEntity.setStatus("OUTSTANDING");
+        traxUpdateInGradEntity.setUpdateDate(DateUtils.addDays(new Date(), -1));
+
+        TraxFrenchImmersionUpdateDTO payload = new TraxFrenchImmersionUpdateDTO();
+        payload.setPen(pen);
+        payload.setCourseCode("FRAL");
+        payload.setCourseLevel("10");
+        payload.setGraduationRequirementYear("2018");
+        String jsonString = JsonUtil.getJsonStringFromObject(payload);
+
+        ConvGradStudent traxStudent = new ConvGradStudent();
+        traxStudent.setPen(pen);
+        traxStudent.setStudentGrade("12");
+        traxStudent.setSchoolOfRecord("12345678");
+        traxStudent.setGraduationRequirementYear("2018");
+        traxStudent.setStudentStatus("A");
+        traxStudent.setArchiveFlag("A");
+        traxStudent.setStudentCitizenship("C");
+        traxStudent.setProgramCodes(Arrays.asList("XC"));
+
+        TraxUpdatedPubEvent traxUpdatedPubEvent = TraxUpdatedPubEvent.builder()
+                .eventType(EventType.FI10ADD.toString())
+                .eventId(UUID.randomUUID())
+                .eventOutcome(EventOutcome.TRAX_STUDENT_MASTER_UPDATED.toString())
+                .activityCode(traxUpdateInGradEntity.getUpdateType())
+                .eventPayload(jsonString)
+                .eventStatus(DB_COMMITTED.toString())
+                .createUser(DEFAULT_CREATED_BY)
+                .updateUser(DEFAULT_UPDATED_BY)
+                .createDate(LocalDateTime.now())
+                .updateDate(LocalDateTime.now())
+                .build();
+
+        ResponseObj tokenObj = new ResponseObj();
+        tokenObj.setAccess_token("123");
+        when(restUtils.getTokenResponseObject()).thenReturn(tokenObj);
+        when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
+        when(traxCommonService.getStudentMasterAsNonGrad(pen, true,"123")).thenReturn(Arrays.asList(traxStudent));
+
+        traxUpdateService.publishTraxUpdatedEvent(traxUpdateInGradEntity);
+        traxUpdateService.updateStatus(traxUpdateInGradEntity);
 
         assertThatNoException();
     }

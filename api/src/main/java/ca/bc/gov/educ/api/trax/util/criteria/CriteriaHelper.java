@@ -61,7 +61,7 @@ public class CriteriaHelper {
 	/**
 	 * Order by the specified column (can be nested).
 	 * 
-	 * @param colum
+	 * @param column: column
 	 * @param asc True for ASC sort, false for DESC sort
 	 * @return
 	 */

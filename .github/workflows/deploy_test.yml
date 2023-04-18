@@ -14,13 +14,14 @@ env:
   APP_DOMAIN: ${{ secrets.APP_DOMAIN }}
   NAMESPACE: ${{ secrets.GRAD_NAMESPACE }}
   TAG: "latest"
-
-  MIN_CPU: "25m"
-  MAX_CPU: "100m"
+  #GRAD2-1947 Resource optimization
+  MIN_CPU: "50m"
+  MAX_CPU: "300m"
   MIN_MEM: "1024Mi"
-  MAX_MEM: "4096Mi"
-  MIN_REPLICAS: "1"
-  MAX_REPLICAS: "3"
+  MAX_MEM: "2200Mi"
+  MIN_REPLICAS: "3"
+  MAX_REPLICAS: "5"
+
 
 
 on:
@@ -31,7 +32,7 @@ jobs:
   deploy-test:
     name: Deploy to OpenShift TEST
     # ubuntu-20.04 can also be used.
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     environment: test
 
     outputs:

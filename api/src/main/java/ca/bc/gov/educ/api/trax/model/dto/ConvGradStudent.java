@@ -1,6 +1,8 @@
 package ca.bc.gov.educ.api.trax.model.dto;
 
 import ca.bc.gov.educ.api.trax.constant.ConversionResultType;
+import ca.bc.gov.educ.api.trax.constant.StudentLoadType;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,33 +15,47 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ConvGradStudent {
-  private String pen;
-  private String program; // inc
-  private Date programCompletionDate;
-  private String slpDate; // inc
-  private String gpa;
-  private String honoursStanding;
-  private String recalculateGradStatus;
-  private String studentGradData;
-  private String schoolOfRecord; // inc
-  private String schoolAtGrad; // inc
-  private String studentGrade; // inc
-  private String studentStatus; // inc
-  private String archiveFlag;
-  private String frenchCert;
-  private String englishCert;
-  private String consumerEducationRequirementMet; // inc
+    private String pen;
+    private String program; // inc
+    private Date programCompletionDate; // inc
+    private String slpDate; // inc
+    private String sccDate;
+    private String gpa;
+    private String honoursStanding; // inc
+    private String studentGradData;
+    private String schoolOfRecord; // inc
+    private String schoolAtGrad; // inc
+    private String studentGrade; // inc
+    private String studentStatus; // inc
+    private String archiveFlag; // inc
+    private String frenchCert;
+    private String englishCert;
+    private String frenchDogwood;
+    private String consumerEducationRequirementMet;
+    private String studentCitizenship;
 
-  // extra
-  private String graduationRequestYear;
+    // extra
+    private String graduationRequirementYear;
 
-  // program codes for optional / career program
-  private List<String> programCodes;
+    // program codes for optional / career program
+    private List<String> programCodes;
 
-  // grad or non-grad
-  private boolean graduated;
+    // grad-one, grad-two, or ungrad
+    private StudentLoadType studentLoadType;
+    private Date distributionDate;
+    private String transcriptSchoolCategoryCode;
+    private String certificateSchoolCategoryCode;
+    private School transcriptSchool;
+    private School certificateSchool;
+    // tsw
+    private TranscriptStudentDemog transcriptStudentDemog;
+    private List<TranscriptStudentCourse> transcriptStudentCourses;
+    // 1950 "AD"
+    private boolean adult19Rule;
+    private boolean allowedAdult;
 
-  // data conversion status after being processed.
-  private ConversionResultType result;
+    // data conversion status after being processed.
+    private ConversionResultType result;
 }

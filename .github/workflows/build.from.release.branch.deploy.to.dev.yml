@@ -20,12 +20,13 @@ env:
   REPO_NAME: "educ-grad-trax-api"
   APP_DOMAIN: ${{ secrets.APP_DOMAIN }}
   TAG: "latest"
-  MIN_CPU: "25m"
-  MAX_CPU: "100m"
+  #GRAD2-1947 Resource optimization
+  MIN_CPU: "50m"
+  MAX_CPU: "300m"
   MIN_MEM: "1024Mi"
-  MAX_MEM: "4096Mi"
-  MIN_REPLICAS: "1"
-  MAX_REPLICAS: "3"
+  MAX_MEM: "2200Mi"
+  MIN_REPLICAS: "3"
+  MAX_REPLICAS: "5"
 
 on:
   # https://docs.github.com/en/actions/reference/events-that-trigger-workflows
@@ -41,7 +42,7 @@ jobs:
   openshift-ci-cd:
     name: Build and deploy to OpenShift DEV from release branch
     # ubuntu-20.04 can also be used.
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     environment: dev
 
     outputs:
@@ -90,18 +91,6 @@ jobs:
           registry: ${{ env.IMAGE_REGISTRY }}
           username: ${{ env.IMAGE_REGISTRY_USER }}
           password: ${{ env.IMAGE_REGISTRY_PASSWORD }}
-
-      # scan the image for vulnerabilities
-      # TODO: set exit-code to '1' to fail on vulnerabilities
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: '${{ steps.push-image.outputs.registry-path }}'
-          format: 'table'
-          exit-code: '0'
-          ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
 
       # The path the image was pushed to is now stored in ${{ steps.push-image.outputs.registry-path }}
       - name: Install oc

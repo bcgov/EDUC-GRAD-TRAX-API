@@ -16,9 +16,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,14 +53,14 @@ public class SchoolService {
     
 
     @SuppressWarnings("unused")
-	private static Logger logger = LoggerFactory.getLogger(SchoolService.class);
+	private final Logger logger = LoggerFactory.getLogger(SchoolService.class);
 
      /**
      * Get all Schools in School DTO
      *
      * @return List of Schools
      */
-    @Transactional
+    @Transactional(readOnly = true)
     public List<School> getSchoolList() {
         List<School> schoolList  = schoolTransformer.transformToDTO(schoolRepository.findAll());  
     	schoolList.forEach(sL -> {
@@ -82,7 +84,7 @@ public class SchoolService {
         return schoolList;
     }
 
-	@Transactional
+	@Transactional(readOnly = true)
 	public School getSchoolDetails(String minCode, String accessToken) {
 		Optional<SchoolEntity> entOptional = schoolRepository.findById(minCode);
 		if(entOptional.isPresent()) {
@@ -98,7 +100,7 @@ public class SchoolService {
 		return null;
 	}
 
-	@Transactional
+	@Transactional(readOnly = true)
 	public List<School> getSchoolsByParams(String schoolName, String minCode, String district, String accessToken) {
 		String sName = !StringUtils.isBlank(schoolName) ? StringUtils.strip(schoolName,"*"):null;
 		String sCode = !StringUtils.isBlank(minCode) ? StringUtils.strip(minCode,"*"):null;
@@ -133,7 +135,7 @@ public class SchoolService {
 		Arrays.sort(result.toArray());
 	}
 
-	@Transactional
+	@Transactional(readOnly = true)
 	public boolean existsSchool(String minCode) {
 		return schoolRepository.countTabSchools(minCode) > 0L;
 	}
@@ -149,10 +151,16 @@ public class SchoolService {
 						h.set(EducGradTraxApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
 					})
 					.retrieve().bodyToMono(CommonSchool.class).block();
+		} catch (WebClientResponseException e) {
+			if(e.getStatusCode() == HttpStatus.NOT_FOUND){
+				logger.warn(String.format("Common School not exists for Ministry Code: %s", mincode));
+			} else {
+				logger.error(String.format("Response error while calling school-api. Status was: %s", e.getStatusCode()));
+			}
 		} catch (Exception e) {
-			logger.warn(String.format("Common School not exists for Ministry Code: %s", mincode));
-    		return null;
+			logger.error(String.format("Error while calling school-api: %s", e.getMessage()));
 		}
+		return null;
 	}
 
 	public List<CommonSchool> getCommonSchools(String accessToken) {

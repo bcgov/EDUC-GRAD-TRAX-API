@@ -5,15 +5,17 @@ spring:
   datasource:
     hikari:
       pool-name: educ-grad-trax-api-cp
-      maximum-pool-size: ${MAXIMUM_POOL_SIZE}
       connection-timeout: ${CONNECTION_TIMEOUT}
+      maximum-pool-size: ${MAXIMUM_POOL_SIZE}
+      minimum-idle: ${MIN_IDLE}
+      idle-timeout: ${IDLE_TIMEOUT}
       max-lifetime: ${MAX_LIFETIME}
     url: ${CONNECTION_STRING}
     username: ${USERNAME}
     password: ${PASSWORD}
     driver-class: oracle.jdbc.driver.OracleDriver
   jpa:
-    show-sql: true
+    show-sql: ${SHOW_SQL_LOGS}
     database-platform: org.hibernate.dialect.Oracle12cDialect
     hibernate:
       ddl-auto: none
@@ -87,6 +89,21 @@ springdoc:
     path: /api/v1/api-docs-ui.html
     operationsSorter: alpha
 
+#Resilience
+resilience4j.retry:
+  instances:
+    rt-getToken:
+      maxAttempts: 10
+      waitDuration: 5s
+      retryExceptions:
+        - org.springframework.web.client.HttpServerErrorException
+      ignoreExceptions:
+        - java.lang.NullPointerException
+
+authorization:
+  user: ${GRAD_CLIENT_NAME}
+  password: ${GRAD_CLIENT_SECRET}
+
 #NATS
 nats:
   url: ${NATS}
@@ -98,13 +115,19 @@ cron:
   scheduled:
     process:
       events:
-        stan:
-          run: ${CRON_SCHEDULED_PROCESS_EVENTS_STAN}
-          lockAtLeastFor: ${CRON_SCHEDULED_PROCESS_EVENTS_STAN_LOCK_AT_LEAST_FOR}
-          lockAtMostFor: ${CRON_SCHEDULED_PROCESS_EVENTS_STAN_LOCK_AT_MOST_FOR}
-      jobs:
-        stan:
-          run: ${CRON_SCHEDULED_PROCESS_JOBS_STAN}
+        grad-to-trax:
+          run: ${CRON_SCHEDULED_GRAD_TO_TRAX_EVENTS}
+          lockAtLeastFor: ${CRON_SCHEDULED_GRAD_TO_TRAX_EVENTS_LOCK_AT_LEAST_FOR}
+          lockAtMostFor: ${CRON_SCHEDULED_GRAD_TO_TRAX_EVENTS_LOCK_AT_MOST_FOR}
+        trax-to-grad:
+          run: ${CRON_SCHEDULED_TRAX_TO_GRAD_EVENTS}
+          lockAtLeastFor: ${CRON_SCHEDULED_TRAX_TO_GRAD_EVENTS_LOCK_AT_LEAST_FOR}
+          lockAtMostFor: ${CRON_SCHEDULED_TRAX_TO_GRAD_EVENTS_LOCK_AT_MOST_FOR}
+      trigger-jobs:
+        read-trax-update:
+          run: ${CRON_SCHEDULED_TRIGGER_TRAX_UPDATES}
+          lockAtLeastFor: ${CRON_SCHEDULED_TRIGGER_TRAX_UPDATES_LOCK_AT_LEAST_FOR}
+          lockAtMostFor: ${CRON_SCHEDULED_TRIGGER_TRAX_UPDATES_LOCK_AT_MOST_FOR}
 
 #Incremental Trax Update
 trax:
@@ -121,6 +144,8 @@ splunk:
 
 #Endpoint properties
 endpoint:
+  keycloak:
+    getToken: ${KEYCLOAK_TOKEN_URL}auth/realms/master/protocol/openid-connect/token
   educ-school-api:
     get-school-by-mincode:
       url: ${EDUC_SCHOOL_API}api/v1/schools/%s

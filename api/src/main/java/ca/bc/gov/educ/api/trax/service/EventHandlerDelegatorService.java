@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
-import static ca.bc.gov.educ.api.trax.constant.Topics.TRAX_UPDATE_EVENTS_TOPIC;
+import static ca.bc.gov.educ.api.trax.constant.Topics.TRAX_UPDATE_EVENT_TOPIC;
 
 @Service
 @Slf4j
@@ -43,7 +43,7 @@ public class EventHandlerDelegatorService {
      */
     public void handleChoreographyEvent(@NonNull final ChoreographedEvent choreographedEvent, final Message message) throws IOException {
         try {
-            if (message.getSubject().equalsIgnoreCase(TRAX_UPDATE_EVENTS_TOPIC.toString())) {
+            if (message.getSubject().equalsIgnoreCase(TRAX_UPDATE_EVENT_TOPIC.toString())) {
                 this.choreographedEventPersistenceService.updateEventStatus(choreographedEvent);
                 if (message.isJetStream()) {
                     message.ack();

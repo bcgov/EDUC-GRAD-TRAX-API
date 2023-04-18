@@ -2,14 +2,14 @@ package ca.bc.gov.educ.api.trax.util.criteria;
 
 import ca.bc.gov.educ.api.trax.util.criteria.GradCriteria.OperationEnum;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.query.criteria.internal.path.PluralAttributePath;
+import org.hibernate.metamodel.mapping.ordering.ast.PluralAttributePath;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.*;
-import javax.persistence.criteria.CriteriaBuilder.In;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.*;
+import jakarta.persistence.criteria.CriteriaBuilder.In;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;

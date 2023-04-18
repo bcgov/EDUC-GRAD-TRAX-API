@@ -5,10 +5,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Data
 @Builder
@@ -21,6 +21,9 @@ public class TraxStudentNoEntity {
   @Column(name = "STUD_NO", unique = true, updatable = false)
   private String studNo;
 
-  @Column(name = "STATUS", nullable = false)
+  @Column(name = "STATUS")
   private String status;
+
+  @Column(name = "REASON")
+  private String reason;
 }

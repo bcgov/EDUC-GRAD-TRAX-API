@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-import static ca.bc.gov.educ.api.trax.constant.Topics.TRAX_UPDATE_EVENTS_TOPIC;
+import static ca.bc.gov.educ.api.trax.constant.Topics.TRAX_UPDATE_EVENT_TOPIC;
 
 /**
  * The type Publisher.
@@ -48,7 +48,7 @@ public class Publisher {
    * @throws JetStreamApiException the jet stream api exception
    */
   private void createUpdateTraxStudentMasterEventStream(final Connection natsConnection) throws IOException, JetStreamApiException {
-    val streamConfiguration = StreamConfiguration.builder().name(EducGradTraxApiConstants.TRAX_STREAM_NAME).replicas(1).maxMessages(10000).addSubjects(TRAX_UPDATE_EVENTS_TOPIC.toString()).build();
+    val streamConfiguration = StreamConfiguration.builder().name(EducGradTraxApiConstants.TRAX_STREAM_NAME).replicas(1).maxMessages(10000).addSubjects(TRAX_UPDATE_EVENT_TOPIC.name()).build();
     try {
       natsConnection.jetStreamManagement().updateStream(streamConfiguration);
     } catch (final JetStreamApiException exception) {
@@ -79,8 +79,8 @@ public class Publisher {
       choreographedEvent.setUpdateUser(traxUpdatedPubEvent.getUpdateUser());
       try {
         log.debug("Broadcasting replicationEvent :: {}", choreographedEvent);
-        val pub = this.jetStream.publishAsync(TRAX_UPDATE_EVENTS_TOPIC.toString(), JsonUtil.getJsonBytesFromObject(choreographedEvent));
-        pub.thenAcceptAsync(result -> log.info("Event ID :: {} Published to JetStream :: {}", traxUpdatedPubEvent.getEventId(), result.getSeqno()));
+        val pub = this.jetStream.publishAsync(TRAX_UPDATE_EVENT_TOPIC.name(), JsonUtil.getJsonBytesFromObject(choreographedEvent));
+        pub.thenAcceptAsync(result -> log.debug("Event ID :: {} Published to JetStream :: {}", traxUpdatedPubEvent.getEventId(), result.getSeqno()));
       } catch (IOException e) {
         log.error("exception while broadcasting message to JetStream", e);
       }
