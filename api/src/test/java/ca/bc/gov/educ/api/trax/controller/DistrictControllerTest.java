@@ -1,9 +1,7 @@
 package ca.bc.gov.educ.api.trax.controller;
 
 import ca.bc.gov.educ.api.trax.model.dto.District;
-import ca.bc.gov.educ.api.trax.model.dto.School;
 import ca.bc.gov.educ.api.trax.service.DistrictService;
-import ca.bc.gov.educ.api.trax.service.SchoolService;
 import ca.bc.gov.educ.api.trax.util.ResponseHelper;
 import org.junit.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,8 +12,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -41,6 +37,18 @@ public class DistrictControllerTest {
         Mockito.when(districtService.getDistrictDetails("123")).thenReturn(district);
         districtController.getDistrictDetails("123");
         Mockito.verify(districtService).getDistrictDetails("123");
+
+    }
+
+    @Test
+    public void testGetDistrictBySchoolCategoryCode() {
+        final District district = new District();
+        district.setDistrictNumber("123");
+        district.setDistrictName("Test School");
+
+        Mockito.when(districtService.getDistrictBySchoolCategory("123", "accessToken")).thenReturn(List.of(district));
+        districtController.getDistrictBySchoolCategory("123", "accessToken");
+        Mockito.verify(districtService).getDistrictBySchoolCategory("123", "accessToken");
 
     }
 }

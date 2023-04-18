@@ -124,3 +124,5 @@ endpoint:
   educ-school-api:
     get-school-by-mincode:
       url: ${EDUC_SCHOOL_API}api/v1/schools/%s
+    get-all-schools:
+      url: ${EDUC_SCHOOL_API}api/v1/schools

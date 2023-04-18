@@ -14,11 +14,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -150,6 +152,21 @@ public class SchoolService {
 		} catch (Exception e) {
 			logger.warn(String.format("Common School not exists for Ministry Code: %s", mincode));
     		return null;
+		}
+	}
+
+	public List<CommonSchool> getCommonSchools(String accessToken) {
+		try {
+			return webClient.get().uri(constants.getAllSchoolSchoolApiUrl())
+					.headers(h -> {
+						h.setBearerAuth(accessToken);
+						h.set(EducGradTraxApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+					})
+					.retrieve().bodyToMono(new ParameterizedTypeReference<List<CommonSchool>>() {
+					}).block();
+		} catch (Exception e) {
+			logger.error("Common Schools API is not available {}", e.getLocalizedMessage());
+			return new ArrayList<>();
 		}
 	}
 
