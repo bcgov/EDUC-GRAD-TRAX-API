@@ -433,8 +433,7 @@ class SchoolServiceTest {
         var result = schoolService.getCommonSchool("accessToken", "02121000");
         assertThat(result).isNotNull();
         List<CommonSchool> commonSchools = schoolService.getCommonSchools("accessToken");
-        assertThat(commonSchools).isNotNull();
-        assertThat(commonSchools).isNotEmpty();
+        assertThat(commonSchools).isNotNull().isNotEmpty();
     }
 
     @Test
