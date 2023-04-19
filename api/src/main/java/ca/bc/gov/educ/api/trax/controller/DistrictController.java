@@ -61,7 +61,7 @@ public class DistrictController {
     @Operation(summary = "Check school existence by Mincode", description = "Check school existence by Mincode", tags = { "School" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "204", description = "NO CONTENT")})
-    public ResponseEntity<List<District>> getDistrictBySchoolCategory(@PathVariable String schoolCategory, @RequestHeader(name="Authorization") String accessToken) {
+    public ResponseEntity<List<District>> getDistrictBySchoolCategory(@RequestParam(required = false) String schoolCategory, @RequestHeader(name="Authorization") String accessToken) {
         return response.GET(districtService.getDistrictBySchoolCategory(schoolCategory, accessToken.replace(BEARER, "")));
     }
 }

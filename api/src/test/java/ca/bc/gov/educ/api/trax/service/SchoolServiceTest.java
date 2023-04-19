@@ -24,6 +24,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -432,7 +433,7 @@ class SchoolServiceTest {
         var result = schoolService.getCommonSchool("accessToken", "02121000");
         assertThat(result).isNotNull();
         List<CommonSchool> commonSchools = schoolService.getCommonSchools("accessToken");
-        assertThat(commonSchools).isNotNull();
+        assertThat(commonSchools).isNotNull().isNotEmpty();
     }
 
     @Test
@@ -464,6 +465,7 @@ class SchoolServiceTest {
         Mockito.when(this.requestHeadersUriMock.uri(constants.getAllSchoolSchoolApiUrl())).thenReturn(this.requestHeadersMock);
         Mockito.when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
         Mockito.when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-        Mockito.when(this.responseMock.bodyToMono(CommonSchool.class)).thenReturn(Mono.just(commonSchool));
+        Mockito.when(this.responseMock.bodyToMono(new ParameterizedTypeReference<List<CommonSchool>>() {
+        })).thenReturn(Mono.just(List.of(commonSchool)));
     }
 }
