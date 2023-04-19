@@ -434,6 +434,7 @@ class SchoolServiceTest {
         assertThat(result).isNotNull();
         List<CommonSchool> commonSchools = schoolService.getCommonSchools("accessToken");
         assertThat(commonSchools).isNotNull();
+        assertThat(commonSchools).isNotEmpty();
     }
 
     @Test
