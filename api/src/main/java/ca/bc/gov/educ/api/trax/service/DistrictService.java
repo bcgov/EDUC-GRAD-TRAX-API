@@ -46,12 +46,16 @@ public class DistrictService {
 		if(StringUtils.isBlank(schoolCategoryCode)) {
 			return getDistrictsByActiveFlag("Y");
 		} else {
+			List<String> controlList = new ArrayList();
 			List<CommonSchool> schools = schoolService.getCommonSchools(accessToken);
 			for (CommonSchool s : schools) {
 				if (StringUtils.equalsIgnoreCase(schoolCategoryCode, s.getSchoolCategoryCode())) {
-					District district = getDistrictsByDistrictCodeAndActiveFlag(s.getDistNo());
-					if (district != null) {
-						result.add(district);
+					if(!controlList.contains(s.getDistNo())) {
+						controlList.add(s.getDistNo());
+						District district = getDistrictsByDistrictCodeAndActiveFlag(s.getDistNo());
+						if (district != null) {
+							result.add(district);
+						}
 					}
 				}
 			}
