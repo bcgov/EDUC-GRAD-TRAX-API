@@ -173,7 +173,7 @@ public class SchoolService {
 					.retrieve().bodyToMono(new ParameterizedTypeReference<List<CommonSchool>>() {
 					}).block();
 		} catch (Exception e) {
-			logger.error("Common Schools API is not available {}", e.getLocalizedMessage());
+			logger.error("Common Schools API is not available {}", e.getCause().toString());
 			return new ArrayList<>();
 		}
 	}
