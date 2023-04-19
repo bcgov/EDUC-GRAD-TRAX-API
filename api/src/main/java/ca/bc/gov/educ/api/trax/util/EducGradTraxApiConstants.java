@@ -53,6 +53,7 @@ public class EducGradTraxApiConstants {
     public static final String GET_STUDENT_PSI_BY_CODE_MAPPING = "/student";
 
     public static final String GET_DISTRICT_BY_DISTNO_MAPPING = "/{distCode}";
+    public static final String GET_DISTRICTS_BY_SCHOOL_CATEGORY_MAPPING = "/schoolCategory/{schoolCategory}";
 
     public static final String GET_TRANSCRIPT_DEMOG_BY_PEN_MAPPING = "/tran-demog/{pen}";
     public static final String GET_TRANSCRIPT_COURSE_BY_PEN_MAPPING = "/tran-courses/{pen}";
@@ -119,4 +120,7 @@ public class EducGradTraxApiConstants {
 
     @Value("${endpoint.educ-school-api.get-school-by-mincode.url}")
     private String schoolByMincodeSchoolApiUrl;
+
+    @Value("${endpoint.educ-school-api.get-all-schools.url}")
+    private String allSchoolSchoolApiUrl;
 }
