@@ -30,6 +30,8 @@ public class DistrictController {
 
     private static Logger logger = LoggerFactory.getLogger(DistrictController.class);
 
+    private static final String BEARER = "Bearer ";
+
     @Autowired
     DistrictService districtService;
     
@@ -52,5 +54,14 @@ public class DistrictController {
             }
         }
         return null;
+    }
+
+    @GetMapping(EducGradTraxApiConstants.GET_DISTRICTS_BY_SCHOOL_CATEGORY_MAPPING)
+    @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
+    @Operation(summary = "Check school existence by Mincode", description = "Check school existence by Mincode", tags = { "School" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "204", description = "NO CONTENT")})
+    public ResponseEntity<List<District>> getDistrictBySchoolCategory(@RequestParam(required = false) String schoolCategory, @RequestHeader(name="Authorization") String accessToken) {
+        return response.GET(districtService.getDistrictBySchoolCategory(schoolCategory, accessToken.replace(BEARER, "")));
     }
 }

@@ -48,9 +48,15 @@ public class GradTraxConfig {
 
 	@Bean
 	public WebClient webClient() {
+		Integer CODEC_50_MB_SIZE = 50 * 1024 * 1024;
 		HttpClient client = HttpClient.create();
 		client.warmup().block();
-		return WebClient.builder().build();
+		return WebClient.builder().codecs(clientCodecConfigurer -> {
+			var codec = new Jackson2JsonDecoder();
+			codec.setMaxInMemorySize(CODEC_50_MB_SIZE);
+			clientCodecConfigurer.customCodecs().register(codec);
+			clientCodecConfigurer.customCodecs().register(new Jackson2JsonEncoder());
+		}).build();
 	}
 
 	/**
