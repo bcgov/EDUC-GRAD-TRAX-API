@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -159,6 +161,21 @@ public class SchoolService {
 			logger.error(String.format("Error while calling school-api: %s", e.getMessage()));
 		}
 		return null;
+	}
+
+	public List<CommonSchool> getCommonSchools(String accessToken) {
+		try {
+			return webClient.get().uri(constants.getAllSchoolSchoolApiUrl())
+					.headers(h -> {
+						h.setBearerAuth(accessToken);
+						h.set(EducGradTraxApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+					})
+					.retrieve().bodyToMono(new ParameterizedTypeReference<List<CommonSchool>>() {
+					}).block();
+		} catch (Exception e) {
+			logger.error("Common Schools API is not available {}", e.getCause().toString());
+			return new ArrayList<>();
+		}
 	}
 
 	private void adaptSchool(School school, CommonSchool commonSchool) {
