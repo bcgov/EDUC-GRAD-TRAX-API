@@ -13,8 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.codec.json.Jackson2JsonDecoder;
-import org.springframework.http.codec.json.Jackson2JsonEncoder;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.web.client.RestTemplate;
@@ -46,15 +44,9 @@ public class GradTraxConfig {
 
 	@Bean
 	public WebClient webClient() {
-		Integer CODEC_50_MB_SIZE = 50 * 1024 * 1024;
 		HttpClient client = HttpClient.create();
 		client.warmup().block();
-		return WebClient.builder().codecs(clientCodecConfigurer -> {
-			var codec = new Jackson2JsonDecoder();
-			codec.setMaxInMemorySize(CODEC_50_MB_SIZE);
-			clientCodecConfigurer.customCodecs().register(codec);
-			clientCodecConfigurer.customCodecs().register(new Jackson2JsonEncoder());
-		}).build();
+		return WebClient.builder().build();
 	}
 
 	/**
@@ -68,4 +60,6 @@ public class GradTraxConfig {
 	public LockProvider lockProvider(@Autowired JdbcTemplate jdbcTemplate, @Autowired PlatformTransactionManager transactionManager) {
 		return new JdbcTemplateLockProvider(jdbcTemplate, transactionManager, "REPLICATION_SHEDLOCK");
 	}
+
+
 }
