@@ -73,7 +73,7 @@ public class TraxCommonService {
     @Transactional(readOnly = true)
     public boolean isGraduatedStudent(String pen) {
         StudentLoadType loadType = getStudentLoadType(pen);
-        return loadType != StudentLoadType.UNGRAD && loadType != StudentLoadType.NONE;
+        return loadType == StudentLoadType.GRAD_ONE || loadType == StudentLoadType.GRAD_TWO;
     }
 
     // Student Master from TRAX
@@ -394,6 +394,7 @@ public class TraxCommonService {
 
     @Transactional(readOnly = true)
     public StudentLoadType getStudentLoadType(String studNo) {
+        boolean existsUTG = tswService.existsTranscriptStudentDemog(studNo);
         StudentLoadType loadType = StudentLoadType.NONE;
         List<Object[]> list = traxStudentRepository.getGraduationData(studNo);
         if (list != null && !list.isEmpty()) {
@@ -403,13 +404,13 @@ public class TraxCommonService {
                 Integer sccDate = (Integer) col[2];
                 Integer slpDate = (Integer) col[3];
 
-                loadType = determineStudentLoadType(graduationRequirementYear, gradDate, sccDate, slpDate);
+                loadType = determineStudentLoadType(graduationRequirementYear, gradDate, sccDate, slpDate, existsUTG);
             }
         }
         return loadType;
     }
 
-    private StudentLoadType determineStudentLoadType(String gradReqtYear, Integer gradDate, Integer sccDate, Integer slpDate) {
+    private StudentLoadType determineStudentLoadType(String gradReqtYear, Integer gradDate, Integer sccDate, Integer slpDate, boolean existsUTG) {
         StudentLoadType result;
         if (!"SCCP".equalsIgnoreCase(gradReqtYear) && (sccDate != null && sccDate > 0)) {
             result = StudentLoadType.GRAD_TWO;
@@ -422,6 +423,16 @@ public class TraxCommonService {
         } else {
             result = StudentLoadType.NONE;
         }
+
+        // handling bad UTG data
+        if (!existsUTG) {
+            if (result == StudentLoadType.GRAD_TWO) {
+                result = StudentLoadType.NO_UTG; // report as an error
+            } else if (result == StudentLoadType.GRAD_ONE) {
+                result = StudentLoadType.UNGRAD; // treat it as nongrad
+            }
+        }
+
         return result;
     }
 

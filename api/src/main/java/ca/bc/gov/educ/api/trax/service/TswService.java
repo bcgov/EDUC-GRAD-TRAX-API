@@ -40,4 +40,9 @@ public class TswService {
     public List<TranscriptStudentCourse> getTranscriptStudentCourses(String studNo) {
         return transcriptStudentCourseTransformer.transformToDTO(transcriptStudentCourseRepository.findByPen(studNo));
     }
+
+    @Transactional(readOnly = true)
+    public boolean existsTranscriptStudentDemog(String studNo) {
+        return transcriptStudentDemogRepository.existsById(studNo);
+    }
 }

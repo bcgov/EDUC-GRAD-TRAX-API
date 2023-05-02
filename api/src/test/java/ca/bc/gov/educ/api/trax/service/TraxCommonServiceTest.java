@@ -197,13 +197,14 @@ public class TraxCommonServiceTest {
         commonSchool.setSchoolCategoryCode("02");
 
         Object[] cols = new Object[] {
-            "2018", Integer.valueOf(202206), Integer.valueOf(0), Integer.valueOf(0)
+                "2018", Integer.valueOf(202206), Integer.valueOf(0), Integer.valueOf(0)
         };
         List<Object[]> list = new ArrayList<>();
         list.add(cols);
 
         when(this.traxStudentRepository.getGraduationData(pen)).thenReturn(list);
         when(this.traxStudentRepository.loadTraxGraduatedStudent(pen)).thenReturn(results);
+        when(this.tswService.existsTranscriptStudentDemog(pen)).thenReturn(true);
         when(this.tswService.getTranscriptStudentDemog(pen)).thenReturn(transcriptStudentDemog);
         when(this.tswService.getTranscriptStudentCourses(pen)).thenReturn(Arrays.asList(tswCourse1, tswCourse2, tswCourse3, tswAssessment));
         when(this.schoolService.getSchoolDetails(mincode, "123")).thenReturn(school);
@@ -327,6 +328,7 @@ public class TraxCommonServiceTest {
 
         when(this.traxStudentRepository.getGraduationData(pen)).thenReturn(list);
         when(this.traxStudentRepository.loadTraxGraduatedStudent(pen)).thenReturn(results);
+        when(this.tswService.existsTranscriptStudentDemog(pen)).thenReturn(true);
         when(this.tswService.getTranscriptStudentDemog(pen)).thenReturn(transcriptStudentDemog);
         when(this.tswService.getTranscriptStudentCourses(pen)).thenReturn(Arrays.asList(tswCourse1, tswCourse2, tswCourse3, tswAssessment));
 
@@ -449,6 +451,7 @@ public class TraxCommonServiceTest {
         when(this.traxStudentRepository.getGraduationData(pen)).thenReturn(list);
 
         when(this.traxStudentRepository.loadTraxGraduatedStudent(pen)).thenReturn(results);
+        when(this.tswService.existsTranscriptStudentDemog(pen)).thenReturn(true);
         when(this.tswService.getTranscriptStudentDemog(pen)).thenReturn(transcriptStudentDemog);
         when(this.tswService.getTranscriptStudentCourses(pen)).thenReturn(Arrays.asList(tswCourse1, tswCourse2, tswCourse3, tswAssessment));
 
@@ -555,6 +558,7 @@ public class TraxCommonServiceTest {
 
         when(this.traxStudentRepository.getGraduationData(pen)).thenReturn(list);
         when(this.traxStudentRepository.loadTraxGraduatedStudent(pen)).thenReturn(results);
+        when(this.tswService.existsTranscriptStudentDemog(pen)).thenReturn(true);
         when(this.tswService.getTranscriptStudentDemog(pen)).thenReturn(transcriptStudentDemog);
         when(this.tswService.getTranscriptStudentCourses(pen)).thenReturn(Arrays.asList(tswCourse1, tswCourse2, tswCourse3, tswAssessment));
         when(this.schoolService.getSchoolDetails(mincode, "123")).thenReturn(school);
@@ -661,6 +665,7 @@ public class TraxCommonServiceTest {
 
         when(this.traxStudentRepository.getGraduationData(pen)).thenReturn(list);
         when(this.traxStudentRepository.loadTraxGraduatedStudent(pen)).thenReturn(results);
+        when(this.tswService.existsTranscriptStudentDemog(pen)).thenReturn(true);
         when(this.tswService.getTranscriptStudentDemog(pen)).thenReturn(transcriptStudentDemog);
         when(this.tswService.getTranscriptStudentCourses(pen)).thenReturn(Arrays.asList(tswCourse1, tswCourse2, tswCourse3, tswAssessment));
         when(this.schoolService.getSchoolDetails(mincode, "123")).thenReturn(school);
@@ -793,7 +798,7 @@ public class TraxCommonServiceTest {
     @Test
     public void testStudentIsNotGraduated() {
         // Student is graduated or not
-        Boolean result = isStudentGraduated("2004", 0, 0);
+        Boolean result = isStudentGraduated("2004", 0, 0, false);
 
         assertThat(result).isNotNull();
         assertThat(result).isFalse();
@@ -802,7 +807,29 @@ public class TraxCommonServiceTest {
     @Test
     public void testStudent_whenStatus_isNotInGraduatedOrUnGraduated_then_ReturnsNone() {
         // Student is graduated or not
-        Boolean result = isStudentGraduated("SCCP", 202206, 0);
+        Boolean result = isStudentGraduated("SCCP", 202206, 0, false);
+
+        assertThat(result).isNotNull();
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    public void testStudent_whenUTG_Data_doesNotExist_then_ReturnsUnGraduated() {
+        // Student is graduated or not
+        Boolean result = isStudentGraduated("1996", 202206, 0, false);
+
+        when(this.tswService.existsTranscriptStudentDemog("123456789")).thenReturn(false);
+
+        assertThat(result).isNotNull();
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    public void testStudentForTwoPrograms_whenUTG_Data_doesNotExist_then_ReturnsNO_UTG() {
+        // Student is graduated or not
+        Boolean result = isStudentGraduated("1996", 202206, 202206, false);
+
+        when(this.tswService.existsTranscriptStudentDemog("123456789")).thenReturn(false);
 
         assertThat(result).isNotNull();
         assertThat(result).isFalse();
@@ -816,13 +843,13 @@ public class TraxCommonServiceTest {
     })
     void testStudentIsGraduated(String gradReqtYear, int gradDate, int sccDate) {
         // Student is graduated or not
-        Boolean result = isStudentGraduated(gradReqtYear, gradDate, sccDate);
+        Boolean result = isStudentGraduated(gradReqtYear, gradDate, sccDate, true);
 
         assertThat(result).isNotNull();
         assertThat(result).isTrue();
     }
 
-    private Boolean isStudentGraduated(String gradReqtYear, int gradDate, int sccDate) {
+    private Boolean isStudentGraduated(String gradReqtYear, int gradDate, int sccDate, boolean existsUTG) {
         final String pen = "123456789";
 
         Object[] cols = new Object[] {
@@ -831,6 +858,7 @@ public class TraxCommonServiceTest {
         List<Object[]> list = new ArrayList<>();
         list.add(cols);
 
+        when(this.tswService.existsTranscriptStudentDemog(pen)).thenReturn(existsUTG);
         when(this.traxStudentRepository.getGraduationData(pen)).thenReturn(list);
         return traxCommonService.isGraduatedStudent(pen);
     }
