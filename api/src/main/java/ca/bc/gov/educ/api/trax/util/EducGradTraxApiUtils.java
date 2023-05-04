@@ -92,6 +92,14 @@ public class EducGradTraxApiUtils {
         }
     }
 
+    public static boolean isTraxDateNullOrZero(Integer traxDate) {
+        return traxDate == null || traxDate == 0;
+    }
+
+    public static boolean isTraxDateGreaterThanZero(Integer traxDate) {
+        return traxDate != null && traxDate > 0;
+    }
+
 	public static HttpHeaders getHeaders (String accessToken)
     {
 		HttpHeaders httpHeaders = new HttpHeaders();

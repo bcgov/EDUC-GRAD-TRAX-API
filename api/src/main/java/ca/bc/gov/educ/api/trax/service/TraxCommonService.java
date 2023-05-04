@@ -22,6 +22,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
+import static ca.bc.gov.educ.api.trax.util.EducGradTraxApiUtils.isTraxDateGreaterThanZero;
+import static ca.bc.gov.educ.api.trax.util.EducGradTraxApiUtils.isTraxDateNullOrZero;
+
 @SuppressWarnings("ALL")
 @Service
 @Slf4j
@@ -412,13 +415,13 @@ public class TraxCommonService {
 
     private StudentLoadType determineStudentLoadType(String gradReqtYear, Integer gradDate, Integer sccDate, Integer slpDate, boolean existsUTG) {
         StudentLoadType result;
-        if (!"SCCP".equalsIgnoreCase(gradReqtYear) && (sccDate != null && sccDate > 0)) {
+        if (!"SCCP".equalsIgnoreCase(gradReqtYear) && isTraxDateGreaterThanZero(sccDate)) {
             result = StudentLoadType.GRAD_TWO;
-        } else if ((!"SCCP".equalsIgnoreCase(gradReqtYear) && gradDate > 0) && (slpDate == null || slpDate == 0)) {
+        } else if ((!"SCCP".equalsIgnoreCase(gradReqtYear) && isTraxDateGreaterThanZero(gradDate)) && isTraxDateNullOrZero(slpDate)) {
             result = StudentLoadType.GRAD_ONE;
-        } else if ("SCCP".equalsIgnoreCase(gradReqtYear) && (sccDate != null && sccDate > 0)) {
+        } else if ("SCCP".equalsIgnoreCase(gradReqtYear) && isTraxDateGreaterThanZero(sccDate)) {
             result = StudentLoadType.GRAD_ONE;
-        } else if (gradDate == 0 && (sccDate == null || sccDate == 0)) {
+        } else if (isTraxDateNullOrZero(gradDate) && isTraxDateNullOrZero(sccDate)) {
             result = StudentLoadType.UNGRAD;
         } else {
             result = StudentLoadType.NONE;
