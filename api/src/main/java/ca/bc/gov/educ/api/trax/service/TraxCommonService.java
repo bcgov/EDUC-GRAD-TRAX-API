@@ -414,11 +414,11 @@ public class TraxCommonService {
         StudentLoadType result;
         if (!"SCCP".equalsIgnoreCase(gradReqtYear) && (sccDate != null && sccDate > 0)) {
             result = StudentLoadType.GRAD_TWO;
-        } else if ((!"SCCP".equalsIgnoreCase(gradReqtYear) && gradDate > 0) && (slpDate == null || slpDate == 0)) {
+        } else if ((!"SCCP".equalsIgnoreCase(gradReqtYear) && (gradDate != null && gradDate > 0)) && (slpDate == null || slpDate == 0)) {
             result = StudentLoadType.GRAD_ONE;
         } else if ("SCCP".equalsIgnoreCase(gradReqtYear) && (sccDate != null && sccDate > 0)) {
             result = StudentLoadType.GRAD_ONE;
-        } else if (gradDate == 0 && (sccDate == null || sccDate == 0)) {
+        } else if ((gradDate == null || gradDate == 0) && (sccDate == null || sccDate == 0)) {
             result = StudentLoadType.UNGRAD;
         } else {
             result = StudentLoadType.NONE;
