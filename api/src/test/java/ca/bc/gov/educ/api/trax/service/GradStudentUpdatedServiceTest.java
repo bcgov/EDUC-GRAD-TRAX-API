@@ -56,6 +56,12 @@ public class GradStudentUpdatedServiceTest {
     }
 
     @Test
+    public void testProcessEvent_givenGRAD_STUDENT_UPDATED_Event_for_2023_program() throws JsonProcessingException {
+        createTraxStudent("2023-EN", "CUR", null, null, null, true);
+        testProcessEvent("2023-EN", "CUR");
+    }
+
+    @Test
     public void testProcessEvent_givenGRAD_STUDENT_UPDATED_Event_for_2018_program() throws JsonProcessingException {
         createTraxStudent("2018-EN", "CUR", null, null, null, true);
         testProcessEvent("2018-EN", "CUR");

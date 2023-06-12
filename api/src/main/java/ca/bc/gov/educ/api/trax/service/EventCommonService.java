@@ -220,7 +220,9 @@ public abstract class EventCommonService implements EventService {
 
     protected String convertProgramToYear(String program) {
         String ret = " ";
-        if (StringUtils.startsWith(program, "2018")) {
+        if (StringUtils.startsWith(program, "2023")) {
+            ret = "2023";
+        } else if (StringUtils.startsWith(program, "2018")) {
             ret = "2018";
         } else if (StringUtils.startsWith(program, "2004")) {
             ret = "2004";
