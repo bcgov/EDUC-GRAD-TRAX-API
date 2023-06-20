@@ -127,8 +127,22 @@ public class GradStudentGraduatedServiceTest {
         testProcessEvent("1996-EN", "MER");
     }
 
+    @Test
+    public void testProcessEvent_givenGRAD_STUDENT_NOT_GRADUATED_Event_for_1996_program() throws JsonProcessingException {
+        createTraxStudent("1996-EN", "CUR", "12", null, null, false);
+        testProcessEventForNonGrad("1996-EN", "CUR");
+    }
+
     private void testProcessEvent(String program, String studentStatus) throws JsonProcessingException {
         final var request = TestUtils.createGraduationStatus(true);
+        request.setProgram(program);
+        request.setStudentStatus(studentStatus);
+        final var event = TestUtils.createEvent(EventType.GRAD_STUDENT_GRADUATED.name(), request, eventRepository);
+        this.gradStudentGraduatedService.processEvent(request, event);
+    }
+
+    private void testProcessEventForNonGrad(String program, String studentStatus) throws JsonProcessingException {
+        final var request = TestUtils.createGraduationStatus(false);
         request.setProgram(program);
         request.setStudentStatus(studentStatus);
         final var event = TestUtils.createEvent(EventType.GRAD_STUDENT_GRADUATED.name(), request, eventRepository);
