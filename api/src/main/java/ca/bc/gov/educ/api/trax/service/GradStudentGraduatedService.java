@@ -31,6 +31,17 @@ public class GradStudentGraduatedService extends EventCommonService {
         if (StringUtils.equalsIgnoreCase(gradStatusUpdate.getProgram(), "SCCP")) {
             updateFieldsMap.clear();
             log.debug("  Skip the graduation update against SCCP student in TRAX");
+            return;
+        }
+
+        // ignore fields for un-graduated student
+        if (StringUtils.isBlank(gradStatusUpdate.getProgramCompletionDate())) {
+            updateFieldsMap.remove(FIELD_GRAD_REQT_YEAR_AT_GRAD);
+            updateFieldsMap.remove(FIELD_STUD_GRADE_AT_GRAD);
+            updateFieldsMap.remove(FIELD_MINCODE_GRAD);
+            // ignore fields for SCCP
+            updateFieldsMap.remove(FIELD_SLP_DATE);
+            updateFieldsMap.remove(FIELD_SCC_DATE);
         }
     }
 
