@@ -32,9 +32,9 @@ public class GradStudentUndoCompletionService extends EventCommonService {
         // When a student is un-graduated ---------------------------------------------------
         if (isSCCP) {
             gradStatusUpdate.setProgramCompletionDate(null);
-            // slp_date
+            // slp_date(= zero)
             updateFieldsMap.put(FIELD_SLP_DATE, Pair.of(FieldType.TRAX_DATE, Long.valueOf("0")));
-            // scc_date
+            // scc_date(= zero)
             updateFieldsMap.put(FIELD_SCC_DATE, Pair.of(FieldType.TRAX_DATE, Long.valueOf("0")));
 
             // ignored fields for programs other than SCCP
