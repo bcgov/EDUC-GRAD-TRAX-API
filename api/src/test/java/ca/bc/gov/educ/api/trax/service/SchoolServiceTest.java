@@ -364,6 +364,15 @@ class SchoolServiceTest {
         assertThat(result).isNotNull();
 
     }
+
+    @Test
+    void testGetSchoolsBySchoolCategoryCode() {
+        mockCommonSchools();
+        var result = schoolService.getSchoolsBySchoolCategory("02", "accessToken");
+        assertThat(result).isNotNull();
+
+    }
+
     @Test
     void testGetSchoolsByParams_params() {
         // School
@@ -460,6 +469,20 @@ class SchoolServiceTest {
         Mockito.when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
         Mockito.when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
         Mockito.when(this.responseMock.bodyToMono(CommonSchool.class)).thenReturn(Mono.just(commonSchool));
+
+        Mockito.when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+        Mockito.when(this.requestHeadersUriMock.uri(constants.getAllSchoolSchoolApiUrl())).thenReturn(this.requestHeadersMock);
+        Mockito.when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+        Mockito.when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+        Mockito.when(this.responseMock.bodyToMono(new ParameterizedTypeReference<List<CommonSchool>>() {
+        })).thenReturn(Mono.just(List.of(commonSchool)));
+    }
+
+    void mockCommonSchools() {
+        CommonSchool commonSchool = new CommonSchool();
+        commonSchool.setSchlNo("1234567");
+        commonSchool.setSchoolName("Test School");
+        commonSchool.setSchoolCategoryCode("02");
 
         Mockito.when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
         Mockito.when(this.requestHeadersUriMock.uri(constants.getAllSchoolSchoolApiUrl())).thenReturn(this.requestHeadersMock);
