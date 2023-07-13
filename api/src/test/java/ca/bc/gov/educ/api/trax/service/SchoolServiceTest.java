@@ -369,7 +369,11 @@ class SchoolServiceTest {
     void testGetSchoolsBySchoolCategoryCode() {
         mockCommonSchools();
         var result = schoolService.getSchoolsBySchoolCategory("02", "accessToken");
-        assertThat(result).isNotNull();
+        assertThat(result).isNotNull().isNotEmpty();
+        result = schoolService.getSchoolsBySchoolCategory("01", "accessToken");
+        assertThat(result).isNotNull().isEmpty();
+        result = schoolService.getSchoolsBySchoolCategory("", "accessToken");
+        assertThat(result).isNotNull().isNotEmpty();
 
     }
 
