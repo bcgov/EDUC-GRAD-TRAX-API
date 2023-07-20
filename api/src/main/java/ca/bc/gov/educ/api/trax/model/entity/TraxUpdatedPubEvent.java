@@ -111,9 +111,8 @@ public class TraxUpdatedPubEvent {
          * @return the student event . student event builder
          */
         public TraxUpdatedPubEventBuilder eventPayload(String eventPayload) {
-            if(StringUtils.isNotBlank(eventPayload)) {
-                this.eventPayloadBytes = eventPayload.getBytes(StandardCharsets.UTF_8);
-            }
+            if(StringUtils.isBlank(eventPayload)) eventPayload = "{}";
+            this.eventPayloadBytes = eventPayload.getBytes(StandardCharsets.UTF_8);
             return this;
         }
     }
