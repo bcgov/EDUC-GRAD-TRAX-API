@@ -92,7 +92,12 @@ public class TraxUpdatedPubEvent {
      * @param eventPayload the event payload
      */
     public void setEventPayload(String eventPayload) {
-        setEventPayloadBytes(eventPayload.getBytes(StandardCharsets.UTF_8));
+        setEventPayloadBytes(nullSafeEventPayload(eventPayload).getBytes(StandardCharsets.UTF_8));
+    }
+
+    private static String nullSafeEventPayload(String eventPayload) {
+        if(StringUtils.isBlank(eventPayload)) eventPayload = "{}";
+        return eventPayload;
     }
 
     /**
@@ -111,8 +116,7 @@ public class TraxUpdatedPubEvent {
          * @return the student event . student event builder
          */
         public TraxUpdatedPubEventBuilder eventPayload(String eventPayload) {
-            if(StringUtils.isBlank(eventPayload)) eventPayload = "{}";
-            this.eventPayloadBytes = eventPayload.getBytes(StandardCharsets.UTF_8);
+            this.eventPayloadBytes = nullSafeEventPayload(eventPayload).getBytes(StandardCharsets.UTF_8);
             return this;
         }
     }
