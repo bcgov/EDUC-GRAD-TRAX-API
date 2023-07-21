@@ -140,6 +140,21 @@ public class SchoolService {
 		return schoolRepository.countTabSchools(minCode) > 0L;
 	}
 
+	public List<School> getSchoolsBySchoolCategory(String schoolCategoryCode, String accessToken) {
+		List<School> result = new ArrayList<>();
+		if(StringUtils.isBlank(schoolCategoryCode)) {
+			return adaptSchools(getCommonSchools(accessToken));
+		} else {
+			List<CommonSchool> schools = getCommonSchools(accessToken);
+			for (CommonSchool s : schools) {
+				if (StringUtils.equalsIgnoreCase(schoolCategoryCode, s.getSchoolCategoryCode())) {
+					result.add(adaptSchool(s));
+				}
+			}
+		}
+		return result;
+	}
+
 	public CommonSchool getCommonSchool(String accessToken, String mincode) {
     	if(StringUtils.isBlank(mincode)) {
     		return null;
@@ -176,6 +191,22 @@ public class SchoolService {
 			logger.error("Common Schools API is not available {}", e.getCause().toString());
 			return new ArrayList<>();
 		}
+	}
+
+	private School adaptSchool(CommonSchool commonSchool) {
+		School school = new School();
+		school.setMinCode(commonSchool.getDistNo()+commonSchool.getSchlNo());
+		school.setSchoolName(commonSchool.getSchoolName());
+		school.setSchoolCategory(commonSchool.getSchoolCategoryCode());
+		return school;
+	}
+
+	private List<School> adaptSchools(List<CommonSchool> commonSchools) {
+		List<School> result = new ArrayList<>();
+		for(CommonSchool sch: commonSchools) {
+			result.add(adaptSchool(sch));
+		}
+		return result;
 	}
 
 	private void adaptSchool(School school, CommonSchool commonSchool) {

@@ -91,6 +91,16 @@ public class SchoolControllerTest {
     }
 
     @Test
+    public void testGetSchoolsBySchoolCategoryCode() {
+        final School school = new School();
+        school.setMinCode("1234567");
+        school.setSchoolName("Test School");
+        Mockito.when(schoolService.getSchoolsBySchoolCategory("01", "accessToken")).thenReturn(Arrays.asList(school));
+        schoolController.getSchoolsBySchoolCategory("01", "accessToken");
+        Mockito.verify(schoolService).getSchoolsBySchoolCategory("01", "accessToken");
+    }
+
+    @Test
     public void testCheckSchoolExists() {
         Mockito.when(schoolService.existsSchool("1234567")).thenReturn(true);
         schoolController.checkSchoolExists("1234567");

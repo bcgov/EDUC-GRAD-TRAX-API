@@ -1,16 +1,17 @@
 package ca.bc.gov.educ.api.trax.model.entity;
 
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PastOrPresent;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -91,7 +92,12 @@ public class TraxUpdatedPubEvent {
      * @param eventPayload the event payload
      */
     public void setEventPayload(String eventPayload) {
-        setEventPayloadBytes(eventPayload.getBytes(StandardCharsets.UTF_8));
+        setEventPayloadBytes(nullSafeEventPayload(eventPayload).getBytes(StandardCharsets.UTF_8));
+    }
+
+    private static String nullSafeEventPayload(String eventPayload) {
+        if(StringUtils.isBlank(eventPayload)) eventPayload = "{}";
+        return eventPayload;
     }
 
     /**
@@ -110,7 +116,7 @@ public class TraxUpdatedPubEvent {
          * @return the student event . student event builder
          */
         public TraxUpdatedPubEventBuilder eventPayload(String eventPayload) {
-            this.eventPayloadBytes = eventPayload.getBytes(StandardCharsets.UTF_8);
+            this.eventPayloadBytes = nullSafeEventPayload(eventPayload).getBytes(StandardCharsets.UTF_8);
             return this;
         }
     }
