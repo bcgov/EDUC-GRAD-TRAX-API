@@ -119,15 +119,18 @@ cron:
           run: ${CRON_SCHEDULED_GRAD_TO_TRAX_EVENTS}
           lockAtLeastFor: ${CRON_SCHEDULED_GRAD_TO_TRAX_EVENTS_LOCK_AT_LEAST_FOR}
           lockAtMostFor: ${CRON_SCHEDULED_GRAD_TO_TRAX_EVENTS_LOCK_AT_MOST_FOR}
+          threshold: ${CRON_SCHEDULED_GRAD_TO_TRAX_EVENTS_THRESHOLD}
         trax-to-grad:
           run: ${CRON_SCHEDULED_TRAX_TO_GRAD_EVENTS}
           lockAtLeastFor: ${CRON_SCHEDULED_TRAX_TO_GRAD_EVENTS_LOCK_AT_LEAST_FOR}
           lockAtMostFor: ${CRON_SCHEDULED_TRAX_TO_GRAD_EVENTS_LOCK_AT_MOST_FOR}
+          threshold: ${CRON_SCHEDULED_TRAX_TO_GRAD_EVENTS_THRESHOLD}
       trigger-jobs:
         read-trax-update:
           run: ${CRON_SCHEDULED_TRIGGER_TRAX_UPDATES}
           lockAtLeastFor: ${CRON_SCHEDULED_TRIGGER_TRAX_UPDATES_LOCK_AT_LEAST_FOR}
           lockAtMostFor: ${CRON_SCHEDULED_TRIGGER_TRAX_UPDATES_LOCK_AT_MOST_FOR}
+          threshold: ${CRON_SCHEDULED_TRIGGER_TRAX_UPDATES_THRESHOLD}
 
 #Incremental Trax Update
 trax:
