@@ -35,7 +35,6 @@ public class EducGradTraxApiConstants {
     public static final String GRAD_TRAX_COMMON_URL_MAPPING = GRAD_TRAX_API_ROOT_MAPPING + "/common";
     public static final String GRAD_TSW_URL_MAPPING = GRAD_TRAX_API_ROOT_MAPPING + "/tsw";
 
-
     // Service Methods Mappings
     public static final String GET_ALL_COUNTRY_MAPPING = "/country";
     public static final String GET_ALL_COUNTRY_BY_CODE_MAPPING = "/country/{countryCode}";
@@ -124,4 +123,44 @@ public class EducGradTraxApiConstants {
 
     @Value("${endpoint.educ-school-api.get-all-schools.url}")
     private String allSchoolSchoolApiUrl;
+
+    // Scheduler: ongoing updates from TRAX to GRAD
+    @Value("${cron.scheduled.process.events.trax-to-grad.run}")
+    private String traxToGradCronRun;
+
+    @Value("${cron.scheduled.process.events.trax-to-grad.lockAtLeastFor}")
+    private String traxToGradLockAtLeastFor;
+
+    @Value("${cron.scheduled.process.events.trax-to-grad.lockAtMostFor}")
+    private String traxToGradLockAtMostFor;
+
+    @Value("${cron.scheduled.process.events.trax-to-grad.threshold}")
+    private int traxToGradProcessingThreshold;
+
+    // Scheduler: ongoing updates from GRAD to TRAX
+    @Value("${cron.scheduled.process.events.grad-to-trax.run}")
+    private String gradToTraxCronRun;
+
+    @Value("${cron.scheduled.process.events.grad-to-trax.lockAtLeastFor}")
+    private String gradToTraxLockAtLeastFor;
+
+    @Value("${cron.scheduled.process.events.grad-to-trax.lockAtMostFor}")
+    private String gradToTraxLockAtMostFor;
+
+    @Value("${cron.scheduled.process.events.grad-to-trax.threshold}")
+    private int gradToTraxProcessingThreshold;
+
+    // Scheduler: TRAX triggers
+    @Value("${cron.scheduled.process.trigger-jobs.read-trax-update.run}")
+    private String traxTriggersCronRun;
+
+    @Value("${cron.scheduled.process.trigger-jobs.read-trax-update.lockAtLeastFor}")
+    private String traxTriggersLockAtLeastFor;
+
+    @Value("${cron.scheduled.process.trigger-jobs.read-trax-update.lockAtMostFor}")
+    private String traxTriggersLockAtMostFor;
+
+    @Value("${cron.scheduled.process.trigger-jobs.read-trax-update.threshold}")
+    private int traxTriggersProcessingThreshold;
+
 }

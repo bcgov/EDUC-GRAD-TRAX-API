@@ -78,15 +78,18 @@ cron:
           run: 0 0/10 * * * *
           lockAtLeastFor: PT1M
           lockAtMostFor: PT4M
+          threshold: 100
         trax-to-grad:
           run: 0 0/10 * * * *
           lockAtLeastFor: PT1M
           lockAtMostFor: PT4M
+          threshold: 100
       trigger-jobs:
         read-trax-update:
           run: 0 0/2 * * * *
           lockAtLeastFor: 800ms
           lockAtMostFor: 900ms
+          threshold: 100
 
 #Incremental Trax Update
 trax:
