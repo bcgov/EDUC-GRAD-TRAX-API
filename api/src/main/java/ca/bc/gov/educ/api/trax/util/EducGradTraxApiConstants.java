@@ -34,11 +34,13 @@ public class EducGradTraxApiConstants {
     public static final String GRAD_PSI_URL_MAPPING = GRAD_TRAX_API_ROOT_MAPPING + "/psi";
     public static final String GRAD_TRAX_COMMON_URL_MAPPING = GRAD_TRAX_API_ROOT_MAPPING + "/common";
     public static final String GRAD_TSW_URL_MAPPING = GRAD_TRAX_API_ROOT_MAPPING + "/tsw";
+    public static final String GRAD_EDW_URL_MAPPING = GRAD_TRAX_API_ROOT_MAPPING + "/edw";
+
 
     // Service Methods Mappings
     public static final String GET_ALL_COUNTRY_MAPPING = "/country";
     public static final String GET_ALL_COUNTRY_BY_CODE_MAPPING = "/country/{countryCode}";
-    
+
     public static final String GET_ALL_PROVINCE_MAPPING = "/province";
     public static final String GET_ALL_PROVINCE_BY_CODE_MAPPING = "/province/{provinceCode}";
 
@@ -58,6 +60,10 @@ public class EducGradTraxApiConstants {
     public static final String GET_TRANSCRIPT_DEMOG_BY_PEN_MAPPING = "/tran-demog/{pen}";
     public static final String GET_TRANSCRIPT_COURSE_BY_PEN_MAPPING = "/tran-courses/{pen}";
 
+    public static final String GET_SCHOOLS_BY_GRAD_YEAR_MAPPING = "/get-schools/snapshot/{gradYear}";
+    public static final String GET_STUDENTS_BY_GRAD_YEAR_MAPPING = "/get-students/snapshot/{gradYear}";
+    public static final String GET_STUDENTS_BY_GRAD_YEAR_AND_SCHOOL_MAPPING = "/get-students/snapshot/{gradYear}/{minCode}";
+
     public static final String GET_TRAX_STUDENT_GRADUATED_BY_PEN_MAPPING = "/student/graduated/{pen}";
     public static final String GET_TRAX_STUDENT_MASTER_MAPPING = "/student-master/{pen}";
     public static final String GET_TRAX_STUDENT_DEMOG_MAPPING = "/student-demog/{pen}";
@@ -66,7 +72,7 @@ public class EducGradTraxApiConstants {
     public static final String GET_COURSE_RESTRICTION_LIST_MAPPING = "/course-restrictions";
     public static final String GET_COURSE_REQUIREMENT_LIST_MAPPING = "/course-requirements";
     public static final String POST_SAVE_TRAX_STUDENT_NO_MAPPING = "/trax-student-no";
-    
+
     //Default Attribute value constants
     public static final String DEFAULT_CREATED_BY = "API_GRAD_TRAX";
     protected static final Date DEFAULT_CREATED_TIMESTAMP = new Date();
@@ -75,7 +81,7 @@ public class EducGradTraxApiConstants {
 
     //Default Date format constants
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
-    
+
     public static final String TRAX_DATE_FORMAT = "yyyyMMdd";
     public static final String TRAX_TSW_DATE_FORMAT = "yyyyMM";
     public static final Date ADULT_18_RULE_VALID_DATE = EducGradTraxApiUtils.parseDate("2012-07-01");
