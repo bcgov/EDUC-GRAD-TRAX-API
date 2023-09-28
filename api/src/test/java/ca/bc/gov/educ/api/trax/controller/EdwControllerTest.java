@@ -1,8 +1,6 @@
 package ca.bc.gov.educ.api.trax.controller;
 
 import ca.bc.gov.educ.api.trax.model.dto.SnapshotResponse;
-import ca.bc.gov.educ.api.trax.model.dto.TranscriptStudentCourse;
-import ca.bc.gov.educ.api.trax.model.dto.TranscriptStudentDemog;
 import ca.bc.gov.educ.api.trax.service.EdwService;
 import ca.bc.gov.educ.api.trax.util.GradValidation;
 import ca.bc.gov.educ.api.trax.util.ResponseHelper;
@@ -14,9 +12,12 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(MockitoJUnitRunner.class)
 @ExtendWith(MockitoExtension.class)
@@ -43,6 +44,14 @@ public class EdwControllerTest {
         Mockito.verify(edwService).getUniqueSchoolList(gradYear);
     }
 
+    @Test
+    public void testValidationErrorForGetSchoolListFromSnapshotByGradYear() {
+        Mockito.when(validation.hasErrors()).thenReturn(true);
+        var result = edwController.getSchoolListFromSnapshotByGradYear(null);
+        assertThat(result).isNotNull();
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
 
     @Test
     public void testGetStudentsFromSnapshotByGradYear() {
@@ -63,6 +72,14 @@ public class EdwControllerTest {
     }
 
     @Test
+    public void testValidationErrorForGetStudentsFromSnapshotByGradYear() {
+        Mockito.when(validation.hasErrors()).thenReturn(true);
+        var result = edwController.getStudentsFromSnapshotByGradYear(null);
+        assertThat(result).isNotNull();
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
     public void testGetStudentsFromSnapshotByGradYearAndSchool() {
         Integer gradYear = 2023;
         String minCode = "12345678";
@@ -79,6 +96,16 @@ public class EdwControllerTest {
         Mockito.when(edwService.getStudents(gradYear, minCode)).thenReturn(Arrays.asList(snapshot1, snapshot2));
         edwController.getStudentsFromSnapshotByGradYearAndSchool(gradYear, minCode);
         Mockito.verify(edwService).getStudents(gradYear, minCode);
+    }
+
+    @Test
+    public void testValidationErrorForGetStudentsFromSnapshotByGradYearAndSchool() {
+        Integer gradYear = 2023;
+
+        Mockito.when(validation.hasErrors()).thenReturn(true);
+        var result = edwController.getStudentsFromSnapshotByGradYearAndSchool(gradYear, null);
+        assertThat(result).isNotNull();
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
 }
