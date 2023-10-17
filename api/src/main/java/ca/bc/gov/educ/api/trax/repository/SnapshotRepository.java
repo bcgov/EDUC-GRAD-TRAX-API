@@ -20,12 +20,12 @@ public interface SnapshotRepository extends JpaRepository<SnapshotEntity, Snapsh
             "where s.grad_year = :gradYear", nativeQuery=true)
     List<String> getSchools(@Param("gradYear") Integer gradYear);
 
-    @Query(value="select new ca.bc.gov.educ.api.trax.model.dto.SnapshotResponse(trim(s.pen), trim(s.graduatedDate), s.gpa, trim(s.honourFlag))\n" +
+    @Query(value="select new ca.bc.gov.educ.api.trax.model.dto.SnapshotResponse(trim(s.pen), trim(s.graduatedDate), s.gpa, trim(s.honourFlag), trim(s.schoolOfRecord))\n" +
             "from SnapshotEntity s\n" +
             "where s.gradYear = :gradYear")
     List<SnapshotResponse> getStudentsByGradYear(@Param("gradYear") Integer gradYear);
 
-    @Query(value="select new ca.bc.gov.educ.api.trax.model.dto.SnapshotResponse(trim(s.pen), trim(s.graduatedDate), s.gpa, trim(s.honourFlag))\n" +
+    @Query(value="select new ca.bc.gov.educ.api.trax.model.dto.SnapshotResponse(trim(s.pen), trim(s.graduatedDate), s.gpa, trim(s.honourFlag), trim(s.schoolOfRecord))\n" +
             "from SnapshotEntity s\n" +
             "where s.gradYear = :gradYear\n" +
             "and s.schoolOfRecord = :schoolOfRecord")

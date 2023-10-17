@@ -12,11 +12,13 @@ public class SnapshotResponse {
     private String graduatedDate; // yyyyMM
     private BigDecimal gpa;
     private String honourFlag;
+    private String schoolOfRecord;
 
-    public SnapshotResponse(String pen, String graduatedDate, BigDecimal gpa, String honourFlag) {
+    public SnapshotResponse(String pen, String graduatedDate, BigDecimal gpa, String honourFlag, String schoolOfRecord) {
         this.pen = pen;
         this.graduatedDate = graduatedDate;
         this.gpa = gpa;
         this.honourFlag = honourFlag;
+        this.schoolOfRecord = schoolOfRecord;
     }
 }
