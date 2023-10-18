@@ -15,9 +15,11 @@ import java.util.List;
 @Repository
 public interface SnapshotRepository extends JpaRepository<SnapshotEntity, SnapshotID> {
 
-    @Query(value="select distinct trim(s.mincode) as schoolOfRecord\n" +
-            "from snapshot s\n" +
-            "where s.grad_year = :gradYear", nativeQuery=true)
+    @Query(value="select s.mincode as schoolOfRecord from (\n" +
+            " select mincode, count(*) from SNAPSHOT\n" +
+            " where grad_year = :gradYear\n" +
+            " group by mincode\n" +
+            " order by 2 desc ) s", nativeQuery=true)
     List<String> getSchools(@Param("gradYear") Integer gradYear);
 
     @Query(value="select new ca.bc.gov.educ.api.trax.model.dto.SnapshotResponse(trim(s.pen), trim(s.graduatedDate), s.gpa, trim(s.honourFlag), trim(s.schoolOfRecord))\n" +
