@@ -53,7 +53,7 @@ public class ChoreographedEventPersistenceService {
         .createDate(LocalDateTime.now())
         .updateDate(LocalDateTime.now())
         .build();
-    return eventRepository.save(event);
+    return this.eventRepository.save(event);
   }
 
   /**
