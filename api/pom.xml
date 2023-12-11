@@ -6,7 +6,7 @@
 
     <groupId>ca.bc.gov.educ</groupId>
     <artifactId>educ-grad-trax-api</artifactId>
-    <version>1.8.45</version>
+    <version>1.8.47</version>
     <name>educ-grad-trax-api</name>
     <description>Ministry of Education GRAD TRAX API</description>
 
@@ -22,6 +22,7 @@
             src/main/java/ca/bc/gov/educ/api/trax/scheduler/**,
             src/main/java/ca/bc/gov/educ/api/trax/exception/**,
             src/main/java/ca/bc/gov/educ/api/trax/model/**,
+            src/main/java/ca/bc/gov/educ/api/trax/service/EventHandlerDelegatorService,
             src/main/java/ca/bc/gov/educ/api/trax/util/**,
             src/main/java/ca/bc/gov/educ/api/trax/repository/**
         </sonar.exclusions>

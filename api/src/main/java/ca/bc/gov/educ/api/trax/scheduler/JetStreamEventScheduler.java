@@ -13,6 +13,8 @@ import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+
 import static ca.bc.gov.educ.api.trax.constant.EventStatus.DB_COMMITTED;
 
 @Component
@@ -54,12 +56,13 @@ public class JetStreamEventScheduler {
     @Scheduled(cron = "${cron.scheduled.process.events.grad-to-trax.run}")
     @SchedulerLock(name = "PROCESS_CHOREOGRAPHED_EVENTS_FROM_JET_STREAM", lockAtLeastFor = "${cron.scheduled.process.events.grad-to-trax.lockAtLeastFor}", lockAtMostFor = "${cron.scheduled.process.events.grad-to-trax.lockAtMostFor}")
     public void findAndProcessEvents() {
-        log.debug("PROCESS_CHOREOGRAPHED_EVENTS_FROM_JET_STREAM: started - cron {}, lockAtMostFor {}", constants.getGradToTraxCronRun(), constants.getGradToTraxLockAtMostFor());
         LockAssert.assertLocked();
+        log.debug("PROCESS_CHOREOGRAPHED_EVENTS_FROM_JET_STREAM: started - cron {}, lockAtMostFor {}", constants.getGradToTraxCronRun(), constants.getGradToTraxLockAtMostFor());
         final var results = this.eventRepository.findAllByEventStatusOrderByCreateDate(DB_COMMITTED.toString());
         if (!results.isEmpty()) {
+            var filteredList = results.stream().filter(el -> el.getUpdateDate().isBefore(LocalDateTime.now().minusMinutes(5))).toList();
             int cnt = 0;
-            for (Event e : results) {
+            for (Event e : filteredList) {
                 if (cnt++ >= constants.getGradToTraxProcessingThreshold()) {
                     log.info(" ==> Reached the processing threshold of {}", constants.getGradToTraxProcessingThreshold());
                     break;
@@ -77,12 +80,13 @@ public class JetStreamEventScheduler {
     @Scheduled(cron = "${cron.scheduled.process.events.trax-to-grad.run}")
     @SchedulerLock(name = "PUBLISH_TRAX_UPDATED_EVENTS_TO_JET_STREAM", lockAtLeastFor = "${cron.scheduled.process.events.trax-to-grad.lockAtLeastFor}", lockAtMostFor = "${cron.scheduled.process.events.trax-to-grad.lockAtMostFor}")
     public void findAndPublishGradStatusEventsToJetStream() {
-        log.debug("PUBLISH_TRAX_UPDATED_EVENTS_TO_JET_STREAM: started - cron {}, lockAtMostFor {}", constants.getTraxToGradCronRun(), constants.getTraxToGradLockAtMostFor());
         LockAssert.assertLocked();
+        log.debug("PUBLISH_TRAX_UPDATED_EVENTS_TO_JET_STREAM: started - cron {}, lockAtMostFor {}", constants.getTraxToGradCronRun(), constants.getTraxToGradLockAtMostFor());
         final var results = this.traxUpdatedPubEventRepository.findByEventStatusOrderByCreateDate(DB_COMMITTED.toString());
         if (!results.isEmpty()) {
+            var filteredList = results.stream().filter(el -> el.getUpdateDate().isBefore(LocalDateTime.now().minusMinutes(5))).toList();
             int cnt = 0;
-            for (TraxUpdatedPubEvent el : results) {
+            for (TraxUpdatedPubEvent el : filteredList) {
                 if (cnt++ >= constants.getTraxToGradProcessingThreshold()) {
                     log.info(" ==> Reached the processing threshold of {}", constants.getTraxToGradProcessingThreshold());
                     break;
