@@ -169,4 +169,7 @@ public class EducGradTraxApiConstants {
     @Value("${cron.scheduled.process.trigger-jobs.read-trax-update.threshold}")
     private int traxTriggersProcessingThreshold;
 
+    @Value("${cron.scheduled.process.purge-old-records.staleInDays}")
+    private int recordsStaleInDays;
+
 }

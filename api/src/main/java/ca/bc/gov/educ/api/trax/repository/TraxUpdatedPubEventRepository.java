@@ -1,10 +1,12 @@
 package ca.bc.gov.educ.api.trax.repository;
 
 import ca.bc.gov.educ.api.trax.model.entity.TraxUpdatedPubEvent;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -37,5 +39,10 @@ public interface TraxUpdatedPubEventRepository extends JpaRepository<TraxUpdated
    * @return the list
    */
   List<TraxUpdatedPubEvent> findByEventStatusOrderByCreateDate(String eventStatus);
+
+  @Transactional
+  @Modifying
+  @Query("delete from TraxUpdatedPubEvent where createDate <= :createDate")
+  void deleteByCreateDateBefore(LocalDateTime createDate);
 
 }
