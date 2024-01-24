@@ -18,7 +18,6 @@ env:
   IMAGE_REGISTRY_PASSWORD: ${{ github.token }}
 
   SPRING_BOOT_IMAGE_NAME: educ-grad-trax-api-dc
-  DOCKER_ARTIFACTORY_REPO: artifacts.developer.gov.bc.ca/docker-remote
   REPO_NAME: "educ-grad-trax-api"
   APP_DOMAIN: ${{ vars.APP_DOMAIN }}
   BRANCH: "grad-release"
