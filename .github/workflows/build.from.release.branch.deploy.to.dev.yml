@@ -22,7 +22,7 @@ env:
   APP_DOMAIN: ${{ vars.APP_DOMAIN }}
   BRANCH: "grad-release"
   TAG: "latest"
-  #GRAD2-1947 Resource optimization
+  MIN_CPU: "50m"
   MAX_CPU: "300m"
   MIN_MEM: "1024Mi"
   MAX_MEM: "2200Mi"
@@ -115,6 +115,17 @@ jobs:
 
           # UPDATE Configmaps
           curl -s https://raw.githubusercontent.com/bcgov/${{ env.REPO_NAME }}/${{ env.BRANCH }}/tools/config/update-configmap.sh \
+          | bash /dev/stdin \
+          dev \
+          ${{ env.REPO_NAME }} \
+          ${{ env.GRAD_NAMESPACE }} \
+          ${{ env.COMMON_NAMESPACE }} \
+          ${{ env.BUSINESS_NAMESPACE }} \
+          ${{ secrets.SPLUNK_TOKEN }} \
+          ${{ vars.APP_LOG_LEVEL }}
+          
+          # OVERRIDE Configmaps
+          curl -s https://raw.githubusercontent.com/bcgov/${{ env.REPO_NAME }}/${{ env.BRANCH }}/tools/config/override-configmap-dev.sh \
           | bash /dev/stdin \
           dev \
           ${{ env.REPO_NAME }} \
