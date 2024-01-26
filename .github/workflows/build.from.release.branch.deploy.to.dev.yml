@@ -22,6 +22,7 @@ env:
   APP_DOMAIN: ${{ vars.APP_DOMAIN }}
   BRANCH: "grad-release"
   TAG: "latest"
+  MIN_CPU: "50m"
   MAX_CPU: "300m"
   MIN_MEM: "1024Mi"
   MAX_MEM: "2200Mi"
