@@ -12,7 +12,7 @@ import jakarta.persistence.Table;
 @Data
 @Immutable
 @Entity
-@Where(clause = "GRAD_REQT_YEAR in ('2004','2018','1950','1996','1986')")
+@Where(clause = "GRAD_REQT_YEAR in ('2023','2018','2004','1996','1986','1950')")
 @Table(name = "TAB_GRAD_CRSE")
 public class GradCourseEntity {
 
@@ -69,4 +69,6 @@ public class GradCourseEntity {
     private String fineArts;
     @Column(name = "GRAD_CAREER_LIFE_CONNECTIONS")
     private String careerLifeConnections;
+    @Column(name = "GRAD_INDIGENOUS_FOCUSED")
+    private String indigenousFocused;
 }
