@@ -66,7 +66,7 @@ oc create -n "$GRAD_NAMESPACE"-"$envValue" configmap "$APP_NAME"-config-map \
   --from-literal=CRON_SCHEDULED_TRIGGER_TRAX_UPDATES_LOCK_AT_MOST_FOR="PT20M" \
   --from-literal=CRON_SCHEDULED_TRIGGER_TRAX_UPDATES_THRESHOLD="4000" \
   --from-literal=ENABLE_FLYWAY="true" \
-  --from-literal=ENABLE_GET_STUDENT_MASTER_ONLY="false" \
+  --from-literal=ENABLE_GET_STUDENT_MASTER_ONLY="true" \
   --from-literal=ENABLE_TRAX_UPDATE="true" \
   --from-literal=KEYCLOAK_TOKEN_URL="https://soam-$envValue.apps.silver.devops.gov.bc.ca/" \
   --from-literal=MAX_RETRY_ATTEMPTS="3" \
