@@ -38,21 +38,6 @@ public class TraxCommonController {
     @Autowired
     ResponseHelper response;
 
-    @GetMapping(EducGradTraxApiConstants.GET_TRAX_STUDENT_GRADUATED_BY_PEN_MAPPING)
-    @PreAuthorize(PermissionsConstants.READ_GRAD_TRAX_STUDENT_DATA)
-    @Operation(summary = "Get student is graduated or not from TSW", description = "Find a student graduated or not", tags = { "TSW" })
-    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
-            @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-    public ResponseEntity<Boolean> getStudentIsGraduatedByPen(@PathVariable String pen) {
-        logger.debug("getTranscriptStudentGraduatedByPen : ");
-        validation.requiredField(pen, "Pen #");
-        if (validation.hasErrors()) {
-            validation.stopOnErrors();
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        return response.GET(traxCommonService.isGraduatedStudent(pen));
-    }
-
     @GetMapping(EducGradTraxApiConstants.GET_TRAX_STUDENT_DEMOG_MAPPING)
     @PreAuthorize(PermissionsConstants.READ_GRAD_TRAX_STUDENT_DATA)
     @Operation(summary = "Find Student Demographics from TRAX", description = "Find Student Demographics from TRAX", tags = {"Student"})
@@ -71,14 +56,14 @@ public class TraxCommonController {
     @PreAuthorize(PermissionsConstants.READ_GRAD_TRAX_STUDENT_DATA)
     @Operation(summary = "Find Student Master Record from TRAX", description = "Find Student Master Record from TRAX", tags = {"Student"})
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),  @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-    public ResponseEntity<List<ConvGradStudent>> getStudentMasterDataFromTrax(@PathVariable String pen, @RequestHeader(name="Authorization") String accessToken) {
+    public ResponseEntity<List<ConvGradStudent>> getStudentMasterDataFromTrax(@PathVariable String pen) {
         logger.debug("getStudentMasterDataFromTrax : ");
         validation.requiredField(pen, "Pen #");
         if (validation.hasErrors()) {
             validation.stopOnErrors();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        return response.GET(traxCommonService.getStudentMasterDataFromTrax(pen, accessToken.replace(BEARER, "")));
+        return response.GET(traxCommonService.getStudentMasterDataFromTrax(pen));
     }
 
     @GetMapping(EducGradTraxApiConstants.GET_TRAX_STUDENT_NO_LIST_BY_PAGING_MAPPING)

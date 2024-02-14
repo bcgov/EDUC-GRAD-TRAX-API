@@ -1,7 +1,6 @@
 package ca.bc.gov.educ.api.trax.model.dto;
 
 import ca.bc.gov.educ.api.trax.constant.ConversionResultType;
-import ca.bc.gov.educ.api.trax.constant.StudentLoadType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -42,19 +41,8 @@ public class ConvGradStudent {
     // program codes for optional / career program
     private List<String> programCodes;
 
-    // grad-one, grad-two, or ungrad
-    private StudentLoadType studentLoadType;
-    private Date distributionDate;
-    private String transcriptSchoolCategoryCode;
-    private String certificateSchoolCategoryCode;
-    private School transcriptSchool;
-    private School certificateSchool;
-    // tsw
-    private TranscriptStudentDemog transcriptStudentDemog;
-    private List<TranscriptStudentCourse> transcriptStudentCourses;
     // 1950 "AD"
     private boolean adult19Rule;
-    private boolean allowedAdult;
 
     // data conversion status after being processed.
     private ConversionResultType result;
