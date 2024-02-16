@@ -64,7 +64,6 @@ public class EducGradTraxApiConstants {
     public static final String GET_STUDENTS_BY_GRAD_YEAR_MAPPING = "/get-students/snapshot/{gradYear}";
     public static final String GET_STUDENTS_BY_GRAD_YEAR_AND_SCHOOL_MAPPING = "/get-students/snapshot/{gradYear}/{minCode}";
 
-    public static final String GET_TRAX_STUDENT_GRADUATED_BY_PEN_MAPPING = "/student/graduated/{pen}";
     public static final String GET_TRAX_STUDENT_MASTER_MAPPING = "/student-master/{pen}";
     public static final String GET_TRAX_STUDENT_DEMOG_MAPPING = "/student-demog/{pen}";
     public static final String GET_TRAX_STUDENT_NO_LIST_BY_PAGING_MAPPING = "/student-no-list/paginated";
@@ -119,10 +118,6 @@ public class EducGradTraxApiConstants {
     // Splunk LogHelper Enabled
     @Value("${splunk.log-helper.enabled}")
     private boolean splunkLogHelperEnabled;
-
-    // Forced to read student master only
-    @Value("${trax.get.student-master-only.enabled}")
-    private boolean enableStudentMasterOnly;
 
     @Value("${endpoint.educ-school-api.get-school-by-mincode.url}")
     private String schoolByMincodeSchoolApiUrl;

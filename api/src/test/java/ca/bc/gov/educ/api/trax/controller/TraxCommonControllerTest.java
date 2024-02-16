@@ -69,9 +69,9 @@ public class TraxCommonControllerTest {
 								.schoolOfRecord("12345678")
 							.build();
 		studentList.add(obj);
-		Mockito.when(traxCommonService.getStudentMasterDataFromTrax(pen, "123")).thenReturn(studentList);
-		traxCommonController.getStudentMasterDataFromTrax(pen, "123");
-		Mockito.verify(traxCommonService).getStudentMasterDataFromTrax(pen, "123");
+		Mockito.when(traxCommonService.getStudentMasterDataFromTrax(pen)).thenReturn(studentList);
+		traxCommonController.getStudentMasterDataFromTrax(pen);
+		Mockito.verify(traxCommonService).getStudentMasterDataFromTrax(pen);
 	}
 
 	@Test
@@ -145,10 +145,10 @@ public class TraxCommonControllerTest {
 		Mockito.verify(traxCommonService).saveTraxStudentNo(obj);
 	}
 
-	@Test
-	public void testGetStudentIsGraduatedByPen() {
-		Mockito.when(traxCommonService.isGraduatedStudent("123456789")).thenReturn(true);
-		traxCommonController.getStudentIsGraduatedByPen("123456789");
-		Mockito.verify(traxCommonService).isGraduatedStudent("123456789");
-	}
+//	@Test
+//	public void testGetStudentIsGraduatedByPen() {
+//		Mockito.when(traxCommonService.isGraduatedStudent("123456789")).thenReturn(true);
+//		traxCommonController.getStudentIsGraduatedByPen("123456789");
+//		Mockito.verify(traxCommonService).isGraduatedStudent("123456789");
+//	}
 }
