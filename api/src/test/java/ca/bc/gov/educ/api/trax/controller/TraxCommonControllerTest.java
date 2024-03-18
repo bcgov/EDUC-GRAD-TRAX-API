@@ -2,6 +2,9 @@ package ca.bc.gov.educ.api.trax.controller;
 
 import ca.bc.gov.educ.api.trax.model.dto.*;
 import ca.bc.gov.educ.api.trax.service.TraxCommonService;
+import ca.bc.gov.educ.api.trax.util.GradValidation;
+import ca.bc.gov.educ.api.trax.util.MessageHelper;
+import ca.bc.gov.educ.api.trax.util.ResponseHelper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -22,9 +25,18 @@ public class TraxCommonControllerTest {
 	@Mock
 	private TraxCommonService traxCommonService;
 	
+	@Mock
+	ResponseHelper response;
+
 	@InjectMocks
 	private TraxCommonController traxCommonController;
 	
+	@Mock
+	GradValidation validation;
+
+	@Mock
+	MessageHelper messagesHelper;
+
 	@Test
 	public void testGetStudentDemographicsDataFromTrax() {
 		final String pen = "123456789";
@@ -89,6 +101,7 @@ public class TraxCommonControllerTest {
 
 	@Test
 	public void testGetCourseRestrictions() {
+		final String pen = "123456789";
 		List<CourseRestriction> courseRestrictionList = new ArrayList<>();
 		CourseRestriction obj = new CourseRestriction();
 		obj.setMainCourse("main");
@@ -106,6 +119,7 @@ public class TraxCommonControllerTest {
 
 	@Test
 	public void testGetCourseRequirements() {
+		final String pen = "123456789";
 		List<GradCourse> courseRequirementList = new ArrayList<>();
 		GradCourse obj = new GradCourse();
 		obj.setCourseCode("main");
