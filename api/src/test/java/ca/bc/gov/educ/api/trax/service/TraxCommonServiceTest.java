@@ -677,6 +677,23 @@ public class TraxCommonServiceTest {
         assertThat(traxStudentNo.getStatus()).isEqualTo(result.getStatus());
     }
 
+    @Test
+    public void updateSaveTraxStudentNo() {
+        TraxStudentNo traxStudentNo = new TraxStudentNo();
+        traxStudentNo.setStudNo("123456789");
+        traxStudentNo.setStatus(null);
+
+        TraxStudentNoEntity traxStudentNoEntity = traxStudentNoTransformer.transformToEntity(traxStudentNo);
+
+        when(traxStudentNoRepository.findById(traxStudentNo.getStudNo())).thenReturn(Optional.of(traxStudentNoEntity));
+        when(traxStudentNoRepository.save(traxStudentNoEntity)).thenReturn(traxStudentNoEntity);
+
+        var result = traxCommonService.updateTraxStudentNo(traxStudentNo.getStudNo());
+        assertThat(result).isNotNull();
+        assertThat(traxStudentNo.getStudNo()).isEqualTo(result.getStudNo());
+        assertThat(traxStudentNo.getStatus()).isNull();
+    }
+
 //    @Test
 //    public void testStudentIsNotGraduated() {
 //        // Student is graduated or not

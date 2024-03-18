@@ -145,6 +145,17 @@ public class TraxCommonControllerTest {
 		Mockito.verify(traxCommonService).saveTraxStudentNo(obj);
 	}
 
+	@Test
+	public void testUpdateTraxStudentNo() {
+		final String pen = "123456789";
+		TraxStudentNo obj = new TraxStudentNo();
+		obj.setStudNo(pen);
+
+		Mockito.when(traxCommonService.updateTraxStudentNo(pen)).thenReturn(obj);
+		traxCommonController.updateTraxStudentNo(pen);
+		Mockito.verify(traxCommonService).updateTraxStudentNo(pen);
+	}
+
 //	@Test
 //	public void testGetStudentIsGraduatedByPen() {
 //		Mockito.when(traxCommonService.isGraduatedStudent("123456789")).thenReturn(true);

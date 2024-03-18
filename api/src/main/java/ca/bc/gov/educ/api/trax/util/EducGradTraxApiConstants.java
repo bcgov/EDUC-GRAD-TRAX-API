@@ -71,6 +71,7 @@ public class EducGradTraxApiConstants {
     public static final String GET_COURSE_RESTRICTION_LIST_MAPPING = "/course-restrictions";
     public static final String GET_COURSE_REQUIREMENT_LIST_MAPPING = "/course-requirements";
     public static final String POST_SAVE_TRAX_STUDENT_NO_MAPPING = "/trax-student-no";
+    public static final String PUT_SAVE_TRAX_STUDENT_NO_MAPPING = "/trax-student-no/{pen}";
 
     //Default Attribute value constants
     public static final String DEFAULT_CREATED_BY = "API_GRAD_TRAX";

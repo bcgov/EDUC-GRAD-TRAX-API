@@ -112,4 +112,12 @@ public class TraxCommonController {
         logger.debug("saveTraxStudentNo : ");
         return response.GET(traxCommonService.saveTraxStudentNo(traxStudentNo));
     }
+
+    @PutMapping(EducGradTraxApiConstants.PUT_SAVE_TRAX_STUDENT_NO_MAPPING)
+    @PreAuthorize(PermissionsConstants.UPDATE_GRAD_TRAX_STUDENT_DATA)
+    @Operation(summary = "Update TraxStudentNo status", description = "Update TraxStudentNo status", tags = {"Student"})
+    public ResponseEntity<TraxStudentNo> updateTraxStudentNo(@PathVariable String pen) {
+        logger.debug("updateTraxStudentNo : ");
+        return response.GET(traxCommonService.updateTraxStudentNo(pen));
+    }
 }
