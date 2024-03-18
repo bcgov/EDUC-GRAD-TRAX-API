@@ -104,7 +104,7 @@ public class TraxCommonController {
         return response.GET(traxCommonService.loadGradCourseRequirementsDataFromTrax());
     }
 
-    @PostMapping(EducGradTraxApiConstants.POST_SAVE_TRAX_STUDENT_NO_MAPPING)
+    @PostMapping(EducGradTraxApiConstants.SAVE_TRAX_STUDENT_NO_MAPPING)
     @PreAuthorize(PermissionsConstants.UPDATE_GRAD_TRAX_STUDENT_DATA)
     @Operation(summary = "Save TraxStudentNo", description = "Save TraxStudentNo", tags = {"Student"})
     public ResponseEntity<TraxStudentNo> saveTraxStudentNo(@RequestBody TraxStudentNo traxStudentNo) {
@@ -112,7 +112,7 @@ public class TraxCommonController {
         return response.GET(traxCommonService.saveTraxStudentNo(traxStudentNo));
     }
 
-    @PutMapping(EducGradTraxApiConstants.PUT_SAVE_TRAX_STUDENT_NO_MAPPING)
+    @PutMapping(EducGradTraxApiConstants.SAVE_TRAX_STUDENT_NO_MAPPING)
     @PreAuthorize(PermissionsConstants.UPDATE_GRAD_TRAX_STUDENT_DATA)
     @Operation(summary = "Update TraxStudentNo status", description = "Update TraxStudentNo status", tags = {"Student"})
     public ResponseEntity<TraxStudentNo> updateTraxStudentNo(@RequestBody TraxStudentNo traxStudentNo) {
