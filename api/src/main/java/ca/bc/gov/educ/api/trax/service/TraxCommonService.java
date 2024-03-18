@@ -174,11 +174,12 @@ public class TraxCommonService {
     }
 
     @Transactional
-    public TraxStudentNo updateTraxStudentNo(String pen) {
-        Optional<TraxStudentNoEntity> optional = traxStudentNoRepository.findById(pen);
+    public TraxStudentNo updateTraxStudentNo(TraxStudentNo traxStudentNo) {
+        Optional<TraxStudentNoEntity> optional = traxStudentNoRepository.findById(traxStudentNo.getStudNo());
         if (optional.isPresent()) {
             TraxStudentNoEntity entity = optional.get();
-            entity.setStatus(null);
+            entity.setStatus(traxStudentNo.getStatus());
+            entity.setReason(traxStudentNo.getReason());
             return traxStudentNoTransformer.transformToDTO(traxStudentNoRepository.save(entity));
         }
         return null;

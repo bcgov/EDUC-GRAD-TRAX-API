@@ -688,7 +688,7 @@ public class TraxCommonServiceTest {
         when(traxStudentNoRepository.findById(traxStudentNo.getStudNo())).thenReturn(Optional.of(traxStudentNoEntity));
         when(traxStudentNoRepository.save(traxStudentNoEntity)).thenReturn(traxStudentNoEntity);
 
-        var result = traxCommonService.updateTraxStudentNo(traxStudentNo.getStudNo());
+        var result = traxCommonService.updateTraxStudentNo(traxStudentNo);
         assertThat(result).isNotNull();
         assertThat(traxStudentNo.getStudNo()).isEqualTo(result.getStudNo());
         assertThat(traxStudentNo.getStatus()).isNull();

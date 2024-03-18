@@ -27,13 +27,13 @@ public class TraxCommonControllerTest {
 	
 	@Mock
 	ResponseHelper response;
-	
+
 	@InjectMocks
 	private TraxCommonController traxCommonController;
 	
 	@Mock
 	GradValidation validation;
-	
+
 	@Mock
 	MessageHelper messagesHelper;
 
@@ -151,9 +151,9 @@ public class TraxCommonControllerTest {
 		TraxStudentNo obj = new TraxStudentNo();
 		obj.setStudNo(pen);
 
-		Mockito.when(traxCommonService.updateTraxStudentNo(pen)).thenReturn(obj);
-		traxCommonController.updateTraxStudentNo(pen);
-		Mockito.verify(traxCommonService).updateTraxStudentNo(pen);
+		Mockito.when(traxCommonService.updateTraxStudentNo(obj)).thenReturn(obj);
+		traxCommonController.updateTraxStudentNo(obj);
+		Mockito.verify(traxCommonService).updateTraxStudentNo(obj);
 	}
 
 //	@Test
