@@ -173,18 +173,6 @@ public class TraxCommonService {
         return traxStudentNo;
     }
 
-    @Transactional
-    public TraxStudentNo updateTraxStudentNo(TraxStudentNo traxStudentNo) {
-        Optional<TraxStudentNoEntity> optional = traxStudentNoRepository.findById(traxStudentNo.getStudNo());
-        if (optional.isPresent()) {
-            TraxStudentNoEntity entity = optional.get();
-            entity.setStatus(traxStudentNo.getStatus());
-            entity.setReason(traxStudentNo.getReason());
-            return traxStudentNoTransformer.transformToDTO(traxStudentNoRepository.save(entity));
-        }
-        return null;
-    }
-
     private List<ConvGradStudent> buildConversionGradStudents(List<Object[]> traxStudents) {
         List<ConvGradStudent> students = new ArrayList<>();
         traxStudents.forEach(result -> {
