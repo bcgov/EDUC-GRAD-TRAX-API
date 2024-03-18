@@ -26,8 +26,7 @@ import java.util.List;
 @RequestMapping(EducGradTraxApiConstants.GRAD_TRAX_COMMON_URL_MAPPING)
 @OpenAPIDefinition(info = @Info(title = "API for TRAX Data.", description = "This API is for TRAX.", version = "1"))
 public class TraxCommonController {
-    private static Logger logger = LoggerFactory.getLogger(TraxCommonController.class);
-    private static final String BEARER = "Bearer ";
+    private static final Logger logger = LoggerFactory.getLogger(TraxCommonController.class);
 
     @Autowired
     TraxCommonService traxCommonService;
@@ -116,8 +115,8 @@ public class TraxCommonController {
     @PutMapping(EducGradTraxApiConstants.PUT_SAVE_TRAX_STUDENT_NO_MAPPING)
     @PreAuthorize(PermissionsConstants.UPDATE_GRAD_TRAX_STUDENT_DATA)
     @Operation(summary = "Update TraxStudentNo status", description = "Update TraxStudentNo status", tags = {"Student"})
-    public ResponseEntity<TraxStudentNo> updateTraxStudentNo(@PathVariable String pen) {
+    public ResponseEntity<TraxStudentNo> updateTraxStudentNo(@RequestBody TraxStudentNo traxStudentNo) {
         logger.debug("updateTraxStudentNo : ");
-        return response.GET(traxCommonService.updateTraxStudentNo(pen));
+        return response.GET(traxCommonService.updateTraxStudentNo(traxStudentNo));
     }
 }

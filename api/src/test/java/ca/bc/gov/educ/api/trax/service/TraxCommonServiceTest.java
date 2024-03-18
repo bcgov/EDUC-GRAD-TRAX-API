@@ -1,13 +1,9 @@
 package ca.bc.gov.educ.api.trax.service;
 
-import ca.bc.gov.educ.api.trax.messaging.NatsConnection;
-import ca.bc.gov.educ.api.trax.messaging.jetstream.Publisher;
-import ca.bc.gov.educ.api.trax.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.trax.model.dto.*;
 import ca.bc.gov.educ.api.trax.model.entity.GradCourseEntity;
 import ca.bc.gov.educ.api.trax.model.entity.GradCourseKey;
 import ca.bc.gov.educ.api.trax.model.entity.TraxStudentNoEntity;
-import ca.bc.gov.educ.api.trax.model.transformer.GradCourseTransformer;
 import ca.bc.gov.educ.api.trax.model.transformer.TraxStudentNoTransformer;
 import ca.bc.gov.educ.api.trax.repository.*;
 import org.junit.After;
@@ -37,9 +33,6 @@ public class TraxCommonServiceTest {
     TraxCommonService traxCommonService;
 
     @Autowired
-    GradCourseTransformer gradCourseTransformer;
-
-    @Autowired
     TraxStudentNoTransformer traxStudentNoTransformer;
 
     @MockBean
@@ -50,19 +43,6 @@ public class TraxCommonServiceTest {
 
     @MockBean
     TraxStudentNoRepository traxStudentNoRepository;
-
-    @MockBean
-    SchoolService schoolService;
-
-    // NATS
-    @MockBean
-    private NatsConnection natsConnection;
-
-    @MockBean
-    private Publisher publisher;
-
-    @MockBean
-    private Subscriber subscriber;
 
     @Before
     public void setUp() {
@@ -77,8 +57,8 @@ public class TraxCommonServiceTest {
     @Test
     public void testGetStudentMasterDataFromTrax() {
         Object[] obj = new Object[] {
-                "123456789", "12345678", "12345678", "AD", Character.valueOf('A'),Character.valueOf('A'), "1950", Integer.valueOf(0),
-                Integer.valueOf(0), null, null, null, null, null, null, null, null, null, null, Character.valueOf('C'), Character.valueOf('N'), null
+                "123456789", "12345678", "12345678", "AD", 'A', 'A', "1950", 0,
+                0, null, null, null, null, null, null, null, null, null, null, 'C', 'N', null
         };
         List<Object[]> results = new ArrayList<>();
         results.add(obj);
@@ -87,7 +67,7 @@ public class TraxCommonServiceTest {
         Character status = (Character)obj[4];
 
         Object[] cols = new Object[] {
-                "1950", Integer.valueOf(0), Integer.valueOf(0), null
+                "1950", 0, 0, null
         };
         List<Object[]> list = new ArrayList<>();
         list.add(cols);
@@ -565,7 +545,7 @@ public class TraxCommonServiceTest {
     @Test
     public void testGetStudentDemographicsDataFromTrax() {
         Object[] obj = new Object[] {
-                "123456789", "Test", "QA", "", Character.valueOf('A'),Character.valueOf('A'), "12345678", "12", "V4N3Y2", Character.valueOf('M'), "19800111",  BigDecimal.valueOf(202005), null, "            "
+                "123456789", "Test", "QA", "", 'A', 'A', "12345678", "12", "V4N3Y2", 'M', "19800111",  BigDecimal.valueOf(202005), null, "            "
         };
         List<Object[]> results = new ArrayList<>();
         results.add(obj);
@@ -592,7 +572,7 @@ public class TraxCommonServiceTest {
         TraxStudentNoEntity traxStudentNoEntity = new TraxStudentNoEntity();
         traxStudentNoEntity.setStudNo("123456789");
 
-        Page<TraxStudentNoEntity> pages = new PageImpl<TraxStudentNoEntity>(Arrays.asList(traxStudentNoEntity), pageable, 1);
+        Page<TraxStudentNoEntity> pages = new PageImpl<>(List.of(traxStudentNoEntity), pageable, 1);
 
         when(this.traxStudentNoRepository.findAllByStatus(null, pageable)).thenReturn(pages);
 
@@ -622,9 +602,6 @@ public class TraxCommonServiceTest {
         List<Object[]> results = new ArrayList<>();
         results.add(obj);
 
-        String pen = (String) obj[0];
-        Character status = (Character)obj[4];
-
         when(this.traxStudentRepository.loadInitialCourseRestrictionRawData()).thenReturn(results);
 
         var result = traxCommonService.loadGradCourseRestrictionsDataFromTrax();
@@ -648,7 +625,7 @@ public class TraxCommonServiceTest {
         gradCourseEntity.setGradCourseKey(key);
         gradCourseEntity.setEnglish10("Y");
 
-        when(this.gradCourseRepository.findAll()).thenReturn(Arrays.asList(gradCourseEntity));
+        when(this.gradCourseRepository.findAll()).thenReturn(List.of(gradCourseEntity));
 
         var result = traxCommonService.loadGradCourseRequirementsDataFromTrax();
 
@@ -688,7 +665,7 @@ public class TraxCommonServiceTest {
         when(traxStudentNoRepository.findById(traxStudentNo.getStudNo())).thenReturn(Optional.of(traxStudentNoEntity));
         when(traxStudentNoRepository.save(traxStudentNoEntity)).thenReturn(traxStudentNoEntity);
 
-        var result = traxCommonService.updateTraxStudentNo(traxStudentNo.getStudNo());
+        var result = traxCommonService.updateTraxStudentNo(traxStudentNo);
         assertThat(result).isNotNull();
         assertThat(traxStudentNo.getStudNo()).isEqualTo(result.getStudNo());
         assertThat(traxStudentNo.getStatus()).isNull();
