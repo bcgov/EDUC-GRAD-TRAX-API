@@ -115,7 +115,7 @@ public class TraxCommonController {
 
     @DeleteMapping(EducGradTraxApiConstants.DELETE_TRAX_STUDENT_NO_MAPPING)
     @PreAuthorize(PermissionsConstants.UPDATE_GRAD_TRAX_STUDENT_DATA)
-    @Operation(summary = "Update TraxStudentNo status", description = "Update TraxStudentNo status", tags = {"Student"})
+    @Operation(summary = "Delete TraxStudentNo", description = "Delete TraxStudentNo ", tags = {"Student"})
     public ResponseEntity<TraxStudentNo> deleteTraxStudentNo(@PathVariable String pen) {
         logger.debug("deleteTraxStudentNo : ");
         return response.GET(traxCommonService.deleteTraxStudentNo(pen));
