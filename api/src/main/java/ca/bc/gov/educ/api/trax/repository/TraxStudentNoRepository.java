@@ -16,4 +16,6 @@ public interface TraxStudentNoRepository extends PagingAndSortingRepository<Trax
   Optional<TraxStudentNoEntity> findById(String studNo);
 
   TraxStudentNoEntity save(TraxStudentNoEntity entity);
+
+  Optional<TraxStudentNoEntity> deleteById(String studNo);
 }
