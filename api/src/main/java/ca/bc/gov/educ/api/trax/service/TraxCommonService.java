@@ -173,6 +173,15 @@ public class TraxCommonService {
         return traxStudentNo;
     }
 
+    @Transactional
+    public TraxStudentNo deleteTraxStudentNo(String pen) {
+        Optional<TraxStudentNoEntity> optional = traxStudentNoRepository.findById(pen);
+        if (optional.isPresent()) {
+            return traxStudentNoTransformer.transformToDTO(traxStudentNoRepository.deleteById(pen));
+        }
+        return null;
+    }
+
     private List<ConvGradStudent> buildConversionGradStudents(List<Object[]> traxStudents) {
         List<ConvGradStudent> students = new ArrayList<>();
         traxStudents.forEach(result -> {
