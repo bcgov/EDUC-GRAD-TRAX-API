@@ -93,6 +93,7 @@ public class SchoolService {
 			if(dist != null) {
 				school.setDistrictName(dist.getDistrictName());
 			}
+			// error handling here
 			CommonSchool commonSchool = getCommonSchool(accessToken, school.getMinCode());
 			adaptSchool(school, commonSchool);
 			return school;
