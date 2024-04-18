@@ -25,6 +25,7 @@ import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepo
 import org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
 
@@ -52,10 +53,18 @@ public class GradTraxConfig {
 	}
 
 	@Bean("gradClient")
-	WebClient webClient(OAuth2AuthorizedClientManager authorizedClientManager) {
+	public WebClient getGradClientWebClient(OAuth2AuthorizedClientManager authorizedClientManager) {
 		ServletOAuth2AuthorizedClientExchangeFilterFunction filter = new ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager);
 		filter.setDefaultClientRegistrationId("gradclient");
-		return WebClient.builder().apply(filter.oauth2Configuration()).build();
+		return WebClient.builder()
+				.exchangeStrategies(ExchangeStrategies
+						.builder()
+						.codecs(codecs -> codecs
+								.defaultCodecs()
+								.maxInMemorySize(50 * 1024 * 1024))
+						.build())
+				.apply(filter.oauth2Configuration())
+				.build();
 	}
 	@Bean
 	public OAuth2AuthorizedClientManager authorizedClientManager(

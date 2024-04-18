@@ -94,7 +94,7 @@ class SchoolServiceTest {
         WebClientResponseException webClientException  = new WebClientResponseException("Not Found", 404, "404 NOT FOUND", null, null, null);
         // mock webclient
         Mockito.when(this.webClient.get()).thenThrow(webClientException);
-        CommonSchool commonSchool = schoolService.getCommonSchool(null, "12345678");
+        CommonSchool commonSchool = schoolService.getCommonSchool(null);
         Assertions.assertNull(commonSchool);
         // assert logging
         Assertions.assertTrue(output.getOut().contains(MESSAGE));
@@ -107,7 +107,7 @@ class SchoolServiceTest {
         WebClientResponseException webClientException  = new WebClientResponseException("Service Unavailable", 503, "503 SERVICE UNAVAILABLE", null, null, null);
         // mock webclient
         Mockito.when(this.webClient.get()).thenThrow(webClientException);
-        CommonSchool commonSchool = schoolService.getCommonSchool(null, "12345678");
+        CommonSchool commonSchool = schoolService.getCommonSchool(null);
         Assertions.assertNull(commonSchool);
         // assert logging
         Assertions.assertTrue(output.getOut().contains(MESSAGE));
@@ -368,11 +368,11 @@ class SchoolServiceTest {
     @Test
     void testGetSchoolsBySchoolCategoryCode() {
         mockCommonSchools();
-        var result = schoolService.getSchoolsBySchoolCategory("02", "accessToken");
+        var result = schoolService.getSchoolsBySchoolCategory("02");
         assertThat(result).isNotNull().isNotEmpty();
-        result = schoolService.getSchoolsBySchoolCategory("01", "accessToken");
+        result = schoolService.getSchoolsBySchoolCategory("01");
         assertThat(result).isNotNull().isEmpty();
-        result = schoolService.getSchoolsBySchoolCategory("", "accessToken");
+        result = schoolService.getSchoolsBySchoolCategory("");
         assertThat(result).isNotNull().isNotEmpty();
 
     }
@@ -443,22 +443,22 @@ class SchoolServiceTest {
     @Test
     void testCommonSchool() {
         mockCommonSchool("02121000", "THE GATEWAY COMMUNITY LEARNING CENTRE");
-        var result = schoolService.getCommonSchool("accessToken", "02121000");
+        var result = schoolService.getCommonSchool("02121000");
         assertThat(result).isNotNull();
-        List<CommonSchool> commonSchools = schoolService.getCommonSchools("accessToken");
+        List<CommonSchool> commonSchools = schoolService.getCommonSchools();
         assertThat(commonSchools).isNotNull().isNotEmpty();
     }
 
     @Test
     void testCommonSchool_mincode_null() {
-        var result = schoolService.getCommonSchool("accessToken", null);
+        var result = schoolService.getCommonSchool(null);
         assertThat(result).isNull();
     }
 
     @Test
     void testCommonSchoolIsNull() {
         mockCommonSchool("02121000", "THE GATEWAY COMMUNITY LEARNING CENTRE");
-        var result = schoolService.getCommonSchool("accessToken", "12345678");
+        var result = schoolService.getCommonSchool("12345678");
         assertThat(result).isNull();
     }
 

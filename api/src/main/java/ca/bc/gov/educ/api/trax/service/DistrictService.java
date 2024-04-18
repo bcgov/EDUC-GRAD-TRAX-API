@@ -25,7 +25,7 @@ public class DistrictService {
 	private SchoolService schoolService;
 
     @SuppressWarnings("unused")
-	private static Logger logger = LoggerFactory.getLogger(DistrictService.class);
+	private static final Logger logger = LoggerFactory.getLogger(DistrictService.class);
 
 	public District getDistrictDetails(String districtCode) {
 		Optional<DistrictEntity> distEntityOptional =  districtRepository.findById(districtCode);
@@ -41,13 +41,13 @@ public class DistrictService {
 		return districtTransformer.transformToDTO(districtRepository.findByActiveFlag(activeFlag));
 	}
 
-	public List<District> getDistrictBySchoolCategory(String schoolCategoryCode, String accessToken) {
+	public List<District> getDistrictBySchoolCategory(String schoolCategoryCode) {
 		List<District> result = new ArrayList<>();
 		if(StringUtils.isBlank(schoolCategoryCode)) {
 			return getDistrictsByActiveFlag("Y");
 		} else {
 			List<String> controlList = new ArrayList<>();
-			List<CommonSchool> schools = schoolService.getCommonSchools(accessToken);
+			List<CommonSchool> schools = schoolService.getCommonSchools();
 			for (CommonSchool s : schools) {
 				if (StringUtils.equalsIgnoreCase(schoolCategoryCode, s.getSchoolCategoryCode()) && !controlList.contains(s.getDistNo())) {
 					controlList.add(s.getDistNo());

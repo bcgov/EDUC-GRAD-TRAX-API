@@ -95,9 +95,9 @@ public class SchoolControllerTest {
         final School school = new School();
         school.setMinCode("1234567");
         school.setSchoolName("Test School");
-        Mockito.when(schoolService.getSchoolsBySchoolCategory("01", "accessToken")).thenReturn(Arrays.asList(school));
+        Mockito.when(schoolService.getSchoolsBySchoolCategory("01")).thenReturn(Arrays.asList(school));
         schoolController.getSchoolsBySchoolCategory("01", "accessToken");
-        Mockito.verify(schoolService).getSchoolsBySchoolCategory("01", "accessToken");
+        Mockito.verify(schoolService).getSchoolsBySchoolCategory("01");
     }
 
     @Test

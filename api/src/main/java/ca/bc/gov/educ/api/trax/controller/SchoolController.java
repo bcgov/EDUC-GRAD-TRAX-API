@@ -94,6 +94,6 @@ public class SchoolController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "204", description = "NO CONTENT")})
     public ResponseEntity<List<School>> getSchoolsBySchoolCategory(@RequestParam(required = false) String schoolCategory, @RequestHeader(name="Authorization") String accessToken) {
-        return response.GET(schoolService.getSchoolsBySchoolCategory(schoolCategory, accessToken.replace(BEARER, "")));
+        return response.GET(schoolService.getSchoolsBySchoolCategory(schoolCategory));
     }
 }

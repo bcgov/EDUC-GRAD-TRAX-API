@@ -3,12 +3,13 @@ package ca.bc.gov.educ.api.trax.util;
 import ca.bc.gov.educ.api.trax.model.dto.CommonSchool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,36 +21,39 @@ import java.util.stream.Collectors;
 public class CommonSchoolCache {
 
     private Map<String, CommonSchool> schools;
-    private LocalDate cacheExpiry;
+    private LocalDateTime cacheExpiry;
     private final Logger logger = LoggerFactory.getLogger(CommonSchoolCache.class);
     private WebClient webClient;
     private EducGradTraxApiConstants constants;
 
+    @Autowired
     public CommonSchoolCache(@Qualifier("gradClient") WebClient webClient, EducGradTraxApiConstants constants) {
         this.webClient = webClient;
         this.constants = constants;
     }
 
-    public CommonSchool getSchoolByMincode(String mincode){
-        if(schools == null || schools.isEmpty() || cacheHasExpired()){
-            populateCache();
-        }
+    public CommonSchool getSchoolByMincode(String mincode) {
+        cacheCheck();
         return schools.get(mincode);
     }
 
     public List<CommonSchool> getAllCommonSchools() {
-        if(schools == null || schools.isEmpty() || cacheHasExpired()){
-            populateCache();
-        }
+        cacheCheck();
         return new ArrayList<>(schools.values());
     }
 
-    private boolean cacheHasExpired() {
-        return cacheExpiry == null || cacheExpiry.isBefore(LocalDate.now());
+    private void cacheCheck() {
+        if (schools == null || schools.isEmpty() || cacheHasExpired()) {
+            populateCache();
+        }
     }
 
-    private void updateCacheExpiry(){
-        this.cacheExpiry = LocalDate.now().plus(constants.getSchoolCacheExpiryInMins(), ChronoUnit.MINUTES);
+    private boolean cacheHasExpired() {
+        return cacheExpiry == null || cacheExpiry.isBefore(LocalDateTime.now());
+    }
+
+    private void updateCacheExpiry() {
+        this.cacheExpiry = LocalDateTime.now().plus(constants.getSchoolCacheExpiryInMins(), ChronoUnit.MINUTES);
     }
 
     private void populateCache() {
@@ -58,7 +62,7 @@ public class CommonSchoolCache {
             List<CommonSchool> commonSchools = getCommonSchools();
             // create map
             this.schools = commonSchools.stream()
-                            .collect(Collectors.toMap(commonSchool -> (commonSchool.getDistNo()+commonSchool.getSchlNo()), Function.identity()));
+                    .collect(Collectors.toMap(commonSchool -> (commonSchool.getDistNo() + commonSchool.getSchlNo()), Function.identity()));
             // update cache
             updateCacheExpiry();
         } catch (Exception e) {
@@ -66,7 +70,7 @@ public class CommonSchoolCache {
         }
     }
 
-    private List<CommonSchool> getCommonSchools(){
+    private List<CommonSchool> getCommonSchools() {
         // avoid npe
         List<CommonSchool> commonSchools = new ArrayList<>();
         try {

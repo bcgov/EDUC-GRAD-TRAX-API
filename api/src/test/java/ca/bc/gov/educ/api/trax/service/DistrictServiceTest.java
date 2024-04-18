@@ -123,10 +123,10 @@ public class DistrictServiceTest {
 
         when(districtRepository.findByDistrictNumberAndActiveFlag("123","Y")).thenReturn(Optional.of(district));
 
-        List<District> districts = districtService.getDistrictBySchoolCategory("02", "accessToken");
+        List<District> districts = districtService.getDistrictBySchoolCategory("02");
         assertThat(districts).isNotEmpty();
 
-        districts = districtService.getDistrictBySchoolCategory(null, "accessToken");
+        districts = districtService.getDistrictBySchoolCategory(null);
         assertThat(districts).isNotEmpty();
     }
 
