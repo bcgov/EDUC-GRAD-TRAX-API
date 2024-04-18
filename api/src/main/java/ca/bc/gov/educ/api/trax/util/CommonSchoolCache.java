@@ -1,8 +1,7 @@
 package ca.bc.gov.educ.api.trax.util;
 
 import ca.bc.gov.educ.api.trax.model.dto.CommonSchool;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
@@ -18,11 +17,11 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
+@Slf4j
 public class CommonSchoolCache {
 
     private Map<String, CommonSchool> schools;
     private LocalDateTime cacheExpiry;
-    private final Logger logger = LoggerFactory.getLogger(CommonSchoolCache.class);
     private WebClient webClient;
     private EducGradTraxApiConstants constants;
 
@@ -66,7 +65,7 @@ public class CommonSchoolCache {
             // update cache
             updateCacheExpiry();
         } catch (Exception e) {
-            logger.error(String.format("Error while attempting to populate school cache: %s", e.getCause().toString()));
+            log.error(String.format("Error while attempting to populate school cache: %s", e.getCause().toString()));
         }
     }
 
@@ -81,7 +80,7 @@ public class CommonSchoolCache {
                     .retrieve().bodyToMono(new ParameterizedTypeReference<List<CommonSchool>>() {
                     }).block();
         } catch (Exception e) {
-            logger.error(String.format("Error while attempting to populate school cache: %s", e.getCause().toString()));
+            log.error(String.format("Error while attempting to populate school cache: %s", e.getCause().toString()));
         }
         return commonSchools;
     }

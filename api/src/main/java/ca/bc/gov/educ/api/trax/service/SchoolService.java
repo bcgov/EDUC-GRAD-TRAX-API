@@ -10,8 +10,6 @@ import ca.bc.gov.educ.api.trax.repository.TraxSchoolSearchCriteria;
 import ca.bc.gov.educ.api.trax.repository.TraxSchoolSearchSpecification;
 import ca.bc.gov.educ.api.trax.util.CommonSchoolCache;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -42,9 +40,6 @@ public class SchoolService {
 		this.codeService = codeService;
 		this.commonSchoolCache = commonSchoolCache;
 	}
-
-	@SuppressWarnings("unused")
-	private final Logger logger = LoggerFactory.getLogger(SchoolService.class);
 
      /**
      * Get all Schools in School DTO
@@ -84,7 +79,6 @@ public class SchoolService {
 			if(dist != null) {
 				school.setDistrictName(dist.getDistrictName());
 			}
-			// error handling here
 			CommonSchool commonSchool = getCommonSchool(school.getMinCode());
 			adaptSchool(school, commonSchool);
 			return school;

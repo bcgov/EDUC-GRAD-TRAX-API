@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.trax.controller;
 
+import ca.bc.gov.educ.api.trax.model.dto.CommonSchool;
 import ca.bc.gov.educ.api.trax.model.dto.School;
 import ca.bc.gov.educ.api.trax.service.SchoolService;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
@@ -32,14 +33,17 @@ public class SchoolController {
 
     private static final String BEARER = "Bearer ";
 
-    @Autowired
+
     SchoolService schoolService;
-    
-    @Autowired
     GradValidation validation;
-    
-    @Autowired
 	ResponseHelper response;
+
+    @Autowired
+    public SchoolController(SchoolService schoolService, GradValidation validation, ResponseHelper response) {
+        this.schoolService = schoolService;
+        this.validation = validation;
+        this.response = response;
+    }
 
     @GetMapping
     @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
@@ -64,6 +68,21 @@ public class SchoolController {
     	}else {
     		return response.NOT_FOUND();
     	}
+    }
+
+    @GetMapping(EducGradTraxApiConstants.GET_COMMON_SCHOOL_BY_CODE_MAPPING)
+    @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
+    @Operation(summary = "Find a Common School by Mincode", description = "Get a Common School by Mincode", tags = { "School" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND")})
+    public ResponseEntity<CommonSchool> getCommonSchool(@PathVariable String minCode) {
+        logger.debug("getSchoolDetails : ");
+        CommonSchool schoolResponse = schoolService.getCommonSchool(minCode);
+        if(schoolResponse != null) {
+            return response.GET(schoolResponse);
+        }else {
+            return response.NOT_FOUND();
+        }
     }
     
     @GetMapping(EducGradTraxApiConstants.GET_SCHOOL_SEARCH_MAPPING)
