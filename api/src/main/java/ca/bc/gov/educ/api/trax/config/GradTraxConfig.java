@@ -52,10 +52,10 @@ public class GradTraxConfig {
 		return builder.build();
 	}
 
-	@Bean("gradClient")
-	public WebClient getGradClientWebClient(OAuth2AuthorizedClientManager authorizedClientManager) {
+	@Bean("traxClient")
+	public WebClient getTraxClientWebClient(OAuth2AuthorizedClientManager authorizedClientManager) {
 		ServletOAuth2AuthorizedClientExchangeFilterFunction filter = new ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager);
-		filter.setDefaultClientRegistrationId("gradclient");
+		filter.setDefaultClientRegistrationId("traxclient");
 		return WebClient.builder()
 				.exchangeStrategies(ExchangeStrategies
 						.builder()

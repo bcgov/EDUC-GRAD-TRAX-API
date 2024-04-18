@@ -26,7 +26,7 @@ public class CommonSchoolCache {
     private EducGradTraxApiConstants constants;
 
     @Autowired
-    public CommonSchoolCache(@Qualifier("gradClient") WebClient webClient, EducGradTraxApiConstants constants) {
+    public CommonSchoolCache(@Qualifier("traxClient") WebClient webClient, EducGradTraxApiConstants constants) {
         this.webClient = webClient;
         this.constants = constants;
     }
