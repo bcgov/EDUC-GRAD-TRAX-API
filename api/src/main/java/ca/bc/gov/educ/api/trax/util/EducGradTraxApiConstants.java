@@ -170,7 +170,7 @@ public class EducGradTraxApiConstants {
     @Value("${cron.scheduled.process.purge-old-records.staleInDays}")
     private int recordsStaleInDays;
 
-    @Value("${SCHOOL_CACHE_EXPIRY_IN_MINS}")
+    @Value("${props.school-cache-expiry-in-mins}")
     private long schoolCacheExpiryInMins;
 
 }
