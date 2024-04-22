@@ -70,6 +70,14 @@ public class SchoolController {
     	}
     }
 
+    @GetMapping(EducGradTraxApiConstants.GET_COMMON_SCHOOLS)
+    @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
+    @Operation(summary = "Get all common schools", description = "Get a list of all common schools", tags = { "School" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+    public ResponseEntity<List<CommonSchool>> getAllCommonSchool() {
+        return response.GET(schoolService.getCommonSchools());
+    }
+
     @GetMapping(EducGradTraxApiConstants.GET_COMMON_SCHOOL_BY_CODE_MAPPING)
     @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
     @Operation(summary = "Find a Common School by Mincode", description = "Get a Common School by Mincode", tags = { "School" })
@@ -79,20 +87,6 @@ public class SchoolController {
         CommonSchool schoolResponse = schoolService.getCommonSchool(minCode);
         if(schoolResponse != null) {
             return response.GET(schoolResponse);
-        }else {
-            return response.NOT_FOUND();
-        }
-    }
-
-    @GetMapping(EducGradTraxApiConstants.GET_COMMON_SCHOOLS)
-    @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
-    @Operation(summary = "Get all common schools", description = "Get a list of all common schools", tags = { "School" })
-    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
-            @ApiResponse(responseCode = "404", description = "NOT FOUND")})
-    public ResponseEntity<List<CommonSchool>> getAllCommonSchool() {
-        List<CommonSchool> commonSchools = schoolService.getCommonSchools();
-        if(commonSchools != null) {
-            return response.GET(commonSchools);
         }else {
             return response.NOT_FOUND();
         }
