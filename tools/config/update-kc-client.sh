@@ -3,6 +3,8 @@ ENV=$1
 COMMON_NAMESPACE=$2
 SOAM_KC_REALM_ID=$3
 CLIENT_ID=$4
+BRANCH=$5
+REPO_NAME=$6
 SOAM_KC=soam-$ENV.apps.silver.devops.gov.bc.ca
 
 SOAM_KC_LOAD_USER_ADMIN=$(oc -n $COMMON_NAMESPACE-$ENV -o json get secret sso-admin-${ENV} | sed -n 's/.*"username": "\(.*\)"/\1/p' | base64 --decode)
@@ -25,7 +27,7 @@ CLIENT_UUID=$(curl -sX GET "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID
 if [ "$CLIENT_UUID" = "" ]
 then
   echo "$CLIENT_ID DOES NOT EXIST IN KEYCLOAK! A new client with be created with a new access key. Creating..."
-  clientJSON=$(cat educ-grad-trax-api-service.json | jq -c 'del(.secret)')
+  clientJSON=$(curl -s https://raw.githubusercontent.com/bcgov/$REPO_NAME/$BRANCH/tools/config/educ-grad-trax-api-service.json | jq -c 'del(.secret)')
   curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/clients" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer $TKN" \
@@ -42,7 +44,7 @@ else
     -H "Authorization: Bearer $TKN"
 
   echo Creating new client with credentials
-  clientJSON=$(cat educ-grad-trax-api-service.json | jq -c --arg secret "$serviceClientSecret" '.secret = $secret')
+  clientJSON=$(curl -s https://raw.githubusercontent.com/bcgov/$REPO_NAME/$BRANCH/tools/config/educ-grad-trax-api-service.json | jq -c --arg secret "$serviceClientSecret" '.secret = $secret')
   curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/clients" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer $TKN" \
