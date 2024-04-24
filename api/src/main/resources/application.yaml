@@ -33,6 +33,7 @@ spring:
     user: ${USERNAME}
     password: ${PASSWORD}
     location: classpath:db/migration
+
   #Keycloak/OAuth properties
   security:
     oauth2:
@@ -40,6 +41,16 @@ spring:
         jwt:
           issuer-uri: ${TOKEN_ISSUER_URL}
           jwk-set-uri: ${TOKEN_ISSUER_URL}/protocol/openid-connect/certs
+      client:
+        registration:
+          traxclient:
+            client-id: ${TRAX_CLIENT_NAME}
+            client-secret: ${TRAX_CLIENT_SECRET}
+            authorization-grant-type: client_credentials
+        provider:
+          traxclient:
+            issuer-uri: ${TOKEN_ISSUER_URL}
+            token-uri: ${TOKEN_ISSUER_URL}/protocol/openid-connect/token
 
 #Logging properties
 logging:
@@ -154,3 +165,7 @@ endpoint:
       url: ${EDUC_SCHOOL_API}api/v1/schools/%s
     get-all-schools:
       url: ${EDUC_SCHOOL_API}api/v1/schools
+
+# other properties
+props:
+  school-cache-expiry-in-mins: ${SCHOOL_CACHE_EXPIRY_IN_MINS}

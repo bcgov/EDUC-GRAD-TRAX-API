@@ -95,9 +95,9 @@ public class SchoolControllerTest {
         final School school = new School();
         school.setMinCode("1234567");
         school.setSchoolName("Test School");
-        Mockito.when(schoolService.getSchoolsBySchoolCategory("01", "accessToken")).thenReturn(Arrays.asList(school));
+        Mockito.when(schoolService.getSchoolsBySchoolCategory("01")).thenReturn(Arrays.asList(school));
         schoolController.getSchoolsBySchoolCategory("01", "accessToken");
-        Mockito.verify(schoolService).getSchoolsBySchoolCategory("01", "accessToken");
+        Mockito.verify(schoolService).getSchoolsBySchoolCategory("01");
     }
 
     @Test
@@ -105,6 +105,31 @@ public class SchoolControllerTest {
         Mockito.when(schoolService.existsSchool("1234567")).thenReturn(true);
         schoolController.checkSchoolExists("1234567");
         Mockito.verify(schoolService).existsSchool("1234567");
+    }
+
+    @Test
+    public void testGetAllCommonSchools_expect200Ok(){
+        final List<CommonSchool> schoolList = new ArrayList<>();
+        CommonSchool csOne = new CommonSchool();
+        csOne.setSchlNo("4567");
+        csOne.setSchoolName("Test1 School");
+        schoolList.add(csOne);
+        CommonSchool csTwo = new CommonSchool();
+        csTwo.setSchlNo("4321");
+        csTwo.setSchoolName("Test2 School");
+        schoolList.add(csTwo);
+        schoolController.getAllSchools();
+        Mockito.verify(schoolService).getSchoolList();
+    }
+    @Test
+    public void testGetCommonsSchoolByMincode_expect200Ok(){
+        final CommonSchool school = new CommonSchool();
+        school.setDistNo("123");
+        school.setSchlNo("4567");
+        school.setSchoolName("Test School");
+        Mockito.when(schoolService.getCommonSchool("1234567")).thenReturn(school);
+        schoolController.getCommonSchool("1234567");
+        Mockito.verify(schoolService).getCommonSchool("1234567");
     }
 
     private void mockCommonSchool(String minCode, String schoolName) {

@@ -46,9 +46,9 @@ public class DistrictControllerTest {
         district.setDistrictNumber("123");
         district.setDistrictName("Test School");
 
-        Mockito.when(districtService.getDistrictBySchoolCategory("123", "accessToken")).thenReturn(List.of(district));
-        districtController.getDistrictBySchoolCategory("123", "accessToken");
-        Mockito.verify(districtService).getDistrictBySchoolCategory("123", "accessToken");
+        Mockito.when(districtService.getDistrictBySchoolCategory("123")).thenReturn(List.of(district));
+        districtController.getDistrictBySchoolCategory("123");
+        Mockito.verify(districtService).getDistrictBySchoolCategory("123");
 
     }
 }

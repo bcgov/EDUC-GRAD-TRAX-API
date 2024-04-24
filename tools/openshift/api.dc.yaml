@@ -68,6 +68,8 @@ objects:
                     name: api-grad-trax-db-secret
                 - secretRef:
                     name: grad-client-secret
+                - secretRef:
+                    name: trax-client-secret
               resources:
                 requests:
                   cpu: "${MIN_CPU}"

@@ -10,12 +10,17 @@ import ca.bc.gov.educ.api.trax.model.entity.GradProvinceEntity;
 import ca.bc.gov.educ.api.trax.repository.GradCountryRepository;
 import ca.bc.gov.educ.api.trax.repository.GradProvinceRepository;
 import ca.bc.gov.educ.api.trax.util.GradValidation;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -53,6 +58,19 @@ public class CodeServiceTest {
 
 	@MockBean
 	private Subscriber subscriber;
+
+	@TestConfiguration
+	static class TestConfig {
+		@Bean
+		public ClientRegistrationRepository clientRegistrationRepository() {
+			return new ClientRegistrationRepository() {
+				@Override
+				public ClientRegistration findByRegistrationId(String registrationId) {
+					return null;
+				}
+			};
+		}
+	}
 	
 	@Test
 	public void testGetAllProvinceList() {
@@ -66,8 +84,8 @@ public class CodeServiceTest {
 		obj.setProvName("Alberta");
 		gradProvinceList.add(obj);
 		Mockito.when(gradProvinceRepository.findAll()).thenReturn(gradProvinceList);
-		codeService.getAllProvinceCodeList();
-		
+		List<GradProvince> provinces = codeService.getAllProvinceCodeList();
+		Assert.assertTrue(provinces.size() == 2);
 	}
 	
 	@Test
