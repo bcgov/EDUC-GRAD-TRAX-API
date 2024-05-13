@@ -19,7 +19,6 @@ public enum EventType {
   NEWSTUDENT,
   UPD_DEMOG,
   UPD_GRAD,
-  UPD_STD_STATUS,
   XPROGRAM,
   ASSESSMENT,
   COURSE,
