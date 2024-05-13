@@ -147,14 +147,9 @@ public class TraxUpdateService {
                     gradUpdate.setSchoolOfRecord(traxStudent.getSchoolOfRecord());
                     gradUpdate.setSlpDate(traxStudent.getSlpDate());
                     gradUpdate.setCitizenship(traxStudent.getStudentCitizenship());
+                    gradUpdate.setStudentStatus(traxStudent.getStudentStatus());
+                    gradUpdate.setArchiveFlag(traxStudent.getArchiveFlag());
                     result = gradUpdate;
-                    break;
-                case "UPD_STD_STATUS":
-                    TraxStudentStatusUpdateDTO studentStatus = new TraxStudentStatusUpdateDTO();
-                    studentStatus.setPen(pen);
-                    studentStatus.setStudentStatus(traxStudent.getStudentStatus());
-                    studentStatus.setArchiveFlag(traxStudent.getArchiveFlag());
-                    result = studentStatus;
                     break;
                 case "XPROGRAM":
                     TraxXProgramDTO xprogram = new TraxXProgramDTO();

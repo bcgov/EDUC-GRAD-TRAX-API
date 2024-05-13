@@ -342,11 +342,11 @@ public class TraxUpdateServiceTest {
 
         TraxUpdateInGradEntity traxUpdateInGradEntity = new TraxUpdateInGradEntity();
         traxUpdateInGradEntity.setPen(pen);
-        traxUpdateInGradEntity.setUpdateType("UPD_STD_STATUS");
+        traxUpdateInGradEntity.setUpdateType("UPD_GRAD");
         traxUpdateInGradEntity.setStatus("OUTSTANDING");
         traxUpdateInGradEntity.setUpdateDate(DateUtils.addDays(new Date(), -1));
 
-        TraxStudentStatusUpdateDTO payload = new TraxStudentStatusUpdateDTO();
+        TraxGraduationUpdateDTO payload = new TraxGraduationUpdateDTO();
         payload.setPen(pen);
         payload.setStudentStatus("A");
         payload.setStudentStatus("A");
@@ -362,7 +362,7 @@ public class TraxUpdateServiceTest {
         traxStudent.setStudentCitizenship("C");
 
         TraxUpdatedPubEvent traxUpdatedPubEvent = TraxUpdatedPubEvent.builder()
-                .eventType(EventType.UPD_STD_STATUS.toString())
+                .eventType(EventType.UPD_GRAD.toString())
                 .eventId(UUID.randomUUID())
                 .eventOutcome(EventOutcome.TRAX_STUDENT_MASTER_UPDATED.toString())
                 .activityCode(traxUpdateInGradEntity.getUpdateType())
