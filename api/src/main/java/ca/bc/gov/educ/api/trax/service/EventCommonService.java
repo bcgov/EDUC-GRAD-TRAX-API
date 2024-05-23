@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.trax.service;
 
+import ca.bc.gov.educ.api.trax.constant.EventStatus;
 import ca.bc.gov.educ.api.trax.constant.FieldType;
 import ca.bc.gov.educ.api.trax.model.dto.GradStatusEventPayloadDTO;
 import ca.bc.gov.educ.api.trax.model.entity.Event;
@@ -75,6 +76,14 @@ public abstract class EventCommonService<T> implements EventService<T> {
                 em.close();
             }
         }
+    }
+
+    protected void updateEvent(final Event event) {
+        this.eventRepository.findByEventId(event.getEventId()).ifPresent(existingEvent -> {
+            existingEvent.setEventStatus(EventStatus.PROCESSED.toString());
+            existingEvent.setUpdateDate(LocalDateTime.now());
+            this.eventRepository.save(existingEvent);
+        });
     }
 
     private void process(Optional<TraxStudentEntity> existingStudent, GradStatusEventPayloadDTO gradStatusUpdate, EntityManager em, EntityTransaction tx, boolean updateTrax) {

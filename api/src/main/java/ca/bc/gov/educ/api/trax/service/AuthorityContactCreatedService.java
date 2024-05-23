@@ -22,6 +22,7 @@ public class AuthorityContactCreatedService extends EventCommonService<Authority
     public void processEvent(final AuthorityContact districtContact, Event event) {
         log.debug("Processing Authority Contact Created");
         // TODO: process the event here as per https://eccbc.atlassian.net/browse/GRAD2-2648
+        this.updateEvent(event);
     }
 
     @Override

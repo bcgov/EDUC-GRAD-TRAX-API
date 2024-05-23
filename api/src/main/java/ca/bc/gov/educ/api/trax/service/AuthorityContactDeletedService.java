@@ -21,6 +21,7 @@ public class AuthorityContactDeletedService extends EventCommonService<Authority
     public void processEvent(final AuthorityContact districtContact, Event event) {
         log.debug("Processing Authority Contact Deleted");
         // TODO: process the event here as per https://eccbc.atlassian.net/browse/GRAD2-2648
+        this.updateEvent(event);
     }
 
     @Override
