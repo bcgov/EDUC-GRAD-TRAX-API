@@ -28,11 +28,12 @@ public class EducGradTraxApiConstants {
     public static final String GRAD_TRAX_API_ROOT_MAPPING = "/api/" + API_VERSION+"/trax";
 
     // Controller Mappings
+    public static final String GET_COMMON_SCHOOLS = "/common";
     public static final String GRAD_TRAX_CODE_URL_MAPPING = GRAD_TRAX_API_ROOT_MAPPING + "/code";
     public static final String GRAD_SCHOOL_URL_MAPPING = GRAD_TRAX_API_ROOT_MAPPING + "/school";
     public static final String GRAD_DISTRICT_URL_MAPPING = GRAD_TRAX_API_ROOT_MAPPING + "/district";
     public static final String GRAD_PSI_URL_MAPPING = GRAD_TRAX_API_ROOT_MAPPING + "/psi";
-    public static final String GRAD_TRAX_COMMON_URL_MAPPING = GRAD_TRAX_API_ROOT_MAPPING + "/common";
+    public static final String GRAD_TRAX_COMMON_URL_MAPPING = GRAD_TRAX_API_ROOT_MAPPING + GET_COMMON_SCHOOLS;
     public static final String GRAD_TSW_URL_MAPPING = GRAD_TRAX_API_ROOT_MAPPING + "/tsw";
     public static final String GRAD_EDW_URL_MAPPING = GRAD_TRAX_API_ROOT_MAPPING + "/edw";
 
@@ -46,6 +47,8 @@ public class EducGradTraxApiConstants {
 
     public static final String CHECK_SCHOOL_BY_CODE_MAPPING = "/check/{minCode}";
     public static final String GET_SCHOOL_BY_CODE_MAPPING = "/{minCode}";
+
+    public static final String GET_COMMON_SCHOOL_BY_CODE_MAPPING = GET_COMMON_SCHOOLS + GET_SCHOOL_BY_CODE_MAPPING;
     public static final String GET_SCHOOL_SEARCH_MAPPING = "/search";
 
     public static final String GET_PSI_BY_CODE_MAPPING = "/{psiCode}";
@@ -84,7 +87,7 @@ public class EducGradTraxApiConstants {
 
     public static final String TRAX_DATE_FORMAT = "yyyyMMdd";
     public static final String TRAX_TSW_DATE_FORMAT = "yyyyMM";
-    public static final Date ADULT_18_RULE_VALID_DATE = EducGradTraxApiUtils.parseDate("2012-07-01");
+    protected static final Date ADULT_18_RULE_VALID_DATE = EducGradTraxApiUtils.parseDate("2012-07-01");
 
     @Value("${authorization.user}")
     private String userName;
@@ -167,5 +170,8 @@ public class EducGradTraxApiConstants {
 
     @Value("${cron.scheduled.process.purge-old-records.staleInDays}")
     private int recordsStaleInDays;
+
+    @Value("${props.school-cache-expiry-in-mins}")
+    private long schoolCacheExpiryInMins;
 
 }

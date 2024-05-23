@@ -12,8 +12,6 @@ import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,10 +25,6 @@ import java.util.List;
 @OpenAPIDefinition(info = @Info(title = "API for School Data.", description = "This Read API is for Reading school data.", version = "1"),
 		security = {@SecurityRequirement(name = "OAUTH2", scopes = {"READ_GRAD_SCHOOL_DATA"})})
 public class DistrictController {
-
-    private static Logger logger = LoggerFactory.getLogger(DistrictController.class);
-
-    private static final String BEARER = "Bearer ";
 
     @Autowired
     DistrictService districtService;
@@ -61,7 +55,7 @@ public class DistrictController {
     @Operation(summary = "Check school existence by Mincode", description = "Check school existence by Mincode", tags = { "School" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "204", description = "NO CONTENT")})
-    public ResponseEntity<List<District>> getDistrictBySchoolCategory(@RequestParam(required = false) String schoolCategory, @RequestHeader(name="Authorization") String accessToken) {
-        return response.GET(districtService.getDistrictBySchoolCategory(schoolCategory, accessToken.replace(BEARER, "")));
+    public ResponseEntity<List<District>> getDistrictBySchoolCategory(@RequestParam(required = false) String schoolCategory) {
+        return response.GET(districtService.getDistrictBySchoolCategory(schoolCategory));
     }
 }

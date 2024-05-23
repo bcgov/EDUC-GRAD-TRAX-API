@@ -8,19 +8,13 @@ import ca.bc.gov.educ.api.trax.repository.DistrictRepository;
 import ca.bc.gov.educ.api.trax.repository.SchoolRepository;
 import ca.bc.gov.educ.api.trax.repository.TraxSchoolSearchCriteria;
 import ca.bc.gov.educ.api.trax.repository.TraxSchoolSearchSpecification;
-import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
-import ca.bc.gov.educ.api.trax.util.ThreadLocalStateUtil;
+import ca.bc.gov.educ.api.trax.util.CommonSchoolCache;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
+
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,30 +24,22 @@ import java.util.Optional;
 @Service
 public class SchoolService {
 
-    @Autowired
-    private SchoolRepository schoolRepository;  
-
-    @Autowired
+    private SchoolRepository schoolRepository;
     private SchoolTransformer schoolTransformer;
-    
-    @Autowired
-    private DistrictRepository districtRepository;  
-
-    @Autowired
+    private DistrictRepository districtRepository;
     private DistrictTransformer districtTransformer;
-
-	@Autowired
 	private CodeService codeService;
+	private CommonSchoolCache commonSchoolCache;
 
 	@Autowired
-	private WebClient webClient;
-
-	@Autowired
-	private EducGradTraxApiConstants constants;
-    
-
-    @SuppressWarnings("unused")
-	private final Logger logger = LoggerFactory.getLogger(SchoolService.class);
+	public SchoolService(SchoolRepository schoolRepository, SchoolTransformer schoolTransformer, DistrictRepository districtRepository, DistrictTransformer districtTransformer, CodeService codeService, CommonSchoolCache commonSchoolCache) {
+		this.schoolRepository = schoolRepository;
+		this.schoolTransformer = schoolTransformer;
+		this.districtRepository = districtRepository;
+		this.districtTransformer = districtTransformer;
+		this.codeService = codeService;
+		this.commonSchoolCache = commonSchoolCache;
+	}
 
      /**
      * Get all Schools in School DTO
@@ -93,7 +79,7 @@ public class SchoolService {
 			if(dist != null) {
 				school.setDistrictName(dist.getDistrictName());
 			}
-			CommonSchool commonSchool = getCommonSchool(accessToken, school.getMinCode());
+			CommonSchool commonSchool = getCommonSchool(school.getMinCode());
 			adaptSchool(school, commonSchool);
 			return school;
 		}
@@ -124,7 +110,7 @@ public class SchoolService {
     		if (dist != null) {
 				sL.setDistrictName(dist.getDistrictName());
 			}
-    		CommonSchool commonSchool = getCommonSchool(accessToken, sL.getMinCode());
+    		CommonSchool commonSchool = getCommonSchool(sL.getMinCode());
     		adaptSchool(sL, commonSchool);
     	});
 		sortSchools(schoolList);
@@ -140,12 +126,12 @@ public class SchoolService {
 		return schoolRepository.countTabSchools(minCode) > 0L;
 	}
 
-	public List<School> getSchoolsBySchoolCategory(String schoolCategoryCode, String accessToken) {
+	public List<School> getSchoolsBySchoolCategory(String schoolCategoryCode) {
 		List<School> result = new ArrayList<>();
 		if(StringUtils.isBlank(schoolCategoryCode)) {
-			return adaptSchools(getCommonSchools(accessToken));
+			return adaptSchools(getCommonSchools());
 		} else {
-			List<CommonSchool> schools = getCommonSchools(accessToken);
+			List<CommonSchool> schools = getCommonSchools();
 			for (CommonSchool s : schools) {
 				if (StringUtils.equalsIgnoreCase(schoolCategoryCode, s.getSchoolCategoryCode())) {
 					result.add(adaptSchool(s));
@@ -155,42 +141,12 @@ public class SchoolService {
 		return result;
 	}
 
-	public CommonSchool getCommonSchool(String accessToken, String mincode) {
-    	if(StringUtils.isBlank(mincode)) {
-    		return null;
-		}
-    	try {
-			return webClient.get().uri(String.format(constants.getSchoolByMincodeSchoolApiUrl(), mincode))
-					.headers(h -> {
-						h.setBearerAuth(accessToken);
-						h.set(EducGradTraxApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-					})
-					.retrieve().bodyToMono(CommonSchool.class).block();
-		} catch (WebClientResponseException e) {
-			if(e.getStatusCode() == HttpStatus.NOT_FOUND){
-				logger.warn(String.format("Common School not exists for Ministry Code: %s", mincode));
-			} else {
-				logger.error(String.format("Response error while calling school-api. Status was: %s", e.getStatusCode()));
-			}
-		} catch (Exception e) {
-			logger.error(String.format("Error while calling school-api: %s", e.getMessage()));
-		}
-		return null;
+	public CommonSchool getCommonSchool(String mincode) {
+    	return (StringUtils.isBlank(mincode)) ? null : commonSchoolCache.getSchoolByMincode(mincode);
 	}
 
-	public List<CommonSchool> getCommonSchools(String accessToken) {
-		try {
-			return webClient.get().uri(constants.getAllSchoolSchoolApiUrl())
-					.headers(h -> {
-						h.setBearerAuth(accessToken);
-						h.set(EducGradTraxApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-					})
-					.retrieve().bodyToMono(new ParameterizedTypeReference<List<CommonSchool>>() {
-					}).block();
-		} catch (Exception e) {
-			logger.error("Common Schools API is not available {}", e.getCause().toString());
-			return new ArrayList<>();
-		}
+	public List<CommonSchool> getCommonSchools() {
+		return commonSchoolCache.getAllCommonSchools();
 	}
 
 	private School adaptSchool(CommonSchool commonSchool) {

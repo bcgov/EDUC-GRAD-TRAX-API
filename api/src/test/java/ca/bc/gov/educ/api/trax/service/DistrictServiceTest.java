@@ -7,6 +7,7 @@ import ca.bc.gov.educ.api.trax.model.dto.CommonSchool;
 import ca.bc.gov.educ.api.trax.model.dto.District;
 import ca.bc.gov.educ.api.trax.model.entity.DistrictEntity;
 import ca.bc.gov.educ.api.trax.repository.DistrictRepository;
+import ca.bc.gov.educ.api.trax.util.CommonSchoolCache;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import org.junit.After;
 import org.junit.Before;
@@ -15,9 +16,14 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -51,6 +57,7 @@ public class DistrictServiceTest {
     @Mock WebClient.ResponseSpec responseMock;
 
     @MockBean
+    @Qualifier("default")
     private WebClient webClient;
 
     @Autowired
@@ -65,6 +72,22 @@ public class DistrictServiceTest {
 
     @MockBean
     private Subscriber subscriber;
+
+    @MockBean
+    private CommonSchoolCache commonSchoolCache;
+
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        public ClientRegistrationRepository clientRegistrationRepository() {
+            return new ClientRegistrationRepository() {
+                @Override
+                public ClientRegistration findByRegistrationId(String registrationId) {
+                    return null;
+                }
+            };
+        }
+    }
 
     @Before
     public void setUp() {
@@ -114,19 +137,14 @@ public class DistrictServiceTest {
         commonSchool.setSchoolName("Test School");
         commonSchool.setSchoolCategoryCode("02");
 
-        Mockito.when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-        Mockito.when(this.requestHeadersUriMock.uri(constants.getAllSchoolSchoolApiUrl())).thenReturn(this.requestHeadersMock);
-        Mockito.when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
-        Mockito.when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-        when(this.responseMock.bodyToMono(new ParameterizedTypeReference<List<CommonSchool>>() {
-        })).thenReturn(Mono.just(List.of(commonSchool)));
+        Mockito.when(this.commonSchoolCache.getAllCommonSchools()).thenReturn(List.of(commonSchool));
 
         when(districtRepository.findByDistrictNumberAndActiveFlag("123","Y")).thenReturn(Optional.of(district));
 
-        List<District> districts = districtService.getDistrictBySchoolCategory("02", "accessToken");
+        List<District> districts = districtService.getDistrictBySchoolCategory("02");
         assertThat(districts).isNotEmpty();
 
-        districts = districtService.getDistrictBySchoolCategory(null, "accessToken");
+        districts = districtService.getDistrictBySchoolCategory(null);
         assertThat(districts).isNotEmpty();
     }
 

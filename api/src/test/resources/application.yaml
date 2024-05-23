@@ -113,3 +113,7 @@ endpoint:
       url: https://school-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/schools/%s
     get-all-schools:
       url: https://school-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/schools
+
+# other properties
+props:
+  school-cache-expiry-in-mins: 10

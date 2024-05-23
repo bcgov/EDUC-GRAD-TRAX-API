@@ -22,7 +22,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -75,6 +79,19 @@ public class TraxUpdateServiceTest {
 
     @MockBean
     private Subscriber subscriber;
+
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        public ClientRegistrationRepository clientRegistrationRepository() {
+            return new ClientRegistrationRepository() {
+                @Override
+                public ClientRegistration findByRegistrationId(String registrationId) {
+                    return null;
+                }
+            };
+        }
+    }
 
     @Before
     public void setUp() {
@@ -325,11 +342,11 @@ public class TraxUpdateServiceTest {
 
         TraxUpdateInGradEntity traxUpdateInGradEntity = new TraxUpdateInGradEntity();
         traxUpdateInGradEntity.setPen(pen);
-        traxUpdateInGradEntity.setUpdateType("UPD_STD_STATUS");
+        traxUpdateInGradEntity.setUpdateType("UPD_GRAD");
         traxUpdateInGradEntity.setStatus("OUTSTANDING");
         traxUpdateInGradEntity.setUpdateDate(DateUtils.addDays(new Date(), -1));
 
-        TraxStudentStatusUpdateDTO payload = new TraxStudentStatusUpdateDTO();
+        TraxGraduationUpdateDTO payload = new TraxGraduationUpdateDTO();
         payload.setPen(pen);
         payload.setStudentStatus("A");
         payload.setStudentStatus("A");
@@ -345,7 +362,7 @@ public class TraxUpdateServiceTest {
         traxStudent.setStudentCitizenship("C");
 
         TraxUpdatedPubEvent traxUpdatedPubEvent = TraxUpdatedPubEvent.builder()
-                .eventType(EventType.UPD_STD_STATUS.toString())
+                .eventType(EventType.UPD_GRAD.toString())
                 .eventId(UUID.randomUUID())
                 .eventOutcome(EventOutcome.TRAX_STUDENT_MASTER_UPDATED.toString())
                 .activityCode(traxUpdateInGradEntity.getUpdateType())
