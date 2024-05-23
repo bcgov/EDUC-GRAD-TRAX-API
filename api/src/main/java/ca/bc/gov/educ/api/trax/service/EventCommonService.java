@@ -24,7 +24,7 @@ import java.util.*;
 
 import static ca.bc.gov.educ.api.trax.constant.EventStatus.PROCESSED;
 
-public abstract class EventCommonService implements EventService {
+public abstract class EventCommonService<T> implements EventService<T> {
 
     private static Logger logger = LoggerFactory.getLogger(EventCommonService.class);
 
@@ -53,7 +53,7 @@ public abstract class EventCommonService implements EventService {
     private EducGradTraxApiConstants constants;
 
     @Override
-    public <T extends Object> void processEvent(T request, Event event) {
+    public void processEvent(T request, Event event) {
         GradStatusEventPayloadDTO gradStatusUpdate = (GradStatusEventPayloadDTO) request;
 
         val em = this.getEntityManager();

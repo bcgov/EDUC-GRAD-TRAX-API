@@ -17,7 +17,7 @@ import static ca.bc.gov.educ.api.trax.constant.EventType.GRAD_STUDENT_GRADUATED;
 
 @Service
 @Slf4j
-public class GradStudentGraduatedService extends EventCommonService {
+public class GradStudentGraduatedService<T> extends EventCommonService<T> {
     private final EntityManagerFactory emf;
 
     @Autowired

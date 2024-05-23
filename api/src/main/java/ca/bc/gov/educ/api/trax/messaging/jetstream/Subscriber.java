@@ -72,6 +72,11 @@ public class Subscriber {
     final List<String> traxStatusEventsTopics = new ArrayList<>();
     traxStatusEventsTopics.add(Topics.TRAX_UPDATE_EVENT_TOPIC.name());
     this.streamTopicsMap.put(EducGradTraxApiConstants.TRAX_STREAM_NAME, traxStatusEventsTopics);
+
+    final List<String> instituteEventsTopics = new ArrayList<>();
+    instituteEventsTopics.add(Topics.INSTITUTE_EVENTS_TOPIC.name());
+    this.streamTopicsMap.put(EducGradTraxApiConstants.INSTITUTE_STREAM_NAME, instituteEventsTopics);
+
   }
 
   @PostConstruct

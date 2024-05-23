@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.trax.choreographer;
 
+import ca.bc.gov.educ.api.trax.constant.EventType;
 import ca.bc.gov.educ.api.trax.model.dto.GradStatusEventPayloadDTO;
 import ca.bc.gov.educ.api.trax.model.entity.Event;
 import ca.bc.gov.educ.api.trax.service.EventService;
@@ -41,22 +42,49 @@ public class ChoreographEventHandler {
     //only one thread will process all the request. since RDB won't handle concurrent requests.
     this.eventExecutor.execute(() -> {
       try {
-        switch (event.getEventType()) {
-          case "GRAD_STUDENT_GRADUATED":
+        switch (EventType.valueOf(event.getEventType())) {
+          case GRAD_STUDENT_GRADUATED:
             log.debug("Processing GRAD_STUDENT_GRADUATED event record :: {} ", event);
             final GradStatusEventPayloadDTO eventPayload1 = JsonUtil.getJsonObjectFromString(GradStatusEventPayloadDTO.class, event.getEventPayload());
             this.eventServiceMap.get(GRAD_STUDENT_GRADUATED.toString()).processEvent(eventPayload1, event);
             break;
-          case "GRAD_STUDENT_UPDATED":
+          case GRAD_STUDENT_UPDATED:
             log.debug("Processing GRAD_STUDENT_UPDATED event record :: {} ", event);
             final GradStatusEventPayloadDTO eventPayload2 = JsonUtil.getJsonObjectFromString(GradStatusEventPayloadDTO.class, event.getEventPayload());
             this.eventServiceMap.get(GRAD_STUDENT_UPDATED.toString()).processEvent(eventPayload2, event);
             break;
-          case "GRAD_STUDENT_UNDO_COMPLETION":
+          case GRAD_STUDENT_UNDO_COMPLETION:
             log.debug("Processing GRAD_STUDENT_UNDO_COMPLETION event record :: {} ", event);
             final GradStatusEventPayloadDTO eventPayload3 = JsonUtil.getJsonObjectFromString(GradStatusEventPayloadDTO.class, event.getEventPayload());
             this.eventServiceMap.get(GRAD_STUDENT_UNDO_COMPLETION.toString()).processEvent(eventPayload3, event);
             break;
+          case CREATE_SCHOOL_CONTACT:
+            log.debug("Processing {} event record :: {} ",event.getEventType(), event);
+            // TODO: Implement as per: https://eccbc.atlassian.net/browse/GRAD2-2648
+          case UPDATE_SCHOOL_CONTACT:
+            log.debug("Processing {} event record :: {} ",event.getEventType(), event);
+            // TODO: Implement as per: https://eccbc.atlassian.net/browse/GRAD2-2648
+          case DELETE_SCHOOL_CONTACT:
+            log.debug("Processing {} event record :: {} ",event.getEventType(), event);
+            // TODO: Implement as per: https://eccbc.atlassian.net/browse/GRAD2-2648
+          case CREATE_AUTHORITY_CONTACT:
+            log.debug("Processing {} event record :: {} ",event.getEventType(), event);
+            // TODO: Implement as per: https://eccbc.atlassian.net/browse/GRAD2-2648
+          case UPDATE_AUTHORITY_CONTACT:
+            log.debug("Processing {} event record :: {} ",event.getEventType(), event);
+            // TODO: Implement as per: https://eccbc.atlassian.net/browse/GRAD2-2648
+          case DELETE_AUTHORITY_CONTACT:
+            log.debug("Processing {} event record :: {} ",event.getEventType(), event);
+            // TODO: Implement as per: https://eccbc.atlassian.net/browse/GRAD2-2648
+          case CREATE_DISTRICT_CONTACT:
+            log.debug("Processing {} event record :: {} ",event.getEventType(), event);
+            // TODO: Implement as per: https://eccbc.atlassian.net/browse/GRAD2-2648
+          case UPDATE_DISTRICT_CONTACT:
+            log.debug("Processing {} event record :: {} ",event.getEventType(), event);
+            // TODO: Implement as per: https://eccbc.atlassian.net/browse/GRAD2-2648
+          case DELETE_DISTRICT_CONTACT:
+            log.debug("Processing {} event record :: {} ",event.getEventType(), event);
+            // TODO: Implement as per: https://eccbc.atlassian.net/browse/GRAD2-2648
           default:
             log.warn("Silently ignoring event: {}", event);
             break;

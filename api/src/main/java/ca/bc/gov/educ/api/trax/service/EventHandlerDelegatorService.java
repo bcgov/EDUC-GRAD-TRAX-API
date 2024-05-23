@@ -46,11 +46,11 @@ public class EventHandlerDelegatorService {
             if (message.getSubject().equalsIgnoreCase(TRAX_UPDATE_EVENT_TOPIC.toString())) {
                 this.choreographedEventPersistenceService.updateEventStatus(choreographedEvent);
                 message.ack();
-                log.warn("acknowledged to Jet Stream for TRAX UPDATE EVENT sent...");
+                log.debug("acknowledged to Jet Stream for TRAX UPDATE EVENT sent...");
             } else {
                 final var persistedEvent = this.choreographedEventPersistenceService.persistEventToDB(choreographedEvent);
                 message.ack(); // acknowledge to Jet Stream that api got the message and it is now in DB.
-                log.warn("acknowledged to Jet Stream for GRAD STATUS EVENT received...");
+                log.debug("acknowledged to Jet Stream for GRAD STATUS EVENT received...");
                 this.choreographer.handleEvent(persistedEvent);
             }
         } catch (final BusinessException businessException) {
