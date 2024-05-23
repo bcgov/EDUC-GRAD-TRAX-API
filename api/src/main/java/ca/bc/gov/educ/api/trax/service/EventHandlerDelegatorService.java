@@ -50,7 +50,7 @@ public class EventHandlerDelegatorService {
             } else {
                 final var persistedEvent = this.choreographedEventPersistenceService.persistEventToDB(choreographedEvent);
                 message.ack(); // acknowledge to Jet Stream that api got the message and it is now in DB.
-                log.debug("acknowledged to Jet Stream for GRAD STATUS EVENT received...");
+                log.debug("acknowledged to Jet Stream for EVENT received: {}", persistedEvent.getEventType());
                 this.choreographer.handleEvent(persistedEvent);
             }
         } catch (final BusinessException businessException) {
