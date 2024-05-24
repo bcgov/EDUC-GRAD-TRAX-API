@@ -20,7 +20,7 @@ public class DistrictContactUpdatedService extends EventCommonService<DistrictCo
     @Override
     public void processEvent(final DistrictContact districtContact, Event event) {
         log.debug("Processing District Contact Deleted");
-        // TODO: process the event here as per https://eccbc.atlassian.net/browse/GRAD2-2648
+        // process the event here as per https://eccbc.atlassian.net/browse/GRAD2-2648
         this.updateEvent(event);
     }
 

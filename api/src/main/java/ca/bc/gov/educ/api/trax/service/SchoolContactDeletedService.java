@@ -20,7 +20,7 @@ public class SchoolContactDeletedService extends EventCommonService<SchoolContac
     @Override
     public void processEvent(final SchoolContact districtContact, Event event) {
         log.debug("Processing School Contact Deleted");
-        // TODO: process the event here as per https://eccbc.atlassian.net/browse/GRAD2-2648
+        // process the event here as per https://eccbc.atlassian.net/browse/GRAD2-2648
         this.updateEvent(event);
     }
 
