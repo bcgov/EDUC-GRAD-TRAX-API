@@ -1,5 +1,7 @@
 #DB Properties
 spring:
+  main:
+    allow-bean-definition-overriding: true
   jmx:
     enabled: false
   datasource:
