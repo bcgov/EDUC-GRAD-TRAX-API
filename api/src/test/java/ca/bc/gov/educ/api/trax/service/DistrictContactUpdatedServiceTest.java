@@ -25,4 +25,9 @@ public class DistrictContactUpdatedServiceTest extends BaseReplicationServiceTes
         }
     }
 
+    @Test
+    public void testGetEntityManager_expectNull() {
+        Assert.assertNull(this.districtContactUpdatedService.getEntityManager());
+    }
+
 }

@@ -25,4 +25,9 @@ public class AuthorityContactUpdatedServiceTest extends BaseReplicationServiceTe
         }
     }
 
+    @Test
+    public void testGetEntityManager_expectNull() {
+        Assert.assertNull(this.authorityContactUpdatedService.getEntityManager());
+    }
+
 }

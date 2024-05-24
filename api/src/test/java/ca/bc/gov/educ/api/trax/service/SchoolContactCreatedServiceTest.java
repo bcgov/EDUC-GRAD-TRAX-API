@@ -25,4 +25,9 @@ public class SchoolContactCreatedServiceTest extends BaseReplicationServiceTest 
         }
     }
 
+    @Test
+    public void testGetEntityManager_expectNull() {
+        Assert.assertNull(this.schoolContactCreatedService.getEntityManager());
+    }
+
 }

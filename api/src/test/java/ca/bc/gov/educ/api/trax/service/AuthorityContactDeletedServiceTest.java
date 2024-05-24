@@ -25,4 +25,9 @@ public class AuthorityContactDeletedServiceTest extends BaseReplicationServiceTe
         }
     }
 
+    @Test
+    public void testGetEntityManager_expectNull() {
+        Assert.assertNull(this.authorityContactDeletedService.getEntityManager());
+    }
+
 }
