@@ -6,7 +6,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
 public class SchoolContactUpdatedServiceTest extends BaseReplicationServiceTest {
@@ -21,14 +20,9 @@ public class SchoolContactUpdatedServiceTest extends BaseReplicationServiceTest 
         this.schoolContactUpdatedService.processEvent(request, event);
         var result = this.replicationTestUtils.getEventRepository().findById(event.getReplicationEventId());
         if(result.isPresent()){
-            Assert.assertEquals(result.get().getEventStatus(), "PROCESSED");
+            Assert.assertEquals("PROCESSED", result.get().getEventStatus());
         } else {
             fail("UPDATE_SCHOOL_CONTACT failed to process");
         }
-    }
-
-    @Test
-    public void testGetEntityManager_expectNull() {
-        Assert.assertNull(this.schoolContactUpdatedService.getEntityManager());
     }
 }

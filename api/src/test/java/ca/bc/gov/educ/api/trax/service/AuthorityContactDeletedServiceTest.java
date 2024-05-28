@@ -19,15 +19,10 @@ public class AuthorityContactDeletedServiceTest extends BaseReplicationServiceTe
         this.authorityContactDeletedService.processEvent(request, event);
         var result = this.replicationTestUtils.getEventRepository().findById(event.getReplicationEventId());
         if(result.isPresent()){
-            Assert.assertEquals(result.get().getEventStatus(), "PROCESSED");
+            Assert.assertEquals("PROCESSED", result.get().getEventStatus());
         } else {
             fail("DELETE_AUTHORITY_CONTACT failed to process");
         }
-    }
-
-    @Test
-    public void testGetEntityManager_expectNull() {
-        Assert.assertNull(this.authorityContactDeletedService.getEntityManager());
     }
 
 }

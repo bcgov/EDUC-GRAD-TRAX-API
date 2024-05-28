@@ -1,15 +1,15 @@
 package ca.bc.gov.educ.api.trax.service;
 
-import ca.bc.gov.educ.api.trax.constant.EventStatus;
 import ca.bc.gov.educ.api.trax.constant.FieldType;
 import ca.bc.gov.educ.api.trax.model.dto.GradStatusEventPayloadDTO;
 import ca.bc.gov.educ.api.trax.model.entity.Event;
 import ca.bc.gov.educ.api.trax.model.entity.TraxStudentEntity;
-import ca.bc.gov.educ.api.trax.repository.EventRepository;
 import ca.bc.gov.educ.api.trax.repository.TraxStudentRepository;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiUtils;
 import ca.bc.gov.educ.api.trax.util.ReplicationUtils;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.commons.lang3.StringUtils;
@@ -17,15 +17,13 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityTransaction;
 import java.time.LocalDateTime;
 import java.util.*;
 
 import static ca.bc.gov.educ.api.trax.constant.EventStatus.PROCESSED;
 
 @Slf4j
-public abstract class EventCommonService<T> implements EventService<T> {
+public abstract class EventCommonService<T> extends EventBaseService<T> {
     
 
     public static final String FIELD_GRAD_REQT_YEAR = "GRAD_REQT_YEAR";
@@ -48,8 +46,6 @@ public abstract class EventCommonService<T> implements EventService<T> {
     @Autowired
     private TraxStudentRepository traxStudentRepository;
     @Autowired
-    private EventRepository eventRepository;
-    @Autowired
     private EducGradTraxApiConstants constants;
 
     @Override
@@ -62,7 +58,7 @@ public abstract class EventCommonService<T> implements EventService<T> {
         try {
             process(existingStudent, gradStatusUpdate, em, tx, constants.isTraxUpdateEnabled());
 
-            var existingEvent = eventRepository.findByEventId(event.getEventId());
+            var existingEvent = this.eventRepository.findByEventId(event.getEventId());
             existingEvent.ifPresent(eventRecord -> {
                 eventRecord.setEventStatus(PROCESSED.toString());
                 eventRecord.setUpdateDate(LocalDateTime.now());
@@ -76,14 +72,6 @@ public abstract class EventCommonService<T> implements EventService<T> {
                 em.close();
             }
         }
-    }
-
-    protected void updateEvent(final Event event) {
-        this.eventRepository.findByEventId(event.getEventId()).ifPresent(existingEvent -> {
-            existingEvent.setEventStatus(EventStatus.PROCESSED.toString());
-            existingEvent.setUpdateDate(LocalDateTime.now());
-            this.eventRepository.save(existingEvent);
-        });
     }
 
     private void process(Optional<TraxStudentEntity> existingStudent, GradStatusEventPayloadDTO gradStatusUpdate, EntityManager em, EntityTransaction tx, boolean updateTrax) {

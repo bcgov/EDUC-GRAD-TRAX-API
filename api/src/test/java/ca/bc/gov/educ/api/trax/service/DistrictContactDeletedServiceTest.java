@@ -19,15 +19,10 @@ public class DistrictContactDeletedServiceTest extends BaseReplicationServiceTes
         this.districtContactDeletedService.processEvent(request, event);
         var result = this.replicationTestUtils.getEventRepository().findById(event.getReplicationEventId());
         if(result.isPresent()){
-            Assert.assertEquals(result.get().getEventStatus(), "PROCESSED");
+            Assert.assertEquals("PROCESSED", result.get().getEventStatus());
         } else {
             fail("DELETE_DISTRICT_CONTACT failed to process");
         }
-    }
-
-    @Test
-    public void testGetEntityManager_expectNull() {
-        Assert.assertNull(this.districtContactDeletedService.getEntityManager());
     }
 
 }

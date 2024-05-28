@@ -2,8 +2,6 @@ package ca.bc.gov.educ.api.trax.model.dto;
 
 import lombok.Data;
 
-import java.sql.Date;
-
 @Data
 public class BaseModel {
 	private String createUser;
