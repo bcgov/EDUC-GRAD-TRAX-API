@@ -1,11 +1,13 @@
 package ca.bc.gov.educ.api.trax.choreographer;
 
+import ca.bc.gov.educ.api.trax.constant.EventStatus;
 import ca.bc.gov.educ.api.trax.constant.EventType;
 import ca.bc.gov.educ.api.trax.model.dto.AuthorityContact;
 import ca.bc.gov.educ.api.trax.model.dto.DistrictContact;
 import ca.bc.gov.educ.api.trax.model.dto.GradStatusEventPayloadDTO;
 import ca.bc.gov.educ.api.trax.model.dto.SchoolContact;
 import ca.bc.gov.educ.api.trax.model.entity.Event;
+import ca.bc.gov.educ.api.trax.repository.EventRepository;
 import ca.bc.gov.educ.api.trax.service.EventService;
 import ca.bc.gov.educ.api.trax.util.JsonUtil;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -16,6 +18,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,8 +37,11 @@ public class ChoreographEventHandler {
   private final Executor eventExecutor;
   private final Map<String, EventService> eventServiceMap;
 
-  public ChoreographEventHandler(final List<EventService> eventServices) {
+  private final EventRepository eventRepository;
+
+  public ChoreographEventHandler(final List<EventService> eventServices, final EventRepository eventRepository) {
     this.eventServiceMap = new HashMap<>();
+    this.eventRepository = eventRepository;
     this.eventExecutor = new EnhancedQueueExecutor.Builder()
             .setThreadFactory(new ThreadFactoryBuilder().setNameFormat("event-executor-%d").build())
             .setCorePoolSize(10).setMaximumPoolSize(20).setKeepAliveTime(Duration.ofSeconds(60)).build();
@@ -107,7 +113,15 @@ public class ChoreographEventHandler {
             val districtContactDeleted = JsonUtil.getJsonObjectFromString(DistrictContact.class, event.getEventPayload());
             this.eventServiceMap.get(DELETE_DISTRICT_CONTACT.toString()).processEvent(districtContactDeleted, event);
           }
-          default -> log.warn("Silently ignoring event: {}", event);
+          default -> {
+            log.warn("Silently ignoring event: {}", event);
+            this.eventRepository.findByEventId(event.getEventId()).ifPresent(existingEvent -> {
+            existingEvent.setEventStatus(EventStatus.PROCESSED.toString());
+            existingEvent.setUpdateDate(LocalDateTime.now());
+            this.eventRepository.save(existingEvent);
+            });
+            break;
+          }
         }
       } catch (final Exception exception) {
         log.error("Exception while processing event :: {}", event, exception);
