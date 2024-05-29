@@ -18,6 +18,8 @@ public class EducGradTraxApiConstants {
     public static final String API_NAME = "GRAD-TRAX-API";
     public static final String GRAD_STREAM_NAME ="GRAD_STATUS_EVENT_STREAM";
     public static final String TRAX_STREAM_NAME="TRAX_STATUS_EVENT_STREAM";
+
+    public static final String INSTITUTE_STREAM_NAME="INSTITUTE_EVENTS";
     public static final String CORRELATION_ID = "correlationID";
 
     //API end-point Mapping constants

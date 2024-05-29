@@ -17,7 +17,7 @@ import static ca.bc.gov.educ.api.trax.constant.EventType.GRAD_STUDENT_UNDO_COMPL
 
 @Service
 @Slf4j
-public class GradStudentUndoCompletionService extends EventCommonService {
+public class GradStudentUndoCompletionService<T> extends EventCommonService<T> {
     private final EntityManagerFactory emf;
 
     @Autowired

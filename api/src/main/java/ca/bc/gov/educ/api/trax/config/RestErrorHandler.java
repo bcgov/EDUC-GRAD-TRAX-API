@@ -1,8 +1,7 @@
 package ca.bc.gov.educ.api.trax.config;
 
-import ca.bc.gov.educ.api.trax.exception.BusinessException;
-import ca.bc.gov.educ.api.trax.util.ApiResponseMessage.MessageTypeEnum;
 import ca.bc.gov.educ.api.trax.exception.GradBusinessRuleException;
+import ca.bc.gov.educ.api.trax.util.ApiResponseMessage.MessageTypeEnum;
 import ca.bc.gov.educ.api.trax.util.ApiResponseModel;
 import ca.bc.gov.educ.api.trax.util.GradValidation;
 import org.hibernate.dialect.lock.OptimisticEntityLockException;
