@@ -53,19 +53,18 @@ public class TestUtils {
     }
 
     public static AuthorityContact createAuthorityContact() {
-        var auth = AuthorityContact.builder()
-                .independentAuthorityId(UUID.randomUUID().toString())
-                .firstName("Bud")
-                .lastName("Weiser")
-                .phoneNumber("3216549874")
-                .phoneExtension("321")
-                .alternatePhoneNumber("3216547894")
-                .alternatePhoneExtension("555")
-                .email("bud.weiser@beers.ca")
-                .authorityContactTypeCode("DIRECTOR")
-                .effectiveDate(LocalDateTime.now().toString())
-                .expiryDate(LocalDateTime.now().plus(1, ChronoUnit.DAYS).toString())
-                .build();
+        var auth = new AuthorityContact();
+        auth.setIndependentAuthorityId(UUID.randomUUID().toString());
+        auth.setFirstName("Bud");
+        auth.setLastName("Weiser");
+        auth.setPhoneNumber("3216549874");
+        auth.setPhoneExtension("321");
+        auth.setAlternatePhoneNumber("3216547894");
+        auth.setAlternatePhoneExtension("555");
+        auth.setEmail("bud.weiser@beers.ca");
+        auth.setAuthorityContactTypeCode("DIRECTOR");
+        auth.setEffectiveDate(LocalDateTime.now().toString());
+        auth.setExpiryDate(LocalDateTime.now().plus(1, ChronoUnit.DAYS).toString());
         auth.setCreateDate(LocalDateTime.now().toString());
         auth.setCreateUser("TEST");
         auth.setUpdateDate(LocalDateTime.now().toString());
@@ -74,20 +73,19 @@ public class TestUtils {
     }
 
     public static SchoolContact createSchoolContact() {
-        var contact = SchoolContact.builder()
-                .schoolId(UUID.randomUUID().toString())
-                .firstName("Testy")
-                .lastName("MacTesterton")
-                .phoneNumber("3216549874")
-                .phoneExtension("123")
-                .alternatePhoneNumber("3216549874")
-                .alternatePhoneExtension("321")
-                .email("t.testerton@test.ca")
-                .jobTitle("The Tester")
-                .schoolContactTypeCode("PRINCIPAL")
-                .effectiveDate(LocalDate.now().toString())
-                .expiryDate(LocalDateTime.now().plus(1, ChronoUnit.DAYS).toString())
-                .build();
+        var contact = new SchoolContact();
+        contact.setSchoolId(UUID.randomUUID().toString());
+        contact.setFirstName("Testy");
+        contact.setLastName("MacTesterton");
+        contact.setPhoneNumber("3216549874");
+        contact.setPhoneExtension("123");
+        contact.setAlternatePhoneNumber("3216549874");
+        contact.setAlternatePhoneExtension("321");
+        contact.setEmail("t.testerton@test.ca");
+        contact.setJobTitle("The Tester");
+        contact.setSchoolContactTypeCode("PRINCIPAL");
+        contact.setEffectiveDate(LocalDate.now().toString());
+        contact.setExpiryDate(LocalDateTime.now().plus(1, ChronoUnit.DAYS).toString());
         contact.setCreateDate(LocalDateTime.now().toString());
         contact.setCreateUser("TEST");
         contact.setUpdateDate(LocalDateTime.now().toString());
@@ -96,20 +94,19 @@ public class TestUtils {
     }
 
     public static DistrictContact createDistrictContact() {
-        var contact = DistrictContact.builder()
-                .districtId(UUID.randomUUID().toString())
-                .firstName("Testy")
-                .lastName("MacTesterton")
-                .phoneNumber("3216549874")
-                .phoneExtension("123")
-                .alternatePhoneNumber("3216549874")
-                .alternatePhoneExtension("321")
-                .email("t.testerton@test.ca")
-                .jobTitle("The Tester")
-                .districtContactTypeCode("PRINCIPAL")
-                .effectiveDate(LocalDate.now().toString())
-                .expiryDate(LocalDateTime.now().plus(1, ChronoUnit.DAYS).toString())
-                .build();
+        var contact = new DistrictContact();
+        contact.setDistrictId(UUID.randomUUID().toString());
+        contact.setFirstName("Testy");
+        contact.setLastName("MacTesterton");
+        contact.setPhoneNumber("3216549874");
+        contact.setPhoneExtension("123");
+        contact.setAlternatePhoneNumber("3216549874");
+        contact.setAlternatePhoneExtension("321");
+        contact.setEmail("t.testerton@test.ca");
+        contact.setJobTitle("The Tester");
+        contact.setDistrictContactTypeCode("PRINCIPAL");
+        contact.setEffectiveDate(LocalDate.now().toString());
+        contact.setExpiryDate(LocalDateTime.now().plus(1, ChronoUnit.DAYS).toString());
         contact.setCreateDate(LocalDateTime.now().toString());
         contact.setCreateUser("TEST");
         contact.setUpdateDate(LocalDateTime.now().toString());
