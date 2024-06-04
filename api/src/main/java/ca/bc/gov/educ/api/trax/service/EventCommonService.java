@@ -4,29 +4,27 @@ import ca.bc.gov.educ.api.trax.constant.FieldType;
 import ca.bc.gov.educ.api.trax.model.dto.GradStatusEventPayloadDTO;
 import ca.bc.gov.educ.api.trax.model.entity.Event;
 import ca.bc.gov.educ.api.trax.model.entity.TraxStudentEntity;
-import ca.bc.gov.educ.api.trax.repository.EventRepository;
 import ca.bc.gov.educ.api.trax.repository.TraxStudentRepository;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiUtils;
 import ca.bc.gov.educ.api.trax.util.ReplicationUtils;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityTransaction;
 import java.time.LocalDateTime;
 import java.util.*;
 
 import static ca.bc.gov.educ.api.trax.constant.EventStatus.PROCESSED;
 
-public abstract class EventCommonService implements EventService {
-
-    private static Logger logger = LoggerFactory.getLogger(EventCommonService.class);
+@Slf4j
+public abstract class EventCommonService<T> extends EventBaseService<T> {
+    
 
     public static final String FIELD_GRAD_REQT_YEAR = "GRAD_REQT_YEAR";
     public static final String FIELD_GRAD_REQT_YEAR_AT_GRAD = "GRAD_REQT_YEAR_AT_GRAD";
@@ -48,12 +46,10 @@ public abstract class EventCommonService implements EventService {
     @Autowired
     private TraxStudentRepository traxStudentRepository;
     @Autowired
-    private EventRepository eventRepository;
-    @Autowired
     private EducGradTraxApiConstants constants;
 
     @Override
-    public <T extends Object> void processEvent(T request, Event event) {
+    public void processEvent(T request, Event event) {
         GradStatusEventPayloadDTO gradStatusUpdate = (GradStatusEventPayloadDTO) request;
 
         val em = this.getEntityManager();
@@ -62,14 +58,14 @@ public abstract class EventCommonService implements EventService {
         try {
             process(existingStudent, gradStatusUpdate, em, tx, constants.isTraxUpdateEnabled());
 
-            var existingEvent = eventRepository.findByEventId(event.getEventId());
+            var existingEvent = this.eventRepository.findByEventId(event.getEventId());
             existingEvent.ifPresent(eventRecord -> {
                 eventRecord.setEventStatus(PROCESSED.toString());
                 eventRecord.setUpdateDate(LocalDateTime.now());
                 eventRepository.saveAndFlush(eventRecord);
             });
         } catch (Exception e) {
-            logger.error("Error occurred saving entity {}", e.getMessage());
+            log.error("Error occurred saving entity {}", e.getMessage());
             tx.rollback();
         } finally {
             if (em.isOpen()) {
@@ -80,7 +76,7 @@ public abstract class EventCommonService implements EventService {
 
     private void process(Optional<TraxStudentEntity> existingStudent, GradStatusEventPayloadDTO gradStatusUpdate, EntityManager em, EntityTransaction tx, boolean updateTrax) {
         if (updateTrax && existingStudent.isPresent()) {
-            logger.debug("==========> Start - Trax Incremental Update: pen# [{}]", gradStatusUpdate.getPen());
+            log.debug("==========> Start - Trax Incremental Update: pen# [{}]", gradStatusUpdate.getPen());
             Map<String, Pair<FieldType, Object>> updateFieldsMap = setupUpdateFieldsMap();
             specialHandlingOnUpdateFieldsMap(updateFieldsMap, existingStudent.get(), gradStatusUpdate);
             // Needs to update required fields from GraduationStatus to TraxStudentEntity
@@ -91,11 +87,11 @@ public abstract class EventCommonService implements EventService {
                 em.createNativeQuery(buildUpdateQuery(gradStatusUpdate.getPen(), updateFieldsMap))
                         .setHint("javax.persistence.query.timeout", 10000).executeUpdate();
                 tx.commit();
-                logger.debug("  === Update Transaction is committed! ===");
+                log.debug("  === Update Transaction is committed! ===");
             } else {
-                logger.debug("  === Skip Transaction as no changes are detected!!! ===");
+                log.debug("  === Skip Transaction as no changes are detected!!! ===");
             }
-            logger.debug("==========> End - Trax Incremental Update: pen# [{}]", gradStatusUpdate.getPen());
+            log.debug("==========> End - Trax Incremental Update: pen# [{}]", gradStatusUpdate.getPen());
         }
     }
 
@@ -259,7 +255,7 @@ public abstract class EventCommonService implements EventService {
 
         sb.append(" WHERE STUD_NO=" + "'" + StringUtils.rightPad(pen, 10) + "'"); // a space is appended CAREFUL not to remove.
 
-        logger.debug("Update Query: {}",  sb);
+        log.debug("Update Query: {}",  sb);
         return sb.toString();
 
     }

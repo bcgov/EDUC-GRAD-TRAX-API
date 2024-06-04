@@ -1,6 +1,9 @@
 package ca.bc.gov.educ.api.trax.support;
 
+import ca.bc.gov.educ.api.trax.model.dto.AuthorityContact;
+import ca.bc.gov.educ.api.trax.model.dto.DistrictContact;
 import ca.bc.gov.educ.api.trax.model.dto.GradStatusEventPayloadDTO;
+import ca.bc.gov.educ.api.trax.model.dto.SchoolContact;
 import ca.bc.gov.educ.api.trax.model.entity.Event;
 import ca.bc.gov.educ.api.trax.model.entity.TraxStudentEntity;
 import ca.bc.gov.educ.api.trax.repository.EventRepository;
@@ -8,7 +11,9 @@ import ca.bc.gov.educ.api.trax.util.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.lang3.StringUtils;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 import static ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants.DEFAULT_CREATED_BY;
@@ -35,7 +40,7 @@ public class TestUtils {
         var event = Event.builder()
                 .eventType(eventType)
                 .eventId(UUID.randomUUID())
-                .eventOutcome("PROCESSED")
+                .eventOutcome("DB_COMMITTED")
                 .eventPayload(JsonUtil.getJsonStringFromObject(payload))
                 .eventStatus(DB_COMMITTED.toString())
                 .createUser(DEFAULT_CREATED_BY)
@@ -45,6 +50,68 @@ public class TestUtils {
                 .build();
         eventRepository.save(event);
         return event;
+    }
+
+    public static AuthorityContact createAuthorityContact() {
+        var auth = new AuthorityContact();
+        auth.setIndependentAuthorityId(UUID.randomUUID().toString());
+        auth.setFirstName("Bud");
+        auth.setLastName("Weiser");
+        auth.setPhoneNumber("3216549874");
+        auth.setPhoneExtension("321");
+        auth.setAlternatePhoneNumber("3216547894");
+        auth.setAlternatePhoneExtension("555");
+        auth.setEmail("bud.weiser@beers.ca");
+        auth.setAuthorityContactTypeCode("DIRECTOR");
+        auth.setEffectiveDate(LocalDateTime.now().toString());
+        auth.setExpiryDate(LocalDateTime.now().plus(1, ChronoUnit.DAYS).toString());
+        auth.setCreateDate(LocalDateTime.now().toString());
+        auth.setCreateUser("TEST");
+        auth.setUpdateDate(LocalDateTime.now().toString());
+        auth.setUpdateUser("TEST");
+        return auth;
+    }
+
+    public static SchoolContact createSchoolContact() {
+        var contact = new SchoolContact();
+        contact.setSchoolId(UUID.randomUUID().toString());
+        contact.setFirstName("Testy");
+        contact.setLastName("MacTesterton");
+        contact.setPhoneNumber("3216549874");
+        contact.setPhoneExtension("123");
+        contact.setAlternatePhoneNumber("3216549874");
+        contact.setAlternatePhoneExtension("321");
+        contact.setEmail("t.testerton@test.ca");
+        contact.setJobTitle("The Tester");
+        contact.setSchoolContactTypeCode("PRINCIPAL");
+        contact.setEffectiveDate(LocalDate.now().toString());
+        contact.setExpiryDate(LocalDateTime.now().plus(1, ChronoUnit.DAYS).toString());
+        contact.setCreateDate(LocalDateTime.now().toString());
+        contact.setCreateUser("TEST");
+        contact.setUpdateDate(LocalDateTime.now().toString());
+        contact.setUpdateUser("TEST");
+        return contact;
+    }
+
+    public static DistrictContact createDistrictContact() {
+        var contact = new DistrictContact();
+        contact.setDistrictId(UUID.randomUUID().toString());
+        contact.setFirstName("Testy");
+        contact.setLastName("MacTesterton");
+        contact.setPhoneNumber("3216549874");
+        contact.setPhoneExtension("123");
+        contact.setAlternatePhoneNumber("3216549874");
+        contact.setAlternatePhoneExtension("321");
+        contact.setEmail("t.testerton@test.ca");
+        contact.setJobTitle("The Tester");
+        contact.setDistrictContactTypeCode("PRINCIPAL");
+        contact.setEffectiveDate(LocalDate.now().toString());
+        contact.setExpiryDate(LocalDateTime.now().plus(1, ChronoUnit.DAYS).toString());
+        contact.setCreateDate(LocalDateTime.now().toString());
+        contact.setCreateUser("TEST");
+        contact.setUpdateDate(LocalDateTime.now().toString());
+        contact.setUpdateUser("TEST");
+        return contact;
     }
 
     public static TraxStudentEntity createTraxStudent(boolean isGraduated) {
