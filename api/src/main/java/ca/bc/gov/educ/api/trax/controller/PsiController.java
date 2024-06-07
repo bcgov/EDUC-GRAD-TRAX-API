@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,13 +22,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @CrossOrigin
 @RestController
-@RequestMapping(EducGradTraxApiConstants.GRAD_PSI_URL_MAPPING)
+//@RequestMapping(EducGradTraxApiConstants.GRAD_PSI_URL_MAPPING)
 @OpenAPIDefinition(info = @Info(title = "API for PSI Data.", description = "This API is for PSI.", version = "1"))
 public class PsiController {
-
-    private static Logger logger = LoggerFactory.getLogger(PsiController.class);
 
     @Autowired
     PsiService psiService;
@@ -38,21 +38,21 @@ public class PsiController {
     @Autowired
 	ResponseHelper response;
 
-    @GetMapping
+    @GetMapping(EducGradTraxApiConstants.GRAD_PSI_URL_MAPPING_V1)
     @PreAuthorize(PermissionsConstants.READ_PSI_INFO)
     @Operation(summary = "Find All PSIs", description = "Get All PSIs", tags = { "PSI" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
-    public ResponseEntity<List<Psi>> getAllPSIs() { 
-    	logger.debug("getAllPSIs : ");
+    public ResponseEntity<List<Psi>> getAllPSIs() {
+        log.debug("getAllPSIs : ");
         return response.GET(psiService.getPSIList());
     }
     
-    @GetMapping(EducGradTraxApiConstants.GET_PSI_BY_CODE_MAPPING)
+    @GetMapping(EducGradTraxApiConstants.GRAD_PSI_URL_MAPPING_V1 + EducGradTraxApiConstants.GET_PSI_BY_CODE_MAPPING)
     @PreAuthorize(PermissionsConstants.READ_PSI_INFO)
     @Operation(summary = "Find a PSI by Code", description = "Get a PSI by Code", tags = { "PSI" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),@ApiResponse(responseCode = "400", description = "BAD REQUEST")})
     public ResponseEntity<Psi> getPSIDetails(@PathVariable String psiCode) { 
-    	logger.debug("getPSIDetails : ");
+    	log.debug("getPSIDetails : ");
         Psi psi = psiService.getPSIDetails(psiCode);
         if(psi ==null) {
             return response.NOT_FOUND();
@@ -60,7 +60,7 @@ public class PsiController {
         return response.GET(psi);
     }
     
-    @GetMapping(EducGradTraxApiConstants.GET_PSI_SEARCH_MAPPING)
+    @GetMapping(EducGradTraxApiConstants.GRAD_PSI_URL_MAPPING_V1 + EducGradTraxApiConstants.GET_PSI_SEARCH_MAPPING)
     @PreAuthorize(PermissionsConstants.READ_PSI_INFO)
     @Operation(summary = "Search for PSIs", description = "Search For PSIs", tags = { "PSI" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
@@ -73,7 +73,7 @@ public class PsiController {
 		return response.GET(psiService.getPSIByParams(psiName,psiCode,cslCode,transmissionMode,openFlag));
 	}
 
-    @GetMapping(EducGradTraxApiConstants.GET_STUDENT_PSI_BY_CODE_MAPPING)
+    @GetMapping(EducGradTraxApiConstants.GRAD_PSI_URL_MAPPING_V1 + EducGradTraxApiConstants.GET_STUDENT_PSI_BY_CODE_MAPPING)
     @PreAuthorize(PermissionsConstants.READ_PSI_INFO)
     @Operation(summary = "Find a PSI by Code", description = "Get a PSI by Code", tags = { "PSI" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),@ApiResponse(responseCode = "400", description = "BAD REQUEST")})
@@ -81,7 +81,7 @@ public class PsiController {
             @RequestParam(value = "transmissionMode") String transmissionMode,
             @RequestParam(value = "psiCode") String psiCode,
             @RequestParam(value = "psiYear") String psiYear) {
-        logger.debug("getStudentPSIDetails : ");
+        log.debug("getStudentPSIDetails : ");
         return response.GET(psiService.getStudentPSIDetails(transmissionMode,psiYear,psiCode));
     }
 }

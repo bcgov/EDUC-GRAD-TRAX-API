@@ -64,6 +64,9 @@ logging:
 authorization:
   user: batch-api
   password: abc
+  institute-api:
+    client-id: edx-grad-client-name
+    client-secret: xyz
 
 #NATS
 nats:
@@ -115,6 +118,17 @@ endpoint:
       url: https://school-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/schools/%s
     get-all-schools:
       url: https://school-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/schools
+  institute-api:
+    get-all-schools:
+      url: https://school-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/institute/school
+    get-school-details-by-id:
+      url: https://school-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/institute/school/%s
+    get-all-districts:
+      url: https://school-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/institute/district
+    get-all-school-category-codes:
+      url: https://school-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/institute/category-codes
+    get-all-school-funding-group-codes:
+      url: https://school-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/institute/funding-group-codes
 
 # other properties
 props:

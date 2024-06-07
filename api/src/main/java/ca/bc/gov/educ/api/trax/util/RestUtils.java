@@ -41,8 +41,23 @@ public class RestUtils {
                 .bodyToMono(ResponseObj.class).block();
     }
 
+    @Retry(name = "rt-getToken-institute", fallbackMethod = "rtGetTokenFallback")
+    public ResponseObj getTokenResponseObject(String clientId,  String clientSecret) {
+        log.info("Fetching the access token from KeyCloak API");
+        HttpHeaders httpHeadersKC = EducGradTraxApiUtils.getHeaders(
+                clientId, clientSecret);
+        MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
+        map.add("grant_type", "client_credentials");
+        return this.webClient.post().uri(constants.getTokenUrl())
+                .headers(h -> h.addAll(httpHeadersKC))
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .body(BodyInserters.fromFormData(map))
+                .retrieve()
+                .bodyToMono(ResponseObj.class).block();
+    }
+
     public ResponseObj rtGetTokenFallBack(HttpServerErrorException exception){
-        log.error("{} NOT REACHABLE after many attempts: {}", constants.getTokenUrl(), exception);
+        log.error("{} NOT REACHABLE after many attempts: {}", constants.getTokenUrl(), exception.getMessage());
         return null;
     }
 }

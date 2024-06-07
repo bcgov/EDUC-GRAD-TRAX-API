@@ -21,7 +21,7 @@ import java.util.List;
 
 @CrossOrigin
 @RestController
-@RequestMapping(EducGradTraxApiConstants.GRAD_DISTRICT_URL_MAPPING)
+//@RequestMapping(EducGradTraxApiConstants.GRAD_DISTRICT_URL_MAPPING)
 @OpenAPIDefinition(info = @Info(title = "API for School Data.", description = "This Read API is for Reading school data.", version = "1"),
 		security = {@SecurityRequirement(name = "OAUTH2", scopes = {"READ_GRAD_SCHOOL_DATA"})})
 public class DistrictController {
@@ -36,7 +36,7 @@ public class DistrictController {
 	ResponseHelper response;
 
     
-    @GetMapping(EducGradTraxApiConstants.GET_DISTRICT_BY_DISTNO_MAPPING)
+    @GetMapping(EducGradTraxApiConstants.GRAD_DISTRICT_URL_MAPPING_V1 + EducGradTraxApiConstants.GET_DISTRICT_BY_DISTNO_MAPPING)
     @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
     @Operation(summary = "Find a District by District Number", description = "Get District by District Number", tags = { "District" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
@@ -50,7 +50,7 @@ public class DistrictController {
         return null;
     }
 
-    @GetMapping(EducGradTraxApiConstants.GET_DISTRICTS_BY_SCHOOL_CATEGORY_MAPPING)
+    @GetMapping(EducGradTraxApiConstants.GRAD_DISTRICT_URL_MAPPING_V1 + EducGradTraxApiConstants.GET_DISTRICTS_BY_SCHOOL_CATEGORY_MAPPING)
     @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
     @Operation(summary = "Check school existence by Mincode", description = "Check school existence by Mincode", tags = { "School" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
