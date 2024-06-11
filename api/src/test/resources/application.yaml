@@ -110,7 +110,7 @@ splunk:
 #Endpoint properties
 endpoint:
   keycloak:
-    getToken: https://soam-tools.apps.silver.devops.gov.bc.ca/auth/realms/master/protocol/openid-connect/token
+    getToken: https://soam-dev.apps.silver.devops.gov.bc.ca/auth/realms/master/protocol/openid-connect/token
   educ-school-api:
     get-school-by-mincode:
       url: https://school-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/schools/%s

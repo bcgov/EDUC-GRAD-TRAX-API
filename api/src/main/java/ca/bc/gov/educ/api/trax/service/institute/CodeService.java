@@ -37,8 +37,7 @@ public class CodeService {
 	public List<SchoolCategoryCodeEntity> getSchoolCategoryCodesFromInstituteApi() {
 		try {
 			log.debug("****Before Calling Institute API");
-			List<SchoolCategoryCodeEntity> schoolCategoryCodes;
-			schoolCategoryCodes = webClient.get().uri(constants.getAllSchoolCategoryCodesFromInstituteApiUrl())
+			List<SchoolCategoryCodeEntity> schoolCategoryCodes = webClient.get().uri(constants.getAllSchoolCategoryCodesFromInstituteApiUrl())
 					.headers(h -> {
 						h.setBearerAuth(restUtils.getTokenResponseObject(
 								constants.getInstituteClientId(), constants.getInstituteClientSecret()
@@ -50,7 +49,7 @@ public class CodeService {
             log.debug("# of School Category Codes: " + schoolCategoryCodes.size());
 			return schoolCategoryCodes;
 		} catch (WebClientResponseException e) {
-			log.warn("Error getting School Category Codes");
+			log.warn(String.format("Error getting School Category Codes: %s", e.getMessage()));
 		} catch (Exception e) {
 			log.error(String.format("Error while calling school-api: %s", e.getMessage()));
 		}
