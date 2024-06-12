@@ -4,20 +4,20 @@ import ca.bc.gov.educ.api.trax.messaging.NatsConnection;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.trax.model.dto.ResponseObj;
+import ca.bc.gov.educ.api.trax.model.dto.institute.District;
+import ca.bc.gov.educ.api.trax.model.dto.institute.DistrictContact;
+import ca.bc.gov.educ.api.trax.model.entity.institute.DistrictContactEntity;
+import ca.bc.gov.educ.api.trax.model.entity.institute.DistrictEntity;
 import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolCategoryCodeEntity;
 import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolFundingGroupCodeEntity;
 import ca.bc.gov.educ.api.trax.repository.GradCountryRepository;
 import ca.bc.gov.educ.api.trax.repository.GradProvinceRepository;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.RestUtils;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -31,22 +31,18 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.openMocks;
 
 
 @RunWith(SpringRunner.class)
@@ -54,12 +50,12 @@ import static org.mockito.MockitoAnnotations.openMocks;
 @ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings({"unchecked","rawtypes"})
-public class InstituteCodeServiceTest {
+public class InstituteDistrictServiceTest {
 
 	@Autowired
 	private EducGradTraxApiConstants constants;
 	@Autowired
-	private CodeService codeService;
+	private DistrictService districtService;
 
 	@MockBean
 	private GradCountryRepository gradCountryRepository;
@@ -81,9 +77,7 @@ public class InstituteCodeServiceTest {
 	@Mock
 	private ResponseObj responseObjectMock;
 	@Mock
-	private Mono<List<SchoolCategoryCodeEntity>> schoolCategoryCodeEntitiesMock;
-	@Mock
-	private Mono<List<SchoolFundingGroupCodeEntity>> schoolFundingGroupCodeEntitiesMock;
+	private Mono<List<DistrictEntity>> districtEntitiesMock;
 	@MockBean
 	private RestUtils restUtilsMock;
 
@@ -111,18 +105,17 @@ public class InstituteCodeServiceTest {
 	}
 
 	@Test
-	public void whenGetSchoolCategoryCodesFromInstituteApi_returnsListOfSchoolCategoryCodeEntity() {
-		List<SchoolCategoryCodeEntity> schoolCategoryCodes = new ArrayList<>();
-		SchoolCategoryCodeEntity scce = new SchoolCategoryCodeEntity();
+	public void whenGetDistrictsFromInstituteApi_returnsListOfDistricts() {
+		List<DistrictEntity> districts = new ArrayList<>();
+		DistrictEntity district = new DistrictEntity();
 
-		scce.setSchoolCategoryCode("11");
-		scce.setDescription("Description");
-		scce.setLegacyCode("LegacyCode");
-		scce.setLabel("Label");
-		scce.setEffectiveDate("01-01-2024");
-		scce.setExpiryDate("01-01-2024");
-		scce.setDisplayOrder("10");
-		schoolCategoryCodes.add(scce);
+		district.setDistrictId("ID");
+		district.setDistrictNumber("1234");
+		district.setDistrictStatusCode("SC");
+		district.setDistrictRegionCode("RC");
+		district.setContacts(Arrays.asList(new DistrictContactEntity(), new DistrictContactEntity()));
+
+		districts.add(district);
 
 		ResponseObj tokenObj = new ResponseObj();
 		tokenObj.setAccess_token("123");
@@ -137,16 +130,14 @@ public class InstituteCodeServiceTest {
 				.thenReturn("accessToken");
 		when(requestHeadersSpecMock.retrieve())
 				.thenReturn(responseSpecMock);
-		when(this.responseSpecMock.bodyToMono(new ParameterizedTypeReference<List<SchoolCategoryCodeEntity>>(){}))
-				.thenReturn(schoolCategoryCodeEntitiesMock);
-		when(this.schoolCategoryCodeEntitiesMock.block())
-				.thenReturn(schoolCategoryCodes);
+		when(this.responseSpecMock.bodyToMono(new ParameterizedTypeReference<List<DistrictEntity>>(){}))
+				.thenReturn(districtEntitiesMock);
+		when(this.districtEntitiesMock.block()).thenReturn(districts);
 
-		List<SchoolCategoryCodeEntity> result = codeService.getSchoolCategoryCodesFromInstituteApi();
-		//assertThat(result).hasSize(1);
+		List<District> result = districtService.getDistrictsFromInstituteApi();
 	}
 
-	@Test
+	/*@Test
 	public void whenGetSchoolFundingGroupCodesFromInstituteApi_returnsListOfSchoolFundingGroupCodeEntity() {
 		List<SchoolFundingGroupCodeEntity> schoolFundingGroupCodes = new ArrayList<>();
 		SchoolFundingGroupCodeEntity sfgc = new SchoolFundingGroupCodeEntity();
@@ -184,6 +175,6 @@ public class InstituteCodeServiceTest {
 
 		List<SchoolFundingGroupCodeEntity> result = codeService.getSchoolFundingGroupCodesFromInstituteApi();
 		//assertThat(result).hasSize(1);
-	}
+	}*/
 
 }

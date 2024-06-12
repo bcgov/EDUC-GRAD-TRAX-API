@@ -1,9 +1,6 @@
 package ca.bc.gov.educ.api.trax.model.dto.institute;
 
 import ca.bc.gov.educ.api.trax.model.dto.BaseModel;
-import ca.bc.gov.educ.api.trax.model.entity.institute.DistrictAddressEntity;
-import ca.bc.gov.educ.api.trax.model.entity.institute.DistrictContactEntity;
-import ca.bc.gov.educ.api.trax.model.entity.institute.NoteEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.stereotype.Component;
@@ -23,8 +20,8 @@ public class District extends BaseModel {
     private String website;
     private String districtRegionCode;
     private String districtStatusCode;
-    private List<DistrictContactEntity> contacts;
-    private List<DistrictAddressEntity> addresses;
-    private List<NoteEntity> notes;
+    private List<DistrictContact> contacts;
+    private List<DistrictAddress> addresses;
+    private List<Note> notes;
 
 }
