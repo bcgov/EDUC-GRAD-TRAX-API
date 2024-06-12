@@ -9,6 +9,7 @@ import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolCategoryCodeEntity;
 import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolFundingGroupCodeEntity;
 import ca.bc.gov.educ.api.trax.repository.GradCountryRepository;
 import ca.bc.gov.educ.api.trax.repository.GradProvinceRepository;
+import ca.bc.gov.educ.api.trax.repository.redis.SchoolFundingGroupCodeRedisRepository;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.RestUtils;
 import org.junit.Test;
@@ -40,6 +41,7 @@ import java.util.function.Consumer;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
@@ -53,7 +55,8 @@ public class InstituteCodeServiceTest {
 	private EducGradTraxApiConstants constants;
 	@Autowired
 	private CodeService codeService;
-
+	@MockBean
+	private SchoolFundingGroupCodeRedisRepository schoolFundingGroupCodeRedisRepository;
 	@MockBean
 	private GradCountryRepository gradCountryRepository;
 
@@ -182,7 +185,8 @@ public class InstituteCodeServiceTest {
 	@Test
 	public void whenLoadSchoolFundingGroupCodesIntoRedisCache_DoesNotThrow() {
 		List<SchoolFundingGroupCodeEntity> schoolFundingGroupCodeEntities = Arrays.asList(new SchoolFundingGroupCodeEntity());
+		when(this.schoolFundingGroupCodeRedisRepository.saveAll(schoolFundingGroupCodeEntities))
+				.thenReturn(schoolFundingGroupCodeEntities);
 		assertDoesNotThrow(() -> codeService.loadSchoolFundingGroupCodesIntoRedisCache(schoolFundingGroupCodeEntities));
 	}
-
 }
