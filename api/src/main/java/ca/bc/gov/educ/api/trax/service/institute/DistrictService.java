@@ -54,7 +54,8 @@ public class DistrictService {
     }
 
     public void loadDistrictsIntoRedisCache(List<District> districts) {
-        districtRedisRepository.saveAll(districtTransformer.transformToEntity(districts));
+        districtRedisRepository
+                .saveAll(districtTransformer.transformToEntity(districts));
     }
 
 }

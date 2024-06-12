@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -144,6 +145,14 @@ public class InstituteDistrictServiceTest {
 
 		List<District> result = districtService.getDistrictsFromInstituteApi();
 	}
+
+	/*@Test
+	public void whenLoadSchoolFundingGroupCodesIntoRedisCache_DoesNotThrow() {
+		List<SchoolFundingGroupCodeEntity> schoolFundingGroupCodeEntities = Arrays.asList(new SchoolFundingGroupCodeEntity());
+		when(this.schoolFundingGroupCodeRedisRepository.saveAll(schoolFundingGroupCodeEntities))
+				.thenReturn(schoolFundingGroupCodeEntities);
+		assertDoesNotThrow(() -> codeService.loadSchoolFundingGroupCodesIntoRedisCache(schoolFundingGroupCodeEntities));
+	}*/
 
 	/*@Test
 	public void whenGetSchoolFundingGroupCodesFromInstituteApi_returnsListOfSchoolFundingGroupCodeEntity() {

@@ -4,6 +4,7 @@ import ca.bc.gov.educ.api.trax.messaging.NatsConnection;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.trax.model.dto.ResponseObj;
+import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolCategoryCode;
 import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolFundingGroupCode;
 import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolCategoryCodeEntity;
 import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolFundingGroupCodeEntity;
@@ -138,7 +139,7 @@ public class InstituteCodeServiceTest {
 		when(this.schoolCategoryCodeEntitiesMock.block())
 				.thenReturn(schoolCategoryCodes);
 
-		List<SchoolCategoryCodeEntity> result = codeService.getSchoolCategoryCodesFromInstituteApi();
+		List<SchoolCategoryCode> result = codeService.getSchoolCategoryCodesFromInstituteApi();
 		//assertThat(result).hasSize(1);
 	}
 
@@ -178,15 +179,25 @@ public class InstituteCodeServiceTest {
 		when(this.schoolFundingGroupCodeEntitiesMock.block())
 				.thenReturn(schoolFundingGroupCodes);
 
-		List<SchoolFundingGroupCodeEntity> result = codeService.getSchoolFundingGroupCodesFromInstituteApi();
+		List<SchoolFundingGroupCode> result = codeService.getSchoolFundingGroupCodesFromInstituteApi();
 		//assertThat(result).hasSize(1);
+	}
+
+	@Test
+	public void whenLoadSchoolCategoryCodesIntoRedisCache_DoesNotThrow() {
+		List<SchoolFundingGroupCodeEntity> schoolFundingGroupCodeEntities = Arrays.asList(new SchoolFundingGroupCodeEntity());
+		List<SchoolFundingGroupCode> schoolFundingGroupCodes = Arrays.asList(new SchoolFundingGroupCode());
+		when(this.schoolFundingGroupCodeRedisRepository.saveAll(schoolFundingGroupCodeEntities))
+				.thenReturn(schoolFundingGroupCodeEntities);
+		assertDoesNotThrow(() -> codeService.loadSchoolFundingGroupCodesIntoRedisCache(schoolFundingGroupCodes));
 	}
 
 	@Test
 	public void whenLoadSchoolFundingGroupCodesIntoRedisCache_DoesNotThrow() {
 		List<SchoolFundingGroupCodeEntity> schoolFundingGroupCodeEntities = Arrays.asList(new SchoolFundingGroupCodeEntity());
+		List<SchoolFundingGroupCode> schoolFundingGroupCodes = Arrays.asList(new SchoolFundingGroupCode());
 		when(this.schoolFundingGroupCodeRedisRepository.saveAll(schoolFundingGroupCodeEntities))
 				.thenReturn(schoolFundingGroupCodeEntities);
-		assertDoesNotThrow(() -> codeService.loadSchoolFundingGroupCodesIntoRedisCache(schoolFundingGroupCodeEntities));
+		assertDoesNotThrow(() -> codeService.loadSchoolFundingGroupCodesIntoRedisCache(schoolFundingGroupCodes));
 	}
 }
