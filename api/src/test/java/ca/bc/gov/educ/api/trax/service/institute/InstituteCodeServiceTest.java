@@ -4,20 +4,17 @@ import ca.bc.gov.educ.api.trax.messaging.NatsConnection;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.trax.model.dto.ResponseObj;
+import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolFundingGroupCode;
 import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolCategoryCodeEntity;
 import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolFundingGroupCodeEntity;
 import ca.bc.gov.educ.api.trax.repository.GradCountryRepository;
 import ca.bc.gov.educ.api.trax.repository.GradProvinceRepository;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.RestUtils;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -31,23 +28,19 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.openMocks;
-
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -184,6 +177,12 @@ public class InstituteCodeServiceTest {
 
 		List<SchoolFundingGroupCodeEntity> result = codeService.getSchoolFundingGroupCodesFromInstituteApi();
 		//assertThat(result).hasSize(1);
+	}
+
+	@Test
+	public void whenLoadSchoolFundingGroupCodesIntoRedisCache_DoesNotThrow() {
+		List<SchoolFundingGroupCodeEntity> schoolFundingGroupCodeEntities = Arrays.asList(new SchoolFundingGroupCodeEntity());
+		assertDoesNotThrow(() -> codeService.loadSchoolFundingGroupCodesIntoRedisCache(schoolFundingGroupCodeEntities));
 	}
 
 }

@@ -91,6 +91,7 @@ public class CodeService {
 	}
 
 	public void loadSchoolFundingGroupCodesIntoRedisCache(List<SchoolFundingGroupCodeEntity> schoolFundingGroupCodes) {
-		schoolFundingGroupCodeRedisRepository.saveAll(schoolFundingGroupCodes);
+		schoolFundingGroupCodeRedisRepository
+				.saveAll(schoolFundingGroupCodes);
 	}
 }
