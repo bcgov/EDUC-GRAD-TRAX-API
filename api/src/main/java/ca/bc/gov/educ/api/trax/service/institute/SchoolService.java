@@ -52,7 +52,7 @@ public class SchoolService {
 			//log.debug("# of Schools: " + schools.size());
 			return  schoolTransformer.transformToDTO(schools);
 		} catch (WebClientResponseException e) {
-			log.warn("Error getting Common School List");
+			log.warn(String.format("Error getting Common School List: %s", e.getMessage()));
 		} catch (Exception e) {
 			log.error(String.format("Error while calling school-api: %s", e.getMessage()));
 		}
@@ -60,7 +60,8 @@ public class SchoolService {
 	}
 
 	public void loadSchoolsIntoRedisCache(List<ca.bc.gov.educ.api.trax.model.dto.institute.School> schools) {
-		schoolRedisRepository.saveAll(schoolTransformer.transformToEntity(schools));
+		schoolRedisRepository
+				.saveAll(schoolTransformer.transformToEntity(schools));
 	}
 
     /*public SchoolDetail getCommonSchoolDetailById(String schoolId, String accessToken) {

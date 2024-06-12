@@ -5,15 +5,15 @@ import ca.bc.gov.educ.api.trax.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.trax.model.dto.ResponseObj;
 import ca.bc.gov.educ.api.trax.model.dto.institute.District;
-import ca.bc.gov.educ.api.trax.model.dto.institute.DistrictContact;
+import ca.bc.gov.educ.api.trax.model.dto.institute.School;
 import ca.bc.gov.educ.api.trax.model.entity.institute.DistrictContactEntity;
 import ca.bc.gov.educ.api.trax.model.entity.institute.DistrictEntity;
-import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolCategoryCodeEntity;
-import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolFundingGroupCodeEntity;
+import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolEntity;
 import ca.bc.gov.educ.api.trax.model.transformer.institute.DistrictTransformer;
+import ca.bc.gov.educ.api.trax.model.transformer.institute.SchoolTransformer;
 import ca.bc.gov.educ.api.trax.repository.GradCountryRepository;
 import ca.bc.gov.educ.api.trax.repository.GradProvinceRepository;
-import ca.bc.gov.educ.api.trax.repository.redis.DistrictRedisRepository;
+import ca.bc.gov.educ.api.trax.repository.redis.SchoolRedisRepository;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.RestUtils;
 import org.junit.Test;
@@ -39,11 +39,8 @@ import reactor.core.publisher.Mono;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Consumer;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -53,15 +50,14 @@ import static org.mockito.Mockito.when;
 @ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings({"unchecked","rawtypes"})
-public class InstituteDistrictServiceTest {
+public class InstituteSchoolServiceTest {
 
 	@Autowired
 	private EducGradTraxApiConstants constants;
 	@Autowired
-	private DistrictService districtService;
+	private SchoolService schoolService;
 	@MockBean
-	private DistrictRedisRepository districtRedisRepository;
-
+	private SchoolRedisRepository schoolRedisRepository;
 	@MockBean
 	@Qualifier("default")
 	WebClient webClientMock;
@@ -76,13 +72,13 @@ public class InstituteDistrictServiceTest {
 	@Mock
 	private ResponseObj responseObjectMock;
 	@Mock
-	private Mono<List<DistrictEntity>> districtEntitiesMock;
+	private Mono<List<SchoolEntity>> schoolEntitiesMock;
 	@Mock
-	private List<District> districtsMock;
+	private List<School> schoolsMock;
 	@MockBean
 	private RestUtils restUtilsMock;
 	@MockBean
-	private DistrictTransformer districtTransformerMock;
+	private SchoolTransformer schoolTransformerMock;
 
 	// NATS
 	@MockBean
@@ -108,17 +104,17 @@ public class InstituteDistrictServiceTest {
 	}
 
 	@Test
-	public void whenGetDistrictsFromInstituteApi_returnsListOfDistricts() {
-		List<DistrictEntity> districts = new ArrayList<>();
-		DistrictEntity district = new DistrictEntity();
+	public void whenGetSchoolsFromInstituteApi_returnsListOfSchools() {
+		List<SchoolEntity> schools = new ArrayList<>();
+		SchoolEntity school = new SchoolEntity();
 
-		district.setDistrictId("ID");
-		district.setDistrictNumber("1234");
-		district.setDistrictStatusCode("SC");
-		district.setDistrictRegionCode("RC");
-		district.setContacts(Arrays.asList(new DistrictContactEntity(), new DistrictContactEntity()));
+		school.setSchoolId("ID");
+		school.setDistrictId("DistID");
+		school.setSchoolNumber("12345");
+		school.setSchoolCategoryCode("SCC");
+		school.setEmail("abc@xyz.ca");
 
-		districts.add(district);
+		schools.add(school);
 
 		ResponseObj tokenObj = new ResponseObj();
 		tokenObj.setAccess_token("123");
@@ -133,22 +129,22 @@ public class InstituteDistrictServiceTest {
 				.thenReturn("AccessToken");
 		when(this.requestHeadersSpecMock.retrieve())
 				.thenReturn(responseSpecMock);
-		when(this.responseSpecMock.bodyToMono(new ParameterizedTypeReference<List<DistrictEntity>>(){}))
-				.thenReturn(districtEntitiesMock);
-		when(this.districtEntitiesMock.block()).thenReturn(districts);
+		when(this.responseSpecMock.bodyToMono(new ParameterizedTypeReference<List<SchoolEntity>>(){}))
+				.thenReturn(schoolEntitiesMock);
+		when(this.schoolEntitiesMock.block()).thenReturn(schools);
 
-		when(this.districtTransformerMock.transformToDTO(districts))
-				.thenReturn(districtsMock);
+		when(this.schoolTransformerMock.transformToDTO(schools))
+				.thenReturn(schoolsMock);
 
-		List<District> result = districtService.getDistrictsFromInstituteApi();
+		List<School> result = schoolService.getSchoolsFromInstituteApi();
 	}
 
 	@Test
-	public void whenLoadDistrictsIntoRedisCache_DoesNotThrow() {
-		List<DistrictEntity> districtEntities = Arrays.asList(new DistrictEntity());
-		List<District> districts = Arrays.asList(new District());
-		when(this.districtRedisRepository.saveAll(districtEntities))
-				.thenReturn(districtEntities);
-		assertDoesNotThrow(() -> districtService.loadDistrictsIntoRedisCache(districts));
+	public void whenLoadSchoolsIntoRedisCache_DoesNotThrow() {
+		List<SchoolEntity> schoolEntities = Arrays.asList(new SchoolEntity());
+		List<School> schools = Arrays.asList(new School());
+		when(this.schoolRedisRepository.saveAll(schoolEntities))
+				.thenReturn(schoolEntities);
+		assertDoesNotThrow(() -> schoolService.loadSchoolsIntoRedisCache(schools));
 	}
 }
