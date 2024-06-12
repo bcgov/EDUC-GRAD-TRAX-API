@@ -38,15 +38,18 @@ public class SchoolService {
 		try {
 			log.debug("****Before Calling Institute API");
 			List<SchoolEntity> schools;
-			schools = webClient.get().uri(constants.getAllSchoolsFromInstituteApiUrl())
+			schools = webClient.get()
+					.uri(constants.getAllSchoolsFromInstituteApiUrl())
 					.headers(h -> {
 						h.setBearerAuth(restUtils.getTokenResponseObject(
-								constants.getInstituteClientId(), constants.getInstituteClientSecret()
+								constants.getInstituteClientId(),
+								constants.getInstituteClientSecret()
 						).getAccess_token());
 					})
-					.retrieve().bodyToMono(new ParameterizedTypeReference<List<SchoolEntity>>(){}).block();
-			assert schools != null;
-			log.debug("# of Schools: " + schools.size());
+					.retrieve()
+					.bodyToMono(new ParameterizedTypeReference<List<SchoolEntity>>(){}).block();
+			//assert schools != null;
+			//log.debug("# of Schools: " + schools.size());
 			return  schoolTransformer.transformToDTO(schools);
 		} catch (WebClientResponseException e) {
 			log.warn("Error getting Common School List");

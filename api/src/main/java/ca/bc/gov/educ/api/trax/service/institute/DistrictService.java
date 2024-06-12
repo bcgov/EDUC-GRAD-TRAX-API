@@ -33,17 +33,20 @@ public class DistrictService {
         try {
             log.debug("****Before Calling Institute API");
             List<DistrictEntity> districts =
-                    webClient.get().uri(constants.getAllDistrictsFromInstituteApiUrl())
+                    webClient.get()
+                            .uri(constants.getAllDistrictsFromInstituteApiUrl())
                             .headers(h -> h.setBearerAuth(restUtils.getTokenResponseObject(
-                                    constants.getInstituteClientId(), constants.getInstituteClientSecret()
+                                    constants.getInstituteClientId(),
+                                    constants.getInstituteClientSecret()
                             ).getAccess_token()))
-                            .retrieve().bodyToMono(new ParameterizedTypeReference<List<DistrictEntity>>() {
+                            .retrieve()
+                            .bodyToMono(new ParameterizedTypeReference<List<DistrictEntity>>() {
                             }).block();
-            assert districts != null;
-            log.debug("# of Districts: " + districts.size());
+            //assert districts != null;
+            //log.debug("# of Districts: " + districts.size());
             return districtTransformer.transformToDTO(districts);
         } catch (WebClientResponseException e) {
-            log.warn("Error getting Common School List");
+            log.warn(String.format("Error getting Common School List: %s", e.getMessage()));
         } catch (Exception e) {
             log.error(String.format("Error while calling school-api: %s", e.getMessage()));
         }

@@ -68,7 +68,7 @@ public class InstituteCodeServiceTest {
 	private GradProvinceRepository gradProvinceRepository;
 
 	@MockBean
-	@Qualifier("traxClient")
+	@Qualifier("default")
 	WebClient webClientMock;
 	@Mock
 	private WebClient.RequestHeadersSpec requestHeadersSpecMock;

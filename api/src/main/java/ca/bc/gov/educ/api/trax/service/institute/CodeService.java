@@ -37,13 +37,17 @@ public class CodeService {
 	public List<SchoolCategoryCodeEntity> getSchoolCategoryCodesFromInstituteApi() {
 		try {
 			log.debug("****Before Calling Institute API");
-			List<SchoolCategoryCodeEntity> schoolCategoryCodes = webClient.get().uri(constants.getAllSchoolCategoryCodesFromInstituteApiUrl())
-					.headers(h -> {
-						h.setBearerAuth(restUtils.getTokenResponseObject(
-								constants.getInstituteClientId(), constants.getInstituteClientSecret()
-						).getAccess_token());
+			List<SchoolCategoryCodeEntity> schoolCategoryCodes =
+					webClient.get()
+							.uri(constants.getAllSchoolCategoryCodesFromInstituteApiUrl())
+							.headers(h -> {
+								h.setBearerAuth(restUtils.getTokenResponseObject(
+										constants.getInstituteClientId(),
+										constants.getInstituteClientSecret()
+								).getAccess_token());
 					})
-					.retrieve().bodyToMono(new ParameterizedTypeReference<List<SchoolCategoryCodeEntity>>() {
+					.retrieve()
+							.bodyToMono(new ParameterizedTypeReference<List<SchoolCategoryCodeEntity>>() {
 					}).block();
 			assert schoolCategoryCodes != null;
             log.debug("# of School Category Codes: " + schoolCategoryCodes.size());
@@ -64,19 +68,22 @@ public class CodeService {
 		try {
 			log.debug("****Before Calling Institute API");
 			List<SchoolFundingGroupCodeEntity> schoolFundingGroupCodes;
-			schoolFundingGroupCodes = webClient.get().uri(constants.getAllSchoolFundingGroupCodesFromInstituteApiUrl())
+			schoolFundingGroupCodes = webClient.get()
+					.uri(constants.getAllSchoolFundingGroupCodesFromInstituteApiUrl())
 					.headers(h -> {
 						h.setBearerAuth(restUtils.getTokenResponseObject(
-								constants.getInstituteClientId(), constants.getInstituteClientSecret()
+								constants.getInstituteClientId(),
+								constants.getInstituteClientSecret()
 						).getAccess_token());
 					})
-					.retrieve().bodyToMono(new ParameterizedTypeReference<List<SchoolFundingGroupCodeEntity>>() {
+					.retrieve()
+					.bodyToMono(new ParameterizedTypeReference<List<SchoolFundingGroupCodeEntity>>() {
 					}).block();
-			assert schoolFundingGroupCodes != null;
-			log.debug("# of School Funding Group Codes: " + schoolFundingGroupCodes.size());
+			//assert schoolFundingGroupCodes != null;
+			//log.debug("# of School Funding Group Codes: " + schoolFundingGroupCodes.size());
 			return schoolFundingGroupCodes;
 		} catch (WebClientResponseException e) {
-			log.warn("Error getting School Funding Group Codes");
+			log.warn(String.format("Error getting School Funding Group Codes: %s", e.getMessage()));
 		} catch (Exception e) {
 			log.error(String.format("Error while calling school-api: %s", e.getMessage()));
 		}
