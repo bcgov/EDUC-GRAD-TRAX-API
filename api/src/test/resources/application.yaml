@@ -72,6 +72,11 @@ nats:
   maxReconnect: 60
   connectionName: GRAD-TRAX-API
 
+#Redis
+redis:
+  url: '127.0.0.1'
+  port: '6379'
+
 #Scheduler
 cron:
   scheduled:

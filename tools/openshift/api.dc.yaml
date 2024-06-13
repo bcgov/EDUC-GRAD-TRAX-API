@@ -70,6 +70,8 @@ objects:
                     name: grad-client-secret
                 - secretRef:
                     name: trax-client-secret
+                - secretRef:
+                    name: redis-cache-secret
               resources:
                 requests:
                   cpu: "${MIN_CPU}"

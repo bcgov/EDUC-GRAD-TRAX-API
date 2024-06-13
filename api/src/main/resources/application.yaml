@@ -125,6 +125,11 @@ nats:
   maxReconnect: ${NATS_MAX_RECONNECT}
   connectionName: GRAD-TRAX-API
 
+#Redis
+redis:
+  url: ${REDIS_URL}
+  port: ${REDIS_PORT}
+
 #Scheduler
 cron:
   scheduled:

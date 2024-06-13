@@ -131,6 +131,12 @@ public class EducGradTraxApiConstants {
     @Value("${nats.connectionName}")
     private String connectionName;
 
+    @Value("${redis.url}")
+    private String redisUrl;
+
+    @Value("${redis.port}")
+    private String redisPort;
+
     // Incremental Trax Update
     @Value("${trax.update.enabled}")
     private boolean traxUpdateEnabled;

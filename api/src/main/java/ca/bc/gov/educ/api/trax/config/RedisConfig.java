@@ -1,5 +1,7 @@
 package ca.bc.gov.educ.api.trax.config;
 
+import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
@@ -13,11 +15,13 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 @EnableRedisRepositories("ca.bc.gov.educ.api.trax.repository.redis")
 public class RedisConfig {
+    @Autowired
+    private EducGradTraxApiConstants constants;
     @Bean
     public JedisConnectionFactory jedisConnectionFactory() {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
-        redisStandaloneConfiguration.setHostName("127.0.0.1");
-        redisStandaloneConfiguration.setPort(6379);
+        redisStandaloneConfiguration.setHostName(constants.getRedisUrl());
+        redisStandaloneConfiguration.setPort(Integer.parseInt(constants.getRedisPort()));
         return new JedisConnectionFactory(redisStandaloneConfiguration);
     }
 
