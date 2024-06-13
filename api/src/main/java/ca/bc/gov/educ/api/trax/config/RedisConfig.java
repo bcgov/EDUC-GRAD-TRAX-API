@@ -26,10 +26,10 @@ public class RedisConfig {
         redisStandaloneConfiguration.setPort(Integer.parseInt(constants.getRedisPort()));
         redisStandaloneConfiguration.setPassword(constants.getRedisSecret());
 
-        //Cluster Configuration
+        /*//Cluster Configuration
         RedisClusterConfiguration redisClusterConfiguration = new RedisClusterConfiguration();
         RedisNode node0 = new RedisNode(constants.getRedisUrl(), Integer.parseInt(constants.getRedisPort()));
-        redisClusterConfiguration.addClusterNode(node0);
+        redisClusterConfiguration.addClusterNode(node0);*/
 
         return new JedisConnectionFactory(redisStandaloneConfiguration);
     }
