@@ -137,6 +137,9 @@ public class EducGradTraxApiConstants {
     @Value("${redis.port}")
     private String redisPort;
 
+    @Value("${redis.secret}")
+    private String redisSecret;
+
     // Incremental Trax Update
     @Value("${trax.update.enabled}")
     private boolean traxUpdateEnabled;
