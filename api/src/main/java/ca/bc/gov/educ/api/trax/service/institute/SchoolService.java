@@ -115,21 +115,4 @@ public class SchoolService {
         }
         return schoolDetails;
     }*/
-
-    /*public String getAccessToken() {
-        String token = "";
-        try {
-            OAuthClient client = new OAuthClient(new URLConnectionClient());
-            OAuthClientRequest request = OAuthClientRequest.tokenLocation(constants.getTokenUrl())
-                    .setGrantType(GrantType.CLIENT_CREDENTIALS)
-                    .setClientId(constants.getInstituteClientId())
-                    .setClientSecret(constants.getInstituteClientSecret())
-                    .buildBodyMessage();
-
-            token = client.accessToken(request, OAuth.HttpMethod.POST, OAuthJSONAccessTokenResponse.class).getAccessToken();
-        } catch (Exception exn) {
-            exn.printStackTrace();
-        }
-        return token;
-    }*/
 }

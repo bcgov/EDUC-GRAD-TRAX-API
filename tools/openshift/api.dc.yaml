@@ -71,6 +71,8 @@ objects:
                 - secretRef:
                     name: trax-client-secret
                 - secretRef:
+                    name: edx-grad-client-secret
+                - secretRef:
                     name: redis-cache-secret
               resources:
                 requests:
