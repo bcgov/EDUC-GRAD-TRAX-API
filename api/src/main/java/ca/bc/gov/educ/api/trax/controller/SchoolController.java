@@ -24,7 +24,7 @@ import java.util.List;
 @CrossOrigin
 @RestController
 @Slf4j
-@RequestMapping(EducGradTraxApiConstants.GRAD_SCHOOL_URL_MAPPING)
+//@RequestMapping(EducGradTraxApiConstants.GRAD_SCHOOL_URL_MAPPING)
 @OpenAPIDefinition(info = @Info(title = "API for School Data.", description = "This Read API is for Reading school data.", version = "1"),
 		security = {@SecurityRequirement(name = "OAUTH2", scopes = {"READ_GRAD_SCHOOL_DATA"})})
 public class SchoolController {
@@ -43,7 +43,7 @@ public class SchoolController {
         this.response = response;
     }
 
-    @GetMapping
+    @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_URL_MAPPING_V1)
     @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
     @Operation(summary = "Find All Schools", description = "Get All Schools", tags = { "School" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
@@ -51,9 +51,9 @@ public class SchoolController {
     	log.debug("getAllSchools : ");
         return schoolService.getSchoolList();
     }
+
     
-    
-    @GetMapping(EducGradTraxApiConstants.GET_SCHOOL_BY_CODE_MAPPING)
+    @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_URL_MAPPING_V1 + EducGradTraxApiConstants.GET_SCHOOL_BY_CODE_MAPPING)
     @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
     @Operation(summary = "Find a School by Mincode", description = "Get a School by Mincode", tags = { "School" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
@@ -68,7 +68,7 @@ public class SchoolController {
     	}
     }
 
-    @GetMapping(EducGradTraxApiConstants.GET_COMMON_SCHOOLS)
+    @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_URL_MAPPING_V1 + EducGradTraxApiConstants.GET_COMMON_SCHOOLS)
     @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
     @Operation(summary = "Get all common schools", description = "Get a list of all common schools", tags = { "School" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
@@ -76,7 +76,7 @@ public class SchoolController {
         return response.GET(schoolService.getCommonSchools());
     }
 
-    @GetMapping(EducGradTraxApiConstants.GET_COMMON_SCHOOL_BY_CODE_MAPPING)
+    @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_URL_MAPPING_V1 + EducGradTraxApiConstants.GET_COMMON_SCHOOL_BY_CODE_MAPPING)
     @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
     @Operation(summary = "Find a Common School by Mincode", description = "Get a Common School by Mincode", tags = { "School" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
@@ -90,7 +90,7 @@ public class SchoolController {
         }
     }
     
-    @GetMapping(EducGradTraxApiConstants.GET_SCHOOL_SEARCH_MAPPING)
+    @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_URL_MAPPING_V1 + EducGradTraxApiConstants.GET_SCHOOL_SEARCH_MAPPING)
     @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
     @Operation(summary = "Search for a school", description = "Search for a School", tags = { "School" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
@@ -103,7 +103,7 @@ public class SchoolController {
 		return response.GET(schoolService.getSchoolsByParams(schoolName, mincode, district, accessToken.replace(BEARER, "")));
     }
 
-    @GetMapping(EducGradTraxApiConstants.CHECK_SCHOOL_BY_CODE_MAPPING)
+    @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_URL_MAPPING_V1 + EducGradTraxApiConstants.CHECK_SCHOOL_BY_CODE_MAPPING)
     @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
     @Operation(summary = "Check school existence by Mincode", description = "Check school existence by Mincode", tags = { "School" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
@@ -112,7 +112,7 @@ public class SchoolController {
         return response.GET(schoolService.existsSchool(minCode));
     }
 
-    @GetMapping(EducGradTraxApiConstants.GET_SCHOOLS_BY_SCHOOL_CATEGORY_MAPPING)
+    @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_URL_MAPPING_V1 + EducGradTraxApiConstants.GET_SCHOOLS_BY_SCHOOL_CATEGORY_MAPPING)
     @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
     @Operation(summary = "Check school existence by Mincode", description = "Check school existence by Mincode", tags = { "School" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
