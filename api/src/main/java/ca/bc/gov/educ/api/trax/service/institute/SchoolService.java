@@ -1,8 +1,12 @@
 package ca.bc.gov.educ.api.trax.service.institute;
 
 import ca.bc.gov.educ.api.trax.model.dto.institute.School;
+import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolDetail;
+import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolDetailEntity;
 import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolEntity;
+import ca.bc.gov.educ.api.trax.model.transformer.institute.SchoolDetailTransformer;
 import ca.bc.gov.educ.api.trax.model.transformer.institute.SchoolTransformer;
+import ca.bc.gov.educ.api.trax.repository.redis.SchoolDetailRedisRepository;
 import ca.bc.gov.educ.api.trax.repository.redis.SchoolRedisRepository;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.RestUtils;
@@ -21,16 +25,16 @@ public class SchoolService {
 
 	@Autowired
 	private EducGradTraxApiConstants constants;
-
 	@Autowired
 	private WebClient webClient;
-
 	@Autowired
 	SchoolRedisRepository schoolRedisRepository;
-
+	@Autowired
+	SchoolDetailRedisRepository schoolDetailRedisRepository;
 	@Autowired
 	SchoolTransformer schoolTransformer;
-
+	@Autowired
+	SchoolDetailTransformer schoolDetailTransformer;
 	@Autowired
 	private RestUtils restUtils;
 
@@ -54,7 +58,7 @@ public class SchoolService {
 		} catch (WebClientResponseException e) {
 			log.warn(String.format("Error getting Common School List: %s", e.getMessage()));
 		} catch (Exception e) {
-			log.error(String.format("Error while calling school-api: %s", e.getMessage()));
+			log.error(String.format("Error getting data from Redis cache: %s", e.getMessage()));
 		}
 		return null;
 	}
@@ -62,6 +66,25 @@ public class SchoolService {
 	public void loadSchoolsIntoRedisCache(List<ca.bc.gov.educ.api.trax.model.dto.institute.School> schools) {
 		schoolRedisRepository
 				.saveAll(schoolTransformer.transformToEntity(schools));
+	}
+
+	public List<School> getSchoolsFromRedisCache() {
+			log.debug("**** Getting schools from Redis Cache.");
+			return  schoolTransformer.transformToDTO(schoolRedisRepository.findAll());
+	}
+
+	public List<SchoolDetail> getSchoolDetailsFromInstituteApi() {
+		try {
+			return schoolDetailTransformer.transformToDTO(schoolDetailRedisRepository.findAll());
+		} catch (Exception e) {
+			log.error(String.format("Error getting data from Redis cache: %s", e.getMessage()));
+		}
+		return null;
+	}
+
+	public List<SchoolDetail> getSchoolDetailsFromRedisCache() {
+		log.debug("**** Getting school Details from Redis Cache.");
+		return schoolDetailTransformer.transformToDTO(schoolDetailRedisRepository.findAll());
 	}
 
     /*public SchoolDetail getCommonSchoolDetailById(String schoolId, String accessToken) {
