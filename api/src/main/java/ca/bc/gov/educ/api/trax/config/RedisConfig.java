@@ -24,7 +24,7 @@ public class RedisConfig {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
         redisStandaloneConfiguration.setHostName(constants.getRedisUrl());
         redisStandaloneConfiguration.setPort(Integer.parseInt(constants.getRedisPort()));
-        //redisStandaloneConfiguration.setPassword(constants.getRedisSecret());
+        redisStandaloneConfiguration.setPassword(constants.getRedisSecret());
 
         /*//Cluster Configuration
         RedisClusterConfiguration redisClusterConfiguration = new RedisClusterConfiguration();
