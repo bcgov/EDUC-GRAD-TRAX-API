@@ -68,6 +68,7 @@ oc create -n "$GRAD_NAMESPACE"-"$envValue" configmap "$APP_NAME"-config-map \
   --from-literal=ENABLE_FLYWAY="true" \
   --from-literal=ENABLE_TRAX_UPDATE="true" \
   --from-literal=KEYCLOAK_TOKEN_URL="https://soam-$envValue.apps.silver.devops.gov.bc.ca/" \
+  --from-literal=INSTITUTE_API_URL_ROOT="https://institute-api-$COMMON_NAMESPACE-$envValue.apps.silver.devops.gov.bc.ca/" \
   --from-literal=MAX_RETRY_ATTEMPTS="3" \
   --from-literal=SCHOOL_CACHE_EXPIRY_IN_MINS="240" \
   --dry-run=client -o yaml | oc apply -f -
