@@ -8,6 +8,7 @@ import ca.bc.gov.educ.api.trax.model.transformer.GradCountryTransformer;
 import ca.bc.gov.educ.api.trax.model.transformer.GradProvinceTransformer;
 import ca.bc.gov.educ.api.trax.repository.GradCountryRepository;
 import ca.bc.gov.educ.api.trax.repository.GradProvinceRepository;
+import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.GradValidation;
 import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.StringUtils;
@@ -16,10 +17,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-
 import java.util.List;
 import java.util.Optional;
+import ca.bc.gov.educ.api.trax.util.RestUtils;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 public class CodeService {
 
@@ -37,9 +40,15 @@ public class CodeService {
 
 	@Autowired
 	GradValidation validation;
-	
+
 	@Autowired
-    WebClient webClient;
+	private EducGradTraxApiConstants constants;
+
+	@Autowired
+	private WebClient webClient;
+
+	@Autowired
+	private RestUtils restUtils;
 
 	private static Logger logger = LoggerFactory.getLogger(CodeService.class);
 	private static final String EXCEPTION_MSG = "Exception: %s";

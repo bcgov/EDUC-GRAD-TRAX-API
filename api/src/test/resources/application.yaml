@@ -1,7 +1,5 @@
 #DB Properties
 spring:
-  main:
-    allow-bean-definition-overriding: true
   jmx:
     enabled: false
   datasource:
@@ -64,12 +62,20 @@ logging:
 authorization:
   user: batch-api
   password: abc
+  institute-api:
+    client-id: edx-grad-client-name
+    client-secret: xyz
 
 #NATS
 nats:
   url: test
   maxReconnect: 60
   connectionName: GRAD-TRAX-API
+
+#Redis
+redis:
+  url: '127.0.0.1'
+  port: '6379'
 
 #Scheduler
 cron:
@@ -109,12 +115,23 @@ splunk:
 #Endpoint properties
 endpoint:
   keycloak:
-    getToken: https://soam-tools.apps.silver.devops.gov.bc.ca/auth/realms/master/protocol/openid-connect/token
+    getToken: https://soam-dev.apps.silver.devops.gov.bc.ca/auth/realms/master/protocol/openid-connect/token
   educ-school-api:
     get-school-by-mincode:
       url: https://school-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/schools/%s
     get-all-schools:
       url: https://school-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/schools
+  institute-api:
+    get-all-schools:
+      url: https://school-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/institute/school
+    get-school-details-by-id:
+      url: https://school-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/institute/school/%s
+    get-all-districts:
+      url: https://school-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/institute/district
+    get-all-school-category-codes:
+      url: https://school-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/institute/category-codes
+    get-all-school-funding-group-codes:
+      url: https://school-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/institute/funding-group-codes
 
 # other properties
 props:

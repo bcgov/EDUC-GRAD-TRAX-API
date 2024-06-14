@@ -23,21 +23,29 @@ public class EducGradTraxApiConstants {
     public static final String CORRELATION_ID = "correlationID";
 
     //API end-point Mapping constants
-    public static final String API_ROOT_MAPPING = "";
-    public static final String API_VERSION = "v1";
+    public static final String API_VERSION_V1 = "/api/v1";
+    public static final String API_VERSION_V2 = "/api/v2";
 
     // API Root Mapping
-    public static final String GRAD_TRAX_API_ROOT_MAPPING = "/api/" + API_VERSION+"/trax";
+    public static final String GRAD_TRAX_API_ROOT_MAPPING_V1 = API_VERSION_V1+"/trax";
+    public static final String GRAD_TRAX_API_ROOT_MAPPING_V2 = API_VERSION_V2+"/trax";
 
     // Controller Mappings
     public static final String GET_COMMON_SCHOOLS = "/common";
-    public static final String GRAD_TRAX_CODE_URL_MAPPING = GRAD_TRAX_API_ROOT_MAPPING + "/code";
-    public static final String GRAD_SCHOOL_URL_MAPPING = GRAD_TRAX_API_ROOT_MAPPING + "/school";
-    public static final String GRAD_DISTRICT_URL_MAPPING = GRAD_TRAX_API_ROOT_MAPPING + "/district";
-    public static final String GRAD_PSI_URL_MAPPING = GRAD_TRAX_API_ROOT_MAPPING + "/psi";
-    public static final String GRAD_TRAX_COMMON_URL_MAPPING = GRAD_TRAX_API_ROOT_MAPPING + GET_COMMON_SCHOOLS;
-    public static final String GRAD_TSW_URL_MAPPING = GRAD_TRAX_API_ROOT_MAPPING + "/tsw";
-    public static final String GRAD_EDW_URL_MAPPING = GRAD_TRAX_API_ROOT_MAPPING + "/edw";
+    public static final String GRAD_TRAX_CODE_URL_MAPPING_V1 =  GRAD_TRAX_API_ROOT_MAPPING_V1 + "/code";
+    public static final String GRAD_TRAX_CODE_URL_MAPPING_V2 =  GRAD_TRAX_API_ROOT_MAPPING_V2 + "/code";
+    public static final String GRAD_SCHOOL_URL_MAPPING_V1 = GRAD_TRAX_API_ROOT_MAPPING_V1 + "/school";
+    public static final String GRAD_SCHOOL_URL_MAPPING_V2 = GRAD_TRAX_API_ROOT_MAPPING_V2 + "/school";
+    public static final String GRAD_DISTRICT_URL_MAPPING_V1 = GRAD_TRAX_API_ROOT_MAPPING_V1 + "/district";
+    public static final String GRAD_DISTRICT_URL_MAPPING_V2 = GRAD_TRAX_API_ROOT_MAPPING_V2 + "/district";
+    public static final String GRAD_PSI_URL_MAPPING_V1 = GRAD_TRAX_API_ROOT_MAPPING_V1 + "/psi";
+    public static final String GRAD_PSI_URL_MAPPING_V2 = GRAD_TRAX_API_ROOT_MAPPING_V2 + "/psi";
+    public static final String GRAD_TRAX_COMMON_URL_MAPPING_V1 = GRAD_TRAX_API_ROOT_MAPPING_V1 + GET_COMMON_SCHOOLS;
+    public static final String GRAD_TRAX_COMMON_URL_MAPPING_V2 = GRAD_TRAX_API_ROOT_MAPPING_V2 + GET_COMMON_SCHOOLS;
+    public static final String GRAD_TSW_URL_MAPPING_V1 = GRAD_TRAX_API_ROOT_MAPPING_V1 + "/tsw";
+    public static final String GRAD_TSW_URL_MAPPING_V2 = GRAD_TRAX_API_ROOT_MAPPING_V2 + "/tsw";
+    public static final String GRAD_EDW_URL_MAPPING_V1 = GRAD_TRAX_API_ROOT_MAPPING_V1 + "/edw";
+    public static final String GRAD_EDW_URL_MAPPING_V2 = GRAD_TRAX_API_ROOT_MAPPING_V2 + "/edw";
 
 
     // Service Methods Mappings
@@ -100,6 +108,12 @@ public class EducGradTraxApiConstants {
     @Value("${endpoint.keycloak.getToken}")
     private String tokenUrl;
 
+    @Value("${authorization.institute-api.client-id}")
+    private String instituteClientId;
+
+    @Value("${authorization.institute-api.client-secret}")
+    private String instituteClientSecret;
+
     //NAT
     /**
      * The Server.
@@ -117,6 +131,12 @@ public class EducGradTraxApiConstants {
     @Value("${nats.connectionName}")
     private String connectionName;
 
+    @Value("${redis.url}")
+    private String redisUrl;
+
+    @Value("${redis.port}")
+    private String redisPort;
+
     // Incremental Trax Update
     @Value("${trax.update.enabled}")
     private boolean traxUpdateEnabled;
@@ -130,6 +150,21 @@ public class EducGradTraxApiConstants {
 
     @Value("${endpoint.educ-school-api.get-all-schools.url}")
     private String allSchoolSchoolApiUrl;
+
+    @Value("${endpoint.institute-api.get-all-schools.url}")
+    private String allSchoolsFromInstituteApiUrl;
+
+    @Value("${endpoint.institute-api.get-school-details-by-id.url}")
+    private String schoolDetailsByIdFromInstituteApiUrl;
+
+    @Value("${endpoint.institute-api.get-all-districts.url}")
+    private String allDistrictsFromInstituteApiUrl;
+
+    @Value("${endpoint.institute-api.get-all-school-category-codes.url}")
+    private String allSchoolCategoryCodesFromInstituteApiUrl;
+
+    @Value("${endpoint.institute-api.get-all-school-funding-group-codes.url}")
+    private String allSchoolFundingGroupCodesFromInstituteApiUrl;
 
     // Scheduler: ongoing updates from TRAX to GRAD
     @Value("${cron.scheduled.process.events.trax-to-grad.run}")
