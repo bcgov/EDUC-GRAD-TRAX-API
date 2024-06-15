@@ -2,7 +2,6 @@ package ca.bc.gov.educ.api.trax.service.institute;
 
 import ca.bc.gov.educ.api.trax.model.dto.institute.School;
 import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolDetail;
-import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolDetailEntity;
 import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolEntity;
 import ca.bc.gov.educ.api.trax.model.transformer.institute.SchoolDetailTransformer;
 import ca.bc.gov.educ.api.trax.model.transformer.institute.SchoolTransformer;
@@ -17,10 +16,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-import redis.clients.jedis.Jedis;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Slf4j
 @Service("InstituteSchoolService")
@@ -63,7 +61,7 @@ public class SchoolService {
 		} catch (WebClientResponseException e) {
 			log.warn(String.format("Error getting Common School List: %s", e.getMessage()));
 		} catch (Exception e) {
-			log.error(String.format("Error getting data from Redis cache: %s", e.getMessage()));
+			log.error(String.format("Error getting data from Institute api: %s", e.getMessage()));
 		}
 		return null;
 	}
@@ -98,13 +96,59 @@ public class SchoolService {
 		}
 	}
 
-	public List<SchoolDetail> getSchoolDetailsFromInstituteApi() {
-		try {
-			return schoolDetailTransformer.transformToDTO(schoolDetailRedisRepository.findAll());
-		} catch (Exception e) {
-			log.error(String.format("Error getting data from Redis cache: %s", e.getMessage()));
-		}
-		return null;
+	public SchoolDetail getSchoolDetailByIdFromInstituteApi(String schoolId) {
+		return getSchoolDetailByIdFromInstituteApi(schoolId, "");
+	}
+
+    public SchoolDetail getSchoolDetailByIdFromInstituteApi(String schoolId, String accessToken) {
+        try {
+            return webClient.get().uri(
+                            String.format(constants.getSchoolDetailsByIdFromInstituteApiUrl(), schoolId))
+                    .headers(h -> {
+						if (accessToken.isEmpty() || accessToken.isBlank()) {
+							h.setBearerAuth(restUtils.getTokenResponseObject(
+									constants.getInstituteClientId(),
+									constants.getInstituteClientSecret()
+							).getAccess_token());
+						} else {
+							h.setBearerAuth(accessToken);
+						}
+                    })
+                    .retrieve().bodyToMono(SchoolDetail.class).block();
+        } catch (WebClientResponseException e) {
+            log.warn("Error getting School Details");
+        } catch (Exception e) {
+            log.error(String.format("Error while calling Institute api: %s", e.getMessage()));
+        }
+        return null;
+    }
+
+    public List<SchoolDetail> getSchoolDetailsFromInstituteApi() {
+
+		String accessToken = "";
+        List<School> schools = getSchoolsFromRedisCache();
+        List<SchoolDetail> schoolDetails = new ArrayList<SchoolDetail>();
+
+        int counter = 1;
+
+        for (School s : schools) {
+            SchoolDetail sd = new SchoolDetail();
+
+            if (counter%200 == 0)
+                accessToken = restUtils.getTokenResponseObject(
+						constants.getInstituteClientId(),
+						constants.getInstituteClientSecret()
+				).getAccess_token();
+            sd = getSchoolDetailByIdFromInstituteApi(s.getSchoolId(), accessToken);
+            schoolDetails.add(sd);
+            counter++;
+        }
+        return schoolDetails;
+    }
+
+	public void loadSchoolDetailsIntoRedisCache(List<SchoolDetail> schoolDetails) {
+		schoolDetailRedisRepository
+				.saveAll(schoolDetailTransformer.transformToEntity(schoolDetails));
 	}
 
 	public List<SchoolDetail> getSchoolDetailsFromRedisCache() {
@@ -112,55 +156,24 @@ public class SchoolService {
 		return schoolDetailTransformer.transformToDTO(schoolDetailRedisRepository.findAll());
 	}
 
-    /*public SchoolDetail getCommonSchoolDetailById(String schoolId, String accessToken) {
-        try {
-            return webClient.get().uri(
-                            String.format(constants.getSchoolDetailsByIdFromInstituteApiUrl(), schoolId))
-                    .headers(h -> {
-                        h.setBearerAuth(accessToken);
-                    })
-                    .retrieve().bodyToMono(SchoolDetail.class).block();
-        } catch (WebClientResponseException e) {
-            logger.warn("Error getting Common School Details");
-        } catch (Exception e) {
-            logger.error(String.format("Error while calling school-api: %s", e.getMessage()));
-        }
-        return null;
-    }*/
+	public void initializeSchoolDetailCache(boolean force) {
+		String cacheStatus = redisTemplate.opsForValue().get("SCHOOL_DETAIL_CACHE");
+		cacheStatus = cacheStatus == null ? "" : cacheStatus;
+		if ("READY".compareToIgnoreCase(cacheStatus) == 0) {
+			log.info("SCHOOL_DETAIL_CACHE status: READY");
+			if (force) {
+				log.info("Force Flag is true. Reloading SCHOOL_DETAIL_CACHE...");
+				loadSchoolDetailsIntoRedisCache(getSchoolDetailsFromInstituteApi());
+				log.info("SUCCESS! - SCHOOL_DETAIL_CACHE is now READY");
+			} else {
+				log.info("Force Flag is false. Skipping SCHOOL_DETAIL_CACHE reload");
+			}
+		} else {
+			log.info("Loading SCHOOL_DETAIL_CACHE...");
+			loadSchoolDetailsIntoRedisCache(getSchoolDetailsFromInstituteApi());
+			redisTemplate.opsForValue().set("SCHOOL_DETAIL_CACHE", "READY");
+			log.info("SUCCESS! - SCHOOL_DETAIL_CACHE is now READY");
+		}
+	}
 
-    /*public List<SchoolDetail> getAllSchoolDetails() {
-
-        String accessToken = getAccessToken();
-        List<School> schools = getCommonSchools(accessToken);
-        List<SchoolDetail> schoolDetails = new ArrayList<SchoolDetail>();
-        Address address = new Address();
-        int counter = 1;
-
-        for (School s : schools) {
-            SchoolDetail sd = new SchoolDetail();
-
-            if (counter%100 == 0)
-                accessToken = getAccessToken();
-            sd = getCommonSchoolDetailById(s.getSchoolId(), accessToken);
-
-            address = null;
-            if (sd.getAddresses() == null || sd.getAddresses().isEmpty()) {
-                logger.debug("," + sd.getMincode() + "," + "," + "," + "," + "," + "," + "," + ",");
-            } else {
-                address = sd.getAddresses().get(0);
-                logger.debug("," + sd.getMincode() + ","
-                        + sd.getAddresses().get(0).getAddressLine1() + ","
-                        + sd.getAddresses().get(0).getAddressLine2() + ","
-                        + sd.getAddresses().get(0).getCity() + ","
-                        + sd.getAddresses().get(0).getProvinceCode() + ","
-                        + sd.getAddresses().get(0).getCountryCode() + ","
-                        + sd.getAddresses().get(0).getPostal() + ","
-                        + sd.getAddresses().get(0).getAddressTypeCode() + ","
-                );
-            }
-            schoolDetails.add(sd);
-            counter++;
-        }
-        return schoolDetails;
-    }*/
 }

@@ -28,10 +28,6 @@ public class DistrictController {
 
     @Autowired
     DistrictService districtService;
-    
-    @Autowired
-    GradValidation validation;
-    
     @Autowired
 	ResponseHelper response;
 
