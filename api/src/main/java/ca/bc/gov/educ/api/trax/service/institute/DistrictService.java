@@ -10,12 +10,14 @@ import ca.bc.gov.educ.api.trax.util.RestUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import redis.clients.jedis.Jedis;
 
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service("InstituteDistrictService")
@@ -32,7 +34,7 @@ public class DistrictService {
     @Autowired
     DistrictTransformer districtTransformer;
     @Autowired
-    Jedis jedis;
+    RedisTemplate<String, String> redisTemplate;
 
     public List<District> getDistrictsFromInstituteApi() {
         try {
@@ -69,7 +71,7 @@ public class DistrictService {
     }
 
     public void initializeDistrictCache(boolean force) {
-        if ("READY".compareToIgnoreCase(jedis.get("DISTRICT_CACHE")) == 0) {
+        if ("READY".compareToIgnoreCase(Objects.requireNonNull(redisTemplate.opsForValue().get("DISTRICT_CACHE"))) == 0) {
             log.info("DISTRICT_CACHE status: READY");
             if (force) {
                 log.info("Force Flag is true. Reloading DISTRICT_CACHE...");
@@ -81,7 +83,7 @@ public class DistrictService {
         } else {
             log.info("Loading DISTRICT_CACHE...");
             loadDistrictsIntoRedisCache(getDistrictsFromInstituteApi());
-            jedis.set("DISTRICT_CACHE", "READY");
+            redisTemplate.opsForValue().set("DISTRICT_CACHE", "READY");
             log.info("SUCCESS! - DISTRICT_CACHE is now READY");
         }
     }

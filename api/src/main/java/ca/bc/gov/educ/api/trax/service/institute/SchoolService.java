@@ -20,6 +20,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import redis.clients.jedis.Jedis;
 
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service("InstituteSchoolService")
@@ -40,7 +41,7 @@ public class SchoolService {
 	@Autowired
 	private RestUtils restUtils;
 	@Autowired
-	Jedis jedis;
+	RedisTemplate<String, String> redisTemplate;
 
 	public List<School> getSchoolsFromInstituteApi() {
 		try {
@@ -78,7 +79,7 @@ public class SchoolService {
 	}
 
 	public void initializeSchoolCache(boolean force) {
-		if ("READY".compareToIgnoreCase(jedis.get("SCHOOL_CACHE")) == 0) {
+		if ("READY".compareToIgnoreCase(Objects.requireNonNull(redisTemplate.opsForValue().get("SCHOOL_CACHE"))) == 0) {
 			log.info("SCHOOL_CACHE status: READY");
 			if (force) {
 				log.info("Force Flag is true. Reloading SCHOOL_CACHE...");
@@ -90,7 +91,7 @@ public class SchoolService {
 		} else {
 			log.info("Loading SCHOOL_CACHE...");
 			loadSchoolsIntoRedisCache(getSchoolsFromInstituteApi());
-			jedis.set("SCHOOL_CACHE", "READY");
+			redisTemplate.opsForValue().set("SCHOOL_CACHE", "READY");
 			log.info("SUCCESS! - SCHOOL_CACHE is now READY");
 		}
 	}

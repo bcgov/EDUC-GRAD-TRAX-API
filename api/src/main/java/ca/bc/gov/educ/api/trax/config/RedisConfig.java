@@ -52,6 +52,4 @@ public class RedisConfig {
         return template;
     }
 
-    @Bean
-    public Jedis jedis() {return new Jedis();}
 }
