@@ -1,5 +1,7 @@
 package ca.bc.gov.educ.api.trax.service.institute;
 
+import ca.bc.gov.educ.api.trax.constant.CacheKey;
+import ca.bc.gov.educ.api.trax.constant.CacheStatus;
 import ca.bc.gov.educ.api.trax.model.dto.institute.District;
 import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolCategoryCode;
 import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolFundingGroupCode;
@@ -81,21 +83,25 @@ public class CodeService {
 	}
 
 	public void initializeSchoolCategoryCodeCache(boolean force) {
-		String cacheStatus = redisTemplate.opsForValue().get("SCHOOL_CATEGORY_CODE_CACHE");
+		String cacheStatus = redisTemplate.opsForValue().get(CacheKey.SCHOOL_CATEGORY_CODE_CACHE.name());
 		cacheStatus = cacheStatus == null ? "" : cacheStatus;
-		if ("READY".compareToIgnoreCase(cacheStatus) == 0) {
+		if (CacheStatus.LOADING.name().compareToIgnoreCase(cacheStatus) == 0
+				|| CacheStatus.READY.name().compareToIgnoreCase(cacheStatus) == 0) {
 			log.info("SCHOOL_CATEGORY_CODE_CACHE status: READY");
 			if (force) {
 				log.info("Force Flag is true. Reloading SCHOOL_CATEGORY_CODE_CACHE...");
+				redisTemplate.opsForValue().set(CacheKey.SCHOOL_CATEGORY_CODE_CACHE.name(), CacheStatus.LOADING.name());
 				loadSchoolCategoryCodesIntoRedisCache(getSchoolCategoryCodesFromInstituteApi());
+				redisTemplate.opsForValue().set(CacheKey.SCHOOL_CATEGORY_CODE_CACHE.name(), CacheStatus.READY.name());
 				log.info("SUCCESS! - SCHOOL_CATEGORY_CODE_CACHE is now READY");
 			} else {
 				log.info("Force Flag is false. Skipping SCHOOL_CATEGORY_CODE_CACHE reload");
 			}
 		} else {
 			log.info("Loading SCHOOL_CATEGORY_CODE_CACHE...");
+			redisTemplate.opsForValue().set(CacheKey.SCHOOL_CATEGORY_CODE_CACHE.name(), CacheStatus.LOADING.name());
 			loadSchoolCategoryCodesIntoRedisCache(getSchoolCategoryCodesFromInstituteApi());
-			redisTemplate.opsForValue().set("SCHOOL_CATEGORY_CODE_CACHE", "READY");
+			redisTemplate.opsForValue().set(CacheKey.SCHOOL_CATEGORY_CODE_CACHE.name(), CacheStatus.READY.name());
 			log.info("SUCCESS! - SCHOOL_CATEGORY_CODE_CACHE is now READY");
 		}
 	}
@@ -137,21 +143,25 @@ public class CodeService {
 	}
 
 	public void initializeSchoolFundingGroupCodeCache(boolean force) {
-		String cacheStatus = redisTemplate.opsForValue().get("SCHOOL_FUNDING_GROUP_CODE_CACHE");
+		String cacheStatus = redisTemplate.opsForValue().get(CacheKey.SCHOOL_FUNDING_GROUP_CODE_CACHE.name());
 		cacheStatus = cacheStatus == null ? "" : cacheStatus;
-		if ("READY".compareToIgnoreCase(cacheStatus) == 0) {
+		if (CacheStatus.LOADING.name().compareToIgnoreCase(cacheStatus) == 0
+				|| CacheStatus.READY.name().compareToIgnoreCase(cacheStatus) == 0) {
 			log.info("SCHOOL_FUNDING_GROUP_CODE_CACHE status: READY");
 			if (force) {
 				log.info("Force Flag is true. Reloading SCHOOL_FUNDING_GROUP_CODE_CACHE...");
+				redisTemplate.opsForValue().set(CacheKey.SCHOOL_FUNDING_GROUP_CODE_CACHE.name(), CacheStatus.LOADING.name());
 				loadSchoolFundingGroupCodesIntoRedisCache(getSchoolFundingGroupCodesFromInstituteApi());
+				redisTemplate.opsForValue().set(CacheKey.SCHOOL_FUNDING_GROUP_CODE_CACHE.name(), CacheStatus.READY.name());
 				log.info("SUCCESS! - SCHOOL_FUNDING_GROUP_CODE_CACHE is now READY");
 			} else {
 				log.info("Force Flag is false. Skipping SCHOOL_FUNDING_GROUP_CODE_CACHE reload");
 			}
 		} else {
 			log.info("Loading SCHOOL_FUNDING_GROUP_CODE_CACHE...");
+			redisTemplate.opsForValue().set(CacheKey.SCHOOL_FUNDING_GROUP_CODE_CACHE.name(), CacheStatus.LOADING.name());
 			loadSchoolFundingGroupCodesIntoRedisCache(getSchoolFundingGroupCodesFromInstituteApi());
-			redisTemplate.opsForValue().set("SCHOOL_FUNDING_GROUP_CODE_CACHE", "READY");
+			redisTemplate.opsForValue().set(CacheKey.SCHOOL_FUNDING_GROUP_CODE_CACHE.name(), CacheStatus.READY.name());
 			log.info("SUCCESS! - SCHOOL_FUNDING_GROUP_CODE_CACHE is now READY");
 		}
 	}

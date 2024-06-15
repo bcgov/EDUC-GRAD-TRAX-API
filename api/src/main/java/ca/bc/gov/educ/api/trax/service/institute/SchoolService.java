@@ -1,5 +1,7 @@
 package ca.bc.gov.educ.api.trax.service.institute;
 
+import ca.bc.gov.educ.api.trax.constant.CacheKey;
+import ca.bc.gov.educ.api.trax.constant.CacheStatus;
 import ca.bc.gov.educ.api.trax.model.dto.institute.School;
 import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolDetail;
 import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolEntity;
@@ -77,21 +79,25 @@ public class SchoolService {
 	}
 
 	public void initializeSchoolCache(boolean force) {
-		String cacheStatus = redisTemplate.opsForValue().get("SCHOOL_CACHE");
+		String cacheStatus = redisTemplate.opsForValue().get(CacheKey.SCHOOL_CACHE.name());
 		cacheStatus = cacheStatus == null ? "" : cacheStatus;
-		if ("READY".compareToIgnoreCase(cacheStatus) == 0) {
+		if (CacheStatus.LOADING.name().compareToIgnoreCase(cacheStatus) == 0
+				|| CacheStatus.READY.name().compareToIgnoreCase(cacheStatus) == 0) {
 			log.info("SCHOOL_CACHE status: READY");
 			if (force) {
 				log.info("Force Flag is true. Reloading SCHOOL_CACHE...");
+				redisTemplate.opsForValue().set(CacheKey.SCHOOL_CACHE.name(), CacheStatus.LOADING.name());
 				loadSchoolsIntoRedisCache(getSchoolsFromInstituteApi());
+				redisTemplate.opsForValue().set(CacheKey.SCHOOL_CACHE.name(), CacheStatus.READY.name());
 				log.info("SUCCESS! - SCHOOL_CACHE is now READY");
 			} else {
 				log.info("Force Flag is false. Skipping SCHOOL_CACHE reload");
 			}
 		} else {
 			log.info("Loading SCHOOL_CACHE...");
+			redisTemplate.opsForValue().set(CacheKey.SCHOOL_CACHE.name(), CacheStatus.LOADING.name());
 			loadSchoolsIntoRedisCache(getSchoolsFromInstituteApi());
-			redisTemplate.opsForValue().set("SCHOOL_CACHE", "READY");
+			redisTemplate.opsForValue().set(CacheKey.SCHOOL_CACHE.name(), CacheStatus.READY.name());
 			log.info("SUCCESS! - SCHOOL_CACHE is now READY");
 		}
 	}
@@ -157,21 +163,25 @@ public class SchoolService {
 	}
 
 	public void initializeSchoolDetailCache(boolean force) {
-		String cacheStatus = redisTemplate.opsForValue().get("SCHOOL_DETAIL_CACHE");
+		String cacheStatus = redisTemplate.opsForValue().get(CacheKey.SCHOOL_DETAIL_CACHE.name());
 		cacheStatus = cacheStatus == null ? "" : cacheStatus;
-		if ("READY".compareToIgnoreCase(cacheStatus) == 0) {
+		if (CacheStatus.LOADING.name().compareToIgnoreCase(cacheStatus) == 0
+				|| CacheStatus.READY.name().compareToIgnoreCase(cacheStatus) == 0) {
 			log.info("SCHOOL_DETAIL_CACHE status: READY");
 			if (force) {
 				log.info("Force Flag is true. Reloading SCHOOL_DETAIL_CACHE...");
+				redisTemplate.opsForValue().set(CacheKey.SCHOOL_DETAIL_CACHE.name(), CacheStatus.LOADING.name());
 				loadSchoolDetailsIntoRedisCache(getSchoolDetailsFromInstituteApi());
+				redisTemplate.opsForValue().set(CacheKey.SCHOOL_DETAIL_CACHE.name(), CacheStatus.READY.name());
 				log.info("SUCCESS! - SCHOOL_DETAIL_CACHE is now READY");
 			} else {
 				log.info("Force Flag is false. Skipping SCHOOL_DETAIL_CACHE reload");
 			}
 		} else {
 			log.info("Loading SCHOOL_DETAIL_CACHE...");
+			redisTemplate.opsForValue().set(CacheKey.SCHOOL_DETAIL_CACHE.name(), CacheStatus.LOADING.name());
 			loadSchoolDetailsIntoRedisCache(getSchoolDetailsFromInstituteApi());
-			redisTemplate.opsForValue().set("SCHOOL_DETAIL_CACHE", "READY");
+			redisTemplate.opsForValue().set(CacheKey.SCHOOL_DETAIL_CACHE.name(), CacheStatus.READY.name());
 			log.info("SUCCESS! - SCHOOL_DETAIL_CACHE is now READY");
 		}
 	}

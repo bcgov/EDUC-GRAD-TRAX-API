@@ -1,5 +1,7 @@
 package ca.bc.gov.educ.api.trax.service.institute;
 
+import ca.bc.gov.educ.api.trax.constant.CacheKey;
+import ca.bc.gov.educ.api.trax.constant.CacheStatus;
 import ca.bc.gov.educ.api.trax.model.dto.institute.District;
 import ca.bc.gov.educ.api.trax.model.entity.institute.DistrictEntity;
 import ca.bc.gov.educ.api.trax.model.transformer.institute.DistrictTransformer;
@@ -68,21 +70,25 @@ public class DistrictService {
     }
 
     public void initializeDistrictCache(boolean force) {
-        String cacheStatus = redisTemplate.opsForValue().get("DISTRICT_CACHE");
+        String cacheStatus = redisTemplate.opsForValue().get(CacheKey.DISTRICT_CACHE.name());
         cacheStatus = cacheStatus == null ? "" : cacheStatus;
-        if ("READY".compareToIgnoreCase(cacheStatus) == 0) {
+        if (CacheStatus.LOADING.name().compareToIgnoreCase(cacheStatus) == 0
+                || CacheStatus.READY.name().compareToIgnoreCase(cacheStatus) == 0) {
             log.info("DISTRICT_CACHE status: READY");
             if (force) {
                 log.info("Force Flag is true. Reloading DISTRICT_CACHE...");
+                redisTemplate.opsForValue().set(CacheKey.DISTRICT_CACHE.name(), CacheStatus.LOADING.name());
                 loadDistrictsIntoRedisCache(getDistrictsFromInstituteApi());
+                redisTemplate.opsForValue().set(CacheKey.DISTRICT_CACHE.name(), CacheStatus.READY.name());
                 log.info("SUCCESS! - DISTRICT_CACHE is now READY");
             } else {
                 log.info("Force Flag is false. Skipping DISTRICT_CACHE reload");
             }
         } else {
             log.info("Loading DISTRICT_CACHE...");
+            redisTemplate.opsForValue().set(CacheKey.DISTRICT_CACHE.name(), CacheStatus.LOADING.name());
             loadDistrictsIntoRedisCache(getDistrictsFromInstituteApi());
-            redisTemplate.opsForValue().set("DISTRICT_CACHE", "READY");
+            redisTemplate.opsForValue().set(CacheKey.DISTRICT_CACHE.name(), CacheStatus.READY.name());
             log.info("SUCCESS! - DISTRICT_CACHE is now READY");
         }
     }
