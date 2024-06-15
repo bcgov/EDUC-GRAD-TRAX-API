@@ -13,9 +13,11 @@ import ca.bc.gov.educ.api.trax.util.RestUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import redis.clients.jedis.Jedis;
 
 import java.util.List;
 
@@ -37,6 +39,8 @@ public class SchoolService {
 	SchoolDetailTransformer schoolDetailTransformer;
 	@Autowired
 	private RestUtils restUtils;
+	@Autowired
+	Jedis jedis;
 
 	public List<School> getSchoolsFromInstituteApi() {
 		try {
@@ -69,8 +73,26 @@ public class SchoolService {
 	}
 
 	public List<School> getSchoolsFromRedisCache() {
-			log.debug("**** Getting schools from Redis Cache.");
-			return  schoolTransformer.transformToDTO(schoolRedisRepository.findAll());
+		log.debug("**** Getting schools from Redis Cache.");
+		return  schoolTransformer.transformToDTO(schoolRedisRepository.findAll());
+	}
+
+	public void initializeSchoolCache(boolean force) {
+		if ("READY".compareToIgnoreCase(jedis.get("SCHOOL_CACHE")) == 0) {
+			log.info("SCHOOL_CACHE status: READY");
+			if (force) {
+				log.info("Force Flag is true. Reloading SCHOOL_CACHE...");
+				loadSchoolsIntoRedisCache(getSchoolsFromInstituteApi());
+				log.info("SUCCESS! - SCHOOL_CACHE is now READY");
+			} else {
+				log.info("Force Flag is false. Skipping SCHOOL_CACHE reload");
+			}
+		} else {
+			log.info("Loading SCHOOL_CACHE...");
+			loadSchoolsIntoRedisCache(getSchoolsFromInstituteApi());
+			jedis.set("SCHOOL_CACHE", "READY");
+			log.info("SUCCESS! - SCHOOL_CACHE is now READY");
+		}
 	}
 
 	public List<SchoolDetail> getSchoolDetailsFromInstituteApi() {

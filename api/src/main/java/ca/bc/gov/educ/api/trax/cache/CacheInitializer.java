@@ -23,24 +23,11 @@ public class CacheInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        schoolService.loadSchoolsIntoRedisCache(
-                schoolService.getSchoolsFromInstituteApi()
-        );
-        log.info("Institutes loaded into Redis");
 
-        districtService.loadDistrictsIntoRedisCache(
-                districtService.getDistrictsFromInstituteApi()
-        );
-        log.info("Districts loaded into Redis");
-
-        codeService.loadSchoolCategoryCodesIntoRedisCache(
-                codeService.getSchoolCategoryCodesFromInstituteApi()
-        );
-        log.info("School Category Codes loaded into Redis");
-        codeService.loadSchoolFundingGroupCodesIntoRedisCache(
-                codeService.getSchoolFundingGroupCodesFromInstituteApi()
-        );
-        log.info("School Funding Group Codes loaded into Redis");
+        schoolService.initializeSchoolCache(false);
+        districtService.initializeDistrictCache(false);
+        codeService.initializeSchoolCategoryCodeCache(false);
+        codeService.initializeSchoolFundingGroupCodeCache(false);
 
         log.info("Redis Cache initialized!");
     }

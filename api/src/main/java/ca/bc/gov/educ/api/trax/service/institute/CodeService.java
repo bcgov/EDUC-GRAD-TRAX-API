@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.trax.service.institute;
 
+import ca.bc.gov.educ.api.trax.model.dto.institute.District;
 import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolCategoryCode;
 import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolFundingGroupCode;
 import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolCategoryCodeEntity;
@@ -16,6 +17,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import redis.clients.jedis.Jedis;
 
 import java.util.List;
 
@@ -37,6 +39,8 @@ public class CodeService {
 	SchoolFundingGroupCodeTransformer schoolFundingGroupCodeTransformer;
 	@Autowired
 	private RestUtils restUtils;
+	@Autowired
+	Jedis jedis;
 
 	public List<SchoolCategoryCode> getSchoolCategoryCodesFromInstituteApi() {
 		try {
@@ -69,6 +73,29 @@ public class CodeService {
 				.saveAll(schoolCategoryCodeTransformer.transformToEntity(schoolCategoryCodes));
 	}
 
+	public List<SchoolCategoryCode> getSchoolCategoryCodesFromRedisCache() {
+		log.debug("**** Getting school category codes from Redis Cache.");
+		return  schoolCategoryCodeTransformer.transformToDTO(schoolCategoryCodeRedisRepository.findAll());
+	}
+
+	public void initializeSchoolCategoryCodeCache(boolean force) {
+		if ("READY".compareToIgnoreCase(jedis.get("SCHOOL_CATEGORY_CODE_CACHE")) == 0) {
+			log.info("SCHOOL_CATEGORY_CODE_CACHE status: READY");
+			if (force) {
+				log.info("Force Flag is true. Reloading SCHOOL_CATEGORY_CODE_CACHE...");
+				loadSchoolCategoryCodesIntoRedisCache(getSchoolCategoryCodesFromInstituteApi());
+				log.info("SUCCESS! - SCHOOL_CATEGORY_CODE_CACHE is now READY");
+			} else {
+				log.info("Force Flag is false. Skipping SCHOOL_CATEGORY_CODE_CACHE reload");
+			}
+		} else {
+			log.info("Loading SCHOOL_CATEGORY_CODE_CACHE...");
+			loadSchoolCategoryCodesIntoRedisCache(getSchoolCategoryCodesFromInstituteApi());
+			jedis.set("SCHOOL_CATEGORY_CODE_CACHE", "READY");
+			log.info("SUCCESS! - SCHOOL_CATEGORY_CODE_CACHE is now READY");
+		}
+	}
+
 	public List<SchoolFundingGroupCode> getSchoolFundingGroupCodesFromInstituteApi() {
 		try {
 			log.debug("****Before Calling Institute API");
@@ -98,5 +125,28 @@ public class CodeService {
 	public void loadSchoolFundingGroupCodesIntoRedisCache(List<SchoolFundingGroupCode> schoolFundingGroupCodes) {
 		schoolFundingGroupCodeRedisRepository
 				.saveAll(schoolFundingGroupCodeTransformer.transformToEntity(schoolFundingGroupCodes));
+	}
+
+	public List<SchoolFundingGroupCode> getSchoolFundingGroupCodesFromRedisCache() {
+		log.debug("**** Getting school funding group codes from Redis Cache.");
+		return  schoolFundingGroupCodeTransformer.transformToDTO(schoolFundingGroupCodeRedisRepository.findAll());
+	}
+
+	public void initializeSchoolFundingGroupCodeCache(boolean force) {
+		if ("READY".compareToIgnoreCase(jedis.get("SCHOOL_FUNDING_GROUP_CODE_CACHE")) == 0) {
+			log.info("SCHOOL_FUNDING_GROUP_CODE_CACHE status: READY");
+			if (force) {
+				log.info("Force Flag is true. Reloading SCHOOL_FUNDING_GROUP_CODE_CACHE...");
+				loadSchoolFundingGroupCodesIntoRedisCache(getSchoolFundingGroupCodesFromInstituteApi());
+				log.info("SUCCESS! - SCHOOL_FUNDING_GROUP_CODE_CACHE is now READY");
+			} else {
+				log.info("Force Flag is false. Skipping SCHOOL_FUNDING_GROUP_CODE_CACHE reload");
+			}
+		} else {
+			log.info("Loading SCHOOL_FUNDING_GROUP_CODE_CACHE...");
+			loadSchoolFundingGroupCodesIntoRedisCache(getSchoolFundingGroupCodesFromInstituteApi());
+			jedis.set("SCHOOL_FUNDING_GROUP_CODE_CACHE", "READY");
+			log.info("SUCCESS! - SCHOOL_FUNDING_GROUP_CODE_CACHE is now READY");
+		}
 	}
 }

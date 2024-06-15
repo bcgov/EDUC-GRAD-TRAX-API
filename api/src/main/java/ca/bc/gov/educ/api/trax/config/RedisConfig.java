@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisClusterConfiguration;
+import org.springframework.data.redis.connection.RedisClusterNode;
 import org.springframework.data.redis.connection.RedisNode;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
@@ -26,12 +27,12 @@ public class RedisConfig {
         redisStandaloneConfiguration.setPort(Integer.parseInt(constants.getRedisPort()));
         redisStandaloneConfiguration.setPassword(constants.getRedisSecret());
 
-        /*//Cluster Configuration
+        //Cluster Configuration
         RedisClusterConfiguration redisClusterConfiguration = new RedisClusterConfiguration();
         RedisNode node0 = new RedisNode(constants.getRedisUrl(), Integer.parseInt(constants.getRedisPort()));
         redisClusterConfiguration.addClusterNode(node0);
-        redisClusterConfiguration.addClusterNode(node1);
-        redisClusterConfiguration.addClusterNode(node2);*/
+
+        RedisClusterNode rcn = new RedisClusterNode(constants.getRedisUrl(), Integer.parseInt(constants.getRedisPort()));
 
         return new JedisConnectionFactory(redisStandaloneConfiguration);
     }

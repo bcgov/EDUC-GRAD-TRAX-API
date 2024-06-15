@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.trax.service.institute;
 
 import ca.bc.gov.educ.api.trax.model.dto.institute.District;
+import ca.bc.gov.educ.api.trax.model.dto.institute.School;
 import ca.bc.gov.educ.api.trax.model.entity.institute.DistrictEntity;
 import ca.bc.gov.educ.api.trax.model.transformer.institute.DistrictTransformer;
 import ca.bc.gov.educ.api.trax.repository.redis.DistrictRedisRepository;
@@ -12,6 +13,8 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import redis.clients.jedis.Jedis;
+
 import java.util.List;
 
 @Slf4j
@@ -28,6 +31,8 @@ public class DistrictService {
     DistrictRedisRepository districtRedisRepository;
     @Autowired
     DistrictTransformer districtTransformer;
+    @Autowired
+    Jedis jedis;
 
     public List<District> getDistrictsFromInstituteApi() {
         try {
@@ -56,6 +61,29 @@ public class DistrictService {
     public void loadDistrictsIntoRedisCache(List<District> districts) {
         districtRedisRepository
                 .saveAll(districtTransformer.transformToEntity(districts));
+    }
+
+    public List<District> getSchoolsFromRedisCache() {
+        log.debug("**** Getting districts from Redis Cache.");
+        return  districtTransformer.transformToDTO(districtRedisRepository.findAll());
+    }
+
+    public void initializeDistrictCache(boolean force) {
+        if ("READY".compareToIgnoreCase(jedis.get("DISTRICT_CACHE")) == 0) {
+            log.info("DISTRICT_CACHE status: READY");
+            if (force) {
+                log.info("Force Flag is true. Reloading DISTRICT_CACHE...");
+                loadDistrictsIntoRedisCache(getDistrictsFromInstituteApi());
+                log.info("SUCCESS! - DISTRICT_CACHE is now READY");
+            } else {
+                log.info("Force Flag is false. Skipping DISTRICT_CACHE reload");
+            }
+        } else {
+            log.info("Loading DISTRICT_CACHE...");
+            loadDistrictsIntoRedisCache(getDistrictsFromInstituteApi());
+            jedis.set("DISTRICT_CACHE", "READY");
+            log.info("SUCCESS! - DISTRICT_CACHE is now READY");
+        }
     }
 
 }
