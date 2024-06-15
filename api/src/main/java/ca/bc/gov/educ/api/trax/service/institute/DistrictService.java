@@ -1,7 +1,6 @@
 package ca.bc.gov.educ.api.trax.service.institute;
 
 import ca.bc.gov.educ.api.trax.model.dto.institute.District;
-import ca.bc.gov.educ.api.trax.model.dto.institute.School;
 import ca.bc.gov.educ.api.trax.model.entity.institute.DistrictEntity;
 import ca.bc.gov.educ.api.trax.model.transformer.institute.DistrictTransformer;
 import ca.bc.gov.educ.api.trax.repository.redis.DistrictRedisRepository;
@@ -14,7 +13,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-import redis.clients.jedis.Jedis;
 
 import java.util.List;
 import java.util.Objects;
@@ -71,7 +69,9 @@ public class DistrictService {
     }
 
     public void initializeDistrictCache(boolean force) {
-        if ("READY".compareToIgnoreCase(Objects.requireNonNull(redisTemplate.opsForValue().get("DISTRICT_CACHE"))) == 0) {
+        String cacheStatus = redisTemplate.opsForValue().get("DISTRICT_CACHE");
+        cacheStatus = cacheStatus == null ? "" : cacheStatus;
+        if ("READY".compareToIgnoreCase(cacheStatus) == 0) {
             log.info("DISTRICT_CACHE status: READY");
             if (force) {
                 log.info("Force Flag is true. Reloading DISTRICT_CACHE...");

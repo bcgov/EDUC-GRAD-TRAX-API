@@ -79,7 +79,9 @@ public class SchoolService {
 	}
 
 	public void initializeSchoolCache(boolean force) {
-		if ("READY".compareToIgnoreCase(Objects.requireNonNull(redisTemplate.opsForValue().get("SCHOOL_CACHE"))) == 0) {
+		String cacheStatus = redisTemplate.opsForValue().get("SCHOOL_CACHE");
+		cacheStatus = cacheStatus == null ? "" : cacheStatus;
+		if ("READY".compareToIgnoreCase(cacheStatus) == 0) {
 			log.info("SCHOOL_CACHE status: READY");
 			if (force) {
 				log.info("Force Flag is true. Reloading SCHOOL_CACHE...");
