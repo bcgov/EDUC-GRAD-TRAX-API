@@ -33,6 +33,8 @@ public class SchoolControllerTest {
 
     @Mock
     private SchoolService schoolService;
+    @Mock
+    private ca.bc.gov.educ.api.trax.service.institute.SchoolService schoolServiceV2;
 
     @Autowired
     private EducGradTraxApiConstants constants;
@@ -51,6 +53,9 @@ public class SchoolControllerTest {
 
     @InjectMocks
     private SchoolController schoolController;
+
+    @InjectMocks
+    private ca.bc.gov.educ.api.trax.controller.v2.SchoolController schoolControllerV2;
 
     @Test
     public void testGetAllSchools() {
@@ -144,5 +149,22 @@ public class SchoolControllerTest {
         when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
         when(this.responseMock.bodyToMono(CommonSchool.class)).thenReturn(Mono.just(commonSchool));
 
+    }
+
+    @Test
+    public void whenGetAllSchools_ReturnsListOfSchools() {
+        final List<ca.bc.gov.educ.api.trax.model.dto.institute.School> schoolList = new ArrayList<>();
+        ca.bc.gov.educ.api.trax.model.dto.institute.School school = new ca.bc.gov.educ.api.trax.model.dto.institute.School();
+        school.setSchoolId("1234567");
+        school.setDistrictId("9876543");
+        schoolList.add(school);
+        school = new ca.bc.gov.educ.api.trax.model.dto.institute.School();
+        school.setSchoolId("1234567");
+        school.setDistrictId("9876543");
+        schoolList.add(school);
+
+        Mockito.when(schoolServiceV2.getSchoolsFromRedisCache()).thenReturn(schoolList);
+        schoolControllerV2.getAllSchools();
+        Mockito.verify(schoolServiceV2).getSchoolsFromRedisCache();
     }
 }
