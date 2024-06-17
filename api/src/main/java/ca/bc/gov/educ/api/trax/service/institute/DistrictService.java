@@ -74,7 +74,7 @@ public class DistrictService {
         cacheStatus = cacheStatus == null ? "" : cacheStatus;
         if (CacheStatus.LOADING.name().compareToIgnoreCase(cacheStatus) == 0
                 || CacheStatus.READY.name().compareToIgnoreCase(cacheStatus) == 0) {
-            log.info("DISTRICT_CACHE status: READY");
+            log.info(String.format("DISTRICT_CACHE status: %s", cacheStatus));
             if (force) {
                 log.info("Force Flag is true. Reloading DISTRICT_CACHE...");
                 redisTemplate.opsForValue().set(CacheKey.DISTRICT_CACHE.name(), CacheStatus.LOADING.name());

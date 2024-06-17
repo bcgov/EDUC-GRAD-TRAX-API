@@ -83,7 +83,7 @@ public class SchoolService {
 		cacheStatus = cacheStatus == null ? "" : cacheStatus;
 		if (CacheStatus.LOADING.name().compareToIgnoreCase(cacheStatus) == 0
 				|| CacheStatus.READY.name().compareToIgnoreCase(cacheStatus) == 0) {
-			log.info("SCHOOL_CACHE status: READY");
+			log.info(String.format("SCHOOL_CACHE status: %s", cacheStatus));
 			if (force) {
 				log.info("Force Flag is true. Reloading SCHOOL_CACHE...");
 				redisTemplate.opsForValue().set(CacheKey.SCHOOL_CACHE.name(), CacheStatus.LOADING.name());
@@ -167,7 +167,7 @@ public class SchoolService {
 		cacheStatus = cacheStatus == null ? "" : cacheStatus;
 		if (CacheStatus.LOADING.name().compareToIgnoreCase(cacheStatus) == 0
 				|| CacheStatus.READY.name().compareToIgnoreCase(cacheStatus) == 0) {
-			log.info("SCHOOL_DETAIL_CACHE status: READY");
+			log.info(String.format("SCHOOL_DETAIL_CACHE status: %s", cacheStatus));
 			if (force) {
 				log.info("Force Flag is true. Reloading SCHOOL_DETAIL_CACHE...");
 				redisTemplate.opsForValue().set(CacheKey.SCHOOL_DETAIL_CACHE.name(), CacheStatus.LOADING.name());

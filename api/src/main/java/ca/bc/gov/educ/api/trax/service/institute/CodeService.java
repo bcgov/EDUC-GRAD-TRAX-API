@@ -87,7 +87,7 @@ public class CodeService {
 		cacheStatus = cacheStatus == null ? "" : cacheStatus;
 		if (CacheStatus.LOADING.name().compareToIgnoreCase(cacheStatus) == 0
 				|| CacheStatus.READY.name().compareToIgnoreCase(cacheStatus) == 0) {
-			log.info("SCHOOL_CATEGORY_CODE_CACHE status: READY");
+			log.info(String.format("SCHOOL_CATEGORY_CODE_CACHE status: %s", cacheStatus));
 			if (force) {
 				log.info("Force Flag is true. Reloading SCHOOL_CATEGORY_CODE_CACHE...");
 				redisTemplate.opsForValue().set(CacheKey.SCHOOL_CATEGORY_CODE_CACHE.name(), CacheStatus.LOADING.name());
@@ -147,7 +147,7 @@ public class CodeService {
 		cacheStatus = cacheStatus == null ? "" : cacheStatus;
 		if (CacheStatus.LOADING.name().compareToIgnoreCase(cacheStatus) == 0
 				|| CacheStatus.READY.name().compareToIgnoreCase(cacheStatus) == 0) {
-			log.info("SCHOOL_FUNDING_GROUP_CODE_CACHE status: READY");
+			log.info(String.format("SCHOOL_FUNDING_GROUP_CODE_CACHE status: %s", cacheStatus));
 			if (force) {
 				log.info("Force Flag is true. Reloading SCHOOL_FUNDING_GROUP_CODE_CACHE...");
 				redisTemplate.opsForValue().set(CacheKey.SCHOOL_FUNDING_GROUP_CODE_CACHE.name(), CacheStatus.LOADING.name());

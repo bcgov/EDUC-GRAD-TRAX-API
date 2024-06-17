@@ -1,5 +1,7 @@
 package ca.bc.gov.educ.api.trax.service.institute;
 
+import ca.bc.gov.educ.api.trax.constant.CacheKey;
+import ca.bc.gov.educ.api.trax.constant.CacheStatus;
 import ca.bc.gov.educ.api.trax.messaging.NatsConnection;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Subscriber;
@@ -10,6 +12,7 @@ import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolCategoryCodeEntity;
 import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolFundingGroupCodeEntity;
 import ca.bc.gov.educ.api.trax.repository.GradCountryRepository;
 import ca.bc.gov.educ.api.trax.repository.GradProvinceRepository;
+import ca.bc.gov.educ.api.trax.repository.redis.SchoolCategoryCodeRedisRepository;
 import ca.bc.gov.educ.api.trax.repository.redis.SchoolFundingGroupCodeRedisRepository;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.RestUtils;
@@ -25,6 +28,8 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
@@ -36,10 +41,10 @@ import reactor.core.publisher.Mono;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
@@ -57,6 +62,10 @@ public class InstituteCodeServiceTest {
 	@Autowired
 	private CodeService codeService;
 	@MockBean
+	private CodeService codeServiceMock;
+	@MockBean
+	private SchoolCategoryCodeRedisRepository schoolCategoryCodeRedisRepository;
+	@MockBean
 	private SchoolFundingGroupCodeRedisRepository schoolFundingGroupCodeRedisRepository;
 	@MockBean
 	private GradCountryRepository gradCountryRepository;
@@ -67,6 +76,10 @@ public class InstituteCodeServiceTest {
 	@MockBean
 	@Qualifier("default")
 	WebClient webClientMock;
+	@MockBean
+	RedisTemplate<String, String> redisTemplateMock;
+	@Mock
+	ValueOperations valueOperationsMock;
 	@Mock
 	private WebClient.RequestHeadersSpec requestHeadersSpecMock;
 	@Mock
@@ -199,5 +212,76 @@ public class InstituteCodeServiceTest {
 		when(this.schoolFundingGroupCodeRedisRepository.saveAll(schoolFundingGroupCodeEntities))
 				.thenReturn(schoolFundingGroupCodeEntities);
 		assertDoesNotThrow(() -> codeService.loadSchoolFundingGroupCodesIntoRedisCache(schoolFundingGroupCodes));
+	}
+
+	@Test
+	public void whenGetSchoolCategoryCodesFromRedisCache_GetSchoolCategoryCodes() {
+		SchoolCategoryCodeEntity scce = new SchoolCategoryCodeEntity();
+		List<SchoolCategoryCodeEntity> scces = new ArrayList<>();
+		scce.setSchoolCategoryCode("SCC1");
+		scce.setLabel("SCC1-label");
+		scces.add(scce);
+		scce = new SchoolCategoryCodeEntity();
+		scce.setSchoolCategoryCode("SCC2");
+		scce.setLabel("SCC2-label");
+		scces.add(scce);
+		when(schoolCategoryCodeRedisRepository.findAll()).thenReturn(scces);
+		assertTrue(codeService.getSchoolCategoryCodesFromRedisCache().size() == 2);
+	}
+
+	@Test
+	public void whenInitializeSchoolCategoryCodeCache_WithLoadingAndFalse_DoNotForceLoad() {
+		when(redisTemplateMock.opsForValue())
+				.thenReturn(valueOperationsMock);
+		when(valueOperationsMock.get(CacheKey.SCHOOL_CATEGORY_CODE_CACHE.name()))
+				.thenReturn(String.valueOf(CacheStatus.LOADING));
+		doNothing().when(valueOperationsMock).set(CacheKey.SCHOOL_CATEGORY_CODE_CACHE.name(), CacheStatus.LOADING.name());
+		codeService.initializeSchoolCategoryCodeCache(false);
+	}
+
+	@Test
+	public void whenInitializeSchoolCategoryCodeCache_WithReadyAndFalse_DoNotForceLoad() {
+		when(redisTemplateMock.opsForValue())
+				.thenReturn(valueOperationsMock);
+		when(valueOperationsMock.get(CacheKey.SCHOOL_CATEGORY_CODE_CACHE.name()))
+				.thenReturn(String.valueOf(CacheStatus.READY));
+		doNothing().when(valueOperationsMock).set(CacheKey.SCHOOL_CATEGORY_CODE_CACHE.name(), CacheStatus.READY.name());
+		codeService.initializeSchoolCategoryCodeCache(false);
+	}
+
+	@Test
+	public void whenInitializeSchoolCategoryCodeCache_WithLoadingAndTrue_ThenForceLoad() {
+
+		ResponseObj tokenObj = new ResponseObj();
+		tokenObj.setAccess_token("123");
+
+		SchoolCategoryCode scc = new SchoolCategoryCode();
+		List<SchoolCategoryCode> sccs = new ArrayList<>();
+		scc.setSchoolCategoryCode("SCC1");
+		scc.setLabel("SCC1-label");
+		sccs.add(scc);
+		scc = new SchoolCategoryCode();
+		scc.setSchoolCategoryCode("SCC2");
+		scc.setLabel("SCC2-label");
+		sccs.add(scc);
+
+		when(redisTemplateMock.opsForValue())
+				.thenReturn(valueOperationsMock);
+		when(valueOperationsMock.get(CacheKey.SCHOOL_CATEGORY_CODE_CACHE.name()))
+				.thenReturn(String.valueOf(CacheStatus.LOADING));
+		doNothing().when(valueOperationsMock).set(CacheKey.SCHOOL_CATEGORY_CODE_CACHE.name(), CacheStatus.LOADING.name());
+		when(codeServiceMock.getSchoolCategoryCodesFromInstituteApi())
+				.thenReturn(sccs);
+		codeService.initializeSchoolCategoryCodeCache(true);
+	}
+
+	@Test
+	public void whenInitializeSchoolCategoryCodeCache_WithReadyAndTrue_ThenForceLoad() {
+		when(redisTemplateMock.opsForValue())
+				.thenReturn(valueOperationsMock);
+		when(valueOperationsMock.get(CacheKey.SCHOOL_CATEGORY_CODE_CACHE.name()))
+				.thenReturn(String.valueOf(CacheStatus.READY));
+		doNothing().when(valueOperationsMock).set(CacheKey.SCHOOL_CATEGORY_CODE_CACHE.name(), CacheStatus.READY.name());
+		codeService.initializeSchoolCategoryCodeCache(true);
 	}
 }
