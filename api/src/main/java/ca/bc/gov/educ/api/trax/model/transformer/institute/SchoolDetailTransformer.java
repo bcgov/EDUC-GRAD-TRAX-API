@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component("SchoolDetailTransformer")
 public class SchoolDetailTransformer {
@@ -38,7 +39,11 @@ public class SchoolDetailTransformer {
         return modelMapper.map(schoolDetail, SchoolDetailEntity.class);
     }
 
-    public List<SchoolDetailEntity> transformToEntity (Iterable<SchoolDetail> schoolDetails ) {
-        return modelMapper.map(schoolDetails, new TypeToken<List<SchoolDetailEntity>>(){}.getType());
+    public List<SchoolDetailEntity> transformToEntity (List<SchoolDetail> schoolDetails ) {
+        if (schoolDetails == null) return null;
+        return schoolDetails
+                .stream()
+                .map(sd -> modelMapper.map(sd, SchoolDetailEntity.class))
+                .collect(Collectors.toList());
     }
 }

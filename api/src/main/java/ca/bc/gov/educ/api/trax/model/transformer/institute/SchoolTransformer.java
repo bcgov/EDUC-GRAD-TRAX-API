@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.trax.model.transformer.institute;
 
 import ca.bc.gov.educ.api.trax.model.dto.institute.School;
 import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolDetail;
+import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolCategoryCodeEntity;
 import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolDetailEntity;
 import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolEntity;
 import org.modelmapper.ModelMapper;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component("InstituteSchoolTransformer")
 public class SchoolTransformer {
@@ -37,7 +39,11 @@ public class SchoolTransformer {
         return modelMapper.map(school, SchoolEntity.class);
     }
 
-    public List<SchoolEntity> transformToEntity (Iterable<School> schools ) {
-        return modelMapper.map(schools, new TypeToken<List<SchoolEntity>>(){}.getType());
+    public List<SchoolEntity> transformToEntity (List<School> schools ) {
+        if (schools == null) return null;
+        return schools
+                .stream()
+                .map(school -> modelMapper.map(school, SchoolEntity.class))
+                .collect(Collectors.toList());
     }
 }

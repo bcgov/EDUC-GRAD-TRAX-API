@@ -38,9 +38,7 @@ public class SchoolCategoryCodeTransformer {
     }
 
     public List<SchoolCategoryCodeEntity> transformToEntity (List<SchoolCategoryCode> schoolCategoryCodes ) {
-        if (schoolCategoryCodes == null)
-            return null;
-
+        if (schoolCategoryCodes == null) return null;
         return schoolCategoryCodes
                 .stream()
                 .map(scc -> modelMapper.map(scc, SchoolCategoryCodeEntity.class))
