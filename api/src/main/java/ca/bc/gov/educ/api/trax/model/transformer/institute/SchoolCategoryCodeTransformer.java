@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component("SchoolCategoryCodeTransformer")
 public class SchoolCategoryCodeTransformer {
@@ -36,7 +37,13 @@ public class SchoolCategoryCodeTransformer {
         return modelMapper.map(schoolCategoryCode, SchoolCategoryCodeEntity.class);
     }
 
-    public List<SchoolCategoryCodeEntity> transformToEntity (Iterable<SchoolCategoryCode> schoolCategoryCodes ) {
-        return modelMapper.map(schoolCategoryCodes, new TypeToken<List<SchoolCategoryCodeEntity>>(){}.getType());
+    public List<SchoolCategoryCodeEntity> transformToEntity (List<SchoolCategoryCode> schoolCategoryCodes ) {
+        if (schoolCategoryCodes == null)
+            return null;
+
+        return schoolCategoryCodes
+                .stream()
+                .map(scc -> modelMapper.map(scc, SchoolCategoryCodeEntity.class))
+                .collect(Collectors.toList());
     }
 }

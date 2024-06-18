@@ -295,6 +295,10 @@ public class InstituteCodeServiceTest {
 		when(this.schoolCategoryCodeEntitiesMock.block())
 				.thenReturn(scces);
 
+		when(this.restUtils.getTokenResponseObject(anyString(), anyString()))
+				.thenReturn(responseObjectMock);
+		when(this.responseObjectMock.getAccess_token())
+				.thenReturn("accessToken");
 
 		when(redisTemplateMock.opsForValue())
 				.thenReturn(valueOperationsMock);
@@ -302,18 +306,12 @@ public class InstituteCodeServiceTest {
 				.thenReturn(String.valueOf(CacheStatus.LOADING));
 		doNothing().when(valueOperationsMock).set(CacheKey.SCHOOL_CATEGORY_CODE_CACHE.name(), CacheStatus.LOADING.name());
 
-		when(this.restUtils.getTokenResponseObject(anyString(), anyString()))
-				.thenReturn(responseObjectMock);
-		when(this.responseObjectMock.getAccess_token())
-				.thenReturn("accessToken");
-
 		CodeService codeServicemock = mock(CodeService.class);
 		when(codeServicemock.getSchoolCategoryCodesFromInstituteApi()).thenReturn(sccs);
 		doNothing().when(codeServicemock).loadSchoolCategoryCodesIntoRedisCache(sccs);
 
 		codeService.initializeSchoolCategoryCodeCache(true);
-
-		//verify(codeService).loadSchoolCategoryCodesIntoRedisCache(sccs);
+		//verify(codeServicemock).loadSchoolCategoryCodesIntoRedisCache(sccs);
 	}
 
 	@Test
