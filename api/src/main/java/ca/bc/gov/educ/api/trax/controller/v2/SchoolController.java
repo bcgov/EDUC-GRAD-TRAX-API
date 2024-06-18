@@ -40,7 +40,7 @@ public class SchoolController {
 
     @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_URL_MAPPING_V2)
     @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
-    @Operation(summary = "Find All Schools", description = "Get All Schools from Cache", tags = { "School" })
+    @Operation(summary = "Find All Schools from Cache", description = "Get All Schools from Cache", tags = { "School" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
     public List<School> getAllSchools() {
     	log.debug("getAllSchools : ");
@@ -49,7 +49,7 @@ public class SchoolController {
 
     @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_DETAIL_URL_MAPPING_V2)
     @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
-    @Operation(summary = "Find All School details", description = "Get All School details from Cache", tags = { "School" })
+    @Operation(summary = "Find All School details from Cache", description = "Get All School details from Cache", tags = { "School" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
     public List<SchoolDetail> getAllSchoolDetails() {
         log.debug("getAllSchoolDetails : ");
