@@ -338,4 +338,102 @@ public class InstituteCodeServiceTest {
 		when(schoolFundingGroupCodeRedisRepository.findAll()).thenReturn(sfgces);
 		//assertTrue(codeService.getSchoolCategoryCodesFromRedisCache().size() == 2);
 	}
+
+	@Test
+	public void whenInitializeSchoolFundingGroupCodeCache_WithLoadingAndFalse_DoNotForceLoad() {
+		when(redisTemplateMock.opsForValue())
+				.thenReturn(valueOperationsMock);
+		when(valueOperationsMock.get(CacheKey.SCHOOL_FUNDING_GROUP_CODE_CACHE.name()))
+				.thenReturn(String.valueOf(CacheStatus.LOADING));
+		doNothing().when(valueOperationsMock).set(CacheKey.SCHOOL_FUNDING_GROUP_CODE_CACHE.name(), CacheStatus.LOADING.name());
+		codeService.initializeSchoolFundingGroupCodeCache(false);
+	}
+
+	@Test
+	public void whenInitializeSchoolFundingGroupCodeCache_WithReadyAndFalse_DoNotForceLoad() {
+		when(redisTemplateMock.opsForValue())
+				.thenReturn(valueOperationsMock);
+		when(valueOperationsMock.get(CacheKey.SCHOOL_FUNDING_GROUP_CODE_CACHE.name()))
+				.thenReturn(String.valueOf(CacheStatus.READY));
+		doNothing().when(valueOperationsMock).set(CacheKey.SCHOOL_FUNDING_GROUP_CODE_CACHE.name(), CacheStatus.READY.name());
+		codeService.initializeSchoolFundingGroupCodeCache(false);
+	}
+
+	@Test
+	public void whenInitializeSchoolFundingGroupCodeCache_WithLoadingAndTrue_ThenForceLoad() {
+
+		SchoolFundingGroupCodeEntity sfgce = new SchoolFundingGroupCodeEntity();
+		List<SchoolFundingGroupCodeEntity> sfgces = new ArrayList<SchoolFundingGroupCodeEntity>();
+		sfgce.setSchoolFundingGroupCode("SCC1");
+		sfgce.setLabel("SCC1-label");
+		sfgces.add(sfgce);
+		sfgce = new SchoolFundingGroupCodeEntity();
+		sfgce.setSchoolFundingGroupCode("SCC2");
+		sfgce.setLabel("SCC2-label");
+		sfgces.add(sfgce);
+
+		SchoolFundingGroupCode sfgc = new SchoolFundingGroupCode();
+		List<SchoolFundingGroupCode> sfgcs = new ArrayList<SchoolFundingGroupCode>();
+		sfgc.setSchoolFundingGroupCode("SCC1");
+		sfgc.setLabel("SCC1-label");
+		sfgc.setDescription("Desc");
+		sfgc.setDisplayOrder("10");
+		sfgc.setEffectiveDate("01-01-2024");
+		sfgc.setExpiryDate("01-01-2024");
+		sfgcs.add(sfgc);
+		sfgc = new SchoolFundingGroupCode();
+		sfgc.setSchoolFundingGroupCode("SCC2");
+		sfgc.setLabel("SCC2-label");
+		sfgc.setDescription("Desc");
+		sfgc.setDisplayOrder("20");
+		sfgc.setEffectiveDate("01-01-2024");
+		sfgc.setExpiryDate("01-01-2024");
+		sfgcs.add(sfgc);
+
+
+		when(webClientMock.get())
+				.thenReturn(requestHeadersUriSpecMock);
+		when(requestHeadersUriSpecMock.uri(anyString()))
+				.thenReturn(requestHeadersSpecMock);
+		when(requestHeadersSpecMock.headers(any(Consumer.class)))
+				.thenReturn(requestHeadersSpecMock);
+		when(this.restUtils.getTokenResponseObject(anyString(), anyString()))
+				.thenReturn(responseObjectMock);
+		when(this.responseObjectMock.getAccess_token())
+				.thenReturn("accessToken");
+		when(requestHeadersSpecMock.retrieve())
+				.thenReturn(responseSpecMock);
+		when(this.responseSpecMock.bodyToMono(new ParameterizedTypeReference<List<SchoolFundingGroupCodeEntity>>(){}))
+				.thenReturn(schoolFundingGroupCodeEntitiesMock);
+		when(this.schoolFundingGroupCodeEntitiesMock.block())
+				.thenReturn(sfgces);
+
+		when(this.restUtils.getTokenResponseObject(anyString(), anyString()))
+				.thenReturn(responseObjectMock);
+		when(this.responseObjectMock.getAccess_token())
+				.thenReturn("accessToken");
+
+		when(redisTemplateMock.opsForValue())
+				.thenReturn(valueOperationsMock);
+		when(valueOperationsMock.get(CacheKey.SCHOOL_CATEGORY_CODE_CACHE.name()))
+				.thenReturn(String.valueOf(CacheStatus.LOADING));
+		doNothing().when(valueOperationsMock).set(CacheKey.SCHOOL_CATEGORY_CODE_CACHE.name(), CacheStatus.LOADING.name());
+
+		CodeService codeServicemock = mock(CodeService.class);
+		when(codeServicemock.getSchoolFundingGroupCodesFromInstituteApi()).thenReturn(sfgcs);
+		doNothing().when(codeServicemock).loadSchoolFundingGroupCodesIntoRedisCache(sfgcs);
+
+		codeService.initializeSchoolFundingGroupCodeCache(true);
+		//verify(codeServicemock).loadSchoolCategoryCodesIntoRedisCache(sccs);
+	}
+
+	@Test
+	public void whenInitializeSchoolFundingGroupCodeCache_WithReadyAndTrue_ThenForceLoad() {
+		when(redisTemplateMock.opsForValue())
+				.thenReturn(valueOperationsMock);
+		when(valueOperationsMock.get(CacheKey.SCHOOL_FUNDING_GROUP_CODE_CACHE.name()))
+				.thenReturn(String.valueOf(CacheStatus.READY));
+		doNothing().when(valueOperationsMock).set(CacheKey.SCHOOL_FUNDING_GROUP_CODE_CACHE.name(), CacheStatus.READY.name());
+		codeService.initializeSchoolFundingGroupCodeCache(true);
+	}
 }
