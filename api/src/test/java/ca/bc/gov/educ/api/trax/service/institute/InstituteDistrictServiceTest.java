@@ -1,5 +1,7 @@
 package ca.bc.gov.educ.api.trax.service.institute;
 
+import ca.bc.gov.educ.api.trax.constant.CacheKey;
+import ca.bc.gov.educ.api.trax.constant.CacheStatus;
 import ca.bc.gov.educ.api.trax.messaging.NatsConnection;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Subscriber;
@@ -29,6 +31,8 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
@@ -46,7 +50,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
 
 
 @RunWith(SpringRunner.class)
@@ -66,6 +71,10 @@ public class InstituteDistrictServiceTest {
 	@MockBean
 	@Qualifier("default")
 	WebClient webClientMock;
+	@MockBean
+	RedisTemplate<String, String> redisTemplateMock;
+	@Mock
+	ValueOperations valueOperationsMock;
 	@Mock
 	private WebClient.RequestHeadersSpec requestHeadersSpecMock;
 	@Mock
@@ -147,5 +156,95 @@ public class InstituteDistrictServiceTest {
 		when(this.districtRedisRepository.saveAll(districtEntities))
 				.thenReturn(districtEntities);
 		assertDoesNotThrow(() -> districtService.loadDistrictsIntoRedisCache(districts));
+	}
+
+	@Test
+	public void whenInitializeDistrictCache_WithLoadingAndFalse_DoNotForceLoad() {
+		when(redisTemplateMock.opsForValue())
+				.thenReturn(valueOperationsMock);
+		when(valueOperationsMock.get(CacheKey.DISTRICT_CACHE.name()))
+				.thenReturn(String.valueOf(CacheStatus.LOADING));
+		doNothing().when(valueOperationsMock).set(CacheKey.DISTRICT_CACHE.name(), CacheStatus.LOADING.name());
+		districtService.initializeDistrictCache(false);
+	}
+
+	@Test
+	public void whenInitializeDistrictCache_WithReadyAndFalse_DoNotForceLoad() {
+		when(redisTemplateMock.opsForValue())
+				.thenReturn(valueOperationsMock);
+		when(valueOperationsMock.get(CacheKey.DISTRICT_CACHE.name()))
+				.thenReturn(String.valueOf(CacheStatus.READY));
+		doNothing().when(valueOperationsMock).set(CacheKey.DISTRICT_CACHE.name(), CacheStatus.READY.name());
+		districtService.initializeDistrictCache(false);
+	}
+
+	@Test
+	public void whenInitializeDistrictCache_WithLoadingAndTrue_ThenForceLoad() {
+
+		DistrictEntity de = new DistrictEntity();
+		List<DistrictEntity> des = new ArrayList<DistrictEntity>();
+		de.setDistrictId("123");
+		de.setDistrictNumber("456");
+		des.add(de);
+		de = new DistrictEntity();
+		de.setDistrictId("789");
+		de.setDistrictNumber("012");
+		des.add(de);
+
+		District d = new District();
+		List<District> ds = new ArrayList<District>();
+		d.setDistrictId("123");
+		d.setDistrictNumber("456");
+		ds.add(d);
+		d = new District();
+		d.setDistrictId("789");
+		d.setDistrictNumber("012");
+		ds.add(d);
+
+
+		when(webClientMock.get())
+				.thenReturn(requestHeadersUriSpecMock);
+		when(requestHeadersUriSpecMock.uri(anyString()))
+				.thenReturn(requestHeadersSpecMock);
+		when(requestHeadersSpecMock.headers(any(Consumer.class)))
+				.thenReturn(requestHeadersSpecMock);
+		when(this.restUtils.getTokenResponseObject(anyString(), anyString()))
+				.thenReturn(responseObjectMock);
+		when(this.responseObjectMock.getAccess_token())
+				.thenReturn("accessToken");
+		when(requestHeadersSpecMock.retrieve())
+				.thenReturn(responseSpecMock);
+		when(this.responseSpecMock.bodyToMono(new ParameterizedTypeReference<List<DistrictEntity>>(){}))
+				.thenReturn(districtEntitiesMock);
+		when(this.districtEntitiesMock.block())
+				.thenReturn(des);
+
+		when(this.restUtils.getTokenResponseObject(anyString(), anyString()))
+				.thenReturn(responseObjectMock);
+		when(this.responseObjectMock.getAccess_token())
+				.thenReturn("accessToken");
+
+		when(redisTemplateMock.opsForValue())
+				.thenReturn(valueOperationsMock);
+		when(valueOperationsMock.get(CacheKey.DISTRICT_CACHE.name()))
+				.thenReturn(String.valueOf(CacheStatus.LOADING));
+		doNothing().when(valueOperationsMock).set(CacheKey.DISTRICT_CACHE.name(), CacheStatus.LOADING.name());
+
+		DistrictService districtServiceMock = mock(DistrictService.class);
+		when(districtServiceMock.getDistrictsFromInstituteApi()).thenReturn(ds);
+		doNothing().when(districtServiceMock).loadDistrictsIntoRedisCache(ds);
+
+		districtService.initializeDistrictCache(true);
+		//verify(codeServicemock).loadSchoolCategoryCodesIntoRedisCache(sccs);
+	}
+
+	@Test
+	public void whenInitializeDistrictCache_WithReadyAndTrue_ThenForceLoad() {
+		when(redisTemplateMock.opsForValue())
+				.thenReturn(valueOperationsMock);
+		when(valueOperationsMock.get(CacheKey.DISTRICT_CACHE.name()))
+				.thenReturn(String.valueOf(CacheStatus.READY));
+		doNothing().when(valueOperationsMock).set(CacheKey.DISTRICT_CACHE.name(), CacheStatus.READY.name());
+		districtService.initializeDistrictCache(true);
 	}
 }
