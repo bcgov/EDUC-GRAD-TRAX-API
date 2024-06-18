@@ -137,11 +137,7 @@ public class InstituteDistrictServiceTest {
 				.thenReturn(districtEntitiesMock);
 		when(this.districtEntitiesMock.block()).thenReturn(districts);
 
-		when(this.districtTransformerMock.transformToDTO(districts))
-				.thenReturn(districtsMock);
-
 		List<District> result = districtService.getDistrictsFromInstituteApi();
-
 	}
 
 	@Test
