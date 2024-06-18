@@ -157,7 +157,7 @@ public class InstituteSchoolServiceTest {
 	}
 
 	@Test
-	public void whenGetSchoolDetailssFromInstituteApi_returnsListOfSchoolDetailss() {
+	public void whenGetSchoolDetailssFromInstituteApi_returnsListOfSchoolDetails() {
 		List<SchoolDetailEntity> schoolDetails = new ArrayList<>();
 		SchoolDetailEntity schoolDetail = new SchoolDetailEntity();
 

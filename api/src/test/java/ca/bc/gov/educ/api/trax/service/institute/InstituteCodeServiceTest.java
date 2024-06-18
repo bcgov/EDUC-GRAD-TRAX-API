@@ -122,7 +122,7 @@ public class InstituteCodeServiceTest {
 	}
 
 	@Test
-	public void whenGetSchoolCategoryCodesFromInstituteApi_returnsListOfSchoolCategoryCodeEntity() {
+	public void whenGetSchoolCategoryCodesFromInstituteApi_returnsListOfSchoolCategoryCode() {
 		List<SchoolCategoryCodeEntity> schoolCategoryCodes = new ArrayList<>();
 		SchoolCategoryCodeEntity scce = new SchoolCategoryCodeEntity();
 
@@ -157,7 +157,7 @@ public class InstituteCodeServiceTest {
 	}
 
 	@Test
-	public void whenGetSchoolFundingGroupCodesFromInstituteApi_returnsListOfSchoolFundingGroupCodeEntity() {
+	public void whenGetSchoolFundingGroupCodesFromInstituteApi_returnsListOfSchoolFundingGroupCode() {
 		List<SchoolFundingGroupCodeEntity> schoolFundingGroupCodes = new ArrayList<>();
 		SchoolFundingGroupCodeEntity sfgc = new SchoolFundingGroupCodeEntity();
 
