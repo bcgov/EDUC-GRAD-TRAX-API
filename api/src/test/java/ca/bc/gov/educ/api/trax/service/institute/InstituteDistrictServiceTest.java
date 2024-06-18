@@ -6,6 +6,7 @@ import ca.bc.gov.educ.api.trax.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.trax.model.dto.ResponseObj;
 import ca.bc.gov.educ.api.trax.model.dto.institute.District;
 import ca.bc.gov.educ.api.trax.model.dto.institute.DistrictContact;
+import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolCategoryCode;
 import ca.bc.gov.educ.api.trax.model.entity.institute.DistrictContactEntity;
 import ca.bc.gov.educ.api.trax.model.entity.institute.DistrictEntity;
 import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolCategoryCodeEntity;
@@ -80,8 +81,6 @@ public class InstituteDistrictServiceTest {
 	@Mock
 	private List<District> districtsMock;
 	@MockBean
-	private RestUtils restUtilsMock;
-	@MockBean
 	private DistrictTransformer districtTransformerMock;
 
 	// NATS
@@ -93,6 +92,8 @@ public class InstituteDistrictServiceTest {
 
 	@MockBean
 	private Subscriber subscriber;
+	@MockBean
+	private RestUtils restUtils;
 
 	@TestConfiguration
 	static class TestConfigInstitute {
@@ -120,18 +121,17 @@ public class InstituteDistrictServiceTest {
 
 		districts.add(district);
 
-		ResponseObj tokenObj = new ResponseObj();
-		tokenObj.setAccess_token("123");
-
+		when(this.restUtils.getTokenResponseObject(anyString(), anyString()))
+				.thenReturn(responseObjectMock);
+		when(this.responseObjectMock.getAccess_token())
+				.thenReturn("accessToken");
 		when(webClientMock.get())
 				.thenReturn(requestHeadersUriSpecMock);
 		when(requestHeadersUriSpecMock.uri(anyString()))
 				.thenReturn(requestHeadersSpecMock);
-		when(this.restUtilsMock.getTokenResponseObject(anyString(), anyString()))
-				.thenReturn(tokenObj);
-		when(this.responseObjectMock.getAccess_token())
-				.thenReturn("AccessToken");
-		when(this.requestHeadersSpecMock.retrieve())
+		when(requestHeadersSpecMock.headers(any(Consumer.class)))
+				.thenReturn(requestHeadersSpecMock);
+		when(requestHeadersSpecMock.retrieve())
 				.thenReturn(responseSpecMock);
 		when(this.responseSpecMock.bodyToMono(new ParameterizedTypeReference<List<DistrictEntity>>(){}))
 				.thenReturn(districtEntitiesMock);
@@ -141,6 +141,7 @@ public class InstituteDistrictServiceTest {
 				.thenReturn(districtsMock);
 
 		List<District> result = districtService.getDistrictsFromInstituteApi();
+
 	}
 
 	@Test
