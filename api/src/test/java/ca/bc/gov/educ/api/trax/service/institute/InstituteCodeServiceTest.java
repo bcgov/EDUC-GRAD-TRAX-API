@@ -277,16 +277,17 @@ public class InstituteCodeServiceTest {
 		scc.setExpiryDate("01-01-2024");
 		sccs.add(scc);
 
-		when(this.restUtils.getTokenResponseObject(anyString(), anyString()))
-				.thenReturn(responseObjectMock);
-		when(this.responseObjectMock.getAccess_token())
-				.thenReturn("accessToken");
+
 		when(webClientMock.get())
 				.thenReturn(requestHeadersUriSpecMock);
 		when(requestHeadersUriSpecMock.uri(anyString()))
 				.thenReturn(requestHeadersSpecMock);
 		when(requestHeadersSpecMock.headers(any(Consumer.class)))
 				.thenReturn(requestHeadersSpecMock);
+		when(this.restUtils.getTokenResponseObject(anyString(), anyString()))
+				.thenReturn(responseObjectMock);
+		when(this.responseObjectMock.getAccess_token())
+				.thenReturn("accessToken");
 		when(requestHeadersSpecMock.retrieve())
 				.thenReturn(responseSpecMock);
 		when(this.responseSpecMock.bodyToMono(new ParameterizedTypeReference<List<SchoolCategoryCodeEntity>>(){}))
@@ -300,9 +301,15 @@ public class InstituteCodeServiceTest {
 		when(valueOperationsMock.get(CacheKey.SCHOOL_CATEGORY_CODE_CACHE.name()))
 				.thenReturn(String.valueOf(CacheStatus.LOADING));
 		doNothing().when(valueOperationsMock).set(CacheKey.SCHOOL_CATEGORY_CODE_CACHE.name(), CacheStatus.LOADING.name());
-		when(codeService.getSchoolCategoryCodesFromInstituteApi())
-				.thenReturn(sccs);
-		doNothing().when(codeService).loadSchoolCategoryCodesIntoRedisCache(sccs);
+
+		when(this.restUtils.getTokenResponseObject(anyString(), anyString()))
+				.thenReturn(responseObjectMock);
+		when(this.responseObjectMock.getAccess_token())
+				.thenReturn("accessToken");
+
+		CodeService codeServicemock = mock(CodeService.class);
+		when(codeServicemock.getSchoolCategoryCodesFromInstituteApi()).thenReturn(sccs);
+		doNothing().when(codeServicemock).loadSchoolCategoryCodesIntoRedisCache(sccs);
 
 		codeService.initializeSchoolCategoryCodeCache(true);
 
@@ -322,7 +329,7 @@ public class InstituteCodeServiceTest {
 	@Test
 	public void whenGetSchoolFundingGroupCodesFromRedisCache_GetSchoolFundingGroupCodes() {
 		SchoolFundingGroupCodeEntity sfgce = new SchoolFundingGroupCodeEntity();
-		List<SchoolFundingGroupCodeEntity> sfgces = new ArrayList<>();
+		List<SchoolFundingGroupCodeEntity> sfgces = new ArrayList<SchoolFundingGroupCodeEntity>();
 		sfgce.setSchoolFundingGroupCode("SFGC1");
 		sfgce.setLabel("SFGC1-label");
 		sfgces.add(sfgce);
