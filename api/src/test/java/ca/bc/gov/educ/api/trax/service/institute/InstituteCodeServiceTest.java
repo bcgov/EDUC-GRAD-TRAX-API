@@ -181,7 +181,6 @@ public class InstituteCodeServiceTest {
 				.thenReturn(requestHeadersSpecMock);
 		when(requestHeadersSpecMock.retrieve())
 				.thenReturn(responseSpecMock);
-
 		when(this.responseSpecMock.bodyToMono(new ParameterizedTypeReference<List<SchoolFundingGroupCodeEntity>>(){}))
 				.thenReturn(Mono.just(schoolFundingGroupCodes));
 		when(this.schoolFundingGroupCodeEntitiesMock.block())
@@ -278,19 +277,16 @@ public class InstituteCodeServiceTest {
 		scc.setExpiryDate("01-01-2024");
 		sccs.add(scc);
 
-		ResponseObj tokenObj = mock(ResponseObj.class);
-		tokenObj.setAccess_token("123");
-
+		when(this.restUtils.getTokenResponseObject(anyString(), anyString()))
+				.thenReturn(responseObjectMock);
+		when(this.responseObjectMock.getAccess_token())
+				.thenReturn("accessToken");
 		when(webClientMock.get())
 				.thenReturn(requestHeadersUriSpecMock);
 		when(requestHeadersUriSpecMock.uri(anyString()))
 				.thenReturn(requestHeadersSpecMock);
 		when(requestHeadersSpecMock.headers(any(Consumer.class)))
 				.thenReturn(requestHeadersSpecMock);
-		when(this.restUtils.getTokenResponseObject(anyString(), anyString()))
-				.thenReturn(tokenObj);
-		when(this.responseObjectMock.getAccess_token())
-				.thenReturn("accessToken");
 		when(requestHeadersSpecMock.retrieve())
 				.thenReturn(responseSpecMock);
 		when(this.responseSpecMock.bodyToMono(new ParameterizedTypeReference<List<SchoolCategoryCodeEntity>>(){}))
