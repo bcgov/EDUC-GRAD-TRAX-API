@@ -38,7 +38,7 @@ public class DistrictService {
         try {
             log.debug("****Before Calling Institute API");
             List<DistrictEntity> response = this.restService.get(constants.getAllDistrictsFromInstituteApiUrl(),
-                    List.class);
+                    List.class, webClient);
             return districtTransformer.transformToDTO(response);
         } catch (WebClientResponseException e) {
             log.warn(String.format("Error getting Common School List: %s", e.getMessage()));

@@ -47,7 +47,7 @@ public class SchoolService {
 		try {
 			log.debug("****Before Calling Institute API");
 			List<SchoolEntity> response = this.restService.get(constants.getAllSchoolsFromInstituteApiUrl(),
-					List.class);
+					List.class, webClient);
 			return schoolTransformer.transformToDTO(response);
 		} catch (WebClientResponseException e) {
 			log.warn(String.format("Error getting Common School List: %s", e.getMessage()));
@@ -76,7 +76,7 @@ public class SchoolService {
         try {
 			log.debug("****Before Calling Institute API");
 			SchoolDetailEntity sde = this.restService.get(String.format(constants.getSchoolDetailsByIdFromInstituteApiUrl(), schoolId),
-					SchoolDetailEntity.class);
+					SchoolDetailEntity.class, webClient);
 			return schoolDetailTransformer.transformToDTO(sde);
         } catch (WebClientResponseException e) {
             log.warn("Error getting School Details");

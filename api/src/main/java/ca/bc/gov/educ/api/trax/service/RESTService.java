@@ -21,9 +21,6 @@ public class RESTService {
 
     @Autowired
     private WebClient webClient;
-    @Autowired
-    @Qualifier("instituteWebClient")
-    private WebClient instituteWebClient;
 
     private static final String ERROR_5xx = "5xx error.";
     private static final String SERVICE_FAILED_ERROR = "Service failed to process after max retries.";
@@ -71,10 +68,12 @@ public class RESTService {
         return obj;
     }
 
-    public <T> T get(String url, Class<T> clazz) {
+    public <T> T get(String url, Class<T> clazz, WebClient webClient) {
         T obj;
+        if (webClient == null)
+            webClient = this.webClient;
         try {
-            obj = instituteWebClient
+            obj = webClient
                     .get()
                     .uri(url)
                     .headers(h -> { h.set(EducGradTraxApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()); })
@@ -130,10 +129,12 @@ public class RESTService {
         return obj;
     }
 
-    public <T> T post(String url, Object body, Class<T> clazz) {
+    public <T> T post(String url, Object body, Class<T> clazz, WebClient webClient) {
         T obj;
+        if (webClient == null)
+            webClient = this.webClient;
         try {
-            obj = instituteWebClient.post()
+            obj = webClient.post()
                     .uri(url)
                     .headers(h -> { h.set(EducGradTraxApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()); })
                     .body(BodyInserters.fromValue(body))

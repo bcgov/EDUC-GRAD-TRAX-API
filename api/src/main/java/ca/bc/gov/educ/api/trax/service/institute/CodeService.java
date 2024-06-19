@@ -46,7 +46,7 @@ public class CodeService {
 		try {
 			log.debug("****Before Calling Institute API");
 			List<SchoolCategoryCodeEntity> response = this.restService.get(constants.getAllSchoolCategoryCodesFromInstituteApiUrl(),
-					List.class);
+					List.class, webClient);
 			return schoolCategoryCodeTransformer.transformToDTO(response);
 		} catch (WebClientResponseException e) {
 			log.warn(String.format("Error getting School Category Codes: %s", e.getMessage()));
@@ -75,7 +75,7 @@ public class CodeService {
 		try {
 			log.debug("****Before Calling Institute API");
 			List<SchoolFundingGroupCodeEntity> response = this.restService.get(constants.getAllSchoolFundingGroupCodesFromInstituteApiUrl(),
-					List.class);
+					List.class, webClient);
 			return schoolFundingGroupCodeTransformer.transformToDTO(response);
 		} catch (WebClientResponseException e) {
 			log.warn(String.format("Error getting School Funding Group Codes: %s", e.getMessage()));
