@@ -32,8 +32,6 @@ public class DistrictService {
     @Autowired
     DistrictTransformer districtTransformer;
     @Autowired
-    RedisTemplate<String, String> redisTemplate;
-    @Autowired
     ServiceHelper<DistrictService> serviceHelper;
 
     public List<District> getDistrictsFromInstituteApi() {

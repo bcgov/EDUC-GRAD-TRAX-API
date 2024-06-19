@@ -40,8 +40,6 @@ public class CodeService {
 	@Autowired
 	SchoolFundingGroupCodeTransformer schoolFundingGroupCodeTransformer;
 	@Autowired
-	RedisTemplate<String, String> redisTemplate;
-	@Autowired
 	ServiceHelper<CodeService> serviceHelper;
 
 	public List<SchoolCategoryCode> getSchoolCategoryCodesFromInstituteApi() {

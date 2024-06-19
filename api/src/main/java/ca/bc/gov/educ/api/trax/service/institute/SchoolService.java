@@ -40,8 +40,6 @@ public class SchoolService {
 	@Autowired
 	SchoolDetailTransformer schoolDetailTransformer;
 	@Autowired
-	RedisTemplate<String, String> redisTemplate;
-	@Autowired
 	ServiceHelper<SchoolService> serviceHelper;
 
 	public List<School> getSchoolsFromInstituteApi() {
