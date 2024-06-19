@@ -5,13 +5,11 @@ import ca.bc.gov.educ.api.trax.model.dto.institute.District;
 import ca.bc.gov.educ.api.trax.model.entity.institute.DistrictEntity;
 import ca.bc.gov.educ.api.trax.model.transformer.institute.DistrictTransformer;
 import ca.bc.gov.educ.api.trax.repository.redis.DistrictRedisRepository;
+import ca.bc.gov.educ.api.trax.service.RESTService;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
-import ca.bc.gov.educ.api.trax.util.ThreadLocalStateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -33,20 +31,15 @@ public class DistrictService {
     DistrictTransformer districtTransformer;
     @Autowired
     ServiceHelper<DistrictService> serviceHelper;
+    @Autowired
+    RESTService restService;
 
     public List<District> getDistrictsFromInstituteApi() {
         try {
             log.debug("****Before Calling Institute API");
-            List<DistrictEntity> districts =
-                    webClient.get()
-                            .uri(constants.getAllDistrictsFromInstituteApiUrl())
-                            .headers(h -> {
-                                h.set(EducGradTraxApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                            })
-                            .retrieve()
-                            .bodyToMono(new ParameterizedTypeReference<List<DistrictEntity>>() {
-                            }).block();
-            return districtTransformer.transformToDTO(districts);
+            List<DistrictEntity> response = this.restService.get(constants.getAllDistrictsFromInstituteApiUrl(),
+                    List.class);
+            return districtTransformer.transformToDTO(response);
         } catch (WebClientResponseException e) {
             log.warn(String.format("Error getting Common School List: %s", e.getMessage()));
         } catch (Exception e) {

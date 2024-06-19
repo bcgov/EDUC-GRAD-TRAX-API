@@ -9,13 +9,11 @@ import ca.bc.gov.educ.api.trax.model.transformer.institute.SchoolCategoryCodeTra
 import ca.bc.gov.educ.api.trax.model.transformer.institute.SchoolFundingGroupCodeTransformer;
 import ca.bc.gov.educ.api.trax.repository.redis.SchoolCategoryCodeRedisRepository;
 import ca.bc.gov.educ.api.trax.repository.redis.SchoolFundingGroupCodeRedisRepository;
+import ca.bc.gov.educ.api.trax.service.RESTService;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
-import ca.bc.gov.educ.api.trax.util.ThreadLocalStateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -41,18 +39,15 @@ public class CodeService {
 	SchoolFundingGroupCodeTransformer schoolFundingGroupCodeTransformer;
 	@Autowired
 	ServiceHelper<CodeService> serviceHelper;
+	@Autowired
+	RESTService restService;
 
 	public List<SchoolCategoryCode> getSchoolCategoryCodesFromInstituteApi() {
 		try {
 			log.debug("****Before Calling Institute API");
-			List<SchoolCategoryCodeEntity> schoolCategoryCodes =
-					webClient.get()
-							.uri(constants.getAllSchoolCategoryCodesFromInstituteApiUrl())
-							.headers(h -> {
-								h.set(EducGradTraxApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-							}).retrieve()
-							.bodyToMono(new ParameterizedTypeReference<List<SchoolCategoryCodeEntity>>(){}).block();
-			return schoolCategoryCodeTransformer.transformToDTO(schoolCategoryCodes);
+			List<SchoolCategoryCodeEntity> response = this.restService.get(constants.getAllSchoolCategoryCodesFromInstituteApiUrl(),
+					List.class);
+			return schoolCategoryCodeTransformer.transformToDTO(response);
 		} catch (WebClientResponseException e) {
 			log.warn(String.format("Error getting School Category Codes: %s", e.getMessage()));
 		} catch (Exception e) {
@@ -79,16 +74,9 @@ public class CodeService {
 	public List<SchoolFundingGroupCode> getSchoolFundingGroupCodesFromInstituteApi() {
 		try {
 			log.debug("****Before Calling Institute API");
-			List<SchoolFundingGroupCodeEntity> schoolFundingGroupCodes;
-			schoolFundingGroupCodes = webClient.get()
-					.uri(constants.getAllSchoolFundingGroupCodesFromInstituteApiUrl())
-					.headers(h -> {
-						h.set(EducGradTraxApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-					})
-					.retrieve()
-					.bodyToMono(new ParameterizedTypeReference<List<SchoolFundingGroupCodeEntity>>() {
-					}).block();
-			return schoolFundingGroupCodeTransformer.transformToDTO(schoolFundingGroupCodes);
+			List<SchoolFundingGroupCodeEntity> response = this.restService.get(constants.getAllSchoolFundingGroupCodesFromInstituteApiUrl(),
+					List.class);
+			return schoolFundingGroupCodeTransformer.transformToDTO(response);
 		} catch (WebClientResponseException e) {
 			log.warn(String.format("Error getting School Funding Group Codes: %s", e.getMessage()));
 		} catch (Exception e) {

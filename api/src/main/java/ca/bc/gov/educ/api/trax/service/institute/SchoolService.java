@@ -4,17 +4,16 @@ import ca.bc.gov.educ.api.trax.constant.CacheKey;
 import ca.bc.gov.educ.api.trax.model.dto.institute.School;
 import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolDetail;
 import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolEntity;
+import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolDetailEntity;
 import ca.bc.gov.educ.api.trax.model.transformer.institute.SchoolDetailTransformer;
 import ca.bc.gov.educ.api.trax.model.transformer.institute.SchoolTransformer;
 import ca.bc.gov.educ.api.trax.repository.redis.SchoolDetailRedisRepository;
 import ca.bc.gov.educ.api.trax.repository.redis.SchoolRedisRepository;
+import ca.bc.gov.educ.api.trax.service.RESTService;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
-import ca.bc.gov.educ.api.trax.util.ThreadLocalStateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -41,19 +40,15 @@ public class SchoolService {
 	SchoolDetailTransformer schoolDetailTransformer;
 	@Autowired
 	ServiceHelper<SchoolService> serviceHelper;
+	@Autowired
+	RESTService restService;
 
 	public List<School> getSchoolsFromInstituteApi() {
 		try {
 			log.debug("****Before Calling Institute API");
-			List<SchoolEntity> schools;
-			schools = webClient.get()
-					.uri(constants.getAllSchoolsFromInstituteApiUrl())
-					.headers(h -> {
-						h.set(EducGradTraxApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-					})
-					.retrieve()
-					.bodyToMono(new ParameterizedTypeReference<List<SchoolEntity>>(){}).block();
-			return  schoolTransformer.transformToDTO(schools);
+			List<SchoolEntity> response = this.restService.get(constants.getAllSchoolsFromInstituteApiUrl(),
+					List.class);
+			return schoolTransformer.transformToDTO(response);
 		} catch (WebClientResponseException e) {
 			log.warn(String.format("Error getting Common School List: %s", e.getMessage()));
 		} catch (Exception e) {
@@ -79,12 +74,10 @@ public class SchoolService {
 
     public SchoolDetail getSchoolDetailByIdFromInstituteApi(String schoolId) {
         try {
-            return webClient.get().uri(
-                            String.format(constants.getSchoolDetailsByIdFromInstituteApiUrl(), schoolId))
-					.headers(h -> {
-						h.set(EducGradTraxApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-					})
-                    .retrieve().bodyToMono(SchoolDetail.class).block();
+			log.debug("****Before Calling Institute API");
+			SchoolDetailEntity sde = this.restService.get(String.format(constants.getSchoolDetailsByIdFromInstituteApiUrl(), schoolId),
+					SchoolDetailEntity.class);
+			return schoolDetailTransformer.transformToDTO(sde);
         } catch (WebClientResponseException e) {
             log.warn("Error getting School Details");
         } catch (Exception e) {

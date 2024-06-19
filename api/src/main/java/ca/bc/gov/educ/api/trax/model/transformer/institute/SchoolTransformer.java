@@ -1,9 +1,6 @@
 package ca.bc.gov.educ.api.trax.model.transformer.institute;
 
 import ca.bc.gov.educ.api.trax.model.dto.institute.School;
-import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolDetail;
-import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolCategoryCodeEntity;
-import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolDetailEntity;
 import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolEntity;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
