@@ -16,9 +16,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.codec.json.Jackson2JsonDecoder;
 import org.springframework.http.codec.json.Jackson2JsonEncoder;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProvider;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProviderBuilder;
+import org.springframework.security.oauth2.client.*;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
@@ -66,7 +64,23 @@ public class GradTraxConfig {
 				.apply(filter.oauth2Configuration())
 				.build();
 	}
-	@Bean
+
+
+	@Bean("instituteWebClient")
+	public WebClient getInstituteWebClient(OAuth2AuthorizedClientManager authorizedClientManager) {
+		ServletOAuth2AuthorizedClientExchangeFilterFunction filter = new ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager);
+		filter.setDefaultClientRegistrationId("institute-web-client");
+		return WebClient.builder()
+				.exchangeStrategies(ExchangeStrategies
+						.builder()
+						.codecs(codecs -> codecs
+								.defaultCodecs()
+								.maxInMemorySize(50 * 1024 * 1024))
+						.build())
+				.apply(filter.oauth2Configuration())
+				.build();
+	}
+	/*@Bean
 	public OAuth2AuthorizedClientManager authorizedClientManager(
 			ClientRegistrationRepository clientRegistrationRepository,
 			OAuth2AuthorizedClientRepository authorizedClientRepository) {
@@ -77,7 +91,25 @@ public class GradTraxConfig {
 				clientRegistrationRepository, authorizedClientRepository);
 		authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider);
 		return authorizedClientManager;
+	}*/
+
+	@Bean
+	public OAuth2AuthorizedClientManager authorizedClientManager(
+			ClientRegistrationRepository clientRegistrationRepository,
+			OAuth2AuthorizedClientService clientService) {
+
+		OAuth2AuthorizedClientProvider authorizedClientProvider =
+				OAuth2AuthorizedClientProviderBuilder.builder()
+						.clientCredentials()
+						.build();
+		AuthorizedClientServiceOAuth2AuthorizedClientManager authorizedClientManager =
+				new AuthorizedClientServiceOAuth2AuthorizedClientManager(clientRegistrationRepository, clientService);
+		authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider);
+
+		return authorizedClientManager;
 	}
+
+
 
 	@Bean
 	public WebClient webClient() {

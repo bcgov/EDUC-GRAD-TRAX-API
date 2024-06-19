@@ -1,7 +1,6 @@
 package ca.bc.gov.educ.api.trax.service.institute;
 
 import ca.bc.gov.educ.api.trax.constant.CacheKey;
-import ca.bc.gov.educ.api.trax.constant.CacheStatus;
 import ca.bc.gov.educ.api.trax.model.dto.institute.School;
 import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolDetail;
 import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolEntity;
@@ -10,9 +9,10 @@ import ca.bc.gov.educ.api.trax.model.transformer.institute.SchoolTransformer;
 import ca.bc.gov.educ.api.trax.repository.redis.SchoolDetailRedisRepository;
 import ca.bc.gov.educ.api.trax.repository.redis.SchoolRedisRepository;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
-import ca.bc.gov.educ.api.trax.util.RestUtils;
+import ca.bc.gov.educ.api.trax.util.ThreadLocalStateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -29,6 +29,7 @@ public class SchoolService {
 	@Autowired
 	private EducGradTraxApiConstants constants;
 	@Autowired
+	@Qualifier("instituteWebClient")
 	private WebClient webClient;
 	@Autowired
 	SchoolRedisRepository schoolRedisRepository;
@@ -39,9 +40,9 @@ public class SchoolService {
 	@Autowired
 	SchoolDetailTransformer schoolDetailTransformer;
 	@Autowired
-	private RestUtils restUtils;
-	@Autowired
 	RedisTemplate<String, String> redisTemplate;
+	@Autowired
+	ServiceHelper<SchoolService> serviceHelper;
 
 	public List<School> getSchoolsFromInstituteApi() {
 		try {
@@ -50,15 +51,10 @@ public class SchoolService {
 			schools = webClient.get()
 					.uri(constants.getAllSchoolsFromInstituteApiUrl())
 					.headers(h -> {
-						h.setBearerAuth(restUtils.getTokenResponseObject(
-								constants.getInstituteClientId(),
-								constants.getInstituteClientSecret()
-						).getAccess_token());
+						h.set(EducGradTraxApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
 					})
 					.retrieve()
 					.bodyToMono(new ParameterizedTypeReference<List<SchoolEntity>>(){}).block();
-			//assert schools != null;
-			//log.debug("# of Schools: " + schools.size());
 			return  schoolTransformer.transformToDTO(schools);
 		} catch (WebClientResponseException e) {
 			log.warn(String.format("Error getting Common School List: %s", e.getMessage()));
@@ -71,6 +67,7 @@ public class SchoolService {
 	public void loadSchoolsIntoRedisCache(List<ca.bc.gov.educ.api.trax.model.dto.institute.School> schools) {
 		schoolRedisRepository
 				.saveAll(schoolTransformer.transformToEntity(schools));
+		log.info(String.format("%s Schools Loaded into cache.", schools.size()));
 	}
 
 	public List<School> getSchoolsFromRedisCache() {
@@ -79,47 +76,16 @@ public class SchoolService {
 	}
 
 	public void initializeSchoolCache(boolean force) {
-		String cacheStatus = redisTemplate.opsForValue().get(CacheKey.SCHOOL_CACHE.name());
-		cacheStatus = cacheStatus == null ? "" : cacheStatus;
-		if (CacheStatus.LOADING.name().compareToIgnoreCase(cacheStatus) == 0
-				|| CacheStatus.READY.name().compareToIgnoreCase(cacheStatus) == 0) {
-			log.info(String.format("SCHOOL_CACHE status: %s", cacheStatus));
-			if (force) {
-				log.info("Force Flag is true. Reloading SCHOOL_CACHE...");
-				redisTemplate.opsForValue().set(CacheKey.SCHOOL_CACHE.name(), CacheStatus.LOADING.name());
-				loadSchoolsIntoRedisCache(getSchoolsFromInstituteApi());
-				redisTemplate.opsForValue().set(CacheKey.SCHOOL_CACHE.name(), CacheStatus.READY.name());
-				log.info("SUCCESS! - SCHOOL_CACHE is now READY");
-			} else {
-				log.info("Force Flag is false. Skipping SCHOOL_CACHE reload");
-			}
-		} else {
-			log.info("Loading SCHOOL_CACHE...");
-			redisTemplate.opsForValue().set(CacheKey.SCHOOL_CACHE.name(), CacheStatus.LOADING.name());
-			loadSchoolsIntoRedisCache(getSchoolsFromInstituteApi());
-			redisTemplate.opsForValue().set(CacheKey.SCHOOL_CACHE.name(), CacheStatus.READY.name());
-			log.info("SUCCESS! - SCHOOL_CACHE is now READY");
-		}
+		serviceHelper.initializeCache(force, CacheKey.SCHOOL_CACHE, this);
 	}
 
-	public SchoolDetail getSchoolDetailByIdFromInstituteApi(String schoolId) {
-		return getSchoolDetailByIdFromInstituteApi(schoolId, "");
-	}
-
-    public SchoolDetail getSchoolDetailByIdFromInstituteApi(String schoolId, String accessToken) {
+    public SchoolDetail getSchoolDetailByIdFromInstituteApi(String schoolId) {
         try {
             return webClient.get().uri(
                             String.format(constants.getSchoolDetailsByIdFromInstituteApiUrl(), schoolId))
-                    .headers(h -> {
-						if (accessToken.isEmpty() || accessToken.isBlank()) {
-							h.setBearerAuth(restUtils.getTokenResponseObject(
-									constants.getInstituteClientId(),
-									constants.getInstituteClientSecret()
-							).getAccess_token());
-						} else {
-							h.setBearerAuth(accessToken);
-						}
-                    })
+					.headers(h -> {
+						h.set(EducGradTraxApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+					})
                     .retrieve().bodyToMono(SchoolDetail.class).block();
         } catch (WebClientResponseException e) {
             log.warn("Error getting School Details");
@@ -131,23 +97,14 @@ public class SchoolService {
 
     public List<SchoolDetail> getSchoolDetailsFromInstituteApi() {
 
-		String accessToken = "";
         List<School> schools = getSchoolsFromRedisCache();
         List<SchoolDetail> schoolDetails = new ArrayList<SchoolDetail>();
-
-        int counter = 1;
 
         for (School s : schools) {
             SchoolDetail sd = new SchoolDetail();
 
-            if (counter%200 == 0)
-                accessToken = restUtils.getTokenResponseObject(
-						constants.getInstituteClientId(),
-						constants.getInstituteClientSecret()
-				).getAccess_token();
-            sd = getSchoolDetailByIdFromInstituteApi(s.getSchoolId(), accessToken);
+            sd = getSchoolDetailByIdFromInstituteApi(s.getSchoolId());
             schoolDetails.add(sd);
-            counter++;
         }
         return schoolDetails;
     }
@@ -155,6 +112,7 @@ public class SchoolService {
 	public void loadSchoolDetailsIntoRedisCache(List<SchoolDetail> schoolDetails) {
 		schoolDetailRedisRepository
 				.saveAll(schoolDetailTransformer.transformToEntity(schoolDetails));
+		log.info(String.format("%s School Details Loaded into cache.", schoolDetails.size()));
 	}
 
 	public List<SchoolDetail> getSchoolDetailsFromRedisCache() {
@@ -163,27 +121,7 @@ public class SchoolService {
 	}
 
 	public void initializeSchoolDetailCache(boolean force) {
-		String cacheStatus = redisTemplate.opsForValue().get(CacheKey.SCHOOL_DETAIL_CACHE.name());
-		cacheStatus = cacheStatus == null ? "" : cacheStatus;
-		if (CacheStatus.LOADING.name().compareToIgnoreCase(cacheStatus) == 0
-				|| CacheStatus.READY.name().compareToIgnoreCase(cacheStatus) == 0) {
-			log.info(String.format("SCHOOL_DETAIL_CACHE status: %s", cacheStatus));
-			if (force) {
-				log.info("Force Flag is true. Reloading SCHOOL_DETAIL_CACHE...");
-				redisTemplate.opsForValue().set(CacheKey.SCHOOL_DETAIL_CACHE.name(), CacheStatus.LOADING.name());
-				loadSchoolDetailsIntoRedisCache(getSchoolDetailsFromInstituteApi());
-				redisTemplate.opsForValue().set(CacheKey.SCHOOL_DETAIL_CACHE.name(), CacheStatus.READY.name());
-				log.info("SUCCESS! - SCHOOL_DETAIL_CACHE is now READY");
-			} else {
-				log.info("Force Flag is false. Skipping SCHOOL_DETAIL_CACHE reload");
-			}
-		} else {
-			log.info("Loading SCHOOL_DETAIL_CACHE...");
-			redisTemplate.opsForValue().set(CacheKey.SCHOOL_DETAIL_CACHE.name(), CacheStatus.LOADING.name());
-			loadSchoolDetailsIntoRedisCache(getSchoolDetailsFromInstituteApi());
-			redisTemplate.opsForValue().set(CacheKey.SCHOOL_DETAIL_CACHE.name(), CacheStatus.READY.name());
-			log.info("SUCCESS! - SCHOOL_DETAIL_CACHE is now READY");
-		}
+		serviceHelper.initializeCache(force, CacheKey.SCHOOL_DETAIL_CACHE, this);
 	}
 
 }

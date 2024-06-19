@@ -1,15 +1,15 @@
 package ca.bc.gov.educ.api.trax.service.institute;
 
 import ca.bc.gov.educ.api.trax.constant.CacheKey;
-import ca.bc.gov.educ.api.trax.constant.CacheStatus;
 import ca.bc.gov.educ.api.trax.model.dto.institute.District;
 import ca.bc.gov.educ.api.trax.model.entity.institute.DistrictEntity;
 import ca.bc.gov.educ.api.trax.model.transformer.institute.DistrictTransformer;
 import ca.bc.gov.educ.api.trax.repository.redis.DistrictRedisRepository;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
-import ca.bc.gov.educ.api.trax.util.RestUtils;
+import ca.bc.gov.educ.api.trax.util.ThreadLocalStateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -25,8 +25,7 @@ public class DistrictService {
     @Autowired
     private EducGradTraxApiConstants constants;
     @Autowired
-    private RestUtils restUtils;
-    @Autowired
+    @Qualifier("instituteWebClient")
     private WebClient webClient;
     @Autowired
     DistrictRedisRepository districtRedisRepository;
@@ -34,6 +33,8 @@ public class DistrictService {
     DistrictTransformer districtTransformer;
     @Autowired
     RedisTemplate<String, String> redisTemplate;
+    @Autowired
+    ServiceHelper<DistrictService> serviceHelper;
 
     public List<District> getDistrictsFromInstituteApi() {
         try {
@@ -41,15 +42,12 @@ public class DistrictService {
             List<DistrictEntity> districts =
                     webClient.get()
                             .uri(constants.getAllDistrictsFromInstituteApiUrl())
-                            .headers(h -> h.setBearerAuth(restUtils.getTokenResponseObject(
-                                    constants.getInstituteClientId(),
-                                    constants.getInstituteClientSecret()
-                            ).getAccess_token()))
+                            .headers(h -> {
+                                h.set(EducGradTraxApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                            })
                             .retrieve()
                             .bodyToMono(new ParameterizedTypeReference<List<DistrictEntity>>() {
                             }).block();
-            //assert districts != null;
-            //log.debug("# of Districts: " + districts.size());
             return districtTransformer.transformToDTO(districts);
         } catch (WebClientResponseException e) {
             log.warn(String.format("Error getting Common School List: %s", e.getMessage()));
@@ -62,35 +60,15 @@ public class DistrictService {
     public void loadDistrictsIntoRedisCache(List<District> districts) {
         districtRedisRepository
                 .saveAll(districtTransformer.transformToEntity(districts));
+        log.info(String.format("%s Districts Loaded into cache.", districts.size()));
     }
 
-    public List<District> getSchoolsFromRedisCache() {
+    public List<District> getDistrictsFromRedisCache() {
         log.debug("**** Getting districts from Redis Cache.");
         return  districtTransformer.transformToDTO(districtRedisRepository.findAll());
     }
 
     public void initializeDistrictCache(boolean force) {
-        String cacheStatus = redisTemplate.opsForValue().get(CacheKey.DISTRICT_CACHE.name());
-        cacheStatus = cacheStatus == null ? "" : cacheStatus;
-        if (CacheStatus.LOADING.name().compareToIgnoreCase(cacheStatus) == 0
-                || CacheStatus.READY.name().compareToIgnoreCase(cacheStatus) == 0) {
-            log.info(String.format("DISTRICT_CACHE status: %s", cacheStatus));
-            if (force) {
-                log.info("Force Flag is true. Reloading DISTRICT_CACHE...");
-                redisTemplate.opsForValue().set(CacheKey.DISTRICT_CACHE.name(), CacheStatus.LOADING.name());
-                loadDistrictsIntoRedisCache(getDistrictsFromInstituteApi());
-                redisTemplate.opsForValue().set(CacheKey.DISTRICT_CACHE.name(), CacheStatus.READY.name());
-                log.info("SUCCESS! - DISTRICT_CACHE is now READY");
-            } else {
-                log.info("Force Flag is false. Skipping DISTRICT_CACHE reload");
-            }
-        } else {
-            log.info("Loading DISTRICT_CACHE...");
-            redisTemplate.opsForValue().set(CacheKey.DISTRICT_CACHE.name(), CacheStatus.LOADING.name());
-            loadDistrictsIntoRedisCache(getDistrictsFromInstituteApi());
-            redisTemplate.opsForValue().set(CacheKey.DISTRICT_CACHE.name(), CacheStatus.READY.name());
-            log.info("SUCCESS! - DISTRICT_CACHE is now READY");
-        }
+        serviceHelper.initializeCache(force, CacheKey.DISTRICT_CACHE, this);
     }
-
 }

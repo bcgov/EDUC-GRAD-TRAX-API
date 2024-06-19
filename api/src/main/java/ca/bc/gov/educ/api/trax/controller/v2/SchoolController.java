@@ -56,4 +56,13 @@ public class SchoolController {
         return schoolService.getSchoolDetailsFromRedisCache();
     }
 
+    @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_URL_MAPPING_V2 + "/inst")
+    @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
+    @Operation(summary = "Find All Schools from institute api", description = "Get All Schools from institute api", tags = { "School" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+    public List<School> getAllSchoolsFromInstituteApi() {
+        log.debug("getAllSchools : ");
+        return schoolService.getSchoolsFromInstituteApi();
+    }
+
 }

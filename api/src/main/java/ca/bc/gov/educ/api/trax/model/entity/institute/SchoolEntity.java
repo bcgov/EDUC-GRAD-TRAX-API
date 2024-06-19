@@ -17,15 +17,12 @@ public class SchoolEntity {
     private String districtId;
     @Indexed
     private String mincode;
-    @Indexed
     private String independentAuthorityId;
-    @Indexed
     private String schoolNumber;
     private String faxNumber;
     private String phoneNumber;
     private String email;
     private String website;
-    @Indexed
     private String displayName;
     private String displayNameNoSpecialChars;
     private String schoolReportingRequirementCode;
