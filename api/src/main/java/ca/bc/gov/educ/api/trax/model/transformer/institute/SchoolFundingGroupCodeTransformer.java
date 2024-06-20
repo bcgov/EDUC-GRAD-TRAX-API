@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component("SchoolFundingGroupCodeTransformer")
 public class SchoolFundingGroupCodeTransformer {
@@ -38,7 +39,11 @@ public class SchoolFundingGroupCodeTransformer {
         return modelMapper.map(schoolFundingGroupCode, SchoolFundingGroupCodeEntity.class);
     }
 
-    public List<SchoolFundingGroupCodeEntity> transformToEntity (Iterable<SchoolFundingGroupCode> schoolFundingGroupCodes ) {
-        return modelMapper.map(schoolFundingGroupCodes, new TypeToken<List<SchoolFundingGroupCodeEntity>>(){}.getType());
+    public List<SchoolFundingGroupCodeEntity> transformToEntity (List<SchoolFundingGroupCode> schoolFundingGroupCodes ) {
+        if (schoolFundingGroupCodes == null) return null;
+        return schoolFundingGroupCodes
+                .stream()
+                .map(sfgc -> modelMapper.map(sfgc, SchoolFundingGroupCodeEntity.class))
+                .collect(Collectors.toList());
     }
 }

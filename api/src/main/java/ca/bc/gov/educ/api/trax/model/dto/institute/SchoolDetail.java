@@ -1,21 +1,23 @@
-package ca.bc.gov.educ.api.trax.model.entity.institute;
+package ca.bc.gov.educ.api.trax.model.dto.institute;
 
-import lombok.*;
+import ca.bc.gov.educ.api.trax.model.dto.BaseModel;
+import ca.bc.gov.educ.api.trax.model.dto.SchoolContact;
+import ca.bc.gov.educ.api.trax.model.entity.institute.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.index.Indexed;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-@RedisHash("School")
-public class SchoolEntity {
+@EqualsAndHashCode(callSuper = true)
+@Component("SchoolDetail")
+public class SchoolDetail extends BaseModel {
 
-    @Id
     private String schoolId;
-    @Indexed
     private String districtId;
-    @Indexed
     private String mincode;
     private String independentAuthorityId;
     private String schoolNumber;
@@ -27,17 +29,22 @@ public class SchoolEntity {
     private String displayNameNoSpecialChars;
     private String schoolReportingRequirementCode;
     private String schoolOrganizationCode;
-    @Indexed
     private String schoolCategoryCode;
     private String facilityTypeCode;
     private String openedDate;
     private String closedDate;
-    @Indexed
     private boolean canIssueTranscripts;
-    @Indexed
     private boolean canIssueCertificates;
     private String createUser;
     private String updateUser;
     private String createDate;
     private String updateDate;
+    List<SchoolContact> contacts;
+    List<SchoolAddress> addresses;
+    List<Note> notes;
+    List<Grade> grades;
+    List<SchoolFundingGroup> schoolFundingGroups;
+    List<NeighborhoodLearning> neighborhoodLearnings;
+    List<SchoolMove> schoolMoves;
+
 }

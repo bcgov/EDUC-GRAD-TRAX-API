@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.trax.controller;
 
 import ca.bc.gov.educ.api.trax.model.dto.CommonSchool;
 import ca.bc.gov.educ.api.trax.model.dto.School;
+import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolDetail;
 import ca.bc.gov.educ.api.trax.service.SchoolService;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.ResponseHelper;
@@ -33,6 +34,8 @@ public class SchoolControllerTest {
 
     @Mock
     private SchoolService schoolService;
+    @Mock
+    private ca.bc.gov.educ.api.trax.service.institute.SchoolService schoolServiceV2;
 
     @Autowired
     private EducGradTraxApiConstants constants;
@@ -51,6 +54,9 @@ public class SchoolControllerTest {
 
     @InjectMocks
     private SchoolController schoolController;
+
+    @InjectMocks
+    private ca.bc.gov.educ.api.trax.controller.v2.SchoolController schoolControllerV2;
 
     @Test
     public void testGetAllSchools() {
@@ -144,5 +150,39 @@ public class SchoolControllerTest {
         when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
         when(this.responseMock.bodyToMono(CommonSchool.class)).thenReturn(Mono.just(commonSchool));
 
+    }
+
+    @Test
+    public void whenGetAllSchools_ReturnsListOfSchools() {
+        final List<ca.bc.gov.educ.api.trax.model.dto.institute.School> schools = new ArrayList<>();
+        ca.bc.gov.educ.api.trax.model.dto.institute.School school = new ca.bc.gov.educ.api.trax.model.dto.institute.School();
+        school.setSchoolId("1234567");
+        school.setDistrictId("9876543");
+        schools.add(school);
+        school = new ca.bc.gov.educ.api.trax.model.dto.institute.School();
+        school.setSchoolId("1234567");
+        school.setDistrictId("9876543");
+        schools.add(school);
+
+        Mockito.when(schoolServiceV2.getSchoolsFromRedisCache()).thenReturn(schools);
+        schoolControllerV2.getAllSchools();
+        Mockito.verify(schoolServiceV2).getSchoolsFromRedisCache();
+    }
+
+    @Test
+    public void whenGetAllSchoolDetails_ReturnsListOfSchoolDetails() {
+        final List<SchoolDetail> schoolDetails = new ArrayList<>();
+        SchoolDetail schoolDetail = new SchoolDetail();
+        schoolDetail.setSchoolId("1234567");
+        schoolDetail.setDistrictId("9876543");
+        schoolDetails.add(schoolDetail);
+        schoolDetail = new SchoolDetail();
+        schoolDetail.setSchoolId("1234567");
+        schoolDetail.setDistrictId("9876543");
+        schoolDetails.add(schoolDetail);
+
+        Mockito.when(schoolServiceV2.getSchoolDetailsFromRedisCache()).thenReturn(schoolDetails);
+        schoolControllerV2.getAllSchoolDetails();
+        Mockito.verify(schoolServiceV2).getSchoolDetailsFromRedisCache();
     }
 }
