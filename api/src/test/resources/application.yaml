@@ -75,7 +75,8 @@ nats:
 #Redis
 redis:
   url: '127.0.0.1'
-  port: '6379'
+  port: '54321'
+  secret: 'its-a-secret'
 
 #Scheduler
 cron:

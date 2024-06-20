@@ -1,6 +1,4 @@
 spring:
-  #main:
-  #  allow-bean-definition-overriding: true
   jmx:
     enabled: false
   datasource:
@@ -48,8 +46,15 @@ spring:
             client-id: ${TRAX_CLIENT_NAME}
             client-secret: ${TRAX_CLIENT_SECRET}
             authorization-grant-type: client_credentials
+          institute-web-client:
+            client-id: ${EDX_GRAD_CLIENT_NAME}
+            client-secret: ${EDX_GRAD_CLIENT_SECRET}
+            authorization-grant-type: client_credentials
         provider:
           traxclient:
+            issuer-uri: ${TOKEN_ISSUER_URL}
+            token-uri: ${TOKEN_ISSUER_URL}/protocol/openid-connect/token
+          institute-web-client:
             issuer-uri: ${TOKEN_ISSUER_URL}
             token-uri: ${TOKEN_ISSUER_URL}/protocol/openid-connect/token
 
@@ -129,6 +134,7 @@ nats:
 redis:
   url: ${REDIS_URL}
   port: ${REDIS_PORT}
+  secret: ${REDIS_SECRET}
 
 #Scheduler
 cron:

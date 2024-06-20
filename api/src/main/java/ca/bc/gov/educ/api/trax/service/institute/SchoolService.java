@@ -1,18 +1,24 @@
 package ca.bc.gov.educ.api.trax.service.institute;
 
+import ca.bc.gov.educ.api.trax.constant.CacheKey;
 import ca.bc.gov.educ.api.trax.model.dto.institute.School;
+import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolDetail;
 import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolEntity;
+import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolDetailEntity;
+import ca.bc.gov.educ.api.trax.model.transformer.institute.SchoolDetailTransformer;
 import ca.bc.gov.educ.api.trax.model.transformer.institute.SchoolTransformer;
+import ca.bc.gov.educ.api.trax.repository.redis.SchoolDetailRedisRepository;
 import ca.bc.gov.educ.api.trax.repository.redis.SchoolRedisRepository;
+import ca.bc.gov.educ.api.trax.service.RESTService;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
-import ca.bc.gov.educ.api.trax.util.RestUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -21,40 +27,32 @@ public class SchoolService {
 
 	@Autowired
 	private EducGradTraxApiConstants constants;
-
 	@Autowired
+	@Qualifier("instituteWebClient")
 	private WebClient webClient;
-
 	@Autowired
 	SchoolRedisRepository schoolRedisRepository;
-
+	@Autowired
+	SchoolDetailRedisRepository schoolDetailRedisRepository;
 	@Autowired
 	SchoolTransformer schoolTransformer;
-
 	@Autowired
-	private RestUtils restUtils;
+	SchoolDetailTransformer schoolDetailTransformer;
+	@Autowired
+	ServiceHelper<SchoolService> serviceHelper;
+	@Autowired
+	RESTService restService;
 
 	public List<School> getSchoolsFromInstituteApi() {
 		try {
 			log.debug("****Before Calling Institute API");
-			List<SchoolEntity> schools;
-			schools = webClient.get()
-					.uri(constants.getAllSchoolsFromInstituteApiUrl())
-					.headers(h -> {
-						h.setBearerAuth(restUtils.getTokenResponseObject(
-								constants.getInstituteClientId(),
-								constants.getInstituteClientSecret()
-						).getAccess_token());
-					})
-					.retrieve()
-					.bodyToMono(new ParameterizedTypeReference<List<SchoolEntity>>(){}).block();
-			//assert schools != null;
-			//log.debug("# of Schools: " + schools.size());
-			return  schoolTransformer.transformToDTO(schools);
+			List<SchoolEntity> response = this.restService.get(constants.getAllSchoolsFromInstituteApiUrl(),
+					List.class, webClient);
+			return schoolTransformer.transformToDTO(response);
 		} catch (WebClientResponseException e) {
 			log.warn(String.format("Error getting Common School List: %s", e.getMessage()));
 		} catch (Exception e) {
-			log.error(String.format("Error while calling school-api: %s", e.getMessage()));
+			log.error(String.format("Error getting data from Institute api: %s", e.getMessage()));
 		}
 		return null;
 	}
@@ -62,57 +60,59 @@ public class SchoolService {
 	public void loadSchoolsIntoRedisCache(List<ca.bc.gov.educ.api.trax.model.dto.institute.School> schools) {
 		schoolRedisRepository
 				.saveAll(schoolTransformer.transformToEntity(schools));
+		log.info(String.format("%s Schools Loaded into cache.", schools.size()));
 	}
 
-    /*public SchoolDetail getCommonSchoolDetailById(String schoolId, String accessToken) {
+	public List<School> getSchoolsFromRedisCache() {
+		log.debug("**** Getting schools from Redis Cache.");
+		return  schoolTransformer.transformToDTO(schoolRedisRepository.findAll());
+	}
+
+	public void initializeSchoolCache(boolean force) {
+		serviceHelper.initializeCache(force, CacheKey.SCHOOL_CACHE, this);
+	}
+
+    public SchoolDetail getSchoolDetailByIdFromInstituteApi(String schoolId) {
         try {
-            return webClient.get().uri(
-                            String.format(constants.getSchoolDetailsByIdFromInstituteApiUrl(), schoolId))
-                    .headers(h -> {
-                        h.setBearerAuth(accessToken);
-                    })
-                    .retrieve().bodyToMono(SchoolDetail.class).block();
+			log.debug("****Before Calling Institute API");
+			SchoolDetailEntity sde = this.restService.get(String.format(constants.getSchoolDetailsByIdFromInstituteApiUrl(), schoolId),
+					SchoolDetailEntity.class, webClient);
+			return schoolDetailTransformer.transformToDTO(sde);
         } catch (WebClientResponseException e) {
-            logger.warn("Error getting Common School Details");
+            log.warn("Error getting School Details");
         } catch (Exception e) {
-            logger.error(String.format("Error while calling school-api: %s", e.getMessage()));
+            log.error(String.format("Error while calling Institute api: %s", e.getMessage()));
         }
         return null;
-    }*/
+    }
 
-    /*public List<SchoolDetail> getAllSchoolDetails() {
+    public List<SchoolDetail> getSchoolDetailsFromInstituteApi() {
 
-        String accessToken = getAccessToken();
-        List<School> schools = getCommonSchools(accessToken);
+        List<School> schools = getSchoolsFromRedisCache();
         List<SchoolDetail> schoolDetails = new ArrayList<SchoolDetail>();
-        Address address = new Address();
-        int counter = 1;
 
         for (School s : schools) {
             SchoolDetail sd = new SchoolDetail();
 
-            if (counter%100 == 0)
-                accessToken = getAccessToken();
-            sd = getCommonSchoolDetailById(s.getSchoolId(), accessToken);
-
-            address = null;
-            if (sd.getAddresses() == null || sd.getAddresses().isEmpty()) {
-                logger.debug("," + sd.getMincode() + "," + "," + "," + "," + "," + "," + "," + ",");
-            } else {
-                address = sd.getAddresses().get(0);
-                logger.debug("," + sd.getMincode() + ","
-                        + sd.getAddresses().get(0).getAddressLine1() + ","
-                        + sd.getAddresses().get(0).getAddressLine2() + ","
-                        + sd.getAddresses().get(0).getCity() + ","
-                        + sd.getAddresses().get(0).getProvinceCode() + ","
-                        + sd.getAddresses().get(0).getCountryCode() + ","
-                        + sd.getAddresses().get(0).getPostal() + ","
-                        + sd.getAddresses().get(0).getAddressTypeCode() + ","
-                );
-            }
+            sd = getSchoolDetailByIdFromInstituteApi(s.getSchoolId());
             schoolDetails.add(sd);
-            counter++;
         }
         return schoolDetails;
-    }*/
+    }
+
+	public void loadSchoolDetailsIntoRedisCache(List<SchoolDetail> schoolDetails) {
+		schoolDetailRedisRepository
+				.saveAll(schoolDetailTransformer.transformToEntity(schoolDetails));
+		log.info(String.format("%s School Details Loaded into cache.", schoolDetails.size()));
+	}
+
+	public List<SchoolDetail> getSchoolDetailsFromRedisCache() {
+		log.debug("**** Getting school Details from Redis Cache.");
+		return schoolDetailTransformer.transformToDTO(schoolDetailRedisRepository.findAll());
+	}
+
+	public void initializeSchoolDetailCache(boolean force) {
+		serviceHelper.initializeCache(force, CacheKey.SCHOOL_DETAIL_CACHE, this);
+	}
+
 }

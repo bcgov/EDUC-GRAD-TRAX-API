@@ -6,10 +6,10 @@ import ca.bc.gov.educ.api.trax.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.trax.model.dto.ResponseObj;
 import ca.bc.gov.educ.api.trax.model.dto.institute.District;
 import ca.bc.gov.educ.api.trax.model.dto.institute.School;
-import ca.bc.gov.educ.api.trax.model.entity.institute.DistrictContactEntity;
-import ca.bc.gov.educ.api.trax.model.entity.institute.DistrictEntity;
-import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolEntity;
+import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolDetail;
+import ca.bc.gov.educ.api.trax.model.entity.institute.*;
 import ca.bc.gov.educ.api.trax.model.transformer.institute.DistrictTransformer;
+import ca.bc.gov.educ.api.trax.model.transformer.institute.SchoolDetailTransformer;
 import ca.bc.gov.educ.api.trax.model.transformer.institute.SchoolTransformer;
 import ca.bc.gov.educ.api.trax.repository.GradCountryRepository;
 import ca.bc.gov.educ.api.trax.repository.GradProvinceRepository;
@@ -39,8 +39,10 @@ import reactor.core.publisher.Mono;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -74,11 +76,17 @@ public class InstituteSchoolServiceTest {
 	@Mock
 	private Mono<List<SchoolEntity>> schoolEntitiesMock;
 	@Mock
+	private Mono<List<SchoolDetailEntity>> schoolDetailEntitiesMock;
+	@Mock
 	private List<School> schoolsMock;
+	@Mock
+	private List<SchoolDetail> schoolDetailsMock;
 	@MockBean
-	private RestUtils restUtilsMock;
+	private RestUtils restUtils;
 	@MockBean
 	private SchoolTransformer schoolTransformerMock;
+	@MockBean
+	private SchoolDetailTransformer schoolDetailTransformerMock;
 
 	// NATS
 	@MockBean
@@ -116,18 +124,17 @@ public class InstituteSchoolServiceTest {
 
 		schools.add(school);
 
-		ResponseObj tokenObj = new ResponseObj();
-		tokenObj.setAccess_token("123");
-
+		when(this.restUtils.getTokenResponseObject(anyString(), anyString()))
+				.thenReturn(responseObjectMock);
+		when(this.responseObjectMock.getAccess_token())
+				.thenReturn("accessToken");
 		when(webClientMock.get())
 				.thenReturn(requestHeadersUriSpecMock);
 		when(requestHeadersUriSpecMock.uri(anyString()))
 				.thenReturn(requestHeadersSpecMock);
-		when(this.restUtilsMock.getTokenResponseObject(anyString(), anyString()))
-				.thenReturn(tokenObj);
-		when(this.responseObjectMock.getAccess_token())
-				.thenReturn("AccessToken");
-		when(this.requestHeadersSpecMock.retrieve())
+		when(requestHeadersSpecMock.headers(any(Consumer.class)))
+				.thenReturn(requestHeadersSpecMock);
+		when(requestHeadersSpecMock.retrieve())
 				.thenReturn(responseSpecMock);
 		when(this.responseSpecMock.bodyToMono(new ParameterizedTypeReference<List<SchoolEntity>>(){}))
 				.thenReturn(schoolEntitiesMock);
@@ -135,6 +142,7 @@ public class InstituteSchoolServiceTest {
 
 		when(this.schoolTransformerMock.transformToDTO(schools))
 				.thenReturn(schoolsMock);
+
 
 		List<School> result = schoolService.getSchoolsFromInstituteApi();
 	}
@@ -146,5 +154,40 @@ public class InstituteSchoolServiceTest {
 		when(this.schoolRedisRepository.saveAll(schoolEntities))
 				.thenReturn(schoolEntities);
 		assertDoesNotThrow(() -> schoolService.loadSchoolsIntoRedisCache(schools));
+	}
+
+	@Test
+	public void whenGetSchoolDetailssFromInstituteApi_returnsListOfSchoolDetails() {
+		List<SchoolDetailEntity> schoolDetails = new ArrayList<>();
+		SchoolDetailEntity schoolDetail = new SchoolDetailEntity();
+
+		schoolDetail.setSchoolId("ID");
+		schoolDetail.setDistrictId("DistID");
+		schoolDetail.setSchoolNumber("12345");
+		schoolDetail.setSchoolCategoryCode("SCC");
+		schoolDetail.setEmail("abc@xyz.ca");
+
+		schoolDetails.add(schoolDetail);
+
+		when(this.restUtils.getTokenResponseObject(anyString(), anyString()))
+				.thenReturn(responseObjectMock);
+		when(this.responseObjectMock.getAccess_token())
+				.thenReturn("accessToken");
+		when(webClientMock.get())
+				.thenReturn(requestHeadersUriSpecMock);
+		when(requestHeadersUriSpecMock.uri(anyString()))
+				.thenReturn(requestHeadersSpecMock);
+		when(requestHeadersSpecMock.headers(any(Consumer.class)))
+				.thenReturn(requestHeadersSpecMock);
+		when(requestHeadersSpecMock.retrieve())
+				.thenReturn(responseSpecMock);
+		when(this.responseSpecMock.bodyToMono(new ParameterizedTypeReference<List<SchoolDetailEntity>>(){}))
+				.thenReturn(schoolDetailEntitiesMock);
+		when(this.schoolDetailEntitiesMock.block()).thenReturn(schoolDetails);
+
+		when(this.schoolDetailTransformerMock.transformToDTO(schoolDetails))
+				.thenReturn(schoolDetailsMock);
+
+		List<SchoolDetail> result = schoolService.getSchoolDetailsFromInstituteApi();
 	}
 }

@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.trax.controller.v2;
 
 import ca.bc.gov.educ.api.trax.model.dto.institute.School;
+import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolDetail;
 import ca.bc.gov.educ.api.trax.service.institute.SchoolService;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.GradValidation;
@@ -22,7 +23,7 @@ import java.util.List;
 @CrossOrigin
 @RestController("SchoolControllerV2")
 @Slf4j
-@OpenAPIDefinition(info = @Info(title = "API for School Data.", description = "This Read API is for Reading school data.", version = "1"),
+@OpenAPIDefinition(info = @Info(title = "API for School Data.", description = "This Read API is for Reading school data from Redis Cache.", version = "2"),
 		security = {@SecurityRequirement(name = "OAUTH2", scopes = {"READ_GRAD_SCHOOL_DATA"})})
 public class SchoolController {
 
@@ -39,11 +40,20 @@ public class SchoolController {
 
     @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_URL_MAPPING_V2)
     @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
-    @Operation(summary = "Find All Schools", description = "Get All Schools", tags = { "School" })
+    @Operation(summary = "Find All Schools from Cache", description = "Get All Schools from Cache", tags = { "School" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
     public List<School> getAllSchools() {
     	log.debug("getAllSchools : ");
-        return schoolService.getSchoolsFromInstituteApi();
+        return schoolService.getSchoolsFromRedisCache();
+    }
+
+    @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_DETAIL_URL_MAPPING_V2)
+    @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
+    @Operation(summary = "Find All School details from Cache", description = "Get All School details from Cache", tags = { "School" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+    public List<SchoolDetail> getAllSchoolDetails() {
+        log.debug("getAllSchoolDetails : ");
+        return schoolService.getSchoolDetailsFromRedisCache();
     }
 
 }
