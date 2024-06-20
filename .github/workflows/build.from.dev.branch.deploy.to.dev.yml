@@ -153,6 +153,7 @@ jobs:
           trax-client-secret \
           TRAX_CLIENT_NAME \
           TRAX_CLIENT_SECRET
+          ${{ env.REPO_NAME }}
 
           # Start rollout (if necessary) and follow it
           oc rollout latest dc/${{ env.SPRING_BOOT_IMAGE_NAME }} 2> /dev/null \
