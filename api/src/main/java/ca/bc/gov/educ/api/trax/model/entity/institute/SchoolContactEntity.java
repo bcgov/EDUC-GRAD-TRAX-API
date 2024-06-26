@@ -14,7 +14,7 @@ import org.springframework.data.redis.core.index.Indexed;
 public class SchoolContactEntity {
 
     @Id
-    private String schooldistrictContactId;
+    private String schoolContactId;
     @Indexed
     private String schoolId;
     @Indexed

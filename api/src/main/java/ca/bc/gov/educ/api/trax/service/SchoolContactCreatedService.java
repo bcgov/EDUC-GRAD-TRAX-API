@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 public class SchoolContactCreatedService extends EventBaseService<SchoolContact> {
 
     @Override
-    public void processEvent(final SchoolContact districtContact, Event event) {
+    public void processEvent(final SchoolContact schoolContact, Event event) {
         log.debug("Processing School Contact Created");
         // process the event here as per https://eccbc.atlassian.net/browse/GRAD2-2648
         this.updateEvent(event);

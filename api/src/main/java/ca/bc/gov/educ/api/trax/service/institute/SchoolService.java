@@ -1,6 +1,8 @@
 package ca.bc.gov.educ.api.trax.service.institute;
 
 import ca.bc.gov.educ.api.trax.constant.CacheKey;
+import ca.bc.gov.educ.api.trax.exception.EntityNotFoundException;
+import ca.bc.gov.educ.api.trax.exception.ServiceException;
 import ca.bc.gov.educ.api.trax.model.dto.institute.School;
 import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolDetail;
 import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolEntity;
@@ -115,4 +117,16 @@ public class SchoolService {
 		serviceHelper.initializeCache(force, CacheKey.SCHOOL_DETAIL_CACHE, this);
 	}
 
+	/**
+	 * Updates the school and school details in the cache
+	 * based on schoolId
+	 * @param schoolId the school id guid
+	 */
+	public void updateSchoolCache(String schoolId) throws ServiceException {
+		// get details from institute
+		log.debug("Updating school %s in cache.",  schoolId);
+		SchoolDetailEntity sde = this.restService.get(String.format(constants.getSchoolDetailsByIdFromInstituteApiUrl(), schoolId),
+				SchoolDetailEntity.class, webClient);
+		schoolDetailRedisRepository.save(sde);
+	}
 }

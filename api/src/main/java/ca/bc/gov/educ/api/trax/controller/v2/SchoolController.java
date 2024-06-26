@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.websocket.server.PathParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -54,6 +55,12 @@ public class SchoolController {
     public List<SchoolDetail> getAllSchoolDetails() {
         log.debug("getAllSchoolDetails : ");
         return schoolService.getSchoolDetailsFromRedisCache();
+    }
+
+    @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_URL_MAPPING_TEST_V2)
+    @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
+    public SchoolDetail updateSchool(@PathVariable String schoolID) {
+        return schoolService.getSchoolDetailByIdFromInstituteApi(schoolID);
     }
 
 }
