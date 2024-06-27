@@ -21,6 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.ActiveProfiles;
@@ -51,6 +52,8 @@ public class DistrictServiceTest {
     @Mock WebClient.RequestBodySpec requestBodyMock;
     @Mock WebClient.RequestBodyUriSpec requestBodyUriMock;
     @Mock WebClient.ResponseSpec responseMock;
+    @MockBean
+    private JedisConnectionFactory jedisConnectionFactory;
 
     @MockBean
     @Qualifier("default")
