@@ -21,21 +21,15 @@ import redis.clients.jedis.Jedis;
 public class RedisConfig {
     @Autowired
     private EducGradTraxApiConstants constants;
+
     @Bean
     public JedisConnectionFactory jedisConnectionFactory() {
-        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
-        redisStandaloneConfiguration.setHostName(constants.getRedisUrl());
-        redisStandaloneConfiguration.setPort(Integer.parseInt(constants.getRedisPort()));
-        redisStandaloneConfiguration.setPassword(constants.getRedisSecret());
-
-        //Cluster Configuration
         RedisClusterConfiguration redisClusterConfiguration = new RedisClusterConfiguration();
-        RedisNode node0 = new RedisNode(constants.getRedisUrl(), Integer.parseInt(constants.getRedisPort()));
-        redisClusterConfiguration.addClusterNode(node0);
-
-        RedisClusterNode rcn = new RedisClusterNode(constants.getRedisUrl(), Integer.parseInt(constants.getRedisPort()));
-
-        return new JedisConnectionFactory(redisStandaloneConfiguration);
+        redisClusterConfiguration.addClusterNode(new RedisClusterNode(
+                constants.getRedisUrl(),
+                Integer.parseInt(constants.getRedisPort())));
+        redisClusterConfiguration.setPassword(constants.getRedisSecret());
+        return new JedisConnectionFactory(redisClusterConfiguration);
     }
 
     @Bean
