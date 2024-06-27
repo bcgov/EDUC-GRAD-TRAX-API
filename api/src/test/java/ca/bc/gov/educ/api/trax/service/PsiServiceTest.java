@@ -23,6 +23,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.ActiveProfiles;
@@ -64,6 +65,8 @@ public class PsiServiceTest {
 
 	@MockBean
 	private Subscriber subscriber;
+	@MockBean
+	private JedisConnectionFactory jedisConnectionFactory;
 
 	@TestConfiguration
 	static class TestConfig {

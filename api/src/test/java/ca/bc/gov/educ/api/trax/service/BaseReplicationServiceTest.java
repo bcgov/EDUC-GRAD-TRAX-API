@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
@@ -42,6 +43,8 @@ public abstract class BaseReplicationServiceTest {
     public OAuth2AuthorizedClientRepository oAuth2AuthorizedClientRepository;
     @MockBean
     public OAuth2AuthorizedClientService oAuth2AuthorizedClientService;
+    @MockBean
+    private JedisConnectionFactory jedisConnectionFactory;
 
     @Before
     public void resetState() {

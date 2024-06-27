@@ -29,6 +29,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.http.HttpHeaders;
@@ -69,6 +70,8 @@ public class InstituteCodeServiceTest {
 	private GradCountryRepository gradCountryRepository;
 	@MockBean
 	private GradProvinceRepository gradProvinceRepository;
+	@MockBean
+	private JedisConnectionFactory jedisConnectionFactory;
 
 	@MockBean
 	@Qualifier("default")
