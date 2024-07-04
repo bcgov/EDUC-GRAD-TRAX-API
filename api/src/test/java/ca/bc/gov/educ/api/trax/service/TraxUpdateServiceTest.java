@@ -30,6 +30,7 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import redis.clients.jedis.JedisCluster;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -81,7 +82,9 @@ public class TraxUpdateServiceTest {
     @MockBean
     private Subscriber subscriber;
     @MockBean
-    private JedisConnectionFactory jedisConnectionFactory;
+    private JedisConnectionFactory jedisConnectionFactoryMock;
+    @MockBean
+    private JedisCluster jedisClusterMock;
 
     @TestConfiguration
     static class TestConfig {

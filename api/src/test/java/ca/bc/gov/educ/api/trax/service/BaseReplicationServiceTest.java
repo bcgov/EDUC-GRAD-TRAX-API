@@ -17,6 +17,7 @@ import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepo
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import redis.clients.jedis.JedisCluster;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {EducGradTraxApiApplication.class})
@@ -44,7 +45,9 @@ public abstract class BaseReplicationServiceTest {
     @MockBean
     public OAuth2AuthorizedClientService oAuth2AuthorizedClientService;
     @MockBean
-    private JedisConnectionFactory jedisConnectionFactory;
+    private JedisConnectionFactory jedisConnectionFactoryMock;
+    @MockBean
+    private JedisCluster jedisClusterMock;
 
     @Before
     public void resetState() {

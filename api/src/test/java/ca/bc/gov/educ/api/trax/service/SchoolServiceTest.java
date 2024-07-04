@@ -32,6 +32,7 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import redis.clients.jedis.JedisCluster;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,7 +79,9 @@ class SchoolServiceTest {
     @MockBean
     private CommonSchoolCache commonSchoolCache;
     @MockBean
-    private JedisConnectionFactory jedisConnectionFactory;
+    private JedisConnectionFactory jedisConnectionFactoryMock;
+    @MockBean
+    private JedisCluster jedisClusterMock;
 
     @TestConfiguration
     static class TestConfig {

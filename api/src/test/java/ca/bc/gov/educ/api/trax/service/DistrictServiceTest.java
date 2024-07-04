@@ -27,6 +27,7 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.reactive.function.client.WebClient;
+import redis.clients.jedis.JedisCluster;
 
 import java.util.List;
 import java.util.Optional;
@@ -53,7 +54,9 @@ public class DistrictServiceTest {
     @Mock WebClient.RequestBodyUriSpec requestBodyUriMock;
     @Mock WebClient.ResponseSpec responseMock;
     @MockBean
-    private JedisConnectionFactory jedisConnectionFactory;
+    private JedisConnectionFactory jedisConnectionFactoryMock;
+    @MockBean
+    private JedisCluster jedisClusterMock;
 
     @MockBean
     @Qualifier("default")

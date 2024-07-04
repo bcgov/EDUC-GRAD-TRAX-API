@@ -18,8 +18,6 @@ import org.springframework.http.codec.json.Jackson2JsonEncoder;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.oauth2.client.*;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizedClientManager;
-import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
 import org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.web.client.RestTemplate;
@@ -80,18 +78,6 @@ public class GradTraxConfig {
 				.apply(filter.oauth2Configuration())
 				.build();
 	}
-	/*@Bean
-	public OAuth2AuthorizedClientManager authorizedClientManager(
-			ClientRegistrationRepository clientRegistrationRepository,
-			OAuth2AuthorizedClientRepository authorizedClientRepository) {
-		OAuth2AuthorizedClientProvider authorizedClientProvider = OAuth2AuthorizedClientProviderBuilder.builder()
-				.clientCredentials()
-				.build();
-		DefaultOAuth2AuthorizedClientManager authorizedClientManager = new DefaultOAuth2AuthorizedClientManager(
-				clientRegistrationRepository, authorizedClientRepository);
-		authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider);
-		return authorizedClientManager;
-	}*/
 
 	@Bean
 	public OAuth2AuthorizedClientManager authorizedClientManager(

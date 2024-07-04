@@ -134,6 +134,7 @@ nats:
 redis:
   url: ${REDIS_URL}
   port: ${REDIS_PORT}
+  user: ${REDIS_USER}
   secret: ${REDIS_SECRET}
 
 #Scheduler
