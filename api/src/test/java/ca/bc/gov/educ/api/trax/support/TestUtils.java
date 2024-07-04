@@ -178,7 +178,7 @@ public class TestUtils {
             traxStudent.setArchiveFlag("I");
         } else if (StringUtils.equals(studentStatus, "TER")) {
             traxStudent.setStudStatus("T");
-            traxStudent.setArchiveFlag("I");
+            traxStudent.setArchiveFlag("A");
         }
         return traxStudent;
     }
