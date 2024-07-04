@@ -20,10 +20,12 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.*;
+import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import redis.clients.jedis.JedisCluster;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -67,6 +69,10 @@ public class TraxCommonServiceTest {
 
     @MockBean
     private Subscriber subscriber;
+    @MockBean
+    private JedisConnectionFactory jedisConnectionFactoryMock;
+    @MockBean
+    private JedisCluster jedisClusterMock;
 
     @TestConfiguration
     static class TestConfig {

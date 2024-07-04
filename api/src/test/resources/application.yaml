@@ -76,6 +76,7 @@ nats:
 redis:
   url: '127.0.0.1'
   port: '54321'
+  user: 'default'
   secret: 'its-a-secret'
 
 #Scheduler
