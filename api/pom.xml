@@ -6,7 +6,7 @@
 
     <groupId>ca.bc.gov.educ</groupId>
     <artifactId>educ-grad-trax-api</artifactId>
-    <version>1.8.56</version>
+    <version>1.8.57</version>
     <name>educ-grad-trax-api</name>
     <description>Ministry of Education GRAD TRAX API</description>
 
@@ -79,8 +79,10 @@
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
         </dependency>
-
-
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>

@@ -141,6 +141,9 @@ public class EducGradTraxApiConstants {
     @Value("${redis.port}")
     private String redisPort;
 
+    @Value("${redis.user}")
+    private String redisUser;
+
     @Value("${redis.secret}")
     private String redisSecret;
 

@@ -281,7 +281,7 @@ public abstract class EventCommonService<T> extends EventBaseService<T> {
             newArchiveFlag = "I";
         } else if (StringUtils.equals(gradStudentStatus, "TER")) {
             newStudStatus = "T";
-            newArchiveFlag = "I";
+            newArchiveFlag = "A";
         }
 
         if (!StringUtils.equalsIgnoreCase(studStatus, newStudStatus)) {

@@ -4,18 +4,18 @@ import ca.bc.gov.educ.api.trax.constant.CacheKey;
 import ca.bc.gov.educ.api.trax.constant.CacheStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+import redis.clients.jedis.JedisCluster;
 
 @Slf4j
 @Component
 public class ServiceHelper<T> {
 
     @Autowired
-    RedisTemplate<String, String> redisTemplate;
+    JedisCluster jedisCluster;
 
     public void initializeCache(boolean force, CacheKey cacheKey, T service) {
-        String cacheStatus = redisTemplate.opsForValue().get(cacheKey.name());
+        String cacheStatus = jedisCluster.get(cacheKey.name());
         cacheStatus = cacheStatus == null ? "" : cacheStatus;
         if (CacheStatus.LOADING.name().compareToIgnoreCase(cacheStatus) == 0
                 || CacheStatus.READY.name().compareToIgnoreCase(cacheStatus) == 0) {
@@ -33,9 +33,9 @@ public class ServiceHelper<T> {
     }
 
     private void loadCache(CacheKey cacheKey, T service) {
-        redisTemplate.opsForValue().set(cacheKey.name(), CacheStatus.LOADING.name());
+        jedisCluster.set(cacheKey.name(), CacheStatus.LOADING.name());
         loadDataIntoRedisCache(cacheKey, service);
-        redisTemplate.opsForValue().set(cacheKey.name(), CacheStatus.READY.name());
+        jedisCluster.set(cacheKey.name(), CacheStatus.READY.name());
         log.info(String.format("Success! - %s is now READY", cacheKey));
     }
 
