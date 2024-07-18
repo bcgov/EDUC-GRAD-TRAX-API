@@ -5,12 +5,12 @@ import ca.bc.gov.educ.api.trax.exception.ServiceException;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.ThreadLocalStateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 
@@ -63,7 +63,11 @@ public class RESTService {
                     .block();
         } catch (Exception e) {
             // catches IOExceptions and the like
-            throw new ServiceException(getErrorMessage(url, e.getLocalizedMessage()), HttpStatus.SERVICE_UNAVAILABLE.value(), e);
+            throw new ServiceException(getErrorMessage(
+                    url,
+                    e.getLocalizedMessage()),
+                    (e instanceof WebClientResponseException) ? ((WebClientResponseException) e).getStatusCode().value() : HttpStatus.SERVICE_UNAVAILABLE.value(),
+                    e);
         }
         return obj;
     }
@@ -92,7 +96,11 @@ public class RESTService {
                     .block();
         } catch (Exception e) {
             // catches IOExceptions and the like
-            throw new ServiceException(getErrorMessage(url, e.getLocalizedMessage()), HttpStatus.SERVICE_UNAVAILABLE.value(), e);
+            throw new ServiceException(getErrorMessage(
+                    url,
+                    e.getLocalizedMessage()),
+                    (e instanceof WebClientResponseException) ? ((WebClientResponseException) e).getStatusCode().value() : HttpStatus.SERVICE_UNAVAILABLE.value(),
+                    e);
         }
         return obj;
     }
@@ -124,7 +132,11 @@ public class RESTService {
                             }))
                     .block();
         } catch (Exception e) {
-            throw new ServiceException(getErrorMessage(url, e.getLocalizedMessage()), HttpStatus.SERVICE_UNAVAILABLE.value(), e);
+            throw new ServiceException(getErrorMessage(
+                    url,
+                    e.getLocalizedMessage()),
+                    (e instanceof WebClientResponseException) ? ((WebClientResponseException) e).getStatusCode().value() : HttpStatus.SERVICE_UNAVAILABLE.value(),
+                    e);
         }
         return obj;
     }
@@ -149,7 +161,11 @@ public class RESTService {
                             }))
                     .block();
         } catch (Exception e) {
-            throw new ServiceException(getErrorMessage(url, e.getLocalizedMessage()), HttpStatus.SERVICE_UNAVAILABLE.value(), e);
+            throw new ServiceException(getErrorMessage(
+                    url,
+                    e.getLocalizedMessage()),
+                    (e instanceof WebClientResponseException) ? ((WebClientResponseException) e).getStatusCode().value() : HttpStatus.SERVICE_UNAVAILABLE.value(),
+                    e);
         }
         return obj;
     }

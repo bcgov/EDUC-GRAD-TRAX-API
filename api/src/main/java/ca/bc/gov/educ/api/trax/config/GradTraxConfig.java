@@ -23,6 +23,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.DefaultUriBuilderFactory;
 import reactor.netty.http.client.HttpClient;
 
 @Configuration
@@ -52,7 +53,10 @@ public class GradTraxConfig {
 	public WebClient getTraxClientWebClient(OAuth2AuthorizedClientManager authorizedClientManager) {
 		ServletOAuth2AuthorizedClientExchangeFilterFunction filter = new ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager);
 		filter.setDefaultClientRegistrationId("traxclient");
+		DefaultUriBuilderFactory defaultUriBuilderFactory = new DefaultUriBuilderFactory();
+		defaultUriBuilderFactory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.NONE);
 		return WebClient.builder()
+				.uriBuilderFactory(defaultUriBuilderFactory)
 				.exchangeStrategies(ExchangeStrategies
 						.builder()
 						.codecs(codecs -> codecs
@@ -68,7 +72,10 @@ public class GradTraxConfig {
 	public WebClient getInstituteWebClient(OAuth2AuthorizedClientManager authorizedClientManager) {
 		ServletOAuth2AuthorizedClientExchangeFilterFunction filter = new ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager);
 		filter.setDefaultClientRegistrationId("institute-web-client");
+		DefaultUriBuilderFactory defaultUriBuilderFactory = new DefaultUriBuilderFactory();
+		defaultUriBuilderFactory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.NONE);
 		return WebClient.builder()
+				.uriBuilderFactory(defaultUriBuilderFactory)
 				.exchangeStrategies(ExchangeStrategies
 						.builder()
 						.codecs(codecs -> codecs
