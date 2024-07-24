@@ -26,7 +26,7 @@ public class SchoolContactUpdatedService extends EventBaseService<SchoolContact>
         // process the eventEntity here as per https://eccbc.atlassian.net/browse/GRAD2-2648
         try{
             schoolService.updateSchoolCache(schoolContact.getSchoolId());
-            this.updateEvent(eventEntity);
+            this.updateEventWithHistory(eventEntity);
         } catch (ServiceException e) {
             // do not mark eventEntity as processed
             log.error(e.getMessage());

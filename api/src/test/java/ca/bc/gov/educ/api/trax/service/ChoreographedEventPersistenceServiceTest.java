@@ -123,7 +123,7 @@ public class ChoreographedEventPersistenceServiceTest {
     }
 
     @Test
-    public void testUpdateEventStatus_givenTraxUpdatedEvent() throws BusinessException {
+    public void testUpdateEventStatus_givenTraxUpdatedEvent() {
         UUID eventId = UUID.randomUUID();
 
         ChoreographedEvent choreographedEvent = new ChoreographedEvent();
