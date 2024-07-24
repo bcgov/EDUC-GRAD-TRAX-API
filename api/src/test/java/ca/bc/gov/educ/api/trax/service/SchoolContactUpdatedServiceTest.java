@@ -1,10 +1,12 @@
 package ca.bc.gov.educ.api.trax.service;
 
+import ca.bc.gov.educ.api.trax.service.institute.SchoolService;
 import ca.bc.gov.educ.api.trax.support.TestUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import static org.assertj.core.api.Assertions.fail;
 
@@ -12,6 +14,9 @@ public class SchoolContactUpdatedServiceTest extends BaseReplicationServiceTest 
 
     @Autowired
     private SchoolContactUpdatedService schoolContactUpdatedService;
+
+    @MockBean
+    private SchoolService schoolServiceMock;
 
     @Test
     public void testProcessEvent_givenUPDATE_SCHOOL_CONTACT_Event_shouldProcessEvent() throws JsonProcessingException {
