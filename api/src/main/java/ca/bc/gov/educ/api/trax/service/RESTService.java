@@ -5,7 +5,6 @@ import ca.bc.gov.educ.api.trax.exception.ServiceException;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.ThreadLocalStateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
@@ -20,13 +19,15 @@ import java.time.Duration;
 @Service
 public class RESTService {
 
-    @Autowired
+
     private WebClient webClient;
 
-    private static final String ERROR_5xx = "5xx error.";
+    private static final String SERVER_ERROR = "5xx error.";
     private static final String SERVICE_FAILED_ERROR = "Service failed to process after max retries.";
 
-    public RESTService() {
+    @Autowired
+    public RESTService(WebClient webClient) {
+        this.webClient = webClient;
     }
 
     /**
@@ -52,7 +53,7 @@ public class RESTService {
                     .retrieve()
                     // if 5xx errors, throw Service error
                     .onStatus(HttpStatusCode::is5xxServerError,
-                            clientResponse -> Mono.error(new ServiceException(getErrorMessage(url, ERROR_5xx), clientResponse.statusCode().value())))
+                            clientResponse -> Mono.error(new ServiceException(getErrorMessage(url, SERVER_ERROR), clientResponse.statusCode().value())))
                     .bodyToMono(clazz)
                     // only does retry if initial error was 5xx as service may be temporarily down
                     // 4xx errors will always happen if 404, 401, 403 etc, so does not retry
@@ -81,7 +82,7 @@ public class RESTService {
                     .retrieve()
                     // if 5xx errors, throw Service error
                     .onStatus(HttpStatusCode::is5xxServerError,
-                            clientResponse -> Mono.error(new ServiceException(getErrorMessage(url, ERROR_5xx), clientResponse.statusCode().value())))
+                            clientResponse -> Mono.error(new ServiceException(getErrorMessage(url, SERVER_ERROR), clientResponse.statusCode().value())))
                     .bodyToMono(clazz)
                     // only does retry if initial error was 5xx as service may be temporarily down
                     // 4xx errors will always happen if 404, 401, 403 etc, so does not retry
@@ -119,7 +120,7 @@ public class RESTService {
                     .body(BodyInserters.fromValue(body))
                     .retrieve()
                     .onStatus(HttpStatusCode::is5xxServerError,
-                            clientResponse -> Mono.error(new ServiceException(getErrorMessage(url, ERROR_5xx), clientResponse.statusCode().value())))
+                            clientResponse -> Mono.error(new ServiceException(getErrorMessage(url, SERVER_ERROR), clientResponse.statusCode().value())))
                     .bodyToMono(clazz)
                     .retryWhen(Retry.backoff(3, Duration.ofSeconds(2))
                             .filter(ServiceException.class::isInstance)
@@ -144,7 +145,7 @@ public class RESTService {
                     .body(BodyInserters.fromValue(body))
                     .retrieve()
                     .onStatus(HttpStatusCode::is5xxServerError,
-                            clientResponse -> Mono.error(new ServiceException(getErrorMessage(url, ERROR_5xx), clientResponse.statusCode().value())))
+                            clientResponse -> Mono.error(new ServiceException(getErrorMessage(url, SERVER_ERROR), clientResponse.statusCode().value())))
                     .bodyToMono(clazz)
                     .retryWhen(Retry.backoff(3, Duration.ofSeconds(2))
                             .filter(ServiceException.class::isInstance)
