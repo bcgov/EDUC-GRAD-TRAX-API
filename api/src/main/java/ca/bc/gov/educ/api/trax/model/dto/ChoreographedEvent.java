@@ -18,11 +18,11 @@ import java.util.UUID;
 public class ChoreographedEvent {
   UUID eventID;
   /**
-   * The Event type.
+   * The EventEntity type.
    */
   EventType eventType;
   /**
-   * The Event outcome.
+   * The EventEntity outcome.
    */
   EventOutcome eventOutcome;
   /**
@@ -30,7 +30,7 @@ public class ChoreographedEvent {
    */
   String activityCode;
   /**
-   * The Event payload.
+   * The EventEntity payload.
    */
   String eventPayload; // json string
   /**

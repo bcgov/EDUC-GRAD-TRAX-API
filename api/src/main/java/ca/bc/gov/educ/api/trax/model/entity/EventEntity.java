@@ -21,7 +21,7 @@ import java.util.UUID;
 @Table(name = "REPLICATION_EVENT")
 @Data
 @DynamicUpdate
-public class Event {
+public class EventEntity {
   /**
    * The Create user.
    */
@@ -51,12 +51,12 @@ public class Event {
   @Column(name = "REPLICATION_EVENT_ID", unique = true, updatable = false, columnDefinition = "BINARY(16)")
   private UUID replicationEventId;
   /**
-   * The Event id.
+   * The EventEntity id.
    */
   @Column(name = "EVENT_ID", unique = true, updatable = false, columnDefinition = "BINARY(16)")
   private UUID eventId;
   /**
-   * The Event payload.
+   * The EventEntity payload.
    */
   @NotNull(message = "eventPayload cannot be null")
   @Lob
@@ -64,19 +64,19 @@ public class Event {
   @ToString.Exclude
   private byte[] eventPayloadBytes;
   /**
-   * The Event status.
+   * The EventEntity status.
    */
   @NotNull(message = "eventStatus cannot be null")
   @Column(name = "EVENT_STATUS")
   private String eventStatus;
   /**
-   * The Event type.
+   * The EventEntity type.
    */
   @NotNull(message = "eventType cannot be null")
   @Column(name = "EVENT_TYPE")
   private String eventType;
   /**
-   * The Event outcome.
+   * The EventEntity outcome.
    */
   @NotNull(message = "eventOutcome cannot be null.")
   @Column(name = "EVENT_OUTCOME")
@@ -109,19 +109,19 @@ public class Event {
   /**
    * The type Student event builder.
    */
-  public static class EventBuilder {
+  public static class EventEntityBuilder {
     /**
-     * The Event payload bytes.
+     * The EventEntity payload bytes.
      */
     byte[] eventPayloadBytes;
 
     /**
-     * Event payload student event . student event builder.
+     * EventEntity payload student event . student event builder.
      *
      * @param eventPayload the event payload
      * @return the student event . student event builder
      */
-    public EventBuilder eventPayload(final String eventPayload) {
+    public EventEntityBuilder eventPayload(final String eventPayload) {
       this.eventPayloadBytes = eventPayload.getBytes(StandardCharsets.UTF_8);
       return this;
     }

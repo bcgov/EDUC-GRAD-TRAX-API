@@ -1,6 +1,6 @@
 package ca.bc.gov.educ.api.trax.repository;
 
-import ca.bc.gov.educ.api.trax.model.entity.Event;
+import ca.bc.gov.educ.api.trax.model.entity.EventEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -13,15 +13,15 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface EventRepository extends JpaRepository<Event, UUID> {
+public interface EventRepository extends JpaRepository<EventEntity, UUID> {
 
-    Optional<Event> findByEventId(UUID eventId);
+    Optional<EventEntity> findByEventId(UUID eventId);
 
-    List<Event> findAllByEventStatusOrderByCreateDate(String eventStatus);
+    List<EventEntity> findAllByEventStatusOrderByCreateDate(String eventStatus);
 
     @Transactional
     @Modifying
-    @Query("delete from Event where createDate <= :createDate")
+    @Query("delete from EventEntity where createDate <= :createDate")
     void deleteByCreateDateBefore(LocalDateTime createDate);
 
 }

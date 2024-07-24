@@ -4,7 +4,7 @@ import ca.bc.gov.educ.api.trax.model.dto.AuthorityContact;
 import ca.bc.gov.educ.api.trax.model.dto.DistrictContact;
 import ca.bc.gov.educ.api.trax.model.dto.GradStatusEventPayloadDTO;
 import ca.bc.gov.educ.api.trax.model.dto.SchoolContact;
-import ca.bc.gov.educ.api.trax.model.entity.Event;
+import ca.bc.gov.educ.api.trax.model.entity.EventEntity;
 import ca.bc.gov.educ.api.trax.model.entity.TraxStudentEntity;
 import ca.bc.gov.educ.api.trax.repository.EventRepository;
 import ca.bc.gov.educ.api.trax.util.JsonUtil;
@@ -36,8 +36,8 @@ public class TestUtils {
         return graduationStatus;
     }
 
-    public static Event createEvent(String eventType, Object payload, EventRepository eventRepository) throws JsonProcessingException {
-        var event = Event.builder()
+    public static EventEntity createEvent(String eventType, Object payload, EventRepository eventRepository) throws JsonProcessingException {
+        var event = EventEntity.builder()
                 .eventType(eventType)
                 .eventId(UUID.randomUUID())
                 .eventOutcome("DB_COMMITTED")
