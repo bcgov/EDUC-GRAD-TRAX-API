@@ -11,13 +11,15 @@ import ca.bc.gov.educ.api.trax.model.entity.institute.DistrictContactEntity;
 import ca.bc.gov.educ.api.trax.model.entity.institute.DistrictEntity;
 import ca.bc.gov.educ.api.trax.model.transformer.institute.DistrictTransformer;
 import ca.bc.gov.educ.api.trax.repository.redis.DistrictRedisRepository;
+import ca.bc.gov.educ.api.trax.service.RESTService;
+import ca.bc.gov.educ.api.trax.support.TestUtils;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.RestUtils;
-import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.junit.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.exceptions.base.MockitoException;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +29,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.data.redis.connection.RedisClusterConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
@@ -39,12 +39,13 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import redis.clients.jedis.JedisCluster;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -62,6 +63,8 @@ public class InstituteDistrictServiceTest {
 	@Autowired
 	private EducGradTraxApiConstants constants;
 	@Autowired
+	private DistrictTransformer districtTransformer;
+	@Autowired
 	private DistrictService districtService;
 	@MockBean
 	private DistrictRedisRepository districtRedisRepository;
@@ -73,6 +76,8 @@ public class InstituteDistrictServiceTest {
 	@MockBean
 	@Qualifier("default")
 	WebClient webClientMock;
+
+
 	@Mock
 	private WebClient.RequestHeadersSpec requestHeadersSpecMock;
 	@Mock
@@ -87,8 +92,7 @@ public class InstituteDistrictServiceTest {
 	private Mono<List<DistrictEntity>> districtEntitiesMock;
 	@Mock
 	private List<District> districtsMock;
-	@MockBean
-	private DistrictTransformer districtTransformerMock;
+
 
 	// NATS
 	@MockBean
@@ -101,6 +105,8 @@ public class InstituteDistrictServiceTest {
 	private Subscriber subscriber;
 	@MockBean
 	private RestUtils restUtils;
+	@MockBean
+	private RESTService restServiceMock;
 
 	@TestConfiguration
 	static class TestConfigInstitute {
@@ -248,5 +254,29 @@ public class InstituteDistrictServiceTest {
 		when(jedisClusterMock.set(CacheKey.DISTRICT_CACHE.name(), CacheStatus.READY.name()))
 				.thenReturn(anyString());
 		districtService.initializeDistrictCache(true);
+	}
+
+	@Test
+	public void updateDistrictCache_givenValidDistrictId_shouldUpdateCache() {
+		// given
+		// set up initial district in redis mock
+		DistrictEntity districtEntity = createDistrictEntity();
+		District district = districtTransformer.transformToDTO(districtEntity);
+		// when
+		// call updateDistrictCache with district id and mock a return from webclient
+		Mockito.when(this.restServiceMock.get(String.format(constants.getGetDistrictFromInstituteApiUrl(), districtEntity.getDistrictId()),
+				DistrictEntity.class, this.webClientMock)).thenReturn(districtEntity);
+		// then
+		Mockito.when(this.districtRedisRepository.save(districtEntity)).thenReturn(districtEntity);
+		Mockito.when(this.districtRedisRepository.findById(districtEntity.getDistrictId())).thenReturn(Optional.of(districtEntity));
+		// mock return of district from redis cache and compare
+		districtService.updateDistrictCache(districtEntity.getDistrictId());
+		assertTrue(this.districtRedisRepository.findById(districtEntity.getDistrictId()).isPresent());
+	}
+
+	private DistrictEntity createDistrictEntity() {
+		District d = TestUtils.createDistrict();
+		DistrictEntity de = this.districtTransformer.transformToEntity(d);
+		return de;
 	}
 }

@@ -4,6 +4,7 @@ import ca.bc.gov.educ.api.trax.model.dto.AuthorityContact;
 import ca.bc.gov.educ.api.trax.model.dto.DistrictContact;
 import ca.bc.gov.educ.api.trax.model.dto.GradStatusEventPayloadDTO;
 import ca.bc.gov.educ.api.trax.model.dto.SchoolContact;
+import ca.bc.gov.educ.api.trax.model.dto.institute.District;
 import ca.bc.gov.educ.api.trax.model.dto.institute.School;
 import ca.bc.gov.educ.api.trax.model.entity.EventEntity;
 import ca.bc.gov.educ.api.trax.model.entity.TraxStudentEntity;
@@ -206,4 +207,18 @@ public class TestUtils {
         }
         return traxStudent;
     }
+
+    public static District createDistrict() {
+        District district = new District();
+        district.setDistrictId(UUID.randomUUID().toString());
+        district.setDistrictNumber("002");
+        district.setFaxNumber("1233216547");
+        district.setPhoneNumber("3216549874");
+        district.setEmail("district@district.ca");
+        district.setWebsite("www.district.ca");
+        district.setDistrictRegionCode("NOT_APPLIC");
+        district.setDistrictStatusCode("INACTIVE");
+        return district;
+    }
+
 }

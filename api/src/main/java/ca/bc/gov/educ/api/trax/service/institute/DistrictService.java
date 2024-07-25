@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.trax.service.institute;
 
 import ca.bc.gov.educ.api.trax.constant.CacheKey;
+import ca.bc.gov.educ.api.trax.exception.ServiceException;
 import ca.bc.gov.educ.api.trax.model.dto.institute.District;
 import ca.bc.gov.educ.api.trax.model.entity.institute.DistrictEntity;
 import ca.bc.gov.educ.api.trax.model.transformer.institute.DistrictTransformer;
@@ -61,5 +62,17 @@ public class DistrictService {
 
     public void initializeDistrictCache(boolean force) {
         serviceHelper.initializeCache(force, CacheKey.DISTRICT_CACHE, this);
+    }
+
+    /**
+     * Updates the district details in the cache
+     * based on schoolId
+     * @param districtId the district id guid
+     */
+    public void updateDistrictCache(String districtId) throws ServiceException {
+        log.debug("Updating school %s in cache.",  districtId);
+        DistrictEntity districtEntity = this.restService.get(String.format(constants.getGetDistrictFromInstituteApiUrl(), districtId),
+                DistrictEntity.class, webClient);
+        districtRedisRepository.save(districtEntity);
     }
 }

@@ -169,6 +169,8 @@ public class EducGradTraxApiConstants {
 
     @Value("${endpoint.institute-api.get-all-districts.url}")
     private String allDistrictsFromInstituteApiUrl;
+    @Value("${endpoint.institute-api.get-district.url}")
+    private String getDistrictFromInstituteApiUrl;
 
     @Value("${endpoint.institute-api.get-all-school-category-codes.url}")
     private String allSchoolCategoryCodesFromInstituteApiUrl;
