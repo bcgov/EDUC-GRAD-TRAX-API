@@ -119,12 +119,13 @@ public class ChoreographEventHandler {
             this.eventServiceMap.get(UPDATE_SCHOOL.toString()).processEvent(schoolUpdated, eventEntity);
           }
           case CREATE_SCHOOL -> {
+            val schoolCreated = JsonUtil.getJsonObjectFromString(School.class, eventEntity.getEventPayload());
+            this.eventServiceMap.get(CREATE_SCHOOL.toString()).processEvent(schoolCreated, eventEntity);
+          }
+          case MOVE_SCHOOL -> {
             // TODO
           }
           case UPDATE_DISTRICT -> {
-            // TODO
-          }
-          case MOVE_SCHOOL -> {
             // TODO
           }
           default -> {
