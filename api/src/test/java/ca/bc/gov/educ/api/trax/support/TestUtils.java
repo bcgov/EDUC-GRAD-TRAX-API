@@ -4,6 +4,7 @@ import ca.bc.gov.educ.api.trax.model.dto.AuthorityContact;
 import ca.bc.gov.educ.api.trax.model.dto.DistrictContact;
 import ca.bc.gov.educ.api.trax.model.dto.GradStatusEventPayloadDTO;
 import ca.bc.gov.educ.api.trax.model.dto.SchoolContact;
+import ca.bc.gov.educ.api.trax.model.dto.institute.School;
 import ca.bc.gov.educ.api.trax.model.entity.EventEntity;
 import ca.bc.gov.educ.api.trax.model.entity.TraxStudentEntity;
 import ca.bc.gov.educ.api.trax.repository.EventRepository;
@@ -91,6 +92,29 @@ public class TestUtils {
         contact.setUpdateDate(LocalDateTime.now().toString());
         contact.setUpdateUser("TEST");
         return contact;
+    }
+
+    public static School createSchool() {
+        var school = new School();
+        school.setSchoolId(UUID.randomUUID().toString());
+        school.setDistrictId(UUID.randomUUID().toString());
+        school.setMincode("07996006");
+        school.setIndependentAuthorityId(UUID.randomUUID().toString());
+        school.setSchoolNumber("96006");
+        school.setFaxNumber("2507436200");
+        school.setPhoneNumber("2507435516");
+        school.setEmail("executiveoffice@shawnigan.ca");
+        school.setWebsite(null);
+        school.setDisplayName("Shawnigan Lake");
+        school.setDisplayNameNoSpecialChars("Shawnigan Lake");
+        school.setSchoolReportingRequirementCode("REGULAR");
+        school.setSchoolOrganizationCode("QUARTER");
+        school.setSchoolCategoryCode("INDEPEND");
+        school.setFacilityTypeCode("STANDARD");
+        school.setOpenedDate("1989-09-01T00:00:00");
+        school.setCanIssueCertificates(true);
+        school.setCanIssueTranscripts(true);
+        return school;
     }
 
     public static DistrictContact createDistrictContact() {

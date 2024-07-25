@@ -23,7 +23,6 @@ public class SchoolContactUpdatedService extends EventBaseService<SchoolContact>
     @Override
     public void processEvent(final SchoolContact schoolContact, EventEntity eventEntity) {
         log.debug("Processing School Contact Updated");
-        // process the eventEntity here as per https://eccbc.atlassian.net/browse/GRAD2-2648
         try{
             schoolService.updateSchoolCache(schoolContact.getSchoolId());
             this.updateEventWithHistory(eventEntity);

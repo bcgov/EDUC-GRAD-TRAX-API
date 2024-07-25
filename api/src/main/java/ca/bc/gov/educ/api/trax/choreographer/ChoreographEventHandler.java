@@ -6,6 +6,7 @@ import ca.bc.gov.educ.api.trax.model.dto.AuthorityContact;
 import ca.bc.gov.educ.api.trax.model.dto.DistrictContact;
 import ca.bc.gov.educ.api.trax.model.dto.GradStatusEventPayloadDTO;
 import ca.bc.gov.educ.api.trax.model.dto.SchoolContact;
+import ca.bc.gov.educ.api.trax.model.dto.institute.School;
 import ca.bc.gov.educ.api.trax.model.entity.EventEntity;
 import ca.bc.gov.educ.api.trax.repository.EventRepository;
 import ca.bc.gov.educ.api.trax.service.EventService;
@@ -112,6 +113,19 @@ public class ChoreographEventHandler {
             log.debug("Processing {} eventEntity record :: {} ", eventEntity.getEventType(), eventEntity);
             val districtContactDeleted = JsonUtil.getJsonObjectFromString(DistrictContact.class, eventEntity.getEventPayload());
             this.eventServiceMap.get(DELETE_DISTRICT_CONTACT.toString()).processEvent(districtContactDeleted, eventEntity);
+          }
+          case UPDATE_SCHOOL -> {
+            val schoolUpdated = JsonUtil.getJsonObjectFromString(School.class, eventEntity.getEventPayload());
+            this.eventServiceMap.get(UPDATE_SCHOOL.toString()).processEvent(schoolUpdated, eventEntity);
+          }
+          case CREATE_SCHOOL -> {
+            // TODO
+          }
+          case UPDATE_DISTRICT -> {
+            // TODO
+          }
+          case MOVE_SCHOOL -> {
+            // TODO
           }
           default -> {
             log.warn("Silently ignoring eventEntity: {}", eventEntity);
