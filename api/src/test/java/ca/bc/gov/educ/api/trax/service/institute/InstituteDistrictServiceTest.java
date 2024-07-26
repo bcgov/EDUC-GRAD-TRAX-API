@@ -264,8 +264,8 @@ public class InstituteDistrictServiceTest {
 		District district = districtTransformer.transformToDTO(districtEntity);
 		// when
 		// call updateDistrictCache with district id and mock a return from webclient
-		Mockito.when(this.restServiceMock.get(String.format(constants.getGetDistrictFromInstituteApiUrl(), districtEntity.getDistrictId()),
-				DistrictEntity.class, this.webClientMock)).thenReturn(districtEntity);
+		Mockito.when(this.restServiceMock.get(anyString(),
+				any(), any(WebClient.class))).thenReturn(district);
 		// then
 		Mockito.when(this.districtRedisRepository.save(districtEntity)).thenReturn(districtEntity);
 		Mockito.when(this.districtRedisRepository.findById(districtEntity.getDistrictId())).thenReturn(Optional.of(districtEntity));

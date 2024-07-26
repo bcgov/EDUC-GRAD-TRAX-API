@@ -216,6 +216,7 @@ public class TestUtils {
         district.setPhoneNumber("3216549874");
         district.setEmail("district@district.ca");
         district.setWebsite("www.district.ca");
+        district.setDisplayName("Test Display Name");
         district.setDistrictRegionCode("NOT_APPLIC");
         district.setDistrictStatusCode("INACTIVE");
         return district;

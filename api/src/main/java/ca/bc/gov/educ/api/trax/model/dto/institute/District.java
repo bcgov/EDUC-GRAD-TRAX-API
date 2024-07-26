@@ -1,8 +1,10 @@
 package ca.bc.gov.educ.api.trax.model.dto.institute;
 
 import ca.bc.gov.educ.api.trax.model.dto.BaseModel;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -10,6 +12,8 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Component("InstituteDistrict")
+@NoArgsConstructor
+@AllArgsConstructor
 public class District extends BaseModel {
 
     private String districtId;
