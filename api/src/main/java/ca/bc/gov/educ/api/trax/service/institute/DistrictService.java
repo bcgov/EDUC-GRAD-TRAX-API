@@ -70,9 +70,9 @@ public class DistrictService {
      * @param districtId the district id guid
      */
     public void updateDistrictCache(String districtId) throws ServiceException {
-        log.debug("Updating school %s in cache.",  districtId);
-        DistrictEntity districtEntity = this.restService.get(String.format(constants.getGetDistrictFromInstituteApiUrl(), districtId),
-                DistrictEntity.class, webClient);
-        districtRedisRepository.save(districtEntity);
+        log.debug(String.format("Updating district %s in cache.",  districtId));
+        District district = this.restService.get(String.format(constants.getGetDistrictFromInstituteApiUrl(), districtId),
+                District.class, webClient);
+        districtRedisRepository.save(this.districtTransformer.transformToEntity(district));
     }
 }

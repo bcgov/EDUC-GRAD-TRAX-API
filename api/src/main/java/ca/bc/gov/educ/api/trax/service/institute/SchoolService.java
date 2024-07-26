@@ -22,6 +22,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service("InstituteSchoolService")
@@ -125,8 +126,8 @@ public class SchoolService {
 	public void updateSchoolCache(String schoolId) throws ServiceException {
 		// get details from institute
 		log.debug("Updating school %s in cache.",  schoolId);
-		SchoolDetailEntity sde = this.restService.get(String.format(constants.getSchoolDetailsByIdFromInstituteApiUrl(), schoolId),
-				SchoolDetailEntity.class, webClient);
-		schoolDetailRedisRepository.save(sde);
+		SchoolDetail schoolDetail = this.restService.get(String.format(constants.getSchoolDetailsByIdFromInstituteApiUrl(), schoolId),
+				SchoolDetail.class, webClient);
+		schoolDetailRedisRepository.save(schoolDetailTransformer.transformToEntity(schoolDetail));
 	}
 }
