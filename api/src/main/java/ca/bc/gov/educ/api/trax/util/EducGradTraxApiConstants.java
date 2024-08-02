@@ -36,9 +36,6 @@ public class EducGradTraxApiConstants {
     public static final String GRAD_TRAX_CODE_URL_MAPPING_V2 =  GRAD_TRAX_API_ROOT_MAPPING_V2 + "/code";
     public static final String GRAD_SCHOOL_URL_MAPPING_V1 = GRAD_TRAX_API_ROOT_MAPPING_V1 + "/school";
     public static final String GRAD_SCHOOL_URL_MAPPING_V2 = GRAD_TRAX_API_ROOT_MAPPING_V2 + "/school";
-    // TODO: remove test below
-    public static final String GRAD_SCHOOL_URL_MAPPING_TEST_V2 = GRAD_TRAX_API_ROOT_MAPPING_V2 + "/school/{schoolID}";
-
     public static final String GRAD_SCHOOL_DETAIL_URL_MAPPING_V2 = GRAD_TRAX_API_ROOT_MAPPING_V2 + "/school-detail";
     public static final String GRAD_DISTRICT_URL_MAPPING_V1 = GRAD_TRAX_API_ROOT_MAPPING_V1 + "/district";
     public static final String GRAD_DISTRICT_URL_MAPPING_V2 = GRAD_TRAX_API_ROOT_MAPPING_V2 + "/district";
