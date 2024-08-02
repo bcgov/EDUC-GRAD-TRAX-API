@@ -4,8 +4,7 @@ import ca.bc.gov.educ.api.trax.model.dto.AuthorityContact;
 import ca.bc.gov.educ.api.trax.model.dto.DistrictContact;
 import ca.bc.gov.educ.api.trax.model.dto.GradStatusEventPayloadDTO;
 import ca.bc.gov.educ.api.trax.model.dto.SchoolContact;
-import ca.bc.gov.educ.api.trax.model.dto.institute.District;
-import ca.bc.gov.educ.api.trax.model.dto.institute.School;
+import ca.bc.gov.educ.api.trax.model.dto.institute.*;
 import ca.bc.gov.educ.api.trax.model.entity.EventEntity;
 import ca.bc.gov.educ.api.trax.model.entity.TraxStudentEntity;
 import ca.bc.gov.educ.api.trax.repository.EventRepository;
@@ -16,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.UUID;
 
 import static ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants.DEFAULT_CREATED_BY;
@@ -116,6 +116,14 @@ public class TestUtils {
         school.setCanIssueCertificates(true);
         school.setCanIssueTranscripts(true);
         return school;
+    }
+
+    public static MoveSchoolData createMoveSchoolData() {
+        var move = new MoveSchoolData();
+        move.setToSchool(createSchool());
+        move.setMoveDate(LocalDateTime.now().toString());
+        move.setFromSchoolId(UUID.randomUUID().toString());
+        return move;
     }
 
     public static DistrictContact createDistrictContact() {
@@ -222,4 +230,28 @@ public class TestUtils {
         return district;
     }
 
+    public static SchoolDetail createSchoolDetail(){
+        String schoolId = UUID.randomUUID().toString();
+        SchoolAddress schoolAddress = new SchoolAddress();
+        schoolAddress.setSchoolId(schoolId);
+        schoolAddress.setAddressLine1("123 Fake St");
+        schoolAddress.setCity("Vancouverland");
+        schoolAddress.setCountryCode("CAN");
+        schoolAddress.setPostal("VQV2L2");
+        SchoolDetail schoolDetail = new SchoolDetail();
+        schoolDetail.setSchoolId(schoolId);
+        schoolDetail.setSchoolNumber("96006");
+        schoolDetail.setDistrictId(UUID.randomUUID().toString());
+        schoolDetail.setAddresses(Arrays.asList(schoolAddress));
+        schoolDetail.setCreateDate(LocalDateTime.now().toString());
+        schoolDetail.setCanIssueCertificates(true);
+        schoolDetail.setDisplayName("Blah");
+        schoolDetail.setCreateUser("Test");
+        schoolDetail.setUpdateDate(LocalDateTime.now().toString());
+        schoolDetail.setUpdateUser("Test");
+        schoolDetail.setCreateDate(LocalDateTime.now().toString());
+        schoolDetail.setCanIssueTranscripts(true);
+        schoolDetail.setDisplayNameNoSpecialChars("blah blah");
+        return schoolDetail;
+    }
 }

@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import static org.assertj.core.api.Assertions.fail;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.doThrow;
 
 public class SchoolMovedServiceTest extends BaseReplicationServiceTest {
@@ -24,7 +24,7 @@ public class SchoolMovedServiceTest extends BaseReplicationServiceTest {
 
     @Test
     public void testProcessEvent_givenMOVE_SCHOOL_Event_shouldProcessEvent() throws JsonProcessingException {
-        final var request = TestUtils.createSchool();
+        final var request = TestUtils.createMoveSchoolData();
         final var event = TestUtils.createEvent(EventType.MOVE_SCHOOL.toString(), request, this.replicationTestUtils.getEventRepository());
         this.schoolMovedService.processEvent(request, event);
         var result = this.replicationTestUtils.getEventRepository().findById(event.getReplicationEventId());
@@ -38,8 +38,8 @@ public class SchoolMovedServiceTest extends BaseReplicationServiceTest {
     @Test
     public void testProcessEvent_givenMOVE_SCHOOL_Event_ServiceUnavailable_triggerError() throws JsonProcessingException {
         final String ERROR_MSG = "Test Exception";
-        doThrow(new ServiceException(ERROR_MSG)).when(schoolServiceMock).updateSchoolCache(anyString());
-        final var request = TestUtils.createSchool();
+        doThrow(new ServiceException(ERROR_MSG)).when(schoolServiceMock).updateSchoolCache(anyList());
+        final var request = TestUtils.createMoveSchoolData();
         final var event = TestUtils.createEvent(EventType.MOVE_SCHOOL.toString(), request, this.replicationTestUtils.getEventRepository());
         this.schoolMovedService.processEvent(request, event);
         var result = this.replicationTestUtils.getEventRepository().findById(event.getReplicationEventId());

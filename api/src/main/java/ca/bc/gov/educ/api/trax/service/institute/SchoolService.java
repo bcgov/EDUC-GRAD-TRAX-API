@@ -1,7 +1,6 @@
 package ca.bc.gov.educ.api.trax.service.institute;
 
 import ca.bc.gov.educ.api.trax.constant.CacheKey;
-import ca.bc.gov.educ.api.trax.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.trax.exception.ServiceException;
 import ca.bc.gov.educ.api.trax.model.dto.institute.School;
 import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolDetail;
@@ -22,7 +21,6 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service("InstituteSchoolService")
@@ -129,5 +127,16 @@ public class SchoolService {
 		SchoolDetail schoolDetail = this.restService.get(String.format(constants.getSchoolDetailsByIdFromInstituteApiUrl(), schoolId),
 				SchoolDetail.class, webClient);
 		schoolDetailRedisRepository.save(schoolDetailTransformer.transformToEntity(schoolDetail));
+	}
+
+	/**
+	 * Updates the school and school details in the cache
+	 * based on schoolId
+	 * @param schoolIds the school id guids
+	 */
+	public void updateSchoolCache(List<String> schoolIds) throws ServiceException {
+		for (String schoolId : schoolIds) {
+			updateSchoolCache(schoolId);
+		}
 	}
 }
