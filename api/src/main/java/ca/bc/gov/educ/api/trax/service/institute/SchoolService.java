@@ -68,6 +68,11 @@ public class SchoolService {
 		return  schoolTransformer.transformToDTO(schoolRedisRepository.findAll());
 	}
 
+	public School getSchoolByMincodeFromRedisCache(String mincode) {
+		log.debug("Get School by Mincode from rEdis Cache");
+		return schoolTransformer.transformToDTO(schoolRedisRepository.findByMincode(mincode));
+	}
+
 	public void initializeSchoolCache(boolean force) {
 		serviceHelper.initializeCache(force, CacheKey.SCHOOL_CACHE, this);
 	}
@@ -89,13 +94,9 @@ public class SchoolService {
     public List<SchoolDetail> getSchoolDetailsFromInstituteApi() {
 
         List<School> schools = getSchoolsFromRedisCache();
-        List<SchoolDetail> schoolDetails = new ArrayList<SchoolDetail>();
-
+        List<SchoolDetail> schoolDetails = new ArrayList<>();
         for (School s : schools) {
-            SchoolDetail sd = new SchoolDetail();
-
-            sd = getSchoolDetailByIdFromInstituteApi(s.getSchoolId());
-            schoolDetails.add(sd);
+            schoolDetails.add(getSchoolDetailByIdFromInstituteApi(s.getSchoolId()));
         }
         return schoolDetails;
     }
@@ -113,6 +114,12 @@ public class SchoolService {
 
 	public void initializeSchoolDetailCache(boolean force) {
 		serviceHelper.initializeCache(force, CacheKey.SCHOOL_DETAIL_CACHE, this);
+	}
+
+	public List<SchoolDetail> getSchoolDetailsBySchoolCategoryCode(String schoolCategoryCode) {
+
+		return schoolDetailTransformer.transformToDTO(
+				schoolDetailRedisRepository.findBySchoolCategoryCode(schoolCategoryCode));
 	}
 
 }

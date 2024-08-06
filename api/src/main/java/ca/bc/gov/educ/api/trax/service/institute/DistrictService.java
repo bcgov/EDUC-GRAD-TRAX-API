@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.trax.service.institute;
 
 import ca.bc.gov.educ.api.trax.constant.CacheKey;
 import ca.bc.gov.educ.api.trax.model.dto.institute.District;
+import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolDetail;
 import ca.bc.gov.educ.api.trax.model.entity.institute.DistrictEntity;
 import ca.bc.gov.educ.api.trax.model.transformer.institute.DistrictTransformer;
 import ca.bc.gov.educ.api.trax.repository.redis.DistrictRedisRepository;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -31,6 +33,8 @@ public class DistrictService {
     DistrictTransformer districtTransformer;
     @Autowired
     ServiceHelper<DistrictService> serviceHelper;
+    @Autowired
+    SchoolService schoolService;
     @Autowired
     RESTService restService;
 
@@ -61,5 +65,24 @@ public class DistrictService {
 
     public void initializeDistrictCache(boolean force) {
         serviceHelper.initializeCache(force, CacheKey.DISTRICT_CACHE, this);
+    }
+
+    public District getDistrictByNoFromRedisCache(String districtNumber) {
+        log.debug("**** Getting district by district no. from Redis Cache.");
+        return  districtTransformer.transformToDTO(districtRedisRepository.findByDistrictNumber(districtNumber));
+    }
+
+    public District getDistrictByIdFromRedisCache(String districtId) {
+        log.debug("**** Getting district by ID from Redis Cache.");
+        return  districtTransformer.transformToDTO(districtRedisRepository.findById(districtId));
+    }
+
+    public List<District> getDistrictsBySchoolCategoryCode(String schoolCategoryCode) {
+        List<SchoolDetail> schoolDetails = schoolService.getSchoolDetailsBySchoolCategoryCode(schoolCategoryCode);
+        List<District> districts = new ArrayList<>();
+        for (SchoolDetail schoolDetail : schoolDetails) {
+            districts.add(getDistrictByIdFromRedisCache(schoolDetail.getDistrictId()));
+        }
+        return districts;
     }
 }
