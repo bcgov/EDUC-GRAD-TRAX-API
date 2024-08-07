@@ -103,6 +103,8 @@ public class InstituteSchoolServiceTest {
 	private SchoolTransformer schoolTransformer;
 	@MockBean
 	private SchoolDetailTransformer schoolDetailTransformerMock;
+	@Autowired
+	private SchoolDetailTransformer schoolDetailTransformer;
 
 	// NATS
 	@MockBean
@@ -375,5 +377,31 @@ public class InstituteSchoolServiceTest {
 		when(this.schoolDetailTransformerMock.transformToDTO(schoolDetailEntities))
 				.thenReturn(schoolDetails);
 		assertEquals(schoolDetails, schoolService.getSchoolDetailsFromRedisCache());
+	}
+
+	@Test
+	public void whenGetSchoolDetailByMincodeFromRedisCache_ReturnSchoolDetail() {
+		String mincode = "12345678";
+		SchoolDetail schoolDetail = new SchoolDetail();
+		schoolDetail.setSchoolId("ID");
+		schoolDetail.setDistrictId("DistID");
+		schoolDetail.setSchoolNumber("12345");
+		schoolDetail.setMincode(mincode);
+		schoolDetail.setSchoolCategoryCode("SCC");
+		schoolDetail.setEmail("abc@xyz.ca");
+
+		SchoolDetailEntity schoolDetailEntity = new SchoolDetailEntity();
+		schoolDetailEntity.setSchoolId("ID");
+		schoolDetailEntity.setDistrictId("DistID");
+		schoolDetailEntity.setSchoolNumber("12345");
+		schoolDetailEntity.setMincode(mincode);
+		schoolDetailEntity.setSchoolCategoryCode("SCC");
+		schoolDetailEntity.setEmail("abc@xyz.ca");
+
+		when(this.schoolDetailRedisRepository.findByMincode(mincode))
+				.thenReturn(schoolDetailEntity);
+		when(this.schoolDetailTransformer.transformToDTO(schoolDetailEntity))
+				.thenReturn(schoolDetail);
+		assertEquals(schoolDetail, schoolService.getSchoolDetailByMincodeFromRedisCache(mincode));
 	}
 }
