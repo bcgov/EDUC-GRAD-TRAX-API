@@ -9,11 +9,15 @@ import ca.bc.gov.educ.api.trax.model.dto.ResponseObj;
 import ca.bc.gov.educ.api.trax.model.dto.institute.District;
 import ca.bc.gov.educ.api.trax.model.dto.institute.DistrictContact;
 import ca.bc.gov.educ.api.trax.model.dto.institute.School;
+import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolDetail;
 import ca.bc.gov.educ.api.trax.model.entity.institute.DistrictContactEntity;
 import ca.bc.gov.educ.api.trax.model.entity.institute.DistrictEntity;
+import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolDetailEntity;
 import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolEntity;
 import ca.bc.gov.educ.api.trax.model.transformer.institute.DistrictTransformer;
+import ca.bc.gov.educ.api.trax.model.transformer.institute.SchoolDetailTransformer;
 import ca.bc.gov.educ.api.trax.repository.redis.DistrictRedisRepository;
+import ca.bc.gov.educ.api.trax.repository.redis.SchoolDetailRedisRepository;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.RestUtils;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
@@ -67,8 +71,12 @@ public class InstituteDistrictServiceTest {
 	private EducGradTraxApiConstants constants;
 	@Autowired
 	private DistrictService districtService;
+	@Autowired
+	private SchoolService schoolService;
 	@MockBean
 	private DistrictRedisRepository districtRedisRepository;
+	@MockBean
+	private SchoolDetailRedisRepository schoolDetailRedisRepository;
 	@MockBean
 	private JedisConnectionFactory jedisConnectionFactoryMock;
 	@MockBean
@@ -93,6 +101,8 @@ public class InstituteDistrictServiceTest {
 	private List<District> districtsMock;
 	@MockBean
 	private DistrictTransformer districtTransformerMock;
+	@MockBean
+	private SchoolDetailTransformer schoolDetailTransformer;
 
 	// NATS
 	@MockBean
@@ -221,7 +231,6 @@ public class InstituteDistrictServiceTest {
 
 	@Test
 	public void whenInitializeDistrictCache_WithLoadingAndTrue_ThenForceLoad() {
-
 		DistrictEntity de = new DistrictEntity();
 		List<DistrictEntity> des = new ArrayList<DistrictEntity>();
 		de.setDistrictId("123");
@@ -241,7 +250,6 @@ public class InstituteDistrictServiceTest {
 		d.setDistrictId("789");
 		d.setDistrictNumber("012");
 		ds.add(d);
-
 
 		when(webClientMock.get())
 				.thenReturn(requestHeadersUriSpecMock);
@@ -295,5 +303,90 @@ public class InstituteDistrictServiceTest {
 		when(jedisClusterMock.set(CacheKey.DISTRICT_CACHE.name(), CacheStatus.READY.name()))
 				.thenReturn(anyString());
 		districtService.initializeDistrictCache(true);
+	}
+
+	@Test
+	public void whenGetDistrictsBySchoolCategoryCode_ReturnDistricts() {
+		String schoolCategoryCode = "ABC";
+		List<District> districts = new ArrayList<>();
+		District district = new District();
+		district.setDistrictId("ID");
+		district.setDistrictNumber("1234");
+		district.setDistrictStatusCode("SC");
+		district.setDistrictRegionCode("RC");
+		district.setContacts(Arrays.asList(new DistrictContact(), new DistrictContact()));
+		districts.add(district);
+
+		district = new District();
+		district.setDistrictId("ID");
+		district.setDistrictNumber("1234");
+		district.setDistrictStatusCode("SC");
+		district.setDistrictRegionCode("RC");
+		district.setContacts(Arrays.asList(new DistrictContact(), new DistrictContact()));
+		districts.add(district);
+
+		List<DistrictEntity> districtEntities = new ArrayList<>();
+		DistrictEntity districtEntity = new DistrictEntity();
+		districtEntity.setDistrictId("ID");
+		districtEntity.setDistrictNumber("1234");
+		districtEntity.setDistrictStatusCode("SC");
+		districtEntity.setDistrictRegionCode("RC");
+		districtEntity.setContacts(Arrays.asList(new DistrictContactEntity(), new DistrictContactEntity()));
+		districtEntities.add(districtEntity);
+
+		districtEntity = new DistrictEntity();
+		districtEntity.setDistrictId("ID");
+		districtEntity.setDistrictNumber("1234");
+		districtEntity.setDistrictStatusCode("SC");
+		districtEntity.setDistrictRegionCode("RC");
+		districtEntity.setContacts(Arrays.asList(new DistrictContactEntity(), new DistrictContactEntity()));
+		districtEntities.add(districtEntity);
+
+		List<SchoolDetail> schoolDetails = new ArrayList<>();
+		SchoolDetail schoolDetail = new SchoolDetail();
+		schoolDetail.setSchoolId("ID");
+		schoolDetail.setDistrictId("DistID");
+		schoolDetail.setSchoolNumber("12345");
+		schoolDetail.setSchoolCategoryCode("SCC");
+		schoolDetail.setEmail("abc@xyz.ca");
+		schoolDetails.add(schoolDetail);
+
+		schoolDetail = new SchoolDetail();
+		schoolDetail.setSchoolId("ID");
+		schoolDetail.setDistrictId("DistID");
+		schoolDetail.setSchoolNumber("12345");
+		schoolDetail.setSchoolCategoryCode("SCC");
+		schoolDetail.setEmail("abc@xyz.ca");
+		schoolDetails.add(schoolDetail);
+
+		List<SchoolDetailEntity> schoolDetailEntities = new ArrayList<>();
+		SchoolDetailEntity schoolDetailEntity = new SchoolDetailEntity();
+		schoolDetailEntity.setSchoolId("ID");
+		schoolDetailEntity.setDistrictId("DistID");
+		schoolDetailEntity.setSchoolNumber("12345");
+		schoolDetailEntity.setSchoolCategoryCode("SCC");
+		schoolDetailEntity.setEmail("abc@xyz.ca");
+		schoolDetailEntities.add(schoolDetailEntity);
+
+		schoolDetailEntity = new SchoolDetailEntity();
+		schoolDetailEntity.setSchoolId("ID");
+		schoolDetailEntity.setDistrictId("DistID");
+		schoolDetailEntity.setSchoolNumber("12345");
+		schoolDetailEntity.setSchoolCategoryCode("SCC");
+		schoolDetailEntity.setEmail("abc@xyz.ca");
+		schoolDetailEntities.add(schoolDetailEntity);
+
+
+		when(this.schoolDetailRedisRepository.findBySchoolCategoryCode(schoolCategoryCode))
+				.thenReturn(schoolDetailEntities);
+		when(this.schoolDetailTransformer.transformToDTO(schoolDetailEntities))
+				.thenReturn(schoolDetails);
+		when(this.districtService.getDistrictByIdFromRedisCache("ID"))
+				.thenReturn(district);
+		when(this.districtTransformerMock.transformToDTO(districtEntities))
+				.thenReturn(districts);
+		when(this.schoolService.getSchoolDetailsBySchoolCategoryCode(schoolCategoryCode))
+				.thenReturn(schoolDetails);
+		assertEquals(districts, districtService.getDistrictsBySchoolCategoryCode(schoolCategoryCode));
 	}
 }
