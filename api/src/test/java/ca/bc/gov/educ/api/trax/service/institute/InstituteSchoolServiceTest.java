@@ -328,4 +328,52 @@ public class InstituteSchoolServiceTest {
 		doNothing().when(serviceHelperMock).initializeCache(false, CacheKey.SCHOOL_DETAIL_CACHE, serviceHelperMock);
 		schoolService.initializeSchoolDetailCache(false);
 	}
+
+	@Test
+	public void whenGetSchoolDetailsFromRedisCache_ReturnSchoolDetails() {
+		String mincode = "12345678";
+		List<SchoolDetail> schoolDetails = new ArrayList<>();
+		SchoolDetail schoolDetail = new SchoolDetail();
+		schoolDetail.setSchoolId("ID");
+		schoolDetail.setDistrictId("DistID");
+		schoolDetail.setSchoolNumber("12345");
+		schoolDetail.setMincode(mincode);
+		schoolDetail.setSchoolCategoryCode("SCC");
+		schoolDetail.setEmail("abc@xyz.ca");
+		schoolDetails.add(schoolDetail);
+
+		schoolDetail = new SchoolDetail();
+		schoolDetail.setSchoolId("ID");
+		schoolDetail.setDistrictId("DistID");
+		schoolDetail.setSchoolNumber("12345");
+		schoolDetail.setMincode(mincode);
+		schoolDetail.setSchoolCategoryCode("SCC");
+		schoolDetail.setEmail("abc@xyz.ca");
+		schoolDetails.add(schoolDetail);
+
+		List<SchoolDetailEntity> schoolDetailEntities = new ArrayList<>();
+		SchoolDetailEntity schoolDetailEntity = new SchoolDetailEntity();
+		schoolDetailEntity.setSchoolId("ID");
+		schoolDetailEntity.setDistrictId("DistID");
+		schoolDetailEntity.setSchoolNumber("12345");
+		schoolDetailEntity.setMincode(mincode);
+		schoolDetailEntity.setSchoolCategoryCode("SCC");
+		schoolDetailEntity.setEmail("abc@xyz.ca");
+		schoolDetailEntities.add(schoolDetailEntity);
+
+		schoolDetailEntity = new SchoolDetailEntity();
+		schoolDetailEntity.setSchoolId("ID");
+		schoolDetailEntity.setDistrictId("DistID");
+		schoolDetailEntity.setSchoolNumber("12345");
+		schoolDetailEntity.setMincode(mincode);
+		schoolDetailEntity.setSchoolCategoryCode("SCC");
+		schoolDetailEntity.setEmail("abc@xyz.ca");
+		schoolDetailEntities.add(schoolDetailEntity);
+
+		when(this.schoolDetailRedisRepository.findAll())
+				.thenReturn(schoolDetailEntities);
+		when(this.schoolDetailTransformerMock.transformToDTO(schoolDetailEntities))
+				.thenReturn(schoolDetails);
+		assertEquals(schoolDetails, schoolService.getSchoolDetailsFromRedisCache());
+	}
 }
