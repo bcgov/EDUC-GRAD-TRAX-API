@@ -42,9 +42,9 @@ public class DistrictController {
     @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
     @Operation(summary = "Find a District by District Number", description = "Get District by District Number", tags = { "District" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
-    public ResponseEntity<District> getDistrictDetails(@PathVariable String distCode) {
-        if(distCode.length() <=3) {
-            District distResponse = districtService.getDistrictByNoFromRedisCache(distCode);
+    public ResponseEntity<District> getDistrictDetailsByDistNo(@PathVariable String distNo) {
+        if(distNo.length() <=3) {
+            District distResponse = districtService.getDistrictByDistNoFromRedisCache(distNo);
             if (distResponse != null) {
                 return response.GET(distResponse);
             }

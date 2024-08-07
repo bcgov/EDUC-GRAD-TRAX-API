@@ -12,6 +12,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -21,12 +22,17 @@ public class DistrictControllerTest {
 
     @Mock
     private DistrictService districtService;
+    @Mock
+    private ca.bc.gov.educ.api.trax.service.institute.DistrictService districtServiceV2;
 
     @Mock
     ResponseHelper responseHelper;
 
     @InjectMocks
     private DistrictController districtController;
+
+    @InjectMocks
+    private ca.bc.gov.educ.api.trax.controller.v2.DistrictController districtControllerV2;
 
     @Test
     public void testGetSchoolDetails() {
@@ -50,5 +56,38 @@ public class DistrictControllerTest {
         districtController.getDistrictBySchoolCategory("123");
         Mockito.verify(districtService).getDistrictBySchoolCategory("123");
 
+    }
+
+    @Test
+    public void whenGetDistrictDetailsByDistNo_ReturnsDistrict() {
+        String distNo = "123";
+        ca.bc.gov.educ.api.trax.model.dto.institute.District district = new ca.bc.gov.educ.api.trax.model.dto.institute.District();
+        district.setDistrictId("123456");
+        district.setDistrictNumber("123");
+        district.setDistrictRegionCode("BC");
+
+        Mockito.when(districtServiceV2.getDistrictByDistNoFromRedisCache(distNo)).thenReturn(district);
+        districtControllerV2.getDistrictDetailsByDistNo(distNo);
+        Mockito.verify(districtServiceV2).getDistrictByDistNoFromRedisCache(distNo);
+    }
+
+    @Test
+    public void whenGetDistrictsBySchoolCategoryCode_ReturnListOfDistricts() {
+        String schoolCategoryCode = "123";
+        final List<ca.bc.gov.educ.api.trax.model.dto.institute.District> districts = new ArrayList<>();
+        ca.bc.gov.educ.api.trax.model.dto.institute.District district = new ca.bc.gov.educ.api.trax.model.dto.institute.District();
+        district.setDistrictId("123456");
+        district.setDistrictNumber("123");
+        district.setDistrictRegionCode("BC");
+        districts.add(district);
+        district = new ca.bc.gov.educ.api.trax.model.dto.institute.District();
+        district.setDistrictId("789012");
+        district.setDistrictNumber("456");
+        district.setDistrictRegionCode("BC");
+        districts.add(district);
+
+        Mockito.when(districtServiceV2.getDistrictsBySchoolCategoryCode(schoolCategoryCode)).thenReturn(districts);
+        districtControllerV2.getDistrictsBySchoolCategoryCode(schoolCategoryCode);
+        Mockito.verify(districtServiceV2).getDistrictsBySchoolCategoryCode(schoolCategoryCode);
     }
 }

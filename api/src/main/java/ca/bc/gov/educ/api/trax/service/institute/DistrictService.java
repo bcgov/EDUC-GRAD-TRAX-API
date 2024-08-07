@@ -67,7 +67,7 @@ public class DistrictService {
         serviceHelper.initializeCache(force, CacheKey.DISTRICT_CACHE, this);
     }
 
-    public District getDistrictByNoFromRedisCache(String districtNumber) {
+    public District getDistrictByDistNoFromRedisCache(String districtNumber) {
         log.debug("**** Getting district by district no. from Redis Cache.");
         return  districtTransformer.transformToDTO(districtRedisRepository.findByDistrictNumber(districtNumber));
     }

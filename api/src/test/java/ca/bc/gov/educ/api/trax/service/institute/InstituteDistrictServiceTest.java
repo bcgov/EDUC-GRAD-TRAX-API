@@ -227,7 +227,7 @@ public class InstituteDistrictServiceTest {
 		doNothing().when(districtServiceMock).loadDistrictsIntoRedisCache(ds);
 
 		districtService.initializeDistrictCache(true);
-		//verify(codeServicemock).loadSchoolCategoryCodesIntoRedisCache(sccs);
+		verify(districtServiceMock).loadDistrictsIntoRedisCache(ds);
 	}
 
 	@Test
