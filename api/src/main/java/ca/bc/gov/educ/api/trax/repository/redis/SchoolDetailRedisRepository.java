@@ -11,4 +11,6 @@ public interface SchoolDetailRedisRepository extends CrudRepository<SchoolDetail
     String HASH_KEY = "SchoolDetail";
 
     List<SchoolDetailEntity> findBySchoolCategoryCode(String schoolCategoryCode);
+
+    SchoolDetailEntity findByMincode(String mincode);
 }

@@ -112,6 +112,11 @@ public class SchoolService {
 		return schoolDetailTransformer.transformToDTO(schoolDetailRedisRepository.findAll());
 	}
 
+	public SchoolDetail getSchoolDetailByMincodeFromRedisCache(String mincode) {
+		log.debug("**** Getting school Details By Mincode from Redis Cache.");
+		return schoolDetailTransformer.transformToDTO(schoolDetailRedisRepository.findByMincode(mincode));
+	}
+
 	public void initializeSchoolDetailCache(boolean force) {
 		serviceHelper.initializeCache(force, CacheKey.SCHOOL_DETAIL_CACHE, this);
 	}
