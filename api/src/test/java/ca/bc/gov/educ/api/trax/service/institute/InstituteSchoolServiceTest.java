@@ -404,4 +404,48 @@ public class InstituteSchoolServiceTest {
 				.thenReturn(schoolDetail);
 		assertEquals(schoolDetail, schoolService.getSchoolDetailByMincodeFromRedisCache(mincode));
 	}
+
+	@Test
+	public void whenGetSchoolDetailBySchoolCategoryCode_ReturnSchoolDetail() {
+		String schoolCategoryCode = "ABC";
+		List<SchoolDetail> schoolDetails = new ArrayList<>();
+		SchoolDetail schoolDetail = new SchoolDetail();
+		schoolDetail.setSchoolId("ID");
+		schoolDetail.setDistrictId("DistID");
+		schoolDetail.setSchoolNumber("12345");
+		schoolDetail.setSchoolCategoryCode("SCC");
+		schoolDetail.setEmail("abc@xyz.ca");
+		schoolDetails.add(schoolDetail);
+
+		schoolDetail = new SchoolDetail();
+		schoolDetail.setSchoolId("ID");
+		schoolDetail.setDistrictId("DistID");
+		schoolDetail.setSchoolNumber("12345");
+		schoolDetail.setSchoolCategoryCode("SCC");
+		schoolDetail.setEmail("abc@xyz.ca");
+		schoolDetails.add(schoolDetail);
+
+		List<SchoolDetailEntity> schoolDetailEntities = new ArrayList<>();
+		SchoolDetailEntity schoolDetailEntity = new SchoolDetailEntity();
+		schoolDetailEntity.setSchoolId("ID");
+		schoolDetailEntity.setDistrictId("DistID");
+		schoolDetailEntity.setSchoolNumber("12345");
+		schoolDetailEntity.setSchoolCategoryCode("SCC");
+		schoolDetailEntity.setEmail("abc@xyz.ca");
+		schoolDetailEntities.add(schoolDetailEntity);
+
+		schoolDetailEntity = new SchoolDetailEntity();
+		schoolDetailEntity.setSchoolId("ID");
+		schoolDetailEntity.setDistrictId("DistID");
+		schoolDetailEntity.setSchoolNumber("12345");
+		schoolDetailEntity.setSchoolCategoryCode("SCC");
+		schoolDetailEntity.setEmail("abc@xyz.ca");
+		schoolDetailEntities.add(schoolDetailEntity);
+
+		when(this.schoolDetailRedisRepository.findBySchoolCategoryCode(schoolCategoryCode))
+				.thenReturn(schoolDetailEntities);
+		when(this.schoolDetailTransformer.transformToDTO(schoolDetailEntities))
+				.thenReturn(schoolDetails);
+		assertEquals(schoolDetails, schoolService.getSchoolDetailsBySchoolCategoryCode(schoolCategoryCode));
+	}
 }
