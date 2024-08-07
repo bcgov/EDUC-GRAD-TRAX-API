@@ -173,6 +173,54 @@ public class InstituteSchoolServiceTest {
 	}
 
 	@Test
+	public void whenGetSchoolsFromRedisCache_ReturnSchools() {
+		String mincode = "12345678";
+		List<School> schools = new ArrayList<>();
+		School school = new School();
+		school.setSchoolId("ID");
+		school.setDistrictId("DistID");
+		school.setSchoolNumber("12345");
+		school.setMincode(mincode);
+		school.setSchoolCategoryCode("SCC");
+		school.setEmail("abc@xyz.ca");
+		schools.add(school);
+
+		school = new School();
+		school.setSchoolId("ID");
+		school.setDistrictId("DistID");
+		school.setSchoolNumber("12345");
+		school.setMincode(mincode);
+		school.setSchoolCategoryCode("SCC");
+		school.setEmail("abc@xyz.ca");
+		schools.add(school);
+
+		List<SchoolEntity> schoolEntities = new ArrayList<>();
+		SchoolEntity schoolEntity = new SchoolEntity();
+		schoolEntity.setSchoolId("ID");
+		schoolEntity.setDistrictId("DistID");
+		schoolEntity.setSchoolNumber("12345");
+		schoolEntity.setMincode(mincode);
+		schoolEntity.setSchoolCategoryCode("SCC");
+		schoolEntity.setEmail("abc@xyz.ca");
+		schoolEntities.add(schoolEntity);
+
+		schoolEntity = new SchoolEntity();
+		schoolEntity.setSchoolId("ID");
+		schoolEntity.setDistrictId("DistID");
+		schoolEntity.setSchoolNumber("12345");
+		schoolEntity.setMincode(mincode);
+		schoolEntity.setSchoolCategoryCode("SCC");
+		schoolEntity.setEmail("abc@xyz.ca");
+		schoolEntities.add(schoolEntity);
+
+		when(this.schoolRedisRepository.findAll())
+				.thenReturn(schoolEntities);
+		when(this.schoolTransformer.transformToDTO(schoolEntities))
+				.thenReturn(schools);
+		assertEquals(schools, schoolService.getSchoolsFromRedisCache());
+	}
+
+	@Test
 	public void whenGetSchoolByMincodeFromRedisCache_ReturnSchool() {
 		String mincode = "12345678";
 		School school = new School();
@@ -267,7 +315,7 @@ public class InstituteSchoolServiceTest {
 	}
 
 	@Test
-	public void whenLoadSchoolDetailssIntoRedisCache_DoesNotThrow() {
+	public void whenLoadSchoolDetailsIntoRedisCache_DoesNotThrow() {
 		List<SchoolDetailEntity> schoolDetailEntities = Arrays.asList(new SchoolDetailEntity());
 		List<SchoolDetail> schoolDetails = Arrays.asList(new SchoolDetail());
 		when(this.schoolDetailRedisRepository.saveAll(schoolDetailEntities))
