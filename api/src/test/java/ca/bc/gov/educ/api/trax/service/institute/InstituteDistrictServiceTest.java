@@ -7,8 +7,11 @@ import ca.bc.gov.educ.api.trax.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.trax.model.dto.ResponseObj;
 import ca.bc.gov.educ.api.trax.model.dto.institute.District;
+import ca.bc.gov.educ.api.trax.model.dto.institute.DistrictContact;
+import ca.bc.gov.educ.api.trax.model.dto.institute.School;
 import ca.bc.gov.educ.api.trax.model.entity.institute.DistrictContactEntity;
 import ca.bc.gov.educ.api.trax.model.entity.institute.DistrictEntity;
+import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolEntity;
 import ca.bc.gov.educ.api.trax.model.transformer.institute.DistrictTransformer;
 import ca.bc.gov.educ.api.trax.repository.redis.DistrictRedisRepository;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
@@ -46,6 +49,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -154,6 +158,49 @@ public class InstituteDistrictServiceTest {
 		when(this.districtRedisRepository.saveAll(districtEntities))
 				.thenReturn(districtEntities);
 		assertDoesNotThrow(() -> districtService.loadDistrictsIntoRedisCache(districts));
+	}
+
+	@Test
+	public void whenGetDistrictsFromRedisCache_ReturnDistricts() {
+		List<District> districts = new ArrayList<>();
+		District district = new District();
+		district.setDistrictId("ID");
+		district.setDistrictNumber("1234");
+		district.setDistrictStatusCode("SC");
+		district.setDistrictRegionCode("RC");
+		district.setContacts(Arrays.asList(new DistrictContact(), new DistrictContact()));
+		districts.add(district);
+
+		district = new District();
+		district.setDistrictId("ID");
+		district.setDistrictNumber("1234");
+		district.setDistrictStatusCode("SC");
+		district.setDistrictRegionCode("RC");
+		district.setContacts(Arrays.asList(new DistrictContact(), new DistrictContact()));
+		districts.add(district);
+
+		List<DistrictEntity> districtEntities = new ArrayList<>();
+		DistrictEntity districtEntity = new DistrictEntity();
+		districtEntity.setDistrictId("ID");
+		districtEntity.setDistrictNumber("1234");
+		districtEntity.setDistrictStatusCode("SC");
+		districtEntity.setDistrictRegionCode("RC");
+		districtEntity.setContacts(Arrays.asList(new DistrictContactEntity(), new DistrictContactEntity()));
+		districtEntities.add(districtEntity);
+
+		districtEntity = new DistrictEntity();
+		districtEntity.setDistrictId("ID");
+		districtEntity.setDistrictNumber("1234");
+		districtEntity.setDistrictStatusCode("SC");
+		districtEntity.setDistrictRegionCode("RC");
+		districtEntity.setContacts(Arrays.asList(new DistrictContactEntity(), new DistrictContactEntity()));
+		districtEntities.add(districtEntity);
+
+		when(this.districtRedisRepository.findAll())
+				.thenReturn(districtEntities);
+		when(this.districtTransformerMock.transformToDTO(districtEntities))
+				.thenReturn(districts);
+		assertEquals(districts, districtService.getDistrictsFromRedisCache());
 	}
 
 	@Test
