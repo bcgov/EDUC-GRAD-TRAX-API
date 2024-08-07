@@ -50,6 +50,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -283,6 +284,29 @@ public class InstituteDistrictServiceTest {
 
 		districtService.initializeDistrictCache(true);
 		//verify(districtServiceMock).loadDistrictsIntoRedisCache(ds);
+	}
+
+	@Test
+	public void whenGetDistrictByIdFromRedisCache_ReturnDistrict() {
+		District district = new District();
+		district.setDistrictId("ID");
+		district.setDistrictNumber("1234");
+		district.setDistrictStatusCode("SC");
+		district.setDistrictRegionCode("RC");
+		district.setContacts(Arrays.asList(new DistrictContact(), new DistrictContact()));
+
+		DistrictEntity districtEntity = new DistrictEntity();
+		districtEntity.setDistrictId("ID");
+		districtEntity.setDistrictNumber("1234");
+		districtEntity.setDistrictStatusCode("SC");
+		districtEntity.setDistrictRegionCode("RC");
+		districtEntity.setContacts(Arrays.asList(new DistrictContactEntity(), new DistrictContactEntity()));
+
+		when(this.districtRedisRepository.findById("ID"))
+				.thenReturn(Optional.of(districtEntity));
+		when(this.districtTransformerMock.transformToDTO(Optional.of(districtEntity)))
+				.thenReturn(district);
+		assertEquals(district, districtService.getDistrictByIdFromRedisCache("ID"));
 	}
 
 	@Test
