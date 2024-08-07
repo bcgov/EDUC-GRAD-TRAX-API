@@ -262,4 +262,10 @@ public class InstituteSchoolServiceTest {
 
 		SchoolDetail result = schoolService.getSchoolDetailByIdFromInstituteApi(schoolId);
 	}
+
+	@Test
+	public void whenInitializeSchoolDetailCache_DoNothing() {
+		doNothing().when(serviceHelperMock).initializeCache(false, CacheKey.SCHOOL_DETAIL_CACHE, serviceHelperMock);
+		schoolService.initializeSchoolDetailCache(false);
+	}
 }
