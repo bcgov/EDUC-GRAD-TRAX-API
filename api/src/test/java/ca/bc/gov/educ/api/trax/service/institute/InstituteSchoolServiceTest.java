@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.trax.service.institute;
 
+import ca.bc.gov.educ.api.trax.constant.CacheKey;
 import ca.bc.gov.educ.api.trax.messaging.NatsConnection;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Subscriber;
@@ -47,6 +48,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 
@@ -61,6 +63,8 @@ public class InstituteSchoolServiceTest {
 	private EducGradTraxApiConstants constants;
 	@Autowired
 	private SchoolService schoolService;
+	@MockBean
+	private ServiceHelper serviceHelperMock;
 	@MockBean
 	private SchoolRedisRepository schoolRedisRepository;
 	@MockBean
@@ -189,6 +193,12 @@ public class InstituteSchoolServiceTest {
 		when(this.schoolTransformer.transformToDTO(schoolEntity))
 				.thenReturn(school);
 		assertEquals(school, schoolService.getSchoolByMincodeFromRedisCache(mincode));
+	}
+
+	@Test
+	public void whenInitializeSchoolCache_DoNothing() {
+		doNothing().when(serviceHelperMock).initializeCache(false, CacheKey.SCHOOL_CACHE, serviceHelperMock);
+		schoolService.initializeSchoolCache(false);
 	}
 
 	@Test
