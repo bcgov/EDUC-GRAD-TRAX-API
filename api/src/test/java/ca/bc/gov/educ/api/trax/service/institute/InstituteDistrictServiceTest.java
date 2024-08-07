@@ -287,6 +287,30 @@ public class InstituteDistrictServiceTest {
 	}
 
 	@Test
+	public void whenGetDistrictByDistNoFromRedisCache_ReturnDistrict() {
+		String distNo = "123";
+		District district = new District();
+		district.setDistrictId("ID");
+		district.setDistrictNumber("123");
+		district.setDistrictStatusCode("SC");
+		district.setDistrictRegionCode("RC");
+		district.setContacts(Arrays.asList(new DistrictContact(), new DistrictContact()));
+
+		DistrictEntity districtEntity = new DistrictEntity();
+		districtEntity.setDistrictId("ID");
+		districtEntity.setDistrictNumber("456");
+		districtEntity.setDistrictStatusCode("SC");
+		districtEntity.setDistrictRegionCode("RC");
+		districtEntity.setContacts(Arrays.asList(new DistrictContactEntity(), new DistrictContactEntity()));
+
+		when(this.districtRedisRepository.findByDistrictNumber(distNo))
+				.thenReturn(districtEntity);
+		when(this.districtTransformerMock.transformToDTO(districtEntity))
+				.thenReturn(district);
+		assertEquals(district, districtService.getDistrictByDistNoFromRedisCache(distNo));
+	}
+
+	@Test
 	public void whenGetDistrictByIdFromRedisCache_ReturnDistrict() {
 		District district = new District();
 		district.setDistrictId("ID");
