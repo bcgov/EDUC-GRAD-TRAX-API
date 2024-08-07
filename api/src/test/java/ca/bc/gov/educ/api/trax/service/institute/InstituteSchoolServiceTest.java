@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -91,6 +92,8 @@ public class InstituteSchoolServiceTest {
 	private RestUtils restUtils;
 	@MockBean
 	private SchoolTransformer schoolTransformerMock;
+	@Autowired
+	private SchoolTransformer schoolTransformer;
 	@MockBean
 	private SchoolDetailTransformer schoolDetailTransformerMock;
 
@@ -163,10 +166,35 @@ public class InstituteSchoolServiceTest {
 	}
 
 	@Test
-	public void whenGetSchoolDetailssFromInstituteApi_returnsListOfSchoolDetails() {
+	public void whenGetSchoolByMincodeFromRedisCache_ReturnSchool() {
+		String mincode = "12345678";
+		School school = new School();
+		school.setSchoolId("ID");
+		school.setDistrictId("DistID");
+		school.setSchoolNumber("12345");
+		school.setMincode(mincode);
+		school.setSchoolCategoryCode("SCC");
+		school.setEmail("abc@xyz.ca");
+
+		SchoolEntity schoolEntity = new SchoolEntity();
+		schoolEntity.setSchoolId("ID");
+		schoolEntity.setDistrictId("DistID");
+		schoolEntity.setSchoolNumber("12345");
+		schoolEntity.setMincode(mincode);
+		schoolEntity.setSchoolCategoryCode("SCC");
+		schoolEntity.setEmail("abc@xyz.ca");
+
+		when(this.schoolRedisRepository.findByMincode(mincode))
+				.thenReturn(schoolEntity);
+		when(this.schoolTransformer.transformToDTO(schoolEntity))
+				.thenReturn(school);
+		assertEquals(school, schoolService.getSchoolByMincodeFromRedisCache(mincode));
+	}
+
+	@Test
+	public void whenGetSchoolDetailsFromInstituteApi_returnsListOfSchoolDetails() {
 		List<SchoolDetailEntity> schoolDetails = new ArrayList<>();
 		SchoolDetailEntity schoolDetail = new SchoolDetailEntity();
-
 		schoolDetail.setSchoolId("ID");
 		schoolDetail.setDistrictId("DistID");
 		schoolDetail.setSchoolNumber("12345");
@@ -195,5 +223,33 @@ public class InstituteSchoolServiceTest {
 				.thenReturn(schoolDetailsMock);
 
 		List<SchoolDetail> result = schoolService.getSchoolDetailsFromInstituteApi();
+	}
+
+	@Test
+	public void whenGetSchoolDetailByIdFromInstituteApi_ReturnSchoolDetail() {
+		String schoolId = "school-id";
+		SchoolDetailEntity schoolDetailEntity = new SchoolDetailEntity();
+		schoolDetailEntity.setSchoolId("ID");
+		schoolDetailEntity.setDistrictId("DistID");
+		schoolDetailEntity.setSchoolNumber("12345");
+		schoolDetailEntity.setSchoolCategoryCode("SCC");
+		schoolDetailEntity.setEmail("abc@xyz.ca");
+
+		when(this.restUtils.getTokenResponseObject(anyString(), anyString()))
+				.thenReturn(responseObjectMock);
+		when(this.responseObjectMock.getAccess_token())
+				.thenReturn("accessToken");
+		when(webClientMock.get())
+				.thenReturn(requestHeadersUriSpecMock);
+		when(requestHeadersUriSpecMock.uri(anyString()))
+				.thenReturn(requestHeadersSpecMock);
+		when(requestHeadersSpecMock.headers(any(Consumer.class)))
+				.thenReturn(requestHeadersSpecMock);
+		when(requestHeadersSpecMock.retrieve())
+				.thenReturn(responseSpecMock);
+		when(this.responseSpecMock.bodyToMono(new ParameterizedTypeReference<SchoolDetailEntity>(){}))
+				.thenReturn(Mono.just(schoolDetailEntity));
+
+		SchoolDetail result = schoolService.getSchoolDetailByIdFromInstituteApi(schoolId);
 	}
 }

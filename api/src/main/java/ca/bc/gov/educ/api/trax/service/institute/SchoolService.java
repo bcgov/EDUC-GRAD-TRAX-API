@@ -69,7 +69,7 @@ public class SchoolService {
 	}
 
 	public School getSchoolByMincodeFromRedisCache(String mincode) {
-		log.debug("Get School by Mincode from rEdis Cache");
+		log.debug("Get School by Mincode from Redis Cache");
 		return schoolTransformer.transformToDTO(schoolRedisRepository.findByMincode(mincode));
 	}
 
