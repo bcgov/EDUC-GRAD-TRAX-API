@@ -14,6 +14,7 @@ import ca.bc.gov.educ.api.trax.model.transformer.institute.SchoolDetailTransform
 import ca.bc.gov.educ.api.trax.model.transformer.institute.SchoolTransformer;
 import ca.bc.gov.educ.api.trax.repository.GradCountryRepository;
 import ca.bc.gov.educ.api.trax.repository.GradProvinceRepository;
+import ca.bc.gov.educ.api.trax.repository.redis.SchoolDetailRedisRepository;
 import ca.bc.gov.educ.api.trax.repository.redis.SchoolRedisRepository;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.RestUtils;
@@ -67,6 +68,8 @@ public class InstituteSchoolServiceTest {
 	private ServiceHelper serviceHelperMock;
 	@MockBean
 	private SchoolRedisRepository schoolRedisRepository;
+	@MockBean
+	private SchoolDetailRedisRepository schoolDetailRedisRepository;
 	@MockBean
 	private JedisConnectionFactory jedisConnectionFactoryMock;
 	@MockBean
@@ -261,6 +264,15 @@ public class InstituteSchoolServiceTest {
 				.thenReturn(Mono.just(schoolDetailEntity));
 
 		SchoolDetail result = schoolService.getSchoolDetailByIdFromInstituteApi(schoolId);
+	}
+
+	@Test
+	public void whenLoadSchoolDetailssIntoRedisCache_DoesNotThrow() {
+		List<SchoolDetailEntity> schoolDetailEntities = Arrays.asList(new SchoolDetailEntity());
+		List<SchoolDetail> schoolDetails = Arrays.asList(new SchoolDetail());
+		when(this.schoolDetailRedisRepository.saveAll(schoolDetailEntities))
+				.thenReturn(schoolDetailEntities);
+		assertDoesNotThrow(() -> schoolService.loadSchoolDetailsIntoRedisCache(schoolDetails));
 	}
 
 	@Test
