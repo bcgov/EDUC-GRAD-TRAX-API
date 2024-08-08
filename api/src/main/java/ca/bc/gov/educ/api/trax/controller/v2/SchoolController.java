@@ -77,8 +77,8 @@ public class SchoolController {
     @Operation(summary = "Check school existence by Mincode", description = "Check school existence by Mincode", tags = { "School" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "204", description = "NO CONTENT")})
-    public ResponseEntity<Boolean> checkIfSchoolExists(@PathVariable String minCode) {
-        return response.GET(schoolService.checkIfSchoolExists(minCode));
+    public Boolean checkIfSchoolExists(@PathVariable String minCode) {
+        return schoolService.checkIfSchoolExists(minCode);
     }
 
     @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_URL_MAPPING_V2 + EducGradTraxApiConstants.GET_SCHOOLS_BY_SCHOOL_CATEGORY_MAPPING)
