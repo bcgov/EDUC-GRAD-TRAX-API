@@ -16,6 +16,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -195,6 +196,20 @@ public class SchoolControllerTest {
     }
 
     @Test
+    public void whenGetSchoolByMincode_Return_NOT_FOUND() {
+        String mincode = "12345678";
+        ca.bc.gov.educ.api.trax.model.dto.institute.School school = new ca.bc.gov.educ.api.trax.model.dto.institute.School();
+        school.setSchoolId("1234567");
+        school.setDistrictId("9876543");
+        school.setMincode(mincode);
+
+        Mockito.when(schoolServiceV2.getSchoolByMincodeFromRedisCache(mincode)).thenReturn(null);
+        schoolControllerV2.getSchoolByMincode(mincode);
+        Mockito.verify(schoolServiceV2).getSchoolByMincodeFromRedisCache(mincode);
+        assertEquals(responseHelper.NOT_FOUND(), schoolControllerV2.getSchoolByMincode(mincode));
+    }
+
+    @Test
     public void whenGetAllSchoolDetails_ReturnsListOfSchoolDetails() {
         final List<SchoolDetail> schoolDetails = new ArrayList<>();
         SchoolDetail schoolDetail = new SchoolDetail();
@@ -207,8 +222,9 @@ public class SchoolControllerTest {
         schoolDetails.add(schoolDetail);
 
         Mockito.when(schoolServiceV2.getSchoolDetailsFromRedisCache()).thenReturn(schoolDetails);
-        schoolControllerV2.getAllSchoolDetails();
+        List<SchoolDetail> sd = schoolControllerV2.getAllSchoolDetails();
         Mockito.verify(schoolServiceV2).getSchoolDetailsFromRedisCache();
+        assertEquals(schoolDetails, sd);
     }
 
     @Test
