@@ -4,6 +4,7 @@ import ca.bc.gov.educ.api.trax.model.dto.District;
 import ca.bc.gov.educ.api.trax.service.DistrictService;
 import ca.bc.gov.educ.api.trax.util.ResponseHelper;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -14,6 +15,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.mockito.Mockito.never;
 
 @RunWith(MockitoJUnitRunner.class)
 @ExtendWith(MockitoExtension.class)
@@ -69,6 +72,20 @@ public class DistrictControllerTest {
         Mockito.when(districtServiceV2.getDistrictByDistNoFromRedisCache(distNo)).thenReturn(district);
         districtControllerV2.getDistrictDetailsByDistNo(distNo);
         Mockito.verify(districtServiceV2).getDistrictByDistNoFromRedisCache(distNo);
+    }
+
+    @Test
+    public void whenGetDistrictDetailsByDistNo_ReturnNULL() {
+        String distNo = "1234";
+        ca.bc.gov.educ.api.trax.model.dto.institute.District district = new ca.bc.gov.educ.api.trax.model.dto.institute.District();
+        district.setDistrictId("123456");
+        district.setDistrictNumber("12");
+        district.setDistrictRegionCode("BC");
+
+        Mockito.when(districtServiceV2.getDistrictByDistNoFromRedisCache(distNo)).thenReturn(district);
+        districtControllerV2.getDistrictDetailsByDistNo(distNo);
+        Mockito.verify(districtServiceV2, never()).getDistrictByDistNoFromRedisCache(distNo);
+        Assertions.assertEquals(null, districtControllerV2.getDistrictDetailsByDistNo(distNo));
     }
 
     @Test
