@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -107,10 +108,21 @@ public class SchoolControllerTest {
     }
 
     @Test
-    public void testCheckSchoolExists() {
-        Mockito.when(schoolService.existsSchool("1234567")).thenReturn(true);
-        schoolControllerV2.checkIfSchoolExists("1234567");
-        Mockito.verify(schoolServiceV2).checkIfSchoolExists("1234567");
+    public void testCheckSchoolExists_expectTrue() {
+        String mincode = "1234567";
+        Mockito.when(schoolServiceV2.checkIfSchoolExists(mincode)).thenReturn(true);
+        schoolControllerV2.checkIfSchoolExists(mincode);
+        Mockito.verify(schoolServiceV2).checkIfSchoolExists(mincode);
+        assertEquals(true, schoolServiceV2.checkIfSchoolExists(mincode));
+    }
+
+    @Test
+    public void testCheckSchoolExists_expectFalse() {
+        String mincode = "1234567";
+        Mockito.when(schoolServiceV2.checkIfSchoolExists(mincode)).thenReturn(false);
+        schoolControllerV2.checkIfSchoolExists(mincode);
+        Mockito.verify(schoolServiceV2).checkIfSchoolExists(mincode);
+        assertEquals(false, schoolServiceV2.checkIfSchoolExists(mincode));
     }
 
     @Test
