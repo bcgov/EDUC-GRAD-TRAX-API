@@ -23,6 +23,7 @@ public class DistrictEntity {
     private String phoneNumber;
     private String email;
     private String website;
+    private String displayName;
     private String districtRegionCode;
     private String districtStatusCode;
     private List<DistrictContactEntity> contacts;

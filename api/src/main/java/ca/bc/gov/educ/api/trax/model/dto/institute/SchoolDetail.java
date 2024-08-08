@@ -2,11 +2,8 @@ package ca.bc.gov.educ.api.trax.model.dto.institute;
 
 import ca.bc.gov.educ.api.trax.model.dto.BaseModel;
 import ca.bc.gov.educ.api.trax.model.dto.SchoolContact;
-import ca.bc.gov.educ.api.trax.model.entity.institute.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.redis.core.index.Indexed;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -35,10 +32,6 @@ public class SchoolDetail extends BaseModel {
     private String closedDate;
     private boolean canIssueTranscripts;
     private boolean canIssueCertificates;
-    private String createUser;
-    private String updateUser;
-    private String createDate;
-    private String updateDate;
     List<SchoolContact> contacts;
     List<SchoolAddress> addresses;
     List<Note> notes;

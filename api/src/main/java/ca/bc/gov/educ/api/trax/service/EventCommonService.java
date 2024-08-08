@@ -2,7 +2,7 @@ package ca.bc.gov.educ.api.trax.service;
 
 import ca.bc.gov.educ.api.trax.constant.FieldType;
 import ca.bc.gov.educ.api.trax.model.dto.GradStatusEventPayloadDTO;
-import ca.bc.gov.educ.api.trax.model.entity.Event;
+import ca.bc.gov.educ.api.trax.model.entity.EventEntity;
 import ca.bc.gov.educ.api.trax.model.entity.TraxStudentEntity;
 import ca.bc.gov.educ.api.trax.repository.TraxStudentRepository;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
@@ -49,7 +49,7 @@ public abstract class EventCommonService<T> extends EventBaseService<T> {
     private EducGradTraxApiConstants constants;
 
     @Override
-    public void processEvent(T request, Event event) {
+    public void processEvent(T request, EventEntity eventEntity) {
         GradStatusEventPayloadDTO gradStatusUpdate = (GradStatusEventPayloadDTO) request;
 
         val em = this.getEntityManager();
@@ -58,7 +58,7 @@ public abstract class EventCommonService<T> extends EventBaseService<T> {
         try {
             process(existingStudent, gradStatusUpdate, em, tx, constants.isTraxUpdateEnabled());
 
-            var existingEvent = this.eventRepository.findByEventId(event.getEventId());
+            var existingEvent = this.eventRepository.findByEventId(eventEntity.getEventId());
             existingEvent.ifPresent(eventRecord -> {
                 eventRecord.setEventStatus(PROCESSED.toString());
                 eventRecord.setUpdateDate(LocalDateTime.now());
@@ -95,7 +95,7 @@ public abstract class EventCommonService<T> extends EventBaseService<T> {
         }
     }
 
-    // UpdateFieldsMap to keep which TRAX fields need to be updated by Event Type
+    // UpdateFieldsMap to keep which TRAX fields need to be updated by EventEntity Type
     private Map<String, Pair<FieldType, Object>> setupUpdateFieldsMap() {
         Map<String, Pair<FieldType, Object>> updateFieldsMap = new HashMap<>();
         if (StringUtils.equalsIgnoreCase(getEventType(), "GRAD_STUDENT_GRADUATED")) {

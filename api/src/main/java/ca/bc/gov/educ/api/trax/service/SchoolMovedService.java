@@ -2,39 +2,40 @@ package ca.bc.gov.educ.api.trax.service;
 
 import ca.bc.gov.educ.api.trax.constant.EventType;
 import ca.bc.gov.educ.api.trax.exception.ServiceException;
-import ca.bc.gov.educ.api.trax.model.dto.SchoolContact;
+import ca.bc.gov.educ.api.trax.model.dto.institute.MoveSchoolData;
 import ca.bc.gov.educ.api.trax.model.entity.EventEntity;
+import ca.bc.gov.educ.api.trax.service.institute.SchoolService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ca.bc.gov.educ.api.trax.service.institute.SchoolService;
+
+import java.util.Arrays;
 
 @Service
 @Slf4j
-public class SchoolContactUpdatedService extends EventBaseService<SchoolContact> {
+public class SchoolMovedService extends EventBaseService<MoveSchoolData> {
 
     SchoolService schoolService;
 
     @Autowired
-    public SchoolContactUpdatedService(SchoolService schoolService) {
+    public SchoolMovedService(SchoolService schoolService) {
         this.schoolService = schoolService;
     }
 
     @Override
-    public void processEvent(final SchoolContact schoolContact, EventEntity eventEntity) {
-        log.debug("Processing School Contact Updated");
+    public void processEvent(final MoveSchoolData moveSchoolData, EventEntity eventEntity) {
+        log.debug("Processing School Moved");
         try{
-            schoolService.updateSchoolCache(schoolContact.getSchoolId());
+            schoolService.updateSchoolCache(Arrays.asList(moveSchoolData.getFromSchoolId(), moveSchoolData.getToSchool().getSchoolId()));
             this.updateEventWithHistory(eventEntity);
         } catch (ServiceException e) {
-            // do not mark eventEntity as processed
             log.error(e.getMessage());
         }
     }
 
     @Override
     public String getEventType() {
-        return EventType.UPDATE_SCHOOL_CONTACT.toString();
+        return EventType.MOVE_SCHOOL.toString();
     }
 
 }

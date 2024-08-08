@@ -56,4 +56,5 @@ public class SchoolController {
         return schoolService.getSchoolDetailsFromRedisCache();
     }
 
+
 }

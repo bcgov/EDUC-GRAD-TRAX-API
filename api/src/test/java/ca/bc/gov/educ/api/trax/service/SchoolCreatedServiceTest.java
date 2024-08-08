@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.trax.service;
 
+import ca.bc.gov.educ.api.trax.constant.EventType;
 import ca.bc.gov.educ.api.trax.exception.ServiceException;
 import ca.bc.gov.educ.api.trax.service.institute.SchoolService;
 import ca.bc.gov.educ.api.trax.support.TestUtils;
@@ -13,39 +14,39 @@ import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 
-public class SchoolContactUpdatedServiceTest extends BaseReplicationServiceTest {
+public class SchoolCreatedServiceTest extends BaseReplicationServiceTest {
 
     @Autowired
-    private SchoolContactUpdatedService schoolContactUpdatedService;
+    private SchoolCreatedService schoolCreatedService;
 
     @MockBean
     private SchoolService schoolServiceMock;
 
     @Test
-    public void testProcessEvent_givenUPDATE_SCHOOL_CONTACT_Event_shouldProcessEvent() throws JsonProcessingException {
-        final var request = TestUtils.createSchoolContact();
-        final var event = TestUtils.createEvent("UPDATE_SCHOOL_CONTACT", request, this.replicationTestUtils.getEventRepository());
-        this.schoolContactUpdatedService.processEvent(request, event);
+    public void testProcessEvent_givenCREATE_SCHOOL_Event_shouldProcessEvent() throws JsonProcessingException {
+        final var request = TestUtils.createSchool();
+        final var event = TestUtils.createEvent(EventType.CREATE_SCHOOL.toString(), request, this.replicationTestUtils.getEventRepository());
+        this.schoolCreatedService.processEvent(request, event);
         var result = this.replicationTestUtils.getEventRepository().findById(event.getReplicationEventId());
         if(result.isPresent()){
             Assert.assertEquals("PROCESSED", result.get().getEventStatus());
         } else {
-            fail("UPDATE_SCHOOL_CONTACT failed to process");
+            fail("CREATE_SCHOOL failed to process");
         }
     }
 
     @Test
-    public void testProcessEvent_givenUPDATE_SCHOOL_CONTACT_Event_ServiceUnavailable_triggerError() throws JsonProcessingException {
+    public void testProcessEvent_givenCREATE_SCHOOL_Event_ServiceUnavailable_triggerError() throws JsonProcessingException {
         final String ERROR_MSG = "Test Exception";
         doThrow(new ServiceException(ERROR_MSG)).when(schoolServiceMock).updateSchoolCache(anyString());
-        final var request = TestUtils.createSchoolContact();
-        final var event = TestUtils.createEvent("UPDATE_SCHOOL_CONTACT", request, this.replicationTestUtils.getEventRepository());
-        this.schoolContactUpdatedService.processEvent(request, event);
+        final var request = TestUtils.createSchool();
+        final var event = TestUtils.createEvent(EventType.CREATE_SCHOOL.toString(), request, this.replicationTestUtils.getEventRepository());
+        this.schoolCreatedService.processEvent(request, event);
         var result = this.replicationTestUtils.getEventRepository().findById(event.getReplicationEventId());
         if(result.isPresent()){
             Assert.assertEquals("DB_COMMITTED", result.get().getEventStatus());
         } else {
-            fail("UPDATE_SCHOOL_CONTACT failed to process");
+            fail("CREATE_SCHOOL failed to process");
         }
     }
 }

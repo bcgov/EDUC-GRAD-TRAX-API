@@ -1,7 +1,7 @@
 package ca.bc.gov.educ.api.trax.constant;
 
 /**
- * The enum Event status.
+ * The enum EventEntity status.
  */
 public enum EventStatus {
   /**
