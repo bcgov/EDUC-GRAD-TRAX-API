@@ -257,4 +257,18 @@ public class SchoolControllerTest {
         schoolControllerV2.getSchoolDetailsByMincode(mincode);
         Mockito.verify(schoolServiceV2).getSchoolDetailByMincodeFromRedisCache(mincode);
     }
+
+    @Test
+    public void whenGetSchoolDetailsByMincode_Return_NOT_FOUND() {
+        String mincode = "12345678";
+        SchoolDetail schoolDetail = new SchoolDetail();
+        schoolDetail.setSchoolId("1234567");
+        schoolDetail.setDistrictId("9876543");
+        schoolDetail.setMincode(mincode);
+
+        Mockito.when(schoolServiceV2.getSchoolDetailByMincodeFromRedisCache(mincode)).thenReturn(null);
+        schoolControllerV2.getSchoolDetailsByMincode(mincode);
+        Mockito.verify(schoolServiceV2).getSchoolDetailByMincodeFromRedisCache(mincode);
+        assertEquals(responseHelper.NOT_FOUND(), schoolControllerV2.getSchoolDetailsByMincode(mincode));
+    }
 }
