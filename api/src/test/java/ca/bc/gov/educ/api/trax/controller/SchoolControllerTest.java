@@ -110,7 +110,7 @@ public class SchoolControllerTest {
     public void testCheckSchoolExists() {
         Mockito.when(schoolService.existsSchool("1234567")).thenReturn(true);
         schoolControllerV2.checkIfSchoolExists("1234567");
-        Mockito.verify(schoolService).existsSchool("1234567");
+        Mockito.verify(schoolServiceV2).checkIfSchoolExists("1234567");
     }
 
     @Test
