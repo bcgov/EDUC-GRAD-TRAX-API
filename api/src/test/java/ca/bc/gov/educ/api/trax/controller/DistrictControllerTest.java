@@ -82,7 +82,6 @@ public class DistrictControllerTest {
         district.setDistrictNumber("12");
         district.setDistrictRegionCode("BC");
 
-        Mockito.when(districtServiceV2.getDistrictByDistNoFromRedisCache(distNo)).thenReturn(district);
         districtControllerV2.getDistrictDetailsByDistNo(distNo);
         Mockito.verify(districtServiceV2, never()).getDistrictByDistNoFromRedisCache(distNo);
         Assertions.assertEquals(null, districtControllerV2.getDistrictDetailsByDistNo(distNo));
