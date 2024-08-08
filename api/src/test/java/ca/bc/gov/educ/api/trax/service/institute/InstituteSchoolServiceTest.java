@@ -249,6 +249,28 @@ public class InstituteSchoolServiceTest {
 	}
 
 	@Test
+	public void whenCheckIfSchoolExists_returnTrue() {
+		String minCode = "12345678";
+		SchoolEntity schoolEntity = new SchoolEntity();
+		schoolEntity.setSchoolId("ID");
+		schoolEntity.setDistrictId("DistID");
+		schoolEntity.setSchoolNumber("12345");
+		schoolEntity.setMincode(minCode);
+		schoolEntity.setSchoolCategoryCode("SCC");
+		schoolEntity.setEmail("abc@xyz.ca");
+
+		when(schoolRedisRepository.findByMincode(minCode)).thenReturn(schoolEntity);
+		assertEquals(true, schoolService.checkIfSchoolExists(minCode));
+	}
+
+	@Test
+	public void whenCheckIfSchoolExists_returnFalse() {
+		String minCode = "12345678";
+		when(schoolRedisRepository.findByMincode(minCode)).thenReturn(null);
+		assertEquals(false, schoolService.checkIfSchoolExists(minCode));
+	}
+
+	@Test
 	public void whenInitializeSchoolCache_DoNothing() {
 		doNothing().when(serviceHelperMock).initializeCache(false, CacheKey.SCHOOL_CACHE, serviceHelperMock);
 		schoolService.initializeSchoolCache(false);

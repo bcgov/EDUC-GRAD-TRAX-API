@@ -72,6 +72,24 @@ public class SchoolController {
         return schoolService.getSchoolDetailsFromRedisCache();
     }
 
+    @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_URL_MAPPING_V2 + EducGradTraxApiConstants.CHECK_SCHOOL_BY_CODE_MAPPING)
+    @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
+    @Operation(summary = "Check school existence by Mincode", description = "Check school existence by Mincode", tags = { "School" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "204", description = "NO CONTENT")})
+    public ResponseEntity<Boolean> checkIfSchoolExists(@PathVariable String minCode) {
+        return response.GET(schoolService.checkIfSchoolExists(minCode));
+    }
+
+    @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_URL_MAPPING_V2 + EducGradTraxApiConstants.GET_SCHOOLS_BY_SCHOOL_CATEGORY_MAPPING)
+    @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
+    @Operation(summary = "Get Schools by School Category Code", description = "Get Schools by School Category Code", tags = { "School" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "204", description = "NO CONTENT")})
+    public ResponseEntity<List<SchoolDetail>> getSchoolsBySchoolCategory(@RequestParam(required = false) String schoolCategoryCode) {
+        return response.GET(schoolService.getSchoolDetailsBySchoolCategoryCode(schoolCategoryCode));
+    }
+
     @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_DETAIL_URL_MAPPING_V2 + EducGradTraxApiConstants.GET_SCHOOL_BY_CODE_MAPPING)
     @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
     @Operation(summary = "Find a School by Mincode from cache", description = "Get a School by Mincode from cache", tags = { "School" })

@@ -200,6 +200,24 @@ public class SchoolControllerTest {
     }
 
     @Test
+    public void whenGetSchoolsBySchoolCategory_ReturnListOfSchoolDetails() {
+        String schoolCategoryCode = "SCHL_CATG";
+        final List<SchoolDetail> schoolDetails = new ArrayList<>();
+        SchoolDetail schoolDetail = new SchoolDetail();
+        schoolDetail.setSchoolId("1234567");
+        schoolDetail.setDistrictId("9876543");
+        schoolDetails.add(schoolDetail);
+        schoolDetail = new SchoolDetail();
+        schoolDetail.setSchoolId("1234567");
+        schoolDetail.setDistrictId("9876543");
+        schoolDetails.add(schoolDetail);
+
+        Mockito.when(schoolServiceV2.getSchoolDetailsBySchoolCategoryCode(schoolCategoryCode)).thenReturn(schoolDetails);
+        schoolControllerV2.getSchoolsBySchoolCategory(schoolCategoryCode);
+        Mockito.verify(schoolServiceV2).getSchoolDetailsBySchoolCategoryCode(schoolCategoryCode);
+    }
+
+    @Test
     public void whenGetSchoolDetailsByMincode_ReturnsSchoolDetail() {
         String mincode = "12345678";
         SchoolDetail schoolDetail = new SchoolDetail();

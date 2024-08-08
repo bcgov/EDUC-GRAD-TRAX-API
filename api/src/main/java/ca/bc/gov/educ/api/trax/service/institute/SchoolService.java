@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
@@ -71,6 +72,11 @@ public class SchoolService {
 	public School getSchoolByMincodeFromRedisCache(String mincode) {
 		log.debug("Get School by Mincode from Redis Cache");
 		return schoolTransformer.transformToDTO(schoolRedisRepository.findByMincode(mincode));
+	}
+
+	public boolean checkIfSchoolExists(String minCode) {
+		SchoolEntity schoolEntity = schoolRedisRepository.findByMincode(minCode);
+		return schoolEntity != null;
 	}
 
 	public void initializeSchoolCache(boolean force) {
