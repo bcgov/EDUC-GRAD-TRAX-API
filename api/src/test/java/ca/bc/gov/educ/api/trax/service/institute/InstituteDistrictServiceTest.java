@@ -8,17 +8,14 @@ import ca.bc.gov.educ.api.trax.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.trax.model.dto.ResponseObj;
 import ca.bc.gov.educ.api.trax.model.dto.institute.District;
 import ca.bc.gov.educ.api.trax.model.dto.institute.DistrictContact;
-import ca.bc.gov.educ.api.trax.model.dto.institute.School;
 import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolDetail;
 import ca.bc.gov.educ.api.trax.model.entity.institute.DistrictContactEntity;
 import ca.bc.gov.educ.api.trax.model.entity.institute.DistrictEntity;
 import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolDetailEntity;
-import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolEntity;
 import ca.bc.gov.educ.api.trax.model.transformer.institute.DistrictTransformer;
 import ca.bc.gov.educ.api.trax.model.transformer.institute.SchoolDetailTransformer;
 import ca.bc.gov.educ.api.trax.repository.redis.DistrictRedisRepository;
 import ca.bc.gov.educ.api.trax.repository.redis.SchoolDetailRedisRepository;
-import ca.bc.gov.educ.api.trax.service.RESTService;
 import ca.bc.gov.educ.api.trax.service.RESTService;
 import ca.bc.gov.educ.api.trax.support.TestUtils;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
@@ -47,10 +44,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import redis.clients.jedis.JedisCluster;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 
 import static org.junit.Assert.assertTrue;
@@ -126,8 +120,6 @@ public class InstituteDistrictServiceTest {
 	@MockBean
 	private RestUtils restUtils;
 	@MockBean
-	RESTService restService;
-	@MockBean
 	private ServiceHelper serviceHelper;
 	@MockBean
 	private RESTService restServiceMock;
@@ -165,7 +157,7 @@ public class InstituteDistrictServiceTest {
 		district.setContacts(Arrays.asList(new DistrictContact(), new DistrictContact()));
 		districts.add(district);
 
-		when(restService.get(constants.getAllDistrictsFromInstituteApiUrl(), List.class, instWebClient))
+		when(restServiceMock.get(constants.getAllDistrictsFromInstituteApiUrl(), List.class, instWebClient))
 				.thenReturn(districtEntities);
 		when(districtTransformerMock.transformToDTO(districtEntities))
 				.thenReturn(districts);
@@ -455,8 +447,27 @@ public class InstituteDistrictServiceTest {
 	public void updateDistrictCache_givenValidDistrictId_shouldUpdateCache() {
 		// given
 		// set up initial district in redis mock
-		DistrictEntity districtEntity = createDistrictEntity();
-		District district = districtTransformer.transformToDTO(districtEntity);
+		District district = new District();
+		district.setDistrictId(UUID.randomUUID().toString());
+		district.setDistrictNumber("002");
+		district.setFaxNumber("1233216547");
+		district.setPhoneNumber("3216549874");
+		district.setEmail("district@district.ca");
+		district.setWebsite("www.district.ca");
+		district.setDisplayName("Test Display Name");
+		district.setDistrictRegionCode("NOT_APPLIC");
+		district.setDistrictStatusCode("INACTIVE");
+
+		DistrictEntity districtEntity = new DistrictEntity();
+		districtEntity.setDistrictId(UUID.randomUUID().toString());
+		districtEntity.setDistrictNumber("002");
+		districtEntity.setFaxNumber("1233216547");
+		districtEntity.setPhoneNumber("3216549874");
+		districtEntity.setEmail("district@district.ca");
+		districtEntity.setWebsite("www.district.ca");
+		districtEntity.setDisplayName("Test Display Name");
+		districtEntity.setDistrictRegionCode("NOT_APPLIC");
+		districtEntity.setDistrictStatusCode("INACTIVE");
 		// when
 		// call updateDistrictCache with district id and mock a return from webclient
 		Mockito.when(this.restServiceMock.get(anyString(),
@@ -466,12 +477,17 @@ public class InstituteDistrictServiceTest {
 		Mockito.when(this.districtRedisRepository.findById(districtEntity.getDistrictId())).thenReturn(Optional.of(districtEntity));
 		// mock return of district from redis cache and compare
 		districtService.updateDistrictCache(districtEntity.getDistrictId());
+		/*
+		* log.debug(String.format("Updating district %s in cache.",  districtId));
+        District district = this.restService.get(String.format(constants.getGetDistrictFromInstituteApiUrl(), districtId),
+                District.class, webClient);
+        districtRedisRepository.save(this.districtTransformer.transformToEntity(district));*/
 		assertTrue(this.districtRedisRepository.findById(districtEntity.getDistrictId()).isPresent());
 	}
 
 	private DistrictEntity createDistrictEntity() {
 		District d = TestUtils.createDistrict();
-		DistrictEntity de = this.districtTransformer.transformToEntity(d);
+		DistrictEntity de = districtTransformer.transformToEntity(d);
 		return de;
 	}
 }
