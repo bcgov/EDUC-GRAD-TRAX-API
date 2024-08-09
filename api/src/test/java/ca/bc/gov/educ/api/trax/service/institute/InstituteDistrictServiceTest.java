@@ -18,6 +18,7 @@ import ca.bc.gov.educ.api.trax.model.transformer.institute.DistrictTransformer;
 import ca.bc.gov.educ.api.trax.model.transformer.institute.SchoolDetailTransformer;
 import ca.bc.gov.educ.api.trax.repository.redis.DistrictRedisRepository;
 import ca.bc.gov.educ.api.trax.repository.redis.SchoolDetailRedisRepository;
+import ca.bc.gov.educ.api.trax.service.RESTService;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.RestUtils;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
@@ -86,6 +87,9 @@ public class InstituteDistrictServiceTest {
 	@MockBean
 	@Qualifier("default")
 	WebClient webClientMock;
+	@MockBean
+	@Qualifier("instituteWebClient")
+	private WebClient instWebClient;
 	@Mock
 	private WebClient.RequestHeadersSpec requestHeadersSpecMock;
 	@Mock
@@ -116,6 +120,10 @@ public class InstituteDistrictServiceTest {
 	private Subscriber subscriber;
 	@MockBean
 	private RestUtils restUtils;
+	@MockBean
+	RESTService restService;
+	@MockBean
+	private ServiceHelper serviceHelper;
 
 	@TestConfiguration
 	static class TestConfigInstitute {
@@ -132,34 +140,31 @@ public class InstituteDistrictServiceTest {
 
 	@Test
 	public void whenGetDistrictsFromInstituteApi_returnsListOfDistricts() {
-		List<DistrictEntity> districts = new ArrayList<>();
-		DistrictEntity district = new DistrictEntity();
+		List<DistrictEntity> districtEntities = new ArrayList<>();
+		DistrictEntity districtEntity = new DistrictEntity();
+		districtEntity.setDistrictId("ID");
+		districtEntity.setDistrictNumber("1234");
+		districtEntity.setDistrictStatusCode("SC");
+		districtEntity.setDistrictRegionCode("RC");
+		districtEntity.setContacts(Arrays.asList(new DistrictContactEntity(), new DistrictContactEntity()));
+		districtEntities.add(districtEntity);
 
+		List<District> districts = new ArrayList<>();
+		District district = new District();
 		district.setDistrictId("ID");
 		district.setDistrictNumber("1234");
 		district.setDistrictStatusCode("SC");
 		district.setDistrictRegionCode("RC");
-		district.setContacts(Arrays.asList(new DistrictContactEntity(), new DistrictContactEntity()));
-
+		district.setContacts(Arrays.asList(new DistrictContact(), new DistrictContact()));
 		districts.add(district);
 
-		when(this.restUtils.getTokenResponseObject(anyString(), anyString()))
-				.thenReturn(responseObjectMock);
-		when(this.responseObjectMock.getAccess_token())
-				.thenReturn("accessToken");
-		when(webClientMock.get())
-				.thenReturn(requestHeadersUriSpecMock);
-		when(requestHeadersUriSpecMock.uri(anyString()))
-				.thenReturn(requestHeadersSpecMock);
-		when(requestHeadersSpecMock.headers(any(Consumer.class)))
-				.thenReturn(requestHeadersSpecMock);
-		when(requestHeadersSpecMock.retrieve())
-				.thenReturn(responseSpecMock);
-		when(this.responseSpecMock.bodyToMono(new ParameterizedTypeReference<List<DistrictEntity>>(){}))
-				.thenReturn(districtEntitiesMock);
-		when(this.districtEntitiesMock.block()).thenReturn(districts);
+		when(restService.get(constants.getAllDistrictsFromInstituteApiUrl(), List.class, instWebClient))
+				.thenReturn(districtEntities);
+		when(districtTransformerMock.transformToDTO(districtEntities))
+				.thenReturn(districts);
 
 		List<District> result = districtService.getDistrictsFromInstituteApi();
+		assertEquals(districts, result);
 	}
 
 	@Test
@@ -349,8 +354,9 @@ public class InstituteDistrictServiceTest {
 		when(jedisClusterMock.get(CacheKey.DISTRICT_CACHE.name()))
 				.thenReturn(String.valueOf(CacheStatus.READY));
 		when(jedisClusterMock.set(CacheKey.DISTRICT_CACHE.name(), CacheStatus.READY.name()))
-				.thenReturn(anyString());
+				.thenReturn("OK");
 		districtService.initializeDistrictCache(true);
+		verify(serviceHelper).initializeCache(true, CacheKey.DISTRICT_CACHE, districtService);
 	}
 
 	@Test

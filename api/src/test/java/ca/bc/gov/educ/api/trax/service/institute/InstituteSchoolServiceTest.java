@@ -161,7 +161,6 @@ public class InstituteSchoolServiceTest {
 		when(this.schoolTransformerMock.transformToDTO(schools))
 				.thenReturn(schoolsMock);
 
-
 		List<School> result = schoolService.getSchoolsFromInstituteApi();
 	}
 
@@ -285,7 +284,6 @@ public class InstituteSchoolServiceTest {
 		schoolDetail.setSchoolNumber("12345");
 		schoolDetail.setSchoolCategoryCode("SCC");
 		schoolDetail.setEmail("abc@xyz.ca");
-
 		schoolDetails.add(schoolDetail);
 
 		when(this.restUtils.getTokenResponseObject(anyString(), anyString()))
