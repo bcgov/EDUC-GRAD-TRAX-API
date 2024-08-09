@@ -88,6 +88,9 @@ public class EventEntity {
   @Column(name = "ACTIVITY_CODE")
   private String activityCode;
 
+  @OneToOne(cascade = CascadeType.ALL, mappedBy = "event")
+  private EventHistoryEntity eventHistoryEntity;
+
   /**
    * Gets event payload.
    *

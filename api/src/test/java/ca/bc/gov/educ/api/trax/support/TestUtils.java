@@ -6,7 +6,9 @@ import ca.bc.gov.educ.api.trax.model.dto.GradStatusEventPayloadDTO;
 import ca.bc.gov.educ.api.trax.model.dto.SchoolContact;
 import ca.bc.gov.educ.api.trax.model.dto.institute.*;
 import ca.bc.gov.educ.api.trax.model.entity.EventEntity;
+import ca.bc.gov.educ.api.trax.model.entity.EventHistoryEntity;
 import ca.bc.gov.educ.api.trax.model.entity.TraxStudentEntity;
+import ca.bc.gov.educ.api.trax.repository.EventHistoryRepository;
 import ca.bc.gov.educ.api.trax.repository.EventRepository;
 import ca.bc.gov.educ.api.trax.util.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -39,6 +41,10 @@ public class TestUtils {
     }
 
     public static EventEntity createEvent(String eventType, Object payload, EventRepository eventRepository) throws JsonProcessingException {
+        return createEvent(eventType, payload, LocalDateTime.now(), eventRepository);
+    }
+
+    public static EventEntity createEvent(String eventType, Object payload, LocalDateTime createDate, EventRepository eventRepository) throws JsonProcessingException {
         var event = EventEntity.builder()
                 .eventType(eventType)
                 .eventId(UUID.randomUUID())
@@ -47,11 +53,23 @@ public class TestUtils {
                 .eventStatus(DB_COMMITTED.toString())
                 .createUser(DEFAULT_CREATED_BY)
                 .updateUser(DEFAULT_UPDATED_BY)
-                .createDate(LocalDateTime.now())
+                .createDate(createDate)
                 .updateDate(LocalDateTime.now())
                 .build();
         eventRepository.save(event);
         return event;
+    }
+
+    public static EventHistoryEntity createEventHistory(EventEntity event, LocalDateTime createdDate, EventHistoryRepository eventHistoryRepository) {
+        var eventHistory = new EventHistoryEntity();
+        eventHistory.setEvent(event);
+        eventHistory.setAcknowledgeFlag("N");
+        eventHistory.setCreateDate(createdDate);
+        eventHistory.setCreateUser("TEST");
+        eventHistory.setUpdateDate(LocalDateTime.now());
+        eventHistory.setUpdateUser("TEST");
+        eventHistoryRepository.save(eventHistory);
+        return eventHistory;
     }
 
     public static AuthorityContact createAuthorityContact() {
