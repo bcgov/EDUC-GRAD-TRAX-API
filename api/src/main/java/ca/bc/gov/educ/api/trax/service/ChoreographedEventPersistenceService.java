@@ -3,7 +3,7 @@ package ca.bc.gov.educ.api.trax.service;
 import ca.bc.gov.educ.api.trax.exception.BusinessError;
 import ca.bc.gov.educ.api.trax.exception.BusinessException;
 import ca.bc.gov.educ.api.trax.model.dto.ChoreographedEvent;
-import ca.bc.gov.educ.api.trax.model.entity.Event;
+import ca.bc.gov.educ.api.trax.model.entity.EventEntity;
 import ca.bc.gov.educ.api.trax.repository.EventRepository;
 import ca.bc.gov.educ.api.trax.repository.TraxUpdatedPubEventRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -36,12 +36,12 @@ public class ChoreographedEventPersistenceService {
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public Event persistEventToDB(final ChoreographedEvent choreographedEvent) throws BusinessException {
+  public EventEntity persistEventToDB(final ChoreographedEvent choreographedEvent) throws BusinessException {
     var eventOptional = eventRepository.findByEventId(choreographedEvent.getEventID());
     if (eventOptional.isPresent()) {
       throw new BusinessException(BusinessError.EVENT_ALREADY_PERSISTED, choreographedEvent.getEventID().toString());
     }
-    final Event event = Event.builder()
+    final EventEntity eventEntity = EventEntity.builder()
         .eventType(choreographedEvent.getEventType().toString())
         .eventId(choreographedEvent.getEventID())
         .eventOutcome(choreographedEvent.getEventOutcome().toString())
@@ -53,7 +53,7 @@ public class ChoreographedEventPersistenceService {
         .createDate(LocalDateTime.now())
         .updateDate(LocalDateTime.now())
         .build();
-    return this.eventRepository.save(event);
+    return this.eventRepository.save(eventEntity);
   }
 
   /**

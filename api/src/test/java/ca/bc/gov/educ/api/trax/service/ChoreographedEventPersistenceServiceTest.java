@@ -7,7 +7,7 @@ import ca.bc.gov.educ.api.trax.messaging.NatsConnection;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.trax.model.dto.ChoreographedEvent;
-import ca.bc.gov.educ.api.trax.model.entity.Event;
+import ca.bc.gov.educ.api.trax.model.entity.EventEntity;
 import ca.bc.gov.educ.api.trax.model.entity.TraxUpdatedPubEvent;
 import ca.bc.gov.educ.api.trax.repository.EventRepository;
 import ca.bc.gov.educ.api.trax.repository.TraxUpdatedPubEventRepository;
@@ -83,14 +83,14 @@ public class ChoreographedEventPersistenceServiceTest {
         choreographedEvent.setEventType(EventType.GRAD_STUDENT_UPDATED);
         choreographedEvent.setEventOutcome(EventOutcome.GRAD_STATUS_UPDATED);
 
-        Event event = new Event();
-        event.setEventType(EventType.GRAD_STUDENT_UPDATED.toString());
-        event.setEventStatus(DB_COMMITTED.toString());
-        event.setEventId(eventId);
-        event.setEventOutcome(EventOutcome.GRAD_STATUS_UPDATED.toString());
-        event.setReplicationEventId(UUID.randomUUID());
+        EventEntity eventEntity = new EventEntity();
+        eventEntity.setEventType(EventType.GRAD_STUDENT_UPDATED.toString());
+        eventEntity.setEventStatus(DB_COMMITTED.toString());
+        eventEntity.setEventId(eventId);
+        eventEntity.setEventOutcome(EventOutcome.GRAD_STATUS_UPDATED.toString());
+        eventEntity.setReplicationEventId(UUID.randomUUID());
 
-        Mockito.when(eventRepository.findByEventId(eventId)).thenReturn(Optional.of(event));
+        Mockito.when(eventRepository.findByEventId(eventId)).thenReturn(Optional.of(eventEntity));
 
         choreographedEventPersistenceService.persistEventToDB(choreographedEvent);
 
@@ -105,17 +105,17 @@ public class ChoreographedEventPersistenceServiceTest {
         choreographedEvent.setEventID(eventId);
         choreographedEvent.setEventType(EventType.GRAD_STUDENT_UPDATED);
         choreographedEvent.setEventOutcome(EventOutcome.GRAD_STATUS_UPDATED);
-        choreographedEvent.setEventPayload("{ test: 'event'}");
+        choreographedEvent.setEventPayload("{ test: 'eventEntity'}");
 
-        Event event = new Event();
-        event.setEventType(EventType.GRAD_STUDENT_UPDATED.toString());
-        event.setEventStatus(DB_COMMITTED.toString());
-        event.setEventId(eventId);
-        event.setEventOutcome(EventOutcome.GRAD_STATUS_UPDATED.toString());
-        event.setReplicationEventId(UUID.randomUUID());
+        EventEntity eventEntity = new EventEntity();
+        eventEntity.setEventType(EventType.GRAD_STUDENT_UPDATED.toString());
+        eventEntity.setEventStatus(DB_COMMITTED.toString());
+        eventEntity.setEventId(eventId);
+        eventEntity.setEventOutcome(EventOutcome.GRAD_STATUS_UPDATED.toString());
+        eventEntity.setReplicationEventId(UUID.randomUUID());
 
         Mockito.when(eventRepository.findByEventId(eventId)).thenReturn(Optional.empty());
-        Mockito.when(eventRepository.save(event)).thenReturn(event);
+        Mockito.when(eventRepository.save(eventEntity)).thenReturn(eventEntity);
 
         choreographedEventPersistenceService.persistEventToDB(choreographedEvent);
 
@@ -123,7 +123,7 @@ public class ChoreographedEventPersistenceServiceTest {
     }
 
     @Test
-    public void testUpdateEventStatus_givenTraxUpdatedEvent() throws BusinessException {
+    public void testUpdateEventStatus_givenTraxUpdatedEvent() {
         UUID eventId = UUID.randomUUID();
 
         ChoreographedEvent choreographedEvent = new ChoreographedEvent();

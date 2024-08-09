@@ -146,6 +146,8 @@ endpoint:
       url: https://school-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/institute/school/%s
     get-all-districts:
       url: https://school-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/institute/district
+    get-district:
+      url: https://school-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/institute/district/%s
     get-all-school-category-codes:
       url: https://school-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/institute/category-codes
     get-all-school-funding-group-codes:

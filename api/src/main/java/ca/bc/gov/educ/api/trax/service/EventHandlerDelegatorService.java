@@ -20,7 +20,7 @@ public class EventHandlerDelegatorService {
     private final ChoreographEventHandler choreographer;
 
     /**
-     * Instantiates a new Event handler delegator service.
+     * Instantiates a new EventEntity handler delegator service.
      *
      * @param choreographedEventPersistenceService the choreographed event persistence service
      * @param choreographer                        the choreographer
