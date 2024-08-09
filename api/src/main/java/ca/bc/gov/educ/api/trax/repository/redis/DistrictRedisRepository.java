@@ -7,4 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface DistrictRedisRepository extends CrudRepository<DistrictEntity, String> {
     String HASH_KEY = "District";
+
+    DistrictEntity findByDistrictNumber(String districtNumber);
 }
