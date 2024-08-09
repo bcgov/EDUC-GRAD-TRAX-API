@@ -17,7 +17,7 @@ class EventHistoryServiceMockTest extends BaseReplicationServiceTest {
     EventHistoryService eventHistoryService;
 
     @Test
-    void purgeOldEventAndEventHistoryRecords() {
+    void purgeOldEventAndEventHistoryRecords_givenExceptionThrown_shouldThrowException() {
         final String ERROR_MSG = "Exception encountered";
         final LocalDateTime localDateTime = LocalDateTime.now();
         doThrow(new ServiceException(ERROR_MSG)).when(eventHistoryService).purgeOldEventAndEventHistoryRecords(localDateTime);
