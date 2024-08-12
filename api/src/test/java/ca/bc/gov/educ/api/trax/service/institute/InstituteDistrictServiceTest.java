@@ -287,7 +287,6 @@ public class InstituteDistrictServiceTest {
 		doNothing().when(districtServiceMock).loadDistrictsIntoRedisCache(ds);
 
 		districtService.initializeDistrictCache(true);
-		//verify(districtServiceMock).loadDistrictsIntoRedisCache(ds);
 	}
 
 	@Test
@@ -477,11 +476,6 @@ public class InstituteDistrictServiceTest {
 		Mockito.when(this.districtRedisRepository.findById(districtEntity.getDistrictId())).thenReturn(Optional.of(districtEntity));
 		// mock return of district from redis cache and compare
 		districtService.updateDistrictCache(districtEntity.getDistrictId());
-		/*
-		* log.debug(String.format("Updating district %s in cache.",  districtId));
-        District district = this.restService.get(String.format(constants.getGetDistrictFromInstituteApiUrl(), districtId),
-                District.class, webClient);
-        districtRedisRepository.save(this.districtTransformer.transformToEntity(district));*/
 		assertTrue(this.districtRedisRepository.findById(districtEntity.getDistrictId()).isPresent());
 	}
 
