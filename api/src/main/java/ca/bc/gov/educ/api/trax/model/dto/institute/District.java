@@ -11,7 +11,7 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Component("InstituteDistrict")
+@Component("instituteDistrict")
 @NoArgsConstructor
 @AllArgsConstructor
 public class District extends BaseModel {

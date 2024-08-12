@@ -12,7 +12,7 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Component("DistrictContact")
+@Component("districtContact")
 public class DistrictContact extends BaseModel {
 
     private String districtId;

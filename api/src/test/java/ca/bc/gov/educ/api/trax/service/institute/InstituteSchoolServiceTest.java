@@ -5,20 +5,18 @@ import ca.bc.gov.educ.api.trax.messaging.NatsConnection;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.trax.model.dto.ResponseObj;
-import ca.bc.gov.educ.api.trax.model.dto.institute.District;
 import ca.bc.gov.educ.api.trax.model.dto.institute.School;
 import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolDetail;
 import ca.bc.gov.educ.api.trax.model.entity.institute.*;
-import ca.bc.gov.educ.api.trax.model.transformer.institute.DistrictTransformer;
 import ca.bc.gov.educ.api.trax.model.transformer.institute.SchoolDetailTransformer;
 import ca.bc.gov.educ.api.trax.model.transformer.institute.SchoolTransformer;
-import ca.bc.gov.educ.api.trax.repository.GradCountryRepository;
-import ca.bc.gov.educ.api.trax.repository.GradProvinceRepository;
 import ca.bc.gov.educ.api.trax.repository.redis.SchoolDetailRedisRepository;
 import ca.bc.gov.educ.api.trax.repository.redis.SchoolRedisRepository;
+import ca.bc.gov.educ.api.trax.service.RESTService;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.RestUtils;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -77,6 +75,9 @@ public class InstituteSchoolServiceTest {
 	@MockBean
 	@Qualifier("default")
 	WebClient webClientMock;
+	@MockBean
+	@Qualifier("instituteWebClient")
+	private WebClient instWebClient;
 	@Mock
 	private WebClient.RequestHeadersSpec requestHeadersSpecMock;
 	@Mock
@@ -97,6 +98,8 @@ public class InstituteSchoolServiceTest {
 	private List<SchoolDetail> schoolDetailsMock;
 	@MockBean
 	private RestUtils restUtils;
+	@MockBean
+	private RESTService restServiceMock;
 	@MockBean
 	private SchoolTransformer schoolTransformerMock;
 	@Autowired
@@ -272,68 +275,86 @@ public class InstituteSchoolServiceTest {
 	@Test
 	public void whenInitializeSchoolCache_DoNothing() {
 		doNothing().when(serviceHelperMock).initializeCache(false, CacheKey.SCHOOL_CACHE, serviceHelperMock);
-		schoolService.initializeSchoolCache(false);
-	}
+		Assertions.assertDoesNotThrow(() -> schoolService.initializeSchoolCache(false));
+    }
 
 	@Test
 	public void whenGetSchoolDetailsFromInstituteApi_returnsListOfSchoolDetails() {
-		List<SchoolDetailEntity> schoolDetails = new ArrayList<>();
-		SchoolDetailEntity schoolDetail = new SchoolDetailEntity();
-		schoolDetail.setSchoolId("ID");
-		schoolDetail.setDistrictId("DistID");
-		schoolDetail.setSchoolNumber("12345");
-		schoolDetail.setSchoolCategoryCode("SCC");
-		schoolDetail.setEmail("abc@xyz.ca");
-		schoolDetails.add(schoolDetail);
+		List<School> schools = new ArrayList<>();
+		School school = new School();
+		school.setSchoolId("1");
+		school.setMincode("234");
+		schools.add(school);
+		school = new School();
+		school.setSchoolId("2");
+		school.setMincode("345");
+		schools.add(school);
 
-		when(this.restUtils.getTokenResponseObject(anyString(), anyString()))
-				.thenReturn(responseObjectMock);
-		when(this.responseObjectMock.getAccess_token())
-				.thenReturn("accessToken");
-		when(webClientMock.get())
-				.thenReturn(requestHeadersUriSpecMock);
-		when(requestHeadersUriSpecMock.uri(anyString()))
-				.thenReturn(requestHeadersSpecMock);
-		when(requestHeadersSpecMock.headers(any(Consumer.class)))
-				.thenReturn(requestHeadersSpecMock);
-		when(requestHeadersSpecMock.retrieve())
-				.thenReturn(responseSpecMock);
-		when(this.responseSpecMock.bodyToMono(new ParameterizedTypeReference<List<SchoolDetailEntity>>(){}))
-				.thenReturn(schoolDetailEntitiesMock);
-		when(this.schoolDetailEntitiesMock.block()).thenReturn(schoolDetails);
+		List<SchoolDetail> schoolDetails = new ArrayList<>();
+		SchoolDetail schoolDetail1 = new SchoolDetail();
+		schoolDetail1.setSchoolId("1");
+		schoolDetail1.setDistrictId("DistID");
+		schoolDetail1.setSchoolNumber("12345");
+		schoolDetail1.setSchoolCategoryCode("SCC");
+		schoolDetail1.setEmail("abc@xyz.ca");
+		schoolDetails.add(schoolDetail1);
+		SchoolDetail schoolDetail2 = new SchoolDetail();
+		schoolDetail2.setSchoolId("2");
+		schoolDetail2.setDistrictId("DistID");
+		schoolDetail2.setSchoolNumber("12345");
+		schoolDetail2.setSchoolCategoryCode("SCC");
+		schoolDetail2.setEmail("abc@xyz.ca");
+		schoolDetails.add(schoolDetail2);
 
-		when(this.schoolDetailTransformerMock.transformToDTO(schoolDetails))
-				.thenReturn(schoolDetailsMock);
+		SchoolDetailEntity schoolDetailEntity1 = new SchoolDetailEntity();
+		schoolDetailEntity1.setSchoolId("1");
+		schoolDetailEntity1.setDistrictId("DistID");
+		schoolDetailEntity1.setSchoolNumber("12345");
+		schoolDetailEntity1.setSchoolCategoryCode("SCC");
+		schoolDetailEntity1.setEmail("abc@xyz.ca");
+		SchoolDetailEntity schoolDetailEntity2 = new SchoolDetailEntity();
+		schoolDetailEntity1.setSchoolId("2");
+		schoolDetailEntity1.setDistrictId("DistID");
+		schoolDetailEntity1.setSchoolNumber("12345");
+		schoolDetailEntity1.setSchoolCategoryCode("SCC");
+		schoolDetailEntity1.setEmail("abc@xyz.ca");
+
+		when(this.schoolService.getSchoolsFromRedisCache()).thenReturn(schools);
+		when(this.schoolDetailTransformer.transformToDTO(schoolDetailEntity1)).thenReturn(schoolDetail1);
+		when(this.schoolDetailTransformer.transformToDTO(schoolDetailEntity2)).thenReturn(schoolDetail2);
+		when(this.restServiceMock.get(String.format(constants.getSchoolDetailsByIdFromInstituteApiUrl(), "1"),
+				SchoolDetailEntity.class, instWebClient)).thenReturn(schoolDetailEntity1);
+		when(this.restServiceMock.get(String.format(constants.getSchoolDetailsByIdFromInstituteApiUrl(), "2"),
+				SchoolDetailEntity.class, instWebClient)).thenReturn(schoolDetailEntity2);
 
 		List<SchoolDetail> result = schoolService.getSchoolDetailsFromInstituteApi();
+		assertEquals(schoolDetails, result);
 	}
 
 	@Test
 	public void whenGetSchoolDetailByIdFromInstituteApi_ReturnSchoolDetail() {
-		String schoolId = "school-id";
+		String schoolId = "1";
+
+		SchoolDetail schoolDetail = new SchoolDetail();
+		schoolDetail.setSchoolId("1");
+		schoolDetail.setDistrictId("DistID");
+		schoolDetail.setSchoolNumber("12345");
+		schoolDetail.setSchoolCategoryCode("SCC");
+		schoolDetail.setEmail("abc@xyz.ca");
+
 		SchoolDetailEntity schoolDetailEntity = new SchoolDetailEntity();
-		schoolDetailEntity.setSchoolId("ID");
+		schoolDetailEntity.setSchoolId("1");
 		schoolDetailEntity.setDistrictId("DistID");
 		schoolDetailEntity.setSchoolNumber("12345");
 		schoolDetailEntity.setSchoolCategoryCode("SCC");
 		schoolDetailEntity.setEmail("abc@xyz.ca");
 
-		when(this.restUtils.getTokenResponseObject(anyString(), anyString()))
-				.thenReturn(responseObjectMock);
-		when(this.responseObjectMock.getAccess_token())
-				.thenReturn("accessToken");
-		when(webClientMock.get())
-				.thenReturn(requestHeadersUriSpecMock);
-		when(requestHeadersUriSpecMock.uri(anyString()))
-				.thenReturn(requestHeadersSpecMock);
-		when(requestHeadersSpecMock.headers(any(Consumer.class)))
-				.thenReturn(requestHeadersSpecMock);
-		when(requestHeadersSpecMock.retrieve())
-				.thenReturn(responseSpecMock);
-		when(this.responseSpecMock.bodyToMono(new ParameterizedTypeReference<SchoolDetailEntity>(){}))
-				.thenReturn(Mono.just(schoolDetailEntity));
+		when(this.schoolDetailTransformer.transformToDTO(schoolDetailEntity)).thenReturn(schoolDetail);
+		when(this.restServiceMock.get(String.format(constants.getSchoolDetailsByIdFromInstituteApiUrl(), "1"),
+				SchoolDetailEntity.class, instWebClient)).thenReturn(schoolDetailEntity);
 
 		SchoolDetail result = schoolService.getSchoolDetailByIdFromInstituteApi(schoolId);
+		assertEquals(schoolDetail, result);
 	}
 
 	@Test
@@ -348,7 +369,7 @@ public class InstituteSchoolServiceTest {
 	@Test
 	public void whenInitializeSchoolDetailCache_DoNothing() {
 		doNothing().when(serviceHelperMock).initializeCache(false, CacheKey.SCHOOL_DETAIL_CACHE, serviceHelperMock);
-		schoolService.initializeSchoolDetailCache(false);
+		Assertions.assertDoesNotThrow(() -> schoolService.initializeSchoolDetailCache(false));
 	}
 
 	@Test
