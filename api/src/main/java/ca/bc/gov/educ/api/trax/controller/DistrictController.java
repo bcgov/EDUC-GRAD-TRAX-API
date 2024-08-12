@@ -3,7 +3,6 @@ package ca.bc.gov.educ.api.trax.controller;
 import ca.bc.gov.educ.api.trax.model.dto.District;
 import ca.bc.gov.educ.api.trax.service.DistrictService;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
-import ca.bc.gov.educ.api.trax.util.GradValidation;
 import ca.bc.gov.educ.api.trax.util.PermissionsConstants;
 import ca.bc.gov.educ.api.trax.util.ResponseHelper;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;

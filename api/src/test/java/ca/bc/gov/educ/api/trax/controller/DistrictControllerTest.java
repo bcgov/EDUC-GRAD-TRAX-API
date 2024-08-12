@@ -1,11 +1,9 @@
 package ca.bc.gov.educ.api.trax.controller;
 
 import ca.bc.gov.educ.api.trax.model.dto.District;
-import ca.bc.gov.educ.api.trax.model.entity.institute.DistrictEntity;
 import ca.bc.gov.educ.api.trax.model.transformer.institute.DistrictTransformer;
 import ca.bc.gov.educ.api.trax.service.DistrictService;
 import ca.bc.gov.educ.api.trax.util.ResponseHelper;
-import org.jboss.logging.Logger;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,7 +14,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
-import redis.clients.jedis.Response;
 
 import java.util.ArrayList;
 import java.util.List;

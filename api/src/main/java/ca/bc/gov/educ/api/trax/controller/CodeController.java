@@ -4,7 +4,6 @@ import ca.bc.gov.educ.api.trax.model.dto.GradCountry;
 import ca.bc.gov.educ.api.trax.model.dto.GradProvince;
 import ca.bc.gov.educ.api.trax.service.CodeService;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
-import ca.bc.gov.educ.api.trax.util.GradValidation;
 import ca.bc.gov.educ.api.trax.util.PermissionsConstants;
 import ca.bc.gov.educ.api.trax.util.ResponseHelper;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
