@@ -481,7 +481,6 @@ public class InstituteDistrictServiceTest {
 
 	private DistrictEntity createDistrictEntity() {
 		District d = TestUtils.createDistrict();
-		DistrictEntity de = districtTransformer.transformToEntity(d);
-		return de;
+        return districtTransformer.transformToEntity(d);
 	}
 }
