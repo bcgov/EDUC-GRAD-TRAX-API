@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.trax.service;
 
 import ca.bc.gov.educ.api.trax.constant.EventType;
+import ca.bc.gov.educ.api.trax.exception.ServiceException;
 import ca.bc.gov.educ.api.trax.model.dto.DistrictContact;
 import ca.bc.gov.educ.api.trax.model.entity.EventEntity;
 import ca.bc.gov.educ.api.trax.service.institute.DistrictService;
@@ -22,8 +23,13 @@ public class DistrictContactDeletedService extends EventBaseService<DistrictCont
     @Override
     public void processEvent(final DistrictContact districtContact, EventEntity eventEntity) {
         log.debug("Processing District Contact Deleted");
-        districtService.updateDistrictCache(districtContact.getDistrictId());
-        this.updateEvent(eventEntity);
+        try {
+            districtService.updateDistrictCache(districtContact.getDistrictId());
+            this.updateEvent(eventEntity);
+        } catch (ServiceException e) {
+            // do not mark eventEntity as processed
+            log.error(e.getMessage());
+        }
     }
 
     @Override

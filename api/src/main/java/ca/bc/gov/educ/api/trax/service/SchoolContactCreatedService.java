@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.trax.service;
 
 import ca.bc.gov.educ.api.trax.constant.EventType;
+import ca.bc.gov.educ.api.trax.exception.ServiceException;
 import ca.bc.gov.educ.api.trax.model.dto.SchoolContact;
 import ca.bc.gov.educ.api.trax.model.entity.EventEntity;
 import ca.bc.gov.educ.api.trax.service.institute.SchoolService;
@@ -22,8 +23,14 @@ public class SchoolContactCreatedService extends EventBaseService<SchoolContact>
     @Override
     public void processEvent(final SchoolContact schoolContact, EventEntity eventEntity) {
         log.debug("Processing School Contact Created");
-        schoolService.updateSchoolCache(schoolContact.getSchoolId());
-        this.updateEvent(eventEntity);
+        try {
+            schoolService.updateSchoolCache(schoolContact.getSchoolId());
+            this.updateEvent(eventEntity);
+        } catch (ServiceException e) {
+            // do not mark eventEntity as processed
+            log.error(e.getMessage());
+        }
+
     }
 
     @Override
