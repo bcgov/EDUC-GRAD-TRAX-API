@@ -1,7 +1,6 @@
 package ca.bc.gov.educ.api.trax.service;
 
 import ca.bc.gov.educ.api.trax.constant.EventType;
-import ca.bc.gov.educ.api.trax.exception.ServiceException;
 import ca.bc.gov.educ.api.trax.model.dto.institute.MoveSchoolData;
 import ca.bc.gov.educ.api.trax.model.entity.EventEntity;
 import ca.bc.gov.educ.api.trax.service.institute.SchoolService;
@@ -26,9 +25,11 @@ public class SchoolMovedService extends EventBaseService<MoveSchoolData> {
     public void processEvent(final MoveSchoolData moveSchoolData, EventEntity eventEntity) {
         log.debug("Processing School Moved");
         try{
+            // school move sometimes not fully processed, sleep 1 second
+            Thread.sleep(1000);
             schoolService.updateSchoolCache(Arrays.asList(moveSchoolData.getFromSchoolId(), moveSchoolData.getToSchool().getSchoolId()));
             this.updateEventWithHistory(eventEntity);
-        } catch (ServiceException e) {
+        } catch (Exception e) {
             log.error(e.getMessage());
         }
     }
