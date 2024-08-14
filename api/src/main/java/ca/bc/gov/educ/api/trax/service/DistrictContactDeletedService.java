@@ -1,20 +1,18 @@
 package ca.bc.gov.educ.api.trax.service;
 
 import ca.bc.gov.educ.api.trax.constant.EventType;
-import ca.bc.gov.educ.api.trax.model.dto.DistrictContact;
-import ca.bc.gov.educ.api.trax.model.entity.EventEntity;
+import ca.bc.gov.educ.api.trax.service.institute.DistrictService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class DistrictContactDeletedService extends EventBaseService<DistrictContact> {
+public class DistrictContactDeletedService extends DistrictContactEventBaseService {
 
-    @Override
-    public void processEvent(final DistrictContact districtContact, EventEntity eventEntity) {
-        log.debug("Processing District Contact Deleted");
-        // process the eventEntity here as per https://eccbc.atlassian.net/browse/GRAD2-2648
-        this.updateEvent(eventEntity);
+    @Autowired
+    public DistrictContactDeletedService(DistrictService districtService) {
+        super(districtService);
     }
 
     @Override

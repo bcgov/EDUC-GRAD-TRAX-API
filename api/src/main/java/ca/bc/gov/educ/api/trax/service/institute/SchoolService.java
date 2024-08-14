@@ -123,9 +123,10 @@ public class SchoolService {
 	 */
 	public void updateSchoolCache(String schoolId) throws ServiceException {
 		// get details from institute
-		log.debug("Updating school %s in cache.",  schoolId);
+		log.debug("Updating school {} in cache.",  schoolId);
 		SchoolDetail schoolDetail = this.restService.get(String.format(constants.getSchoolDetailsByIdFromInstituteApiUrl(), schoolId),
 				SchoolDetail.class, webClient);
+		log.debug("Retrieved school: {} from Institute API", schoolDetail.getSchoolId());
 		schoolDetailRedisRepository.save(schoolDetailTransformer.transformToEntity(schoolDetail));
 	}
 

@@ -26,10 +26,14 @@ public class SchoolMovedService extends EventBaseService<MoveSchoolData> {
     public void processEvent(final MoveSchoolData moveSchoolData, EventEntity eventEntity) {
         log.debug("Processing School Moved");
         try{
+            // school move sometimes not fully processed, sleep 1 second
+            Thread.sleep(1000);
             schoolService.updateSchoolCache(Arrays.asList(moveSchoolData.getFromSchoolId(), moveSchoolData.getToSchool().getSchoolId()));
             this.updateEventWithHistory(eventEntity);
         } catch (ServiceException e) {
             log.error(e.getMessage());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
 

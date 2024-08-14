@@ -124,6 +124,10 @@ public class ChoreographEventHandler {
             val schoolCreated = JsonUtil.getJsonObjectFromString(School.class, eventEntity.getEventPayload());
             this.eventServiceMap.get(CREATE_SCHOOL.toString()).processEvent(schoolCreated, eventEntity);
           }
+          case CREATE_DISTRICT -> {
+            val districtCreated = JsonUtil.getJsonObjectFromString(District.class, eventEntity.getEventPayload());
+            this.eventServiceMap.get(CREATE_DISTRICT.toString()).processEvent(districtCreated, eventEntity);
+          }
           case MOVE_SCHOOL -> {
             val schoolMoved = JsonUtil.getJsonObjectFromString(MoveSchoolData.class, eventEntity.getEventPayload());
             this.eventServiceMap.get(MOVE_SCHOOL.toString()).processEvent(schoolMoved, eventEntity);
