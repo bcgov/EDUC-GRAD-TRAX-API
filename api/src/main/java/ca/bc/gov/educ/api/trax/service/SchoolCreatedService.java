@@ -11,13 +11,11 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class SchoolCreatedService extends EventBaseService<School> {
-
-    SchoolService schoolService;
+public class SchoolCreatedService extends SchoolEventBaseService {
 
     @Autowired
     public SchoolCreatedService(SchoolService schoolService) {
-        this.schoolService = schoolService;
+        super(schoolService);
     }
 
     @Override
@@ -25,7 +23,7 @@ public class SchoolCreatedService extends EventBaseService<School> {
         log.debug("Processing School Created");
         try{
             schoolService.updateSchoolCache(school.getSchoolId());
-            this.updateEventWithHistory(eventEntity);
+            this.updateEvent(eventEntity, this.shouldCreateHistory(school));
         } catch (ServiceException e) {
             log.error(e.getMessage());
         }

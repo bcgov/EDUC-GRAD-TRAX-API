@@ -23,7 +23,7 @@ public abstract class SchoolContactEventBaseService extends EventBaseService<Sch
         log.debug("Processing {}", eventEntity.getEventType());
         try {
             schoolService.updateSchoolCache(schoolContact.getSchoolId());
-            this.updateEvent(eventEntity);
+            this.updateEvent(eventEntity, false);
         } catch (ServiceException e) {
             // do not mark eventEntity as processed
             log.error(e.getMessage());

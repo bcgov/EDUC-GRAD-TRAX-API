@@ -25,7 +25,7 @@ public class DistrictCreatedService extends EventBaseService<District> {
         log.debug("Processing District Created");
         try{
             districtService.updateDistrictCache(district.getDistrictId());
-            this.updateEvent(eventEntity);
+            this.updateEvent(eventEntity, false);
         } catch (ServiceException e) {
             log.error(e.getMessage());
         }
