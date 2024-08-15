@@ -49,4 +49,23 @@ public class SchoolUpdatedServiceTest extends BaseReplicationServiceTest {
             fail("UPDATE_SCHOOL failed to process");
         }
     }
+
+    @Test
+    public void testProcessEvent_givenUPDATE_SCHOOL_EventWithPassingHistoryCriteria_shouldStoreInHistoryTable() throws JsonProcessingException {
+        final var request = TestUtils.createSchool();
+        final var event = TestUtils.createEvent(EventType.UPDATE_SCHOOL.toString(), request, this.replicationTestUtils.getEventRepository());
+        this.schoolUpdatedService.processEvent(request, event);
+        var result = this.replicationTestUtils.getEventHistoryRepository().findByEvent_ReplicationEventId(event.getReplicationEventId());
+        Assert.assertTrue(result.isPresent());
+    }
+
+    @Test
+    public void testProcessEvent_givenUPDATE_SCHOOL_EventWithFailingHistoryCriteria_shouldNotStoreInHistoryTable() throws JsonProcessingException {
+        final var request = TestUtils.createSchool();
+        request.setCanIssueTranscripts(false);
+        final var event = TestUtils.createEvent(EventType.UPDATE_SCHOOL.toString(), request, this.replicationTestUtils.getEventRepository());
+        this.schoolUpdatedService.processEvent(request, event);
+        var result = this.replicationTestUtils.getEventHistoryRepository().findByEvent_ReplicationEventId(event.getReplicationEventId());
+        Assert.assertFalse(result.isPresent());
+    }
 }
