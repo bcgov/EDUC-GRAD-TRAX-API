@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class SchoolCreatedService extends SchoolEventBaseService {
+public class SchoolCreatedService extends SchoolEventBaseService<School> {
 
     @Autowired
     public SchoolCreatedService(SchoolService schoolService) {

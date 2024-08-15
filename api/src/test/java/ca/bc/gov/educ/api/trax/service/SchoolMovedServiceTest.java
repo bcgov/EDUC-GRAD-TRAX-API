@@ -13,6 +13,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 
 public class SchoolMovedServiceTest extends BaseReplicationServiceTest {
 
@@ -26,6 +27,9 @@ public class SchoolMovedServiceTest extends BaseReplicationServiceTest {
     public void testProcessEvent_givenMOVE_SCHOOL_Event_shouldProcessEvent() throws JsonProcessingException {
         final var request = TestUtils.createMoveSchoolData();
         final var event = TestUtils.createEvent(EventType.MOVE_SCHOOL.toString(), request, this.replicationTestUtils.getEventRepository());
+        var schoolDetail = TestUtils.createSchoolDetail();
+        schoolDetail.setSchoolId(request.getFromSchoolId());
+        when(schoolServiceMock.getSchoolDetailByIdFromInstituteApi(request.getFromSchoolId())).thenReturn(schoolDetail);
         this.schoolMovedService.processEvent(request, event);
         var result = this.replicationTestUtils.getEventRepository().findById(event.getReplicationEventId());
         if(result.isPresent()){
@@ -48,5 +52,32 @@ public class SchoolMovedServiceTest extends BaseReplicationServiceTest {
         } else {
             fail("MOVE_SCHOOL failed to process");
         }
+    }
+
+    @Test
+    public void testProcessEvent_givenMOVE_SCHOOL_EventWithPassingHistoryCriteria_shouldStoreInHistoryTable() throws JsonProcessingException {
+        final var request = TestUtils.createMoveSchoolData();
+        final var event = TestUtils.createEvent(EventType.MOVE_SCHOOL.toString(), request, this.replicationTestUtils.getEventRepository());
+        var schoolDetail = TestUtils.createSchoolDetail();
+        schoolDetail.setSchoolId(request.getFromSchoolId());
+        schoolDetail.setCanIssueTranscripts(false);
+        when(schoolServiceMock.getSchoolDetailByIdFromInstituteApi(request.getFromSchoolId())).thenReturn(schoolDetail);
+        this.schoolMovedService.processEvent(request, event);
+        var result = this.replicationTestUtils.getEventHistoryRepository().findByEvent_ReplicationEventId(event.getReplicationEventId());
+        Assert.assertTrue(result.isPresent());
+    }
+
+    @Test
+    public void testProcessEvent_givenMOVE_SCHOOL_EventWithFailingHistoryCriteria_shouldNotStoreInHistoryTable() throws JsonProcessingException {
+        final var request = TestUtils.createMoveSchoolData();
+        request.getToSchool().setCanIssueTranscripts(false);
+        final var event = TestUtils.createEvent(EventType.MOVE_SCHOOL.toString(), request, this.replicationTestUtils.getEventRepository());
+        var schoolDetail = TestUtils.createSchoolDetail();
+        schoolDetail.setSchoolId(request.getFromSchoolId());
+        schoolDetail.setCanIssueTranscripts(false);
+        when(schoolServiceMock.getSchoolDetailByIdFromInstituteApi(request.getFromSchoolId())).thenReturn(schoolDetail);
+        this.schoolMovedService.processEvent(request, event);
+        var result = this.replicationTestUtils.getEventHistoryRepository().findByEvent_ReplicationEventId(event.getReplicationEventId());
+        Assert.assertFalse(result.isPresent());
     }
 }

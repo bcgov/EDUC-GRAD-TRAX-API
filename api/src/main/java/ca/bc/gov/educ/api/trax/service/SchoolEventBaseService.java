@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public abstract class SchoolEventBaseService extends EventBaseService<School> {
+public abstract class SchoolEventBaseService<T> extends EventBaseService<T> {
 
     protected SchoolService schoolService;
 
@@ -16,7 +16,7 @@ public abstract class SchoolEventBaseService extends EventBaseService<School> {
         this.schoolService = schoolService;
     }
 
-    public abstract void processEvent(School school, EventEntity eventEntity);
+    public abstract void processEvent(T request, EventEntity eventEntity);
 
     /**
      * Acts as a filter. Add rules here for if a school event should be added to history table
