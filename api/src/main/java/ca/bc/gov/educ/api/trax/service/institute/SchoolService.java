@@ -132,6 +132,14 @@ public class SchoolService {
 
 	/**
 	 * Updates the school and school details in the cache
+	 * @param schoolDetail the school detail object
+	 */
+	public void updateSchoolCache(SchoolDetail schoolDetail) throws ServiceException {
+		schoolDetailRedisRepository.save(schoolDetailTransformer.transformToEntity(schoolDetail));
+	}
+
+	/**
+	 * Updates the school and school details in the cache
 	 * based on schoolId
 	 * @param schoolIds the school id guids
 	 */

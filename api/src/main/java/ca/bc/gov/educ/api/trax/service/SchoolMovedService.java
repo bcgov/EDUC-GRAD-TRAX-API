@@ -29,7 +29,7 @@ public class SchoolMovedService extends SchoolEventBaseService<MoveSchoolData> {
             // have to check event history eligibility on from and to schools for move.
             // if one can issue transcripts, set history eligibility
             SchoolDetail schoolDetail = this.schoolService.getSchoolDetailByIdFromInstituteApi(moveSchoolData.getFromSchoolId());
-            boolean shouldCreateHistory = (schoolDetail.isCanIssueTranscripts() || moveSchoolData.getToSchool().isCanIssueTranscripts());
+            boolean shouldCreateHistory = (schoolDetail.isCanIssueTranscripts() || this.shouldCreateHistory(moveSchoolData.getToSchool()));
             this.updateEvent(eventEntity, shouldCreateHistory);
         } catch (ServiceException e) {
             log.error(e.getMessage());
