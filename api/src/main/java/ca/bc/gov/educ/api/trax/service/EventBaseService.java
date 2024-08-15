@@ -29,14 +29,4 @@ public abstract class EventBaseService<T> implements EventService<T> {
         });
     }
 
-    /**
-     * Adds the event to the EventHistory table. Implementing classes may want to
-     * use this method if they are interested in history tracking
-     * @param eventEntity the event entity
-     */
-    // TODO: Delete this
-    protected void updateEventWithHistory(final EventEntity eventEntity) {
-        this.updateEvent(eventEntity, true);
-    }
-
 }
