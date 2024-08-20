@@ -1,7 +1,6 @@
 package ca.bc.gov.educ.api.trax.service;
 
 import ca.bc.gov.educ.api.trax.model.dto.institute.School;
-import ca.bc.gov.educ.api.trax.model.entity.EventEntity;
 import ca.bc.gov.educ.api.trax.service.institute.SchoolService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,8 +14,6 @@ public abstract class SchoolEventBaseService<T> extends EventBaseService<T> {
     protected SchoolEventBaseService(SchoolService schoolService) {
         this.schoolService = schoolService;
     }
-
-    public abstract void processEvent(T request, EventEntity eventEntity);
 
     /**
      * Acts as a filter. Add rules here for if a school event should be added to history table
