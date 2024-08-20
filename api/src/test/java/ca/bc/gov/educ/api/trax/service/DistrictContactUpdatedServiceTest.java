@@ -39,13 +39,13 @@ public class DistrictContactUpdatedServiceTest extends BaseReplicationServiceTes
         final String ERROR_MSG = "Test Exception";
         doThrow(new ServiceException(ERROR_MSG)).when(districtServiceMock).updateDistrictCache(anyString());
         final var request = TestUtils.createDistrictContact();
-        final var event = TestUtils.createEvent("UPDATE_SCHOOL_CONTACT", request, this.replicationTestUtils.getEventRepository());
+        final var event = TestUtils.createEvent("UPDATE_DISTRICT_CONTACT", request, this.replicationTestUtils.getEventRepository());
         this.districtContactUpdatedService.processEvent(request, event);
         var result = this.replicationTestUtils.getEventRepository().findById(event.getReplicationEventId());
         if(result.isPresent()){
             Assert.assertEquals("DB_COMMITTED", result.get().getEventStatus());
         } else {
-            fail("UPDATE_SCHOOL_CONTACT failed to process");
+            fail("UPDATE_DISTRICT_CONTACT failed to process");
         }
     }
 

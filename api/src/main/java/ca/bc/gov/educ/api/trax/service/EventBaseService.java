@@ -8,7 +8,6 @@ import ca.bc.gov.educ.api.trax.repository.EventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 public abstract class EventBaseService<T> implements EventService<T> {
 
@@ -17,28 +16,17 @@ public abstract class EventBaseService<T> implements EventService<T> {
     @Autowired
     protected EventHistoryRepository eventHistoryRepository;
 
-    protected void updateEvent(final EventEntity eventEntity) {
+    protected void updateEvent(final EventEntity eventEntity, boolean includeHistory) {
         this.eventRepository.findByEventId(eventEntity.getEventId()).ifPresent(existingEvent -> {
             existingEvent.setEventStatus(EventStatus.PROCESSED.toString());
             existingEvent.setUpdateDate(LocalDateTime.now());
             this.eventRepository.save(existingEvent);
+            if(includeHistory){
+                EventHistoryEntity eventHistoryEntity = new EventHistoryEntity();
+                eventHistoryEntity.setEvent(existingEvent);
+                this.eventHistoryRepository.save(eventHistoryEntity);
+            }
         });
-    }
-
-    /**
-     * Adds the event to the EventHistory table. Implementing classes may want to
-     * use this method if they are interested in history tracking
-     * @param eventEntity the event entity
-     */
-    protected void updateEventWithHistory(final EventEntity eventEntity) {
-        this.updateEvent(eventEntity);
-        Optional<EventEntity> savedEvent = this.eventRepository.findByEventId(eventEntity.getEventId());
-        if(savedEvent.isPresent()){
-            EventHistoryEntity eventHistoryEntity = new EventHistoryEntity();
-            eventHistoryEntity.setEvent(savedEvent.get());
-            this.eventHistoryRepository.save(eventHistoryEntity);
-        }
-
     }
 
 }

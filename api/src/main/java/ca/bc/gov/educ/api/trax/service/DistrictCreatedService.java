@@ -11,21 +11,21 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class DistrictUpdatedService extends EventBaseService<District> {
+public class DistrictCreatedService extends EventBaseService<District> {
 
     DistrictService districtService;
 
     @Autowired
-    public DistrictUpdatedService(DistrictService districtService) {
+    public DistrictCreatedService(DistrictService districtService) {
         this.districtService = districtService;
     }
 
     @Override
     public void processEvent(final District district, EventEntity eventEntity) {
-        log.debug("Processing District Updated");
+        log.debug("Processing District Created");
         try{
             districtService.updateDistrictCache(district.getDistrictId());
-            this.updateEvent(eventEntity, true);
+            this.updateEvent(eventEntity, false);
         } catch (ServiceException e) {
             log.error(e.getMessage());
         }
@@ -33,7 +33,7 @@ public class DistrictUpdatedService extends EventBaseService<District> {
 
     @Override
     public String getEventType() {
-        return EventType.UPDATE_DISTRICT.toString();
+        return EventType.CREATE_DISTRICT.toString();
     }
 
 }

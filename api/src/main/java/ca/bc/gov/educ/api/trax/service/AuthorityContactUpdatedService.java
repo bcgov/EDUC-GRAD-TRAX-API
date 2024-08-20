@@ -13,7 +13,7 @@ public class AuthorityContactUpdatedService extends EventBaseService<AuthorityCo
     public void processEvent(final AuthorityContact districtContact, EventEntity eventEntity) {
         log.debug("Processing Authority Contact Updated");
         // process the eventEntity here as per https://eccbc.atlassian.net/browse/GRAD2-2648
-        this.updateEvent(eventEntity);
+        this.updateEvent(eventEntity, false);
     }
 
     @Override
