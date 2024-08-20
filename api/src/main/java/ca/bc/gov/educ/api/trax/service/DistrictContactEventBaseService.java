@@ -22,7 +22,7 @@ public abstract class DistrictContactEventBaseService extends EventBaseService<D
     public void processEvent(DistrictContact districtContact, EventEntity eventEntity) {log.debug("Processing {}", eventEntity.getEventType());
         try {
             districtService.updateDistrictCache(districtContact.getDistrictId());
-            this.updateEvent(eventEntity);
+            this.updateEvent(eventEntity, false);
         } catch (ServiceException e) {
             // do not mark eventEntity as processed
             log.error(e.getMessage());
