@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Component("InstituteSchool")
+@Component("instituteSchool")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class School extends BaseModel {
 

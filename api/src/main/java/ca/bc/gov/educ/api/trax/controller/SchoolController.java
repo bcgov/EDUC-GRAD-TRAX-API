@@ -78,7 +78,7 @@ public class SchoolController {
 
     @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_URL_MAPPING_V1 + EducGradTraxApiConstants.GET_COMMON_SCHOOL_BY_CODE_MAPPING)
     @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
-    @Operation(summary = "Find a Common School by Mincode", description = "Get a Common School by Mincode", tags = { "School" })
+    @Operation(summary = "Find a Common School by Mincode", description = "Find a Common School by Mincode", tags = { "School" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "404", description = "NOT FOUND")})
     public ResponseEntity<CommonSchool> getCommonSchool(@PathVariable String minCode) {
@@ -114,7 +114,7 @@ public class SchoolController {
 
     @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_URL_MAPPING_V1 + EducGradTraxApiConstants.GET_SCHOOLS_BY_SCHOOL_CATEGORY_MAPPING)
     @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
-    @Operation(summary = "Check school existence by Mincode", description = "Check school existence by Mincode", tags = { "School" })
+    @Operation(summary = "Get schools by SchoolCategory", description = "Get schools by SchoolCategory", tags = { "School" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "204", description = "NO CONTENT")})
     public ResponseEntity<List<School>> getSchoolsBySchoolCategory(@RequestParam(required = false) String schoolCategory, @RequestHeader(name="Authorization") String accessToken) {
