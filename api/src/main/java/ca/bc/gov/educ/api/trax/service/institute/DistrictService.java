@@ -79,7 +79,13 @@ public class DistrictService {
     }
 
     public List<District> getDistrictsBySchoolCategoryCode(String schoolCategoryCode) {
-        List<SchoolDetail> schoolDetails = schoolService.getSchoolDetailsBySchoolCategoryCode(schoolCategoryCode);
+        List<SchoolDetail> schoolDetails;
+
+        if (schoolCategoryCode.isBlank() || schoolCategoryCode.isEmpty())
+            schoolDetails = schoolService.getSchoolDetailsFromRedisCache();
+        else
+            schoolDetails = schoolService.getSchoolDetailsBySchoolCategoryCode(schoolCategoryCode);
+
         List<District> districts = new ArrayList<>();
         for (SchoolDetail schoolDetail : schoolDetails) {
             districts.add(getDistrictByIdFromRedisCache(schoolDetail.getDistrictId()));

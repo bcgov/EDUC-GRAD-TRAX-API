@@ -47,7 +47,7 @@ public class DistrictController {
 
     @GetMapping(EducGradTraxApiConstants.GRAD_DISTRICT_URL_MAPPING_V1 + EducGradTraxApiConstants.GET_DISTRICTS_BY_SCHOOL_CATEGORY_MAPPING)
     @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
-    @Operation(summary = "Check school existence by Mincode", description = "Check school existence by Mincode", tags = { "School" })
+    @Operation(summary = "Get Districts by SchoolCategory", description = "Get Districts by SchoolCategory", tags = { "School" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "204", description = "NO CONTENT")})
     public ResponseEntity<List<District>> getDistrictBySchoolCategory(@RequestParam(required = false) String schoolCategory) {

@@ -40,7 +40,7 @@ public class DistrictController {
 
     @GetMapping(EducGradTraxApiConstants.GRAD_DISTRICT_URL_MAPPING_V2 + EducGradTraxApiConstants.GET_DISTRICT_BY_DISTNO_MAPPING)
     @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
-    @Operation(summary = "Find a District by District Number", description = "Get District by District Number", tags = { "District" })
+    @Operation(summary = "Find a District by District Number V2", description = "Get District by District Number V2", tags = { "District" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
     public ResponseEntity<District> getDistrictDetailsByDistNo(@PathVariable String distNo) {
         if(distNo.length() <=3) {
@@ -54,7 +54,7 @@ public class DistrictController {
 
     @GetMapping(EducGradTraxApiConstants.GRAD_DISTRICT_URL_MAPPING_V2 + EducGradTraxApiConstants.GET_DISTRICTS_BY_SCHOOL_CATEGORY_MAPPING)
     @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
-    @Operation(summary = "Get District by school category code", description = "Get District by school category code", tags = { "School" })
+    @Operation(summary = "Get District by school category code V2", description = "Get District by school category code V2", tags = { "School" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "204", description = "NO CONTENT")})
     public ResponseEntity<List<District>> getDistrictsBySchoolCategoryCode(@RequestParam(required = false) String schoolCategoryCode) {

@@ -74,7 +74,7 @@ public class SchoolController {
 
     @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_URL_MAPPING_V2 + EducGradTraxApiConstants.CHECK_SCHOOL_BY_CODE_MAPPING)
     @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
-    @Operation(summary = "Check school existence by Mincode", description = "Check school existence by Mincode", tags = { "School" })
+    @Operation(summary = "Check school existence by Mincode V2", description = "Check school existence by Mincode V2", tags = { "School" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "204", description = "NO CONTENT")})
     public Boolean checkIfSchoolExists(@PathVariable String minCode) {
@@ -83,7 +83,7 @@ public class SchoolController {
 
     @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_URL_MAPPING_V2 + EducGradTraxApiConstants.GET_SCHOOLS_BY_SCHOOL_CATEGORY_MAPPING)
     @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
-    @Operation(summary = "Get Schools by School Category Code", description = "Get Schools by School Category Code", tags = { "School" })
+    @Operation(summary = "Get Schools by School Category Code V2", description = "Get Schools by School Category Code V2", tags = { "School" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "204", description = "NO CONTENT")})
     public ResponseEntity<List<SchoolDetail>> getSchoolsBySchoolCategory(@RequestParam(required = false) String schoolCategoryCode) {
@@ -92,7 +92,7 @@ public class SchoolController {
 
     @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_DETAIL_URL_MAPPING_V2 + EducGradTraxApiConstants.GET_SCHOOL_BY_CODE_MAPPING)
     @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
-    @Operation(summary = "Find a School by Mincode from cache", description = "Get a School by Mincode from cache", tags = { "School" })
+    @Operation(summary = "Find School Details by Mincode from cache", description = "Get School Details by Mincode from cache", tags = { "School" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "204", description = "NO CONTENT")})
     public ResponseEntity<SchoolDetail> getSchoolDetailsByMincode(@PathVariable String minCode) {
