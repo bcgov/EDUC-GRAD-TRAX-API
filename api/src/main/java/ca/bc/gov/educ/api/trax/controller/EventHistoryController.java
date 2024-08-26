@@ -1,7 +1,7 @@
 package ca.bc.gov.educ.api.trax.controller;
+import ca.bc.gov.educ.api.trax.mapper.EventHistoryMapper;
 import ca.bc.gov.educ.api.trax.model.dto.EventHistory;
 import ca.bc.gov.educ.api.trax.model.entity.EventHistoryEntity;
-import ca.bc.gov.educ.api.trax.model.transformer.EventHistoryTransformer;
 import ca.bc.gov.educ.api.trax.service.EventHistoryService;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.JsonUtil;
@@ -16,10 +16,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,12 +29,11 @@ import java.util.concurrent.CompletableFuture;
 public class EventHistoryController {
 
     private final EventHistoryService eventHistoryService;
-    private final EventHistoryTransformer transformer;
+    private static final EventHistoryMapper mapper = EventHistoryMapper.mapper;
 
     @Autowired
-    public EventHistoryController(EventHistoryService eventHistoryService, EventHistoryTransformer transformer) {
+    public EventHistoryController(EventHistoryService eventHistoryService) {
         this.eventHistoryService = eventHistoryService;
-        this.transformer = transformer;
     }
 
     @GetMapping("/paginated")
@@ -46,10 +42,13 @@ public class EventHistoryController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR.")})
     @Transactional(readOnly = true)
     @Operation(summary = "Find All Event History paginated", description = "Find all Event History using pagination", tags = { "Event History" })
-    public CompletableFuture<Page<EventHistory>> findAll(Integer pageNumber, Integer pageSize, String sortCriteriaJson, String searchCriteriaListJson) {
+    public CompletableFuture<Page<EventHistory>> findAll(@RequestParam(name = "pageNumber", defaultValue = "0") Integer pageNumber,
+                                                         @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
+                                                         @RequestParam(name = "sort", defaultValue = "") String sort,
+                                                         @RequestParam(name = "searchParams", required = false) String searchParams) {
         final List<Sort.Order> sorts = new ArrayList<>();
-        Specification<EventHistoryEntity> eventHistorySpecs = eventHistoryService.setSpecificationAndSortCriteria(sortCriteriaJson, searchCriteriaListJson, JsonUtil.mapper, sorts);
-        return this.eventHistoryService.findAll(eventHistorySpecs, pageNumber, pageSize, sorts).thenApplyAsync(schoolEntities -> schoolEntities.map(transformer::toDTO));
+        Specification<EventHistoryEntity> eventHistorySpecs = eventHistoryService.setSpecificationAndSortCriteria(sort, searchParams, JsonUtil.mapper, sorts);
+        return this.eventHistoryService.findAll(eventHistorySpecs, pageNumber, pageSize, sorts).thenApplyAsync(schoolEntities -> schoolEntities.map(mapper::toStructure));
     }
 
 }
