@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.trax.mapper;
 
 import ca.bc.gov.educ.api.trax.model.dto.EventHistory;
 import ca.bc.gov.educ.api.trax.model.entity.EventHistoryEntity;
+import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -11,6 +12,7 @@ public interface EventHistoryMapper {
 
     EventHistoryMapper mapper = Mappers.getMapper(EventHistoryMapper.class);
 
+    @InheritInverseConfiguration
     @Mapping(target = "event.eventPayloadBytes", ignore = true)
     EventHistory toStructure(EventHistoryEntity eventHistoryEntity);
 
