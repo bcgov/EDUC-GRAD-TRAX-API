@@ -178,6 +178,15 @@ public class EducGradTraxApiConstants {
     @Value("${endpoint.institute-api.get-all-school-funding-group-codes.url}")
     private String allSchoolFundingGroupCodesFromInstituteApiUrl;
 
+    @Value("${endpoint.student-admin.school-details.url}")
+    private String studentAdminSchoolDetailsUrl;
+
+    @Value("${endpoint.student-admin.district-details.url}")
+    private String studentAdminDistrictDetailsUrl;
+
+    @Value("${endpoint.student-admin.authority-details.url}")
+    private String studentAdminAuthorityDetailsUrl;
+
     // Scheduler: ongoing updates from TRAX to GRAD
     @Value("${cron.scheduled.process.events.trax-to-grad.run}")
     private String traxToGradCronRun;

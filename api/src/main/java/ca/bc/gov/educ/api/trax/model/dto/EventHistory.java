@@ -12,5 +12,6 @@ import java.util.UUID;
 public class EventHistory extends BaseModel {
     private UUID id;
     private Event event;
+    private String eventHistoryUrl;
     private String acknowledgeFlag;
 }
