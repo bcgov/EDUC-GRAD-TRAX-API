@@ -29,11 +29,12 @@ import java.util.concurrent.CompletableFuture;
 public class EventHistoryController {
 
     private final EventHistoryService eventHistoryService;
-    private static final EventHistoryMapper mapper = EventHistoryMapper.mapper;
+    private EventHistoryMapper mapper;
 
     @Autowired
-    public EventHistoryController(EventHistoryService eventHistoryService) {
+    public EventHistoryController(EventHistoryService eventHistoryService, EventHistoryMapper mapper) {
         this.eventHistoryService = eventHistoryService;
+        this.mapper = mapper;
     }
 
     @GetMapping("/paginated")

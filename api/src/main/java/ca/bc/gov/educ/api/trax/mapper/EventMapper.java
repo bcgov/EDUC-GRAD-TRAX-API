@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(uses = {UUIDMapper.class})
+@Mapper(componentModel = "spring", uses = {UUIDMapper.class})
 public interface EventMapper {
 
     EventMapper mapper = Mappers.getMapper(EventMapper.class);
