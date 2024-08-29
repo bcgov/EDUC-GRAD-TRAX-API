@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Component("SchoolAddress")
+@Component("schoolAddress")
 public class SchoolAddress extends BaseModel {
 
     private String SchoolAddressId;

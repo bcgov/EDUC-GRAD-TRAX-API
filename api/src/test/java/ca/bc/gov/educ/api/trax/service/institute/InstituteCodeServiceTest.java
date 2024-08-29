@@ -6,7 +6,6 @@ import ca.bc.gov.educ.api.trax.messaging.NatsConnection;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.trax.model.dto.ResponseObj;
-import ca.bc.gov.educ.api.trax.model.dto.institute.District;
 import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolCategoryCode;
 import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolFundingGroupCode;
 import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolCategoryCodeEntity;
@@ -153,7 +152,6 @@ public class InstituteCodeServiceTest {
 				.thenReturn(schoolCategoryCodes);
 
 		List<SchoolCategoryCode> result = codeService.getSchoolCategoryCodesFromInstituteApi();
-		//assertThat(result).hasSize(1);
 	}
 
 	@Test
@@ -187,8 +185,6 @@ public class InstituteCodeServiceTest {
 				.thenReturn(schoolFundingGroupCodes);
 
 		List<SchoolFundingGroupCode> result = codeService.getSchoolFundingGroupCodesFromInstituteApi();
-		//assertThat(result).hasSize(1);
-
 	}
 
 	@Test
@@ -221,7 +217,6 @@ public class InstituteCodeServiceTest {
 		scce.setLabel("SCC2-label");
 		scces.add(scce);
 		when(schoolCategoryCodeRedisRepository.findAll()).thenReturn(scces);
-		//assertTrue(codeService.getSchoolCategoryCodesFromRedisCache().size() == 2);
 	}
 
 	@Test
@@ -306,7 +301,6 @@ public class InstituteCodeServiceTest {
 		doNothing().when(codeServicemock).loadSchoolCategoryCodesIntoRedisCache(sccs);
 
 		codeService.initializeSchoolCategoryCodeCache(true);
-		//verify(codeServicemock).loadSchoolCategoryCodesIntoRedisCache(sccs);
 	}
 
 	@Test
@@ -330,7 +324,6 @@ public class InstituteCodeServiceTest {
 		sfgce.setLabel("SFGC2-label");
 		sfgces.add(sfgce);
 		when(schoolFundingGroupCodeRedisRepository.findAll()).thenReturn(sfgces);
-		//assertTrue(codeService.getSchoolCategoryCodesFromRedisCache().size() == 2);
 	}
 
 	@Test
@@ -413,7 +406,6 @@ public class InstituteCodeServiceTest {
 		doNothing().when(codeServicemock).loadSchoolFundingGroupCodesIntoRedisCache(sfgcs);
 
 		codeService.initializeSchoolFundingGroupCodeCache(true);
-		//verify(codeServicemock).loadSchoolCategoryCodesIntoRedisCache(sccs);
 
 	}
 
