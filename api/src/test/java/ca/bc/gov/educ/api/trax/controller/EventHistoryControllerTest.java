@@ -2,16 +2,13 @@ package ca.bc.gov.educ.api.trax.controller;
 
 import ca.bc.gov.educ.api.trax.EducGradTraxApiApplication;
 import ca.bc.gov.educ.api.trax.filter.FilterOperation;
-import ca.bc.gov.educ.api.trax.messaging.NatsConnection;
-import ca.bc.gov.educ.api.trax.messaging.jetstream.Publisher;
-import ca.bc.gov.educ.api.trax.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.trax.model.dto.Search;
 import ca.bc.gov.educ.api.trax.model.dto.SearchCriteria;
 import ca.bc.gov.educ.api.trax.model.dto.ValueType;
 import ca.bc.gov.educ.api.trax.model.entity.EventEntity;
-import ca.bc.gov.educ.api.trax.model.entity.EventHistoryEntity;
 import ca.bc.gov.educ.api.trax.repository.EventHistoryRepository;
 import ca.bc.gov.educ.api.trax.repository.EventRepository;
+import ca.bc.gov.educ.api.trax.util.BaseEventHistoryTest;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
@@ -21,18 +18,11 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import redis.clients.jedis.JedisCluster;
 
-import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -47,9 +37,8 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 @SpringBootTest(classes = { EducGradTraxApiApplication.class })
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
-class EventHistoryControllerTest {
+class EventHistoryControllerTest extends BaseEventHistoryTest {
 
-    private static final String USER = "TEST";
     private static final String READ_SCOPE = "SCOPE_READ_EVENT_HISTORY";
     @Autowired
     private MockMvc mockMvc;
@@ -59,23 +48,6 @@ class EventHistoryControllerTest {
 
     @Autowired
     private EventRepository eventRepository;
-
-    @MockBean
-    private Publisher publisher;
-    @MockBean
-    private Subscriber subscriber;
-    @MockBean
-    private NatsConnection natsConnection;
-    @MockBean
-    private ClientRegistrationRepository clientRegistrationRepository;
-    @MockBean
-    private OAuth2AuthorizedClientRepository oAuth2AuthorizedClientRepository;
-    @MockBean
-    private OAuth2AuthorizedClientService oAuth2AuthorizedClientService;
-    @MockBean
-    private JedisConnectionFactory jedisConnectionFactoryMock;
-    @MockBean
-    private JedisCluster jedisClusterMock;
     private AutoCloseable closeable;
 
     @BeforeEach
@@ -124,31 +96,5 @@ class EventHistoryControllerTest {
         this.mockMvc.perform(asyncDispatch(result)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.content", hasSize(1)));
     }
 
-    private EventEntity createEventData() {
-        return EventEntity.builder()
-                .eventId(UUID.randomUUID())
-                .eventPayload("")
-                .eventStatus("PROCESSED")
-                .eventType("CREATE_SCHOOL_CONTACT")
-                .eventOutcome("SCHOOL_CONTACT_CREATED")
-                .createUser(USER)
-                .createDate(LocalDateTime.now())
-                .updateUser(USER)
-                .updateDate(LocalDateTime.now())
-                .activityCode("INSTITUTE_EVENT")
-                .build();
-
-    }
-
-    private EventHistoryEntity createEventHistoryData(EventEntity event) {
-        return EventHistoryEntity.builder()
-                .event(event)
-                .acknowledgeFlag("N")
-                .createDate(LocalDateTime.now())
-                .createUser(USER)
-                .updateDate(LocalDateTime.now())
-                .updateUser(USER)
-                .build();
-    }
 
 }
