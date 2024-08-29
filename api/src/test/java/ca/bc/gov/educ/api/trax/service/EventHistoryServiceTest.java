@@ -71,7 +71,7 @@ public class EventHistoryServiceTest extends BaseReplicationServiceTest {
     @Test
     public void setSpecificationAndSortCriteria_givenValidData_shouldReturnOk() throws TraxAPIRuntimeException{
         String sort = "{ \"schoolNumber\": \"ASC\" }";
-        String searchParams = "[{\"condition\":null,\"searchCriteriaList\":[{\"key\":\"openedDate\",\"operation\":\"lte\",\"value\":\"2024-08-26T09:05:51.782\",\"valueType\":\"DATE_TIME\",\"condition\":\"AND\"},{\"key\":\"closedDate\",\"operation\":\"eq\",\"value\":null,\"valueType\":\"STRING\",\"condition\":\"AND\"}]}]";
+        String searchParams = "[{\"condition\":null,\"searchCriteriaList\":[{\"key\":\"openedDate\",\"operation\":\"lte\",\"value\":\"2024-08-26T09:05:51.782\",\"valueType\":\"DATE_TIME\",\"condition\":\"AND\"},{\"key\":\"strAnd\",\"operation\":\"eq\",\"value\":\"Test String\",\"valueType\":\"STRING\",\"condition\":\"AND\"},{\"key\":\"longOr\",\"operation\":\"gt\",\"value\":\"1230\",\"valueType\":\"LONG\",\"condition\":\"OR\"},{\"key\":\"intOr\",\"operation\":\"gte\",\"value\":\"12\",\"valueType\":\"INTEGER\",\"condition\":\"OR\"},{\"key\":\"dateAnd\",\"operation\":\"eq\",\"value\":\"2024-08-26\",\"valueType\":\"DATE\",\"condition\":\"AND\"},{\"key\":\"uuidOr\",\"operation\":\"eq\",\"value\":\"6f84aa52-ad90-4f04-be66-04614ed24c37\",\"valueType\":\"UUID\",\"condition\":\"OR\"}]}]";
         Specification<EventHistoryEntity> eventHistorySpecs = eventHistoryService.setSpecificationAndSortCriteria(sort, searchParams, JsonUtil.mapper, new ArrayList<>());
         Assert.assertNotNull(eventHistorySpecs);
     }
