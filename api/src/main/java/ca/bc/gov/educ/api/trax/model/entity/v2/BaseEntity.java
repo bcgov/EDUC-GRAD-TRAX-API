@@ -4,12 +4,18 @@ import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.ThreadLocalStateUtil;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.PastOrPresent;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalDateTime;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@SuperBuilder
 @MappedSuperclass
 public class BaseEntity {
 
