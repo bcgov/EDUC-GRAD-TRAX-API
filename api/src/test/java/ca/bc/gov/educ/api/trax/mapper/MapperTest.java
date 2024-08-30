@@ -15,26 +15,44 @@ import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.lang3.tuple.Pair;
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.UUID;
+
 @SpringBootTest(classes = { EducGradTraxApiApplication.class })
 @ActiveProfiles("test")
-class EventHistoryMapperTest extends BaseEventHistoryTest {
+class MapperTest extends BaseEventHistoryTest {
 
     @Autowired
     private EventHistoryMapper eventHistoryMapper;
     @Autowired
     private EducGradTraxApiConstants constants;
+    private static final UUIDMapper uuidMapper = new UUIDMapper();
 
     @Test
     void testGetMapper_shouldNotBeNull() {
         Assertions.assertNotNull(EventMapper.mapper);
     }
+
+    @Test
+    void testUUIDMapper_givenValidString_shouldReturnUUID() {
+        Assertions.assertNotNull(uuidMapper.map(UUID.randomUUID().toString()));
+    }
+
+    @Test
+    void testUUIDMapper_givenValidUUID_shouldReturnString() {
+        Assertions.assertNotNull(uuidMapper.map(UUID.randomUUID()));
+    }
+
+    @Test
+    void testUUIDMapper_givenBlankString_shouldReturnNull() {
+        Assertions.assertNull(uuidMapper.map(""));
+    }
+
 
     @Test
     void testToEventHistory_givenSchoolEvent_shouldReturnCorrectUrl() throws JsonProcessingException {
