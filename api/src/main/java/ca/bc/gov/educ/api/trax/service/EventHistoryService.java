@@ -1,14 +1,13 @@
 package ca.bc.gov.educ.api.trax.service;
 
+import ca.bc.gov.educ.api.trax.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.trax.exception.InvalidParameterException;
 import ca.bc.gov.educ.api.trax.exception.ServiceException;
 import ca.bc.gov.educ.api.trax.exception.TraxAPIRuntimeException;
 import ca.bc.gov.educ.api.trax.filter.EventHistoryFilterSpecifics;
 import ca.bc.gov.educ.api.trax.filter.FilterOperation;
-import ca.bc.gov.educ.api.trax.model.dto.Condition;
-import ca.bc.gov.educ.api.trax.model.dto.Search;
-import ca.bc.gov.educ.api.trax.model.dto.SearchCriteria;
-import ca.bc.gov.educ.api.trax.model.dto.ValueType;
+import ca.bc.gov.educ.api.trax.mapper.EventHistoryMapper;
+import ca.bc.gov.educ.api.trax.model.dto.*;
 import ca.bc.gov.educ.api.trax.model.entity.EventHistoryEntity;
 import ca.bc.gov.educ.api.trax.repository.EventHistoryRepository;
 import ca.bc.gov.educ.api.trax.repository.EventRepository;
@@ -42,6 +41,7 @@ import java.util.concurrent.Executor;
 @Service
 public class EventHistoryService {
 
+    private final EventHistoryMapper mapper;
     private final EventHistoryFilterSpecifics eventHistoryFilterSpecs;
     private final EventRepository eventRepository;
     private final EventHistoryRepository eventHistoryRepository;
@@ -50,7 +50,8 @@ public class EventHistoryService {
             .setCorePoolSize(2).setMaximumPoolSize(10).setKeepAliveTime(Duration.ofSeconds(60)).build();
 
     @Autowired
-    public EventHistoryService(EventHistoryFilterSpecifics eventHistoryFilterSpecs, EventRepository eventRepository, EventHistoryRepository eventHistoryRepository) {
+    public EventHistoryService(EventHistoryMapper mapper, EventHistoryFilterSpecifics eventHistoryFilterSpecs, EventRepository eventRepository, EventHistoryRepository eventHistoryRepository) {
+        this.mapper = mapper;
         this.eventHistoryFilterSpecs = eventHistoryFilterSpecs;
         this.eventRepository = eventRepository;
         this.eventHistoryRepository = eventHistoryRepository;
@@ -179,5 +180,24 @@ public class EventHistoryService {
             }
         }, paginatedQueryExecutor);
 
+    }
+
+    /**
+     * Updates the event history. Currently, the only fields that will update are
+     * updateUser and acknowledgeFlag
+     * @param eventHistory the history event you want to update
+     * @return the updated history event
+     */
+    public EventHistory updateEventHistory(EventHistory eventHistory) {
+        EventHistoryEntity eventHistoryEntity = eventHistoryRepository.findById(eventHistory.getId()).orElse(null);
+        if(eventHistoryEntity != null){
+            eventHistoryEntity.setUpdateUser(eventHistory.getUpdateUser());
+            eventHistoryEntity.setUpdateDate(LocalDateTime.now());
+            eventHistoryEntity.setAcknowledgeFlag(eventHistory.getAcknowledgeFlag());
+            eventHistoryRepository.save(eventHistoryEntity);
+            return mapper.toStructure(eventHistoryEntity);
+        } else {
+            throw new EntityNotFoundException(String.format("EventHistory with id: %s not found", eventHistory.getId()));
+        }
     }
 }

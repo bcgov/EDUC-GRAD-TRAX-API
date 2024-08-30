@@ -14,6 +14,10 @@ import java.util.stream.IntStream;
 public class EntityNotFoundException extends RuntimeException {
 
 
+    public EntityNotFoundException(String message) {
+        super(message);
+    }
+
     public EntityNotFoundException(Class clazz, String... searchParamsMap) {
         super(EntityNotFoundException.generateMessage(clazz.getSimpleName(), toMap(String.class, String.class, searchParamsMap)));
     }

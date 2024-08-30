@@ -24,7 +24,7 @@
             src/main/java/ca/bc/gov/educ/api/trax/model/**,
             src/main/java/ca/bc/gov/educ/api/trax/service/EventHandlerDelegatorService,
             src/main/java/ca/bc/gov/educ/api/trax/util/**,
-            src/main/java/ca/bc/gov/educ/api/trax/repository/**,
+            src/main/java/ca/bc/gov/educ/api/trax/repository/**
         </sonar.exclusions>
         <sonar.junit.exclusions>
             src/main/java/ca/bc/gov/educ/api/trax/messaging/**,
@@ -32,6 +32,7 @@
             src/main/java/ca/bc/gov/educ/api/trax/model/**,
             src/main/java/ca/bc/gov/educ/api/trax/util/**,
             src/main/java/ca/bc/gov/educ/api/trax/repository/**,
+            src/main/java/ca/bc/gov/educ/api/trax/filter/**,
         </sonar.junit.exclusions>
         <java.version>18</java.version>
         <maven.compiler.version>3.10.1</maven.compiler.version>
