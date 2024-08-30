@@ -56,7 +56,7 @@ public class EventHistoryController {
     }
 
     @PutMapping
-    @PreAuthorize("hasAuthority('SCOPE_UPDATE_EVENT_HISTORY')")
+    @PreAuthorize("hasAuthority('SCOPE_WRITE_EVENT_HISTORY')")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "404", description = "NOT FOUND"),
@@ -64,7 +64,7 @@ public class EventHistoryController {
             @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR.")})
     @Transactional(readOnly = true)
     @Operation(summary = "Update an event history entity", description = "Update a valid event history", tags = { "Event History" })
-    public EventHistory updateEventHistory(@Valid EventHistory eventHistory) {
+    public EventHistory updateEventHistory(@Valid @RequestBody EventHistory eventHistory) {
        return this.eventHistoryService.updateEventHistory(eventHistory);
     }
 }
