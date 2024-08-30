@@ -62,7 +62,7 @@ public class EventHistoryController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND"),
             @ApiResponse(responseCode = "400", description = "BAD REQUEST"),
             @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR.")})
-    @Transactional(readOnly = true)
+    @Transactional
     @Operation(summary = "Update an event history entity", description = "Update a valid event history", tags = { "Event History" })
     public EventHistory updateEventHistory(@Valid @RequestBody EventHistory eventHistory) {
        return this.eventHistoryService.updateEventHistory(eventHistory);

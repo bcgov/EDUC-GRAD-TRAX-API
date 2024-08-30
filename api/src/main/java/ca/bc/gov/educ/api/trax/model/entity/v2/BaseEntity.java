@@ -49,7 +49,10 @@ public class BaseEntity {
 
 	private void initUserInfo() {
 		String user = ThreadLocalStateUtil.getCurrentUser();
-		this.updateUser = (StringUtils.isBlank(user)) ? EducGradTraxApiConstants.DEFAULT_UPDATED_BY : user;
+		if(this.updateUser == null){
+			this.updateUser = (StringUtils.isBlank(user)) ? EducGradTraxApiConstants.DEFAULT_UPDATED_BY : user;
+		}
 		this.createUser = (StringUtils.isBlank(createUser) && StringUtils.isBlank(user)) ? EducGradTraxApiConstants.DEFAULT_CREATED_BY : user;
 	}
+
 }
