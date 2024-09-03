@@ -189,8 +189,8 @@ public class TraxCommonService {
     }
 
     public UUID getSchoolIdFromRedisCache(String mincode) {
-        Optional<ca.bc.gov.educ.api.trax.model.dto.institute.School> optional = schoolService.getSchoolsFromRedisCache().stream().filter(s -> mincode.equalsIgnoreCase(s.getMincode())).findFirst();
-        return optional.map(school -> UUID.fromString(school.getSchoolId())).orElse(null);
+        ca.bc.gov.educ.api.trax.model.dto.institute.School school = schoolService.getSchoolByMincodeFromRedisCache(mincode);
+        return school != null && StringUtils.isNotBlank(school.getSchoolId())? UUID.fromString(school.getSchoolId()) : null;
     }
 
     private List<ConvGradStudent> buildConversionGradStudents(List<Object[]> traxStudents) {
