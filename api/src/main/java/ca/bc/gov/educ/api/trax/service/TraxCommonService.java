@@ -8,6 +8,7 @@ import ca.bc.gov.educ.api.trax.model.transformer.TraxStudentNoTransformer;
 import ca.bc.gov.educ.api.trax.repository.GradCourseRepository;
 import ca.bc.gov.educ.api.trax.repository.TraxStudentNoRepository;
 import ca.bc.gov.educ.api.trax.repository.TraxStudentRepository;
+import ca.bc.gov.educ.api.trax.service.institute.SchoolService;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +27,8 @@ import java.util.*;
 @Service
 @Slf4j
 public class TraxCommonService {
+
+    private SchoolService schoolService;
     private final TraxStudentRepository traxStudentRepository;
     private final TraxStudentNoRepository traxStudentNoRepository;
     private final GradCourseRepository gradCourseRepository;
@@ -35,12 +39,14 @@ public class TraxCommonService {
     private final EducGradTraxApiConstants constants;
 
     @Autowired
-    public TraxCommonService(TraxStudentRepository traxStudentRepository,
+    public TraxCommonService(SchoolService schoolService,
+                             TraxStudentRepository traxStudentRepository,
                              TraxStudentNoRepository traxStudentNoRepository,
                              GradCourseRepository gradCourseRepository,
                              TraxStudentNoTransformer traxStudentNoTransformer,
                              GradCourseTransformer gradCourseTransformer,
                              EducGradTraxApiConstants constants) {
+        this.schoolService = schoolService;
         this.traxStudentRepository = traxStudentRepository;
         this.traxStudentNoRepository = traxStudentNoRepository;
         this.gradCourseRepository = gradCourseRepository;
@@ -182,6 +188,11 @@ public class TraxCommonService {
         return null;
     }
 
+    public UUID getSchoolIdFromRedisCache(String mincode) {
+        Optional<ca.bc.gov.educ.api.trax.model.dto.institute.School> optional = schoolService.getSchoolsFromRedisCache().stream().filter(s -> mincode.equalsIgnoreCase(s.getMincode())).findFirst();
+        return optional.map(school -> UUID.fromString(school.getSchoolId())).orElse(null);
+    }
+
     private List<ConvGradStudent> buildConversionGradStudents(List<Object[]> traxStudents) {
         List<ConvGradStudent> students = new ArrayList<>();
         traxStudents.forEach(result -> {
@@ -209,6 +220,8 @@ public class TraxCommonService {
         Character studentStatus = (Character) fields[4];
         Character archiveFlag = (Character) fields[5];
         String graduationRequirementYear = (String) fields[6];
+
+        UUID schoolOfRecordId = this.getSchoolIdFromRedisCache(schoolOfRecord);
 
         // grad or non-grad
         Date programCompletionDate = null;
@@ -267,6 +280,7 @@ public class TraxCommonService {
                     .slpDate(slpDateStr)
                     .sccDate(sccDateStr)
                     .schoolOfRecord(schoolOfRecord)
+                    .schoolOfRecordId(schoolOfRecordId)
                     .schoolAtGrad(schoolAtGrad)
                     .studentGrade(studentGrade)
                     .studentStatus(studentStatus != null? studentStatus.toString() : null)
