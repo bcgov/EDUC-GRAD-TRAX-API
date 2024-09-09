@@ -71,7 +71,8 @@ public class RestErrorHandler extends ResponseEntityExceptionHandler {
 
 	@ExceptionHandler(value = { JpaObjectRetrievalFailureException.class, DataRetrievalFailureException.class, EntityNotFoundException.class })
 	protected ResponseEntity<Object> handleEntityNotFound(RuntimeException ex) {
-        // no need to log EntityNotFoundExceptions as they are expected
+        // no need to log EntityNotFoundExceptions as error
+		// it is used to denote NOT FOUND and is normal part of operations
 		if(!(ex instanceof EntityNotFoundException)){
 			log.error("JPA ERROR IS: {}", ex.getClass().getName(), ex);
 		}
