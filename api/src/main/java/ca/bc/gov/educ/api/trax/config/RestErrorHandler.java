@@ -59,18 +59,6 @@ public class RestErrorHandler extends ResponseEntityExceptionHandler {
 		return buildResponseEntity(apiError);
 	}
 
-	/**
-	 * Handles the exception thrown by not found and translates to 404 response
-	 * @param ex the exception
-	 * @return a 404 with message
-	 */
-	@ExceptionHandler(value = { EntityNotFoundException.class })
-	protected ResponseEntity<Object> handleEntityNotFoundException(EntityNotFoundException ex){
-		ApiError apiError = new ApiError(NOT_FOUND);
-		apiError.setMessage(ex.getMessage());
-		return buildResponseEntity(apiError);
-	}
-
 	@ExceptionHandler(value = { IllegalArgumentException.class, IllegalStateException.class })
 	protected ResponseEntity<Object> handleConflict(RuntimeException ex) {
         log.error("Illegal argument ERROR IS: {}", ex.getClass().getName(), ex);
@@ -81,11 +69,15 @@ public class RestErrorHandler extends ResponseEntityExceptionHandler {
 		return new ResponseEntity<>(response, HttpStatus.UNPROCESSABLE_ENTITY);
 	}
 
-	@ExceptionHandler(value = { JpaObjectRetrievalFailureException.class, DataRetrievalFailureException.class })
+	@ExceptionHandler(value = { JpaObjectRetrievalFailureException.class, DataRetrievalFailureException.class, EntityNotFoundException.class })
 	protected ResponseEntity<Object> handleEntityNotFound(RuntimeException ex) {
-        log.error("JPA ERROR IS: {}", ex.getClass().getName(), ex);
-		validation.clear();
-		return new ResponseEntity<>(ApiResponseModel.ERROR(null, ex.getLocalizedMessage()), HttpStatus.BAD_REQUEST);
+        // no need to log EntityNotFoundExceptions as they are expected
+		if(!(ex instanceof EntityNotFoundException)){
+			log.error("JPA ERROR IS: {}", ex.getClass().getName(), ex);
+		}
+		ApiError apiError = new ApiError(NOT_FOUND);
+		apiError.setMessage(ex.getMessage());
+		return buildResponseEntity(apiError);
 	}
 
 	@ExceptionHandler(value = { AccessDeniedException.class })
