@@ -1,0 +1,11 @@
+meta {
+  name: Find Student Demographics from TRAX
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{rootURL}}/api/v1/trax/common/student-demog/{pen}
+  body: none
+  auth: none
+}

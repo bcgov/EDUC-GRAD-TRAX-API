@@ -1,0 +1,21 @@
+meta {
+  name: Search for a school
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{rootURL}}/api/v1/trax/school/search
+  body: none
+  auth: none
+}
+
+query {
+  ~schoolName: 
+  ~mincode: 
+  ~district: 
+}
+
+headers {
+  Authorization: 
+}
