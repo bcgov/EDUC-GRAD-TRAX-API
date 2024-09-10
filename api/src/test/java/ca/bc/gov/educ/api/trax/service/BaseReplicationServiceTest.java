@@ -1,7 +1,6 @@
 package ca.bc.gov.educ.api.trax.service;
 
 import ca.bc.gov.educ.api.trax.EducGradTraxApiApplication;
-import ca.bc.gov.educ.api.trax.mapper.EventHistoryMapperImpl;
 import ca.bc.gov.educ.api.trax.messaging.NatsConnection;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Subscriber;
@@ -21,7 +20,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import redis.clients.jedis.JedisCluster;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {EducGradTraxApiApplication.class, EventHistoryMapperImpl.class, EventHistoryMapperImpl.class})
+@SpringBootTest(classes = {EducGradTraxApiApplication.class})
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
 public abstract class BaseReplicationServiceTest {

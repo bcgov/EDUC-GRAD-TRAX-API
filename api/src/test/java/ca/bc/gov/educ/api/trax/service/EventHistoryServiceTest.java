@@ -1,22 +1,16 @@
 package ca.bc.gov.educ.api.trax.service;
 
-import ca.bc.gov.educ.api.trax.exception.TraxAPIRuntimeException;
 import ca.bc.gov.educ.api.trax.model.entity.EventEntity;
 import ca.bc.gov.educ.api.trax.model.entity.EventHistoryEntity;
 import ca.bc.gov.educ.api.trax.repository.EventHistoryRepository;
 import ca.bc.gov.educ.api.trax.repository.EventRepository;
 import ca.bc.gov.educ.api.trax.support.TestUtils;
-import ca.bc.gov.educ.api.trax.util.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 public class EventHistoryServiceTest extends BaseReplicationServiceTest {
@@ -66,19 +60,5 @@ public class EventHistoryServiceTest extends BaseReplicationServiceTest {
         Optional<EventEntity> eventThatShouldNotBePurgedOptional = eventRepository.findById(eventThatShouldNotBePurged.getReplicationEventId());
         Optional<EventHistoryEntity> eventHistoryThatShouldNotBePurgedAlso = eventHistoryRepository.findById(eventHistory.getId());
         Assert.assertTrue(eventHistoryThatShouldNotBePurgedAlso.isPresent() && eventThatShouldNotBePurgedOptional.isPresent());
-    }
-
-    @Test
-    public void setSpecificationAndSortCriteria_givenValidData_shouldReturnOk() throws TraxAPIRuntimeException{
-        String sort = "{ \"schoolNumber\": \"ASC\" }";
-        String searchParams = "[{\"condition\":null,\"searchCriteriaList\":[{\"key\":\"openedDate\",\"operation\":\"lte\",\"value\":\"2024-08-26T09:05:51.782\",\"valueType\":\"DATE_TIME\",\"condition\":\"AND\"},{\"key\":\"strAnd\",\"operation\":\"eq\",\"value\":\"Test String\",\"valueType\":\"STRING\",\"condition\":\"AND\"},{\"key\":\"longOr\",\"operation\":\"gt\",\"value\":\"1230\",\"valueType\":\"LONG\",\"condition\":\"OR\"},{\"key\":\"intOr\",\"operation\":\"gte\",\"value\":\"12\",\"valueType\":\"INTEGER\",\"condition\":\"OR\"},{\"key\":\"dateAnd\",\"operation\":\"eq\",\"value\":\"2024-08-26\",\"valueType\":\"DATE\",\"condition\":\"AND\"},{\"key\":\"uuidOr\",\"operation\":\"eq\",\"value\":\"6f84aa52-ad90-4f04-be66-04614ed24c37\",\"valueType\":\"UUID\",\"condition\":\"OR\"}]}]";
-        Specification<EventHistoryEntity> eventHistorySpecs = eventHistoryService.setSpecificationAndSortCriteria(sort, searchParams, JsonUtil.mapper, new ArrayList<>());
-        Assert.assertNotNull(eventHistorySpecs);
-    }
-
-    @Test
-    public void setSpecificationAndSortCriteria_givenInvalisData_shouldThrowTraxAPIRuntimeException() {
-        final List<Sort.Order> sorts = new ArrayList<>();
-        Assert.assertThrows(TraxAPIRuntimeException.class, () -> eventHistoryService.setSpecificationAndSortCriteria(null, "{ \"bunkjunk\": \"ASC\" }", JsonUtil.mapper, sorts));
     }
 }

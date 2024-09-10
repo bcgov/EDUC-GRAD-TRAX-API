@@ -87,9 +87,6 @@ public class EducGradTraxApiConstants {
     public static final String POST_SAVE_TRAX_STUDENT_NO_MAPPING = "/trax-student-no";
     public static final String DELETE_TRAX_STUDENT_NO_MAPPING = "/trax-student-no/{pen}";
 
-    // Event urls
-    public static final String EVENT_HISTORY_MAPPING_V1 = GRAD_TRAX_API_ROOT_MAPPING_V1 + "/event/history";
-
     //Default Attribute value constants
     public static final String DEFAULT_CREATED_BY = "API_GRAD_TRAX";
     protected static final Date DEFAULT_CREATED_TIMESTAMP = new Date();
@@ -177,15 +174,6 @@ public class EducGradTraxApiConstants {
 
     @Value("${endpoint.institute-api.get-all-school-funding-group-codes.url}")
     private String allSchoolFundingGroupCodesFromInstituteApiUrl;
-
-    @Value("${endpoint.student-admin.school-details.url}")
-    private String studentAdminSchoolDetailsUrl;
-
-    @Value("${endpoint.student-admin.district-details.url}")
-    private String studentAdminDistrictDetailsUrl;
-
-    @Value("${endpoint.student-admin.authority-details.url}")
-    private String studentAdminAuthorityDetailsUrl;
 
     // Scheduler: ongoing updates from TRAX to GRAD
     @Value("${cron.scheduled.process.events.trax-to-grad.run}")

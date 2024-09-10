@@ -194,13 +194,6 @@ endpoint:
       url: ${INSTITUTE_API_URL_ROOT}api/v1/institute/category-codes
     get-all-school-funding-group-codes:
       url: ${INSTITUTE_API_URL_ROOT}api/v1/institute/funding-group-codes
-  student-admin:
-    school-details:
-      url: ${STUDENT_ADMIN_URL_ROOT}institute/school/%s/details
-    district-details:
-      url: ${STUDENT_ADMIN_URL_ROOT}district/%s
-    authority-details:
-      url: ${STUDENT_ADMIN_URL_ROOT}authority/%s
 
 # other properties
 props:

@@ -4,17 +4,15 @@ import ca.bc.gov.educ.api.trax.model.entity.v2.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.*;
-import lombok.experimental.SuperBuilder;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.util.UUID;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@SuperBuilder
+@Getter
+@Setter
 @Entity
 @Table(name = "EVENT_HISTORY")
 @DynamicUpdate
