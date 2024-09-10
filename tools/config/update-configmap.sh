@@ -54,8 +54,8 @@ echo Creating config map "$APP_NAME"-config-map
 oc create -n "$GRAD_NAMESPACE"-"$envValue" configmap "$APP_NAME"-config-map \
   --from-literal=APP_LOG_LEVEL="$APP_LOG_LEVEL" \
   --from-literal=BASELINE_ON_MIGRATE="true" \
-  --from-literal=CRON_SCHEDULED_PURGE_OLD_RECORDS="0 0 0 * * *" \
-  --from-literal=RECORDS_STALE_IN_DAYS=365 \
+  --from-literal=CRON_SCHEDULED_PURGE_OLD_RECORDS: "0 0 0 * * *" \
+  --from-literal=RECORDS_STALE_IN_DAYS: 365 \
   --from-literal=CRON_SCHEDULED_GRAD_TO_TRAX_EVENTS="0 0/5 * * * *" \
   --from-literal=CRON_SCHEDULED_GRAD_TO_TRAX_EVENTS_LOCK_AT_LEAST_FOR="PT1M" \
   --from-literal=CRON_SCHEDULED_GRAD_TO_TRAX_EVENTS_LOCK_AT_MOST_FOR="PT5M" \
