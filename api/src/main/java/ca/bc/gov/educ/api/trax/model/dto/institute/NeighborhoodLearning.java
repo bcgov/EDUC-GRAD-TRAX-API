@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Component("NeighborhoodLearning")
+@Component("neighborhoodLearning")
 public class NeighborhoodLearning extends BaseModel {
 
     private String neighborhoodLearningId;

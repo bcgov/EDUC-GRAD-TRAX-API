@@ -1,13 +1,15 @@
 package ca.bc.gov.educ.api.trax.model.dto.institute;
 
 import ca.bc.gov.educ.api.trax.model.dto.BaseModel;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.stereotype.Component;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Component("InstituteSchool")
+@Component("instituteSchool")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class School extends BaseModel {
 
     private String schoolId;

@@ -1,15 +1,19 @@
 package ca.bc.gov.educ.api.trax.model.dto.institute;
 
 import ca.bc.gov.educ.api.trax.model.dto.BaseModel;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Component("InstituteDistrict")
+@Component("instituteDistrict")
+@NoArgsConstructor
+@AllArgsConstructor
 public class District extends BaseModel {
 
     private String districtId;
@@ -18,6 +22,7 @@ public class District extends BaseModel {
     private String phoneNumber;
     private String email;
     private String website;
+    private String displayName;
     private String districtRegionCode;
     private String districtStatusCode;
     private List<DistrictContact> contacts;

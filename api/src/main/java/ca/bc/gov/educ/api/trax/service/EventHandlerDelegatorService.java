@@ -1,6 +1,8 @@
 package ca.bc.gov.educ.api.trax.service;
 
 import ca.bc.gov.educ.api.trax.choreographer.ChoreographEventHandler;
+import ca.bc.gov.educ.api.trax.constant.EventActivityCode;
+import ca.bc.gov.educ.api.trax.constant.Topics;
 import ca.bc.gov.educ.api.trax.exception.BusinessException;
 import ca.bc.gov.educ.api.trax.model.dto.ChoreographedEvent;
 import io.nats.client.Message;
@@ -10,7 +12,6 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-
 import static ca.bc.gov.educ.api.trax.constant.Topics.TRAX_UPDATE_EVENT_TOPIC;
 
 @Service
@@ -20,7 +21,7 @@ public class EventHandlerDelegatorService {
     private final ChoreographEventHandler choreographer;
 
     /**
-     * Instantiates a new Event handler delegator service.
+     * Instantiates a new EventEntity handler delegator service.
      *
      * @param choreographedEventPersistenceService the choreographed event persistence service
      * @param choreographer                        the choreographer
@@ -41,7 +42,10 @@ public class EventHandlerDelegatorService {
      * @param message            the message
      * @throws IOException the io exception
      */
-    public void handleChoreographyEvent(@NonNull final ChoreographedEvent choreographedEvent, final Message message) throws IOException {
+    public void handleChoreographyEvent(@NonNull ChoreographedEvent choreographedEvent, final Message message) throws IOException {
+        // some messages come in already with an activity code, some do not.
+        // set the activity code early in the process
+        setActivityCode(choreographedEvent, message);
         try {
             if (message.getSubject().equalsIgnoreCase(TRAX_UPDATE_EVENT_TOPIC.toString())) {
                 this.choreographedEventPersistenceService.updateEventStatus(choreographedEvent);
@@ -57,5 +61,34 @@ public class EventHandlerDelegatorService {
             message.ack(); // acknowledge to Jet Stream that api got the message already...
             log.error("acknowledged to Jet Stream for exception...");
         }
+    }
+
+    /**
+     * Applies the correct activity code to ChoreographedEvents.
+     * Add new activity codes here
+     * @param choreographedEvent the choreographed event object
+     * @param message message received from nats
+     */
+    private void setActivityCode(@NonNull final ChoreographedEvent choreographedEvent, final Message message) {
+        Topics topics;
+        try {
+            topics = Topics.valueOf(message.getSubject());
+            switch (topics) {
+                case INSTITUTE_EVENTS_TOPIC:
+                    choreographedEvent.setActivityCode(EventActivityCode.INSTITUTE_EVENT.toString());
+                    break;
+                case COREG_EVENTS_TOPIC:
+                    choreographedEvent.setActivityCode(EventActivityCode.COREG_EVENT.toString());
+                    break;
+                case PEN_EVENTS_TOPIC:
+                    choreographedEvent.setActivityCode(EventActivityCode.PEN_EVENT.toString());
+                    break;
+                default: // do nothing
+                    break;
+            }
+        } catch (Exception e) {
+            log.error("{} is not a valid topic", message.getSubject());
+        }
+
     }
 }

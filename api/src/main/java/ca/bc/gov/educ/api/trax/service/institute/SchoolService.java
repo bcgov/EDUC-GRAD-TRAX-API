@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.trax.service.institute;
 
 import ca.bc.gov.educ.api.trax.constant.CacheKey;
+import ca.bc.gov.educ.api.trax.exception.ServiceException;
 import ca.bc.gov.educ.api.trax.model.dto.institute.School;
 import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolDetail;
 import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolEntity;
@@ -68,6 +69,16 @@ public class SchoolService {
 		return  schoolTransformer.transformToDTO(schoolRedisRepository.findAll());
 	}
 
+	public School getSchoolByMincodeFromRedisCache(String mincode) {
+		log.debug("Get School by Mincode from Redis Cache");
+		return schoolTransformer.transformToDTO(schoolRedisRepository.findByMincode(mincode));
+	}
+
+	public boolean checkIfSchoolExists(String minCode) {
+		SchoolEntity schoolEntity = schoolRedisRepository.findByMincode(minCode);
+		return schoolEntity != null;
+	}
+
 	public void initializeSchoolCache(boolean force) {
 		serviceHelper.initializeCache(force, CacheKey.SCHOOL_CACHE, this);
 	}
@@ -89,13 +100,9 @@ public class SchoolService {
     public List<SchoolDetail> getSchoolDetailsFromInstituteApi() {
 
         List<School> schools = getSchoolsFromRedisCache();
-        List<SchoolDetail> schoolDetails = new ArrayList<SchoolDetail>();
-
+        List<SchoolDetail> schoolDetails = new ArrayList<>();
         for (School s : schools) {
-            SchoolDetail sd = new SchoolDetail();
-
-            sd = getSchoolDetailByIdFromInstituteApi(s.getSchoolId());
-            schoolDetails.add(sd);
+            schoolDetails.add(getSchoolDetailByIdFromInstituteApi(s.getSchoolId()));
         }
         return schoolDetails;
     }
@@ -111,8 +118,51 @@ public class SchoolService {
 		return schoolDetailTransformer.transformToDTO(schoolDetailRedisRepository.findAll());
 	}
 
+	public SchoolDetail getSchoolDetailByMincodeFromRedisCache(String mincode) {
+		log.debug("**** Getting school Details By Mincode from Redis Cache.");
+		return schoolDetailTransformer.transformToDTO(schoolDetailRedisRepository.findByMincode(mincode));
+	}
+
 	public void initializeSchoolDetailCache(boolean force) {
 		serviceHelper.initializeCache(force, CacheKey.SCHOOL_DETAIL_CACHE, this);
 	}
 
+	public List<SchoolDetail> getSchoolDetailsBySchoolCategoryCode(String schoolCategoryCode) {
+
+		return schoolDetailTransformer.transformToDTO(
+				schoolDetailRedisRepository.findBySchoolCategoryCode(schoolCategoryCode));
+	}
+
+	/**
+	 * Updates the school and school details in the cache
+	 * based on schoolId
+	 * @param schoolId the school id guid
+	 */
+	public void updateSchoolCache(String schoolId) throws ServiceException {
+		// get details from institute
+		log.debug("Updating school {} in cache.",  schoolId);
+		SchoolDetail schoolDetail = this.restService.get(String.format(constants.getSchoolDetailsByIdFromInstituteApiUrl(), schoolId),
+				SchoolDetail.class, webClient);
+		log.debug("Retrieved school: {} from Institute API", schoolDetail.getSchoolId());
+		schoolDetailRedisRepository.save(schoolDetailTransformer.transformToEntity(schoolDetail));
+	}
+
+	/**
+	 * Updates the school and school details in the cache
+	 * @param schoolDetail the school detail object
+	 */
+	public void updateSchoolCache(SchoolDetail schoolDetail) throws ServiceException {
+		schoolDetailRedisRepository.save(schoolDetailTransformer.transformToEntity(schoolDetail));
+	}
+
+	/**
+	 * Updates the school and school details in the cache
+	 * based on schoolId
+	 * @param schoolIds the school id guids
+	 */
+	public void updateSchoolCache(List<String> schoolIds) throws ServiceException {
+		for (String schoolId : schoolIds) {
+			updateSchoolCache(schoolId);
+		}
+	}
 }

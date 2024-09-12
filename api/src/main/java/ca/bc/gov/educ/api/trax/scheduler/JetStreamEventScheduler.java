@@ -2,7 +2,7 @@ package ca.bc.gov.educ.api.trax.scheduler;
 
 import ca.bc.gov.educ.api.trax.choreographer.ChoreographEventHandler;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Publisher;
-import ca.bc.gov.educ.api.trax.model.entity.Event;
+import ca.bc.gov.educ.api.trax.model.entity.EventEntity;
 import ca.bc.gov.educ.api.trax.model.entity.TraxUpdatedPubEvent;
 import ca.bc.gov.educ.api.trax.repository.TraxUpdatedPubEventRepository;
 import ca.bc.gov.educ.api.trax.repository.EventRepository;
@@ -22,7 +22,7 @@ import static ca.bc.gov.educ.api.trax.constant.EventStatus.DB_COMMITTED;
 public class JetStreamEventScheduler {
 
     /**
-     * The Event repository.
+     * The EventEntity repository.
      */
     private final EventRepository eventRepository;
     /**
@@ -62,7 +62,7 @@ public class JetStreamEventScheduler {
         if (!results.isEmpty()) {
             var filteredList = results.stream().filter(el -> el.getUpdateDate().isBefore(LocalDateTime.now().minusMinutes(5))).toList();
             int cnt = 0;
-            for (Event e : filteredList) {
+            for (EventEntity e : filteredList) {
                 if (cnt++ >= constants.getGradToTraxProcessingThreshold()) {
                     log.info(" ==> Reached the processing threshold of {}", constants.getGradToTraxProcessingThreshold());
                     break;

@@ -1,7 +1,7 @@
 package ca.bc.gov.educ.api.trax.constant;
 
 /**
- * The enum Event outcome.
+ * The enum EventEntity outcome.
  */
 public enum EventOutcome {
   /**

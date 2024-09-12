@@ -4,8 +4,11 @@ import ca.bc.gov.educ.api.trax.model.dto.AuthorityContact;
 import ca.bc.gov.educ.api.trax.model.dto.DistrictContact;
 import ca.bc.gov.educ.api.trax.model.dto.GradStatusEventPayloadDTO;
 import ca.bc.gov.educ.api.trax.model.dto.SchoolContact;
-import ca.bc.gov.educ.api.trax.model.entity.Event;
+import ca.bc.gov.educ.api.trax.model.dto.institute.*;
+import ca.bc.gov.educ.api.trax.model.entity.EventEntity;
+import ca.bc.gov.educ.api.trax.model.entity.EventHistoryEntity;
 import ca.bc.gov.educ.api.trax.model.entity.TraxStudentEntity;
+import ca.bc.gov.educ.api.trax.repository.EventHistoryRepository;
 import ca.bc.gov.educ.api.trax.repository.EventRepository;
 import ca.bc.gov.educ.api.trax.util.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -14,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.UUID;
 
 import static ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants.DEFAULT_CREATED_BY;
@@ -36,8 +40,12 @@ public class TestUtils {
         return graduationStatus;
     }
 
-    public static Event createEvent(String eventType, Object payload, EventRepository eventRepository) throws JsonProcessingException {
-        var event = Event.builder()
+    public static EventEntity createEvent(String eventType, Object payload, EventRepository eventRepository) throws JsonProcessingException {
+        return createEvent(eventType, payload, LocalDateTime.now(), eventRepository);
+    }
+
+    public static EventEntity createEvent(String eventType, Object payload, LocalDateTime createDate, EventRepository eventRepository) throws JsonProcessingException {
+        var event = EventEntity.builder()
                 .eventType(eventType)
                 .eventId(UUID.randomUUID())
                 .eventOutcome("DB_COMMITTED")
@@ -45,11 +53,23 @@ public class TestUtils {
                 .eventStatus(DB_COMMITTED.toString())
                 .createUser(DEFAULT_CREATED_BY)
                 .updateUser(DEFAULT_UPDATED_BY)
-                .createDate(LocalDateTime.now())
+                .createDate(createDate)
                 .updateDate(LocalDateTime.now())
                 .build();
         eventRepository.save(event);
         return event;
+    }
+
+    public static EventHistoryEntity createEventHistory(EventEntity event, LocalDateTime createdDate, EventHistoryRepository eventHistoryRepository) {
+        var eventHistory = new EventHistoryEntity();
+        eventHistory.setEvent(event);
+        eventHistory.setAcknowledgeFlag("N");
+        eventHistory.setCreateDate(createdDate);
+        eventHistory.setCreateUser("TEST");
+        eventHistory.setUpdateDate(LocalDateTime.now());
+        eventHistory.setUpdateUser("TEST");
+        eventHistoryRepository.save(eventHistory);
+        return eventHistory;
     }
 
     public static AuthorityContact createAuthorityContact() {
@@ -91,6 +111,37 @@ public class TestUtils {
         contact.setUpdateDate(LocalDateTime.now().toString());
         contact.setUpdateUser("TEST");
         return contact;
+    }
+
+    public static School createSchool() {
+        var school = new School();
+        school.setSchoolId(UUID.randomUUID().toString());
+        school.setDistrictId(UUID.randomUUID().toString());
+        school.setMincode("07996006");
+        school.setIndependentAuthorityId(UUID.randomUUID().toString());
+        school.setSchoolNumber("96006");
+        school.setFaxNumber("2507436200");
+        school.setPhoneNumber("2507435516");
+        school.setEmail("executiveoffice@shawnigan.ca");
+        school.setWebsite(null);
+        school.setDisplayName("Shawnigan Lake");
+        school.setDisplayNameNoSpecialChars("Shawnigan Lake");
+        school.setSchoolReportingRequirementCode("REGULAR");
+        school.setSchoolOrganizationCode("QUARTER");
+        school.setSchoolCategoryCode("INDEPEND");
+        school.setFacilityTypeCode("STANDARD");
+        school.setOpenedDate("1989-09-01T00:00:00");
+        school.setCanIssueCertificates(true);
+        school.setCanIssueTranscripts(true);
+        return school;
+    }
+
+    public static MoveSchoolData createMoveSchoolData() {
+        var move = new MoveSchoolData();
+        move.setToSchool(createSchool());
+        move.setMoveDate(LocalDateTime.now().toString());
+        move.setFromSchoolId(UUID.randomUUID().toString());
+        return move;
     }
 
     public static DistrictContact createDistrictContact() {
@@ -181,5 +232,44 @@ public class TestUtils {
             traxStudent.setArchiveFlag("A");
         }
         return traxStudent;
+    }
+
+    public static District createDistrict() {
+        District district = new District();
+        district.setDistrictId(UUID.randomUUID().toString());
+        district.setDistrictNumber("002");
+        district.setFaxNumber("1233216547");
+        district.setPhoneNumber("3216549874");
+        district.setEmail("district@district.ca");
+        district.setWebsite("www.district.ca");
+        district.setDisplayName("Test Display Name");
+        district.setDistrictRegionCode("NOT_APPLIC");
+        district.setDistrictStatusCode("INACTIVE");
+        return district;
+    }
+
+    public static SchoolDetail createSchoolDetail(){
+        String schoolId = UUID.randomUUID().toString();
+        SchoolAddress schoolAddress = new SchoolAddress();
+        schoolAddress.setSchoolId(schoolId);
+        schoolAddress.setAddressLine1("123 Fake St");
+        schoolAddress.setCity("Vancouverland");
+        schoolAddress.setCountryCode("CAN");
+        schoolAddress.setPostal("VQV2L2");
+        SchoolDetail schoolDetail = new SchoolDetail();
+        schoolDetail.setSchoolId(schoolId);
+        schoolDetail.setSchoolNumber("96006");
+        schoolDetail.setDistrictId(UUID.randomUUID().toString());
+        schoolDetail.setAddresses(Arrays.asList(schoolAddress));
+        schoolDetail.setCreateDate(LocalDateTime.now().toString());
+        schoolDetail.setCanIssueCertificates(true);
+        schoolDetail.setDisplayName("Blah");
+        schoolDetail.setCreateUser("Test");
+        schoolDetail.setUpdateDate(LocalDateTime.now().toString());
+        schoolDetail.setUpdateUser("Test");
+        schoolDetail.setCreateDate(LocalDateTime.now().toString());
+        schoolDetail.setCanIssueTranscripts(true);
+        schoolDetail.setDisplayNameNoSpecialChars("blah blah");
+        return schoolDetail;
     }
 }

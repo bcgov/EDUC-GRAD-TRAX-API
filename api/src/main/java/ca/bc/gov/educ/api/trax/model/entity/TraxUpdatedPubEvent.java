@@ -105,12 +105,12 @@ public class TraxUpdatedPubEvent {
      */
     public static class TraxUpdatedPubEventBuilder {
         /**
-         * The Event payload bytes.
+         * The EventEntity payload bytes.
          */
         byte[] eventPayloadBytes;
 
         /**
-         * Event payload grad status event . GradStatus event builder.
+         * EventEntity payload grad status event . GradStatus event builder.
          *
          * @param eventPayload the event payload
          * @return the student event . student event builder

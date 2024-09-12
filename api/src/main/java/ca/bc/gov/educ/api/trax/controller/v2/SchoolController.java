@@ -15,13 +15,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @CrossOrigin
-@RestController("SchoolControllerV2")
+@RestController("schoolControllerV2")
 @Slf4j
 @OpenAPIDefinition(info = @Info(title = "API for School Data.", description = "This Read API is for Reading school data from Redis Cache.", version = "2"),
 		security = {@SecurityRequirement(name = "OAUTH2", scopes = {"READ_GRAD_SCHOOL_DATA"})})
@@ -43,8 +44,23 @@ public class SchoolController {
     @Operation(summary = "Find All Schools from Cache", description = "Get All Schools from Cache", tags = { "School" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
     public List<School> getAllSchools() {
-    	log.debug("getAllSchools : ");
+    	log.debug("getAllSchools V2 : ");
         return schoolService.getSchoolsFromRedisCache();
+    }
+
+    @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_URL_MAPPING_V2 + EducGradTraxApiConstants.GET_SCHOOL_BY_CODE_MAPPING)
+    @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
+    @Operation(summary = "Find a School by Mincode from cache", description = "Get a School by Mincode from cache", tags = { "School" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "204", description = "NO CONTENT")})
+    public ResponseEntity<School> getSchoolByMincode(@PathVariable String minCode) {
+        log.debug("getSchoolByMincode V2 : ");
+        School schoolResponse = schoolService.getSchoolByMincodeFromRedisCache(minCode);
+        if(schoolResponse != null) {
+            return response.GET(schoolResponse);
+        }else {
+            return response.NOT_FOUND();
+        }
     }
 
     @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_DETAIL_URL_MAPPING_V2)
@@ -52,8 +68,42 @@ public class SchoolController {
     @Operation(summary = "Find All School details from Cache", description = "Get All School details from Cache", tags = { "School" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
     public List<SchoolDetail> getAllSchoolDetails() {
-        log.debug("getAllSchoolDetails : ");
+        log.debug("getAllSchoolDetails V2: ");
         return schoolService.getSchoolDetailsFromRedisCache();
     }
+
+    @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_URL_MAPPING_V2 + EducGradTraxApiConstants.CHECK_SCHOOL_BY_CODE_MAPPING)
+    @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
+    @Operation(summary = "Check school existence by Mincode V2", description = "Check school existence by Mincode V2", tags = { "School" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "204", description = "NO CONTENT")})
+    public Boolean checkIfSchoolExists(@PathVariable String minCode) {
+        return schoolService.checkIfSchoolExists(minCode);
+    }
+
+    @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_URL_MAPPING_V2 + EducGradTraxApiConstants.GET_SCHOOLS_BY_SCHOOL_CATEGORY_MAPPING)
+    @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
+    @Operation(summary = "Get Schools by School Category Code V2", description = "Get Schools by School Category Code V2", tags = { "School" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "204", description = "NO CONTENT")})
+    public ResponseEntity<List<SchoolDetail>> getSchoolsBySchoolCategory(@RequestParam(required = false) String schoolCategoryCode) {
+        return response.GET(schoolService.getSchoolDetailsBySchoolCategoryCode(schoolCategoryCode));
+    }
+
+    @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_DETAIL_URL_MAPPING_V2 + EducGradTraxApiConstants.GET_SCHOOL_BY_CODE_MAPPING)
+    @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
+    @Operation(summary = "Find School Details by Mincode from cache", description = "Get School Details by Mincode from cache", tags = { "School" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "204", description = "NO CONTENT")})
+    public ResponseEntity<SchoolDetail> getSchoolDetailsByMincode(@PathVariable String minCode) {
+        log.debug("getSchoolDetails V2 : ");
+        SchoolDetail schoolDetailResponse = schoolService.getSchoolDetailByMincodeFromRedisCache(minCode);
+        if(schoolDetailResponse != null) {
+            return response.GET(schoolDetailResponse);
+        }else {
+            return response.NOT_FOUND();
+        }
+    }
+
 
 }
