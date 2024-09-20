@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -19,6 +21,8 @@ public class TraxGraduationUpdateDTO extends TraxStudentUpdateDTO {
     private String studentGrade;
     // MINCODE
     private String schoolOfRecord;
+    // SchoolId
+    private UUID schoolOfRecordId;
     // SLP_DATE
     private String slpDate;
     // STUD_CITIZ
