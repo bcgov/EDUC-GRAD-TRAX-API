@@ -1,0 +1,19 @@
+meta {
+  name: Save TraxStudentNo
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{rootURL}}/api/v1/trax/common/trax-student-no
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "studNo": "",
+    "status": "",
+    "reason": ""
+  }
+}
