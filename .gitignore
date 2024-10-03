@@ -54,5 +54,5 @@ build/
 ### VS Code ###
 .vscode/
 
-### local dev ###
+### Local dev ###
 **/application-local.yaml

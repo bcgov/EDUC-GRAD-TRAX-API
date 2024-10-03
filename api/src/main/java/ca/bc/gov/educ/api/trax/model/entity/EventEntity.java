@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.trax.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.GenericGenerator;
@@ -58,6 +59,7 @@ public class EventEntity {
   /**
    * The EventEntity payload.
    */
+  @JsonIgnore
   @NotNull(message = "eventPayload cannot be null")
   @Lob
   @Column(name = "EVENT_PAYLOAD")
@@ -88,6 +90,7 @@ public class EventEntity {
   @Column(name = "ACTIVITY_CODE")
   private String activityCode;
 
+  @JsonIgnore
   @OneToOne(cascade = CascadeType.ALL, mappedBy = "event")
   private EventHistoryEntity eventHistoryEntity;
 

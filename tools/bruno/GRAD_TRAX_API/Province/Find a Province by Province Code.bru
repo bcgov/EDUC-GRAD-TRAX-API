@@ -1,0 +1,11 @@
+meta {
+  name: Find a Province by Province Code
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{rootURL}}/api/v1/trax/code/province/{provinceCode}
+  body: none
+  auth: none
+}
