@@ -55,7 +55,7 @@ public class SchoolController {
             @ApiResponse(responseCode = "204", description = "NO CONTENT")})
     public ResponseEntity<School> getSchoolByMincode(@PathVariable String minCode) {
         log.debug("getSchoolByMincode V2 : ");
-        School schoolResponse = schoolService.getSchoolByMincodeFromRedisCache(minCode);
+        School schoolResponse = schoolService.getSchoolByMinCodeFromRedisCache(minCode);
         if(schoolResponse != null) {
             return response.GET(schoolResponse);
         }else {

@@ -10,33 +10,20 @@ import java.util.Objects;
 public class School implements Comparable<School> {
 
 	private String minCode;
+	private String schoolId;
     private String schoolName;
     private String districtName;
     private String transcriptEligibility;    
     private String certificateEligibility;
-    private String independentDesignation;    
-    private String mailerType;    
     private String address1;    
     private String address2;    
     private String city;    
-    private String provCode; 
-    private String provinceName;
-    private String countryCode; 
-    private String countryName;
+    private String provCode;
+    private String countryCode;
     private String postal;
-    private String independentAffiliation;
-    private String openFlag;    
-    private String signatureDistrict;
-    private String newMinCode;    
-    private String schoolOrg;    
-    private String appendTrans;
-    private String ministryContact;
-    private String principalName;
-    private String schoolPhone;
-    private String schoolFax;
-    private String schoolEmail;
-
-	private String schoolCategory;
+	private String openFlag;
+	private String schoolCategoryCode;
+	private String schoolCategoryCodeInstitute;
 
 	public String getSchoolName() {
 		return  schoolName != null ? schoolName.trim(): "";
@@ -57,53 +44,9 @@ public class School implements Comparable<School> {
 	public String getCity() {
 		return city != null ? city.trim(): "";
 	}
-
-	public String getProvinceName() {
-		return provinceName != null ? provinceName.trim(): "";
-	}
-	
-	public String getCountryName() {
-		return countryName != null ? countryName.trim(): "";
-	}
 	
 	public String getPostal() {
 		return postal != null ? postal.trim(): "";
-	}
-	
-	public String getIndependentDesignation() {
-		return independentDesignation != null ? independentDesignation.trim(): "";
-	}
-	
-	public String getIndependentAffiliation() {
-		return independentAffiliation != null ? independentAffiliation.trim(): "";
-	}
-	
-	public String getOpenFlag() {
-		return openFlag != null ? openFlag.trim(): "";
-	}
-
-	public String getReportingFlag() {
-		return getOpenFlag();
-	}
-	
-	public String getSignatureDistrict() {
-		return signatureDistrict != null ? signatureDistrict.trim(): "";
-	}
-	
-	public String getSchoolEmail() {
-		return  schoolEmail != null ? schoolEmail.trim(): "";
-	}
-	
-	public String getPrincipalName() {
-		return  principalName != null ? principalName.trim(): "";
-	}
-	
-	public String getAppendTrans() {
-		return  appendTrans != null ? appendTrans.trim(): "";
-	}
-	
-	public String getMinistryContact() {
-		return  ministryContact != null ? ministryContact.trim(): "";
 	}
 
 	public String getMinCode() {
@@ -126,16 +69,10 @@ public class School implements Comparable<School> {
 
 	@Override
 	public String toString() {
-		return "School [minCode=" + minCode + ", schoolName=" + schoolName + ", districtName=" + districtName
-				+ ", transcriptEligibility=" + transcriptEligibility + ", certificateEligibility="
-				+ certificateEligibility + ", independentDesignation=" + independentDesignation + ", mailerType="
-				+ mailerType + ", address1=" + address1 + ", address2=" + address2 + ", city=" + city + ", provCode="
-				+ provCode + ", provinceName=" + provinceName + ", countryCode=" + countryCode + ", countryName="
-				+ countryName + ", postal=" + postal + ", independentAffiliation=" + independentAffiliation
-				+ ", openFlag=" + openFlag + ", signatureDistrict=" + signatureDistrict + ", newMinCode=" + newMinCode
-				+ ", schoolOrg=" + schoolOrg + ", appendTrans=" + appendTrans + ", ministryContact=" + ministryContact
-				+ ", principalName=" + principalName + ", schoolPhone=" + schoolPhone + ", schoolFax=" + schoolFax
-				+ ", schoolEmail=" + schoolEmail + "]";
+		return "School [minCode=" + minCode + ", schoolId=" + schoolId + ", schoolCategoryCode=" + schoolCategoryCode + ", schoolCategoryCodeInstitute=" + schoolCategoryCodeInstitute
+				+ ", schoolName=" + schoolName + ", districtName=" + districtName + ", transcriptEligibility=" + transcriptEligibility + ", certificateEligibility=" + certificateEligibility
+				+ ", address1=" + address1 + ", address2=" + address2 + ", city=" + city + ", provCode=" + provCode + ", countryCode=" + countryCode + ", postal=" + postal + ", openFlag=" + openFlag
+				+ "]";
 	}
 
 	@Override

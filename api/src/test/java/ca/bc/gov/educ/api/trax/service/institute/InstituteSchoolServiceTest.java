@@ -247,7 +247,7 @@ public class InstituteSchoolServiceTest {
 				.thenReturn(schoolEntity);
 		when(this.schoolTransformer.transformToDTO(schoolEntity))
 				.thenReturn(school);
-		assertEquals(school, schoolService.getSchoolByMincodeFromRedisCache(mincode));
+		assertEquals(school, schoolService.getSchoolByMinCodeFromRedisCache(mincode));
 	}
 
 	@Test

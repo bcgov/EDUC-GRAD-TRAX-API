@@ -69,9 +69,9 @@ public class SchoolService {
 		return  schoolTransformer.transformToDTO(schoolRedisRepository.findAll());
 	}
 
-	public School getSchoolByMincodeFromRedisCache(String mincode) {
-		log.debug("Get School by Mincode from Redis Cache");
-		return schoolTransformer.transformToDTO(schoolRedisRepository.findByMincode(mincode));
+	public School getSchoolByMinCodeFromRedisCache(String minCode) {
+		log.debug("Get School by Mincode from Redis Cache: {}", minCode);
+		return schoolTransformer.transformToDTO(schoolRedisRepository.findByMincode(minCode));
 	}
 
 	public boolean checkIfSchoolExists(String minCode) {
