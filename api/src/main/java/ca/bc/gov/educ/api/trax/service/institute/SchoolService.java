@@ -144,7 +144,7 @@ public class SchoolService {
 		SchoolDetail schoolDetail = this.restService.get(String.format(constants.getSchoolDetailsByIdFromInstituteApiUrl(), schoolId),
 				SchoolDetail.class, webClient);
 		log.debug("Retrieved school: {} from Institute API", schoolDetail.getSchoolId());
-		schoolDetailRedisRepository.save(schoolDetailTransformer.transformToEntity(schoolDetail));
+		updateSchoolCache(schoolDetail);
 	}
 
 	/**
@@ -153,6 +153,7 @@ public class SchoolService {
 	 */
 	public void updateSchoolCache(SchoolDetail schoolDetail) throws ServiceException {
 		schoolDetailRedisRepository.save(schoolDetailTransformer.transformToEntity(schoolDetail));
+		schoolRedisRepository.save(schoolDetailTransformer.transformToSchoolEntity(schoolDetail));
 	}
 
 	/**
