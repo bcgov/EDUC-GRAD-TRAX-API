@@ -1,6 +1,5 @@
 package ca.bc.gov.educ.api.trax.model.transformer.institute;
 
-import ca.bc.gov.educ.api.trax.model.dto.institute.School;
 import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolDetail;
 import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolDetailEntity;
 import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolEntity;
@@ -16,8 +15,36 @@ import java.util.stream.Collectors;
 @Component("SchoolDetailTransformer")
 public class SchoolDetailTransformer {
 
-    @Autowired
     ModelMapper modelMapper;
+
+    @Autowired
+    public SchoolDetailTransformer(ModelMapper modelMapper) {
+        this.modelMapper = modelMapper;
+    }
+
+    public SchoolEntity transformToSchoolEntity(final SchoolDetail schoolDetail) {
+        return SchoolEntity.builder()
+                .schoolId(schoolDetail.getSchoolId())
+                .districtId(schoolDetail.getDistrictId())
+                .mincode(schoolDetail.getMincode())
+                .independentAuthorityId(schoolDetail.getIndependentAuthorityId())
+                .schoolNumber(schoolDetail.getSchoolNumber())
+                .faxNumber(schoolDetail.getFaxNumber())
+                .phoneNumber(schoolDetail.getPhoneNumber())
+                .email(schoolDetail.getEmail())
+                .website(schoolDetail.getWebsite())
+                .displayName(schoolDetail.getDisplayName())
+                .displayNameNoSpecialChars(schoolDetail.getDisplayNameNoSpecialChars())
+                .schoolReportingRequirementCode(schoolDetail.getSchoolReportingRequirementCode())
+                .schoolOrganizationCode(schoolDetail.getSchoolOrganizationCode())
+                .schoolCategoryCode(schoolDetail.getSchoolCategoryCode())
+                .facilityTypeCode(schoolDetail.getFacilityTypeCode())
+                .openedDate(schoolDetail.getOpenedDate())
+                .closedDate(schoolDetail.getClosedDate())
+                .canIssueTranscripts(schoolDetail.isCanIssueTranscripts())
+                .canIssueCertificates(schoolDetail.isCanIssueCertificates())
+                .build();
+    }
 
     public SchoolDetail transformToDTO (SchoolDetailEntity schoolDetailEntity) {
         return modelMapper.map(schoolDetailEntity, SchoolDetail.class);
