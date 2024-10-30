@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.trax.model.transformer.institute;
 
 import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolDetail;
 import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolDetailEntity;
+import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolEntity;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;

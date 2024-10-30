@@ -215,8 +215,6 @@ public class TraxCommonService {
         Character archiveFlag = (Character) fields[5];
         String graduationRequirementYear = (String) fields[6];
 
-        UUID schoolOfRecordId = commonSerivce.getSchoolIdFromRedisCache(schoolOfRecord);
-
         // grad or non-grad
         Date programCompletionDate = null;
         String gradDateStr = null;

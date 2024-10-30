@@ -106,7 +106,6 @@ public class TraxUpdateService {
 
     private ConvGradStudent populateNewStudent(String pen) {
         ConvGradStudent payload = null;
-        String accessToken = fetchAccessToken();
         List<ConvGradStudent> results = traxCommonService.getStudentMasterDataFromTrax(pen);
         if (results != null && !results.isEmpty()) {
             payload = results.get(0);
@@ -135,7 +134,6 @@ public class TraxUpdateService {
     private TraxStudentUpdateDTO populateEventPayload(String updateType, String pen) {
         TraxStudentUpdateDTO result = null;
         ConvGradStudent traxStudent;
-        String accessToken = fetchAccessToken();
         List<ConvGradStudent> results = traxCommonService.getStudentMasterDataFromTrax(pen);
         if (results != null && !results.isEmpty()) {
             traxStudent = results.get(0);
@@ -190,11 +188,4 @@ public class TraxUpdateService {
         }
     }
 
-    private String fetchAccessToken() {
-        ResponseObj res = restUtils.getTokenResponseObject();
-        if (res != null) {
-            return res.getAccess_token();
-        }
-        return null;
-    }
 }
