@@ -133,6 +133,11 @@ public class SchoolService {
 				schoolDetailRedisRepository.findBySchoolCategoryCode(schoolCategoryCode));
 	}
 
+	public List<SchoolDetail> getSchoolDetailsByDistrictFromRedisCache(String districtId) {
+		return schoolDetailTransformer.transformToDTO(
+				schoolDetailRedisRepository.findByDistrictId(districtId));
+	}
+
 	/**
 	 * Updates the school and school details in the cache
 	 * based on schoolId

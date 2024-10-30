@@ -80,6 +80,25 @@ public class CommonServiceTest {
     }
 
     @Test
+    public void testGetSchoolsByDistrictNumber() {
+        String minCode = "12345678";
+        String distNo = "123";
+        SchoolDetail schoolDetail = mockInstituteData(minCode, distNo, "PUBLIC", "01");
+
+        when(schoolService.getSchoolDetailsByDistrictFromRedisCache(schoolDetail.getDistrictId())).thenReturn(List.of(schoolDetail));
+
+        var result = commonService.getSchoolsByDistrictNumberFromRedisCache(distNo);
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getSchoolId()).isEqualTo(schoolDetail.getSchoolId());
+    }
+
+    @Test
+    public void testGetSchoolsByDistrictNumber_returnEmptyList() {
+        var result = commonService.getSchoolsByDistrictNumberFromRedisCache("123");
+        assertThat(result).isEmpty();
+    }
+
+    @Test
     public void testGetSchoolClob() {
         String minCode = "12345678";
         String distNo = "123";
@@ -131,6 +150,7 @@ public class CommonServiceTest {
 
         when(this.codeService.getSchoolCategoryCodeFromRedisCache(schoolCategoryCode)).thenReturn(schoolCategory);
         when(this.districtService.getDistrictByIdFromRedisCache(district.getDistrictId())).thenReturn(district);
+        when(this.districtService.getDistrictByDistNoFromRedisCache(district.getDistrictNumber())).thenReturn(district);
         when(this.schoolService.getSchoolDetailByMincodeFromRedisCache(minCode)).thenReturn(schoolDetail);
         when(this.schoolService.getSchoolDetailsFromRedisCache()).thenReturn(List.of(schoolDetail));
         when(this.schoolService.getSchoolDetailByMincodeFromRedisCache(minCode)).thenReturn(schoolDetail);

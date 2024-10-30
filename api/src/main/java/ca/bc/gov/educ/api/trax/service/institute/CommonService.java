@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.trax.service.institute;
 
 import ca.bc.gov.educ.api.trax.model.dto.School;
+import ca.bc.gov.educ.api.trax.model.dto.institute.District;
 import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolAddress;
 import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolCategoryCode;
 import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolDetail;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -52,6 +54,15 @@ public class CommonService {
     public String getSchoolIdStrFromRedisCache(String minCode) {
         ca.bc.gov.educ.api.trax.model.dto.institute.School school = schoolService.getSchoolByMinCodeFromRedisCache(minCode);
         return school != null && StringUtils.isNotBlank(school.getSchoolId())? school.getSchoolId() : null;
+    }
+
+    public List<School> getSchoolsByDistrictNumberFromRedisCache(String districtNumber) {
+        District district = districtService.getDistrictByDistNoFromRedisCache(districtNumber);
+        if (district != null) {
+            List<SchoolDetail> schoolDetails = schoolService.getSchoolDetailsByDistrictFromRedisCache(district.getDistrictId());
+            return schoolDetails.stream().map(this::convertSchoolDetailIntoSchoolClob).toList();
+        }
+        return new ArrayList<>();
     }
 
     private School convertSchoolDetailIntoSchoolClob(ca.bc.gov.educ.api.trax.model.dto.institute.SchoolDetail schoolDetail) {

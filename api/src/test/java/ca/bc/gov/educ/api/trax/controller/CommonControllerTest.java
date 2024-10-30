@@ -56,6 +56,19 @@ public class CommonControllerTest {
     }
 
     @Test
+    public void testGetSchoolsForClobDataByDistrictNumber() {
+        String distNo = "003";
+        School school = new School();
+        school.setSchoolId(UUID.randomUUID().toString());
+        school.setSchoolName("Test School");
+        school.setMinCode("12345678");
+
+        Mockito.when(commonService.getSchoolsByDistrictNumberFromRedisCache(distNo)).thenReturn(List.of(school));
+        commonController.getSchoolsForClobDataByDistrictNumber(distNo);
+        Mockito.verify(commonService).getSchoolsByDistrictNumberFromRedisCache(distNo);
+    }
+
+    @Test
     public void testGetSchoolClobData() {
         School school = new School();
         school.setSchoolId(UUID.randomUUID().toString());

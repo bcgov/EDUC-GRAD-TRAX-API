@@ -42,9 +42,9 @@ public class CommonController {
     @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
     @Operation(summary = "Find All Schools Clob data for GRAD Algorithm Data from cache", description = "Get All Schools Clob data for GRAD Algorithm Data from cache", tags = { "Algorithm Data" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
-    public List<School> getAllSchoolsForClobData() {
+    public ResponseEntity<List<School>> getAllSchoolsForClobData() {
         log.debug("getAllSchoolsClob : ");
-        return commonService.getSchoolsForClobDataFromRedisCache();
+        return response.GET(commonService.getSchoolsForClobDataFromRedisCache());
     }
 
     @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_CLOB_URL_MAPPING_V2 + EducGradTraxApiConstants.GET_SCHOOL_BY_CODE_MAPPING)
@@ -55,7 +55,7 @@ public class CommonController {
             @ApiResponse(responseCode = "422", description = "UNPROCESSABLE CONTENT"),
             @ApiResponse(responseCode = "204", description = "NO CONTENT")})
     public ResponseEntity<School> getSchoolForClobDataByMinCode(@PathVariable String minCode) {
-        log.debug("getSchoolClobData : {}", minCode);
+        log.debug("getSchoolClobData by minCode: {}", minCode);
         validation.requiredField(minCode, "minCode");
         if (validation.hasErrors()) {
             validation.stopOnErrors();
@@ -69,4 +69,14 @@ public class CommonController {
             return response.NOT_FOUND();
         }
     }
+
+    @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOLS_BY_DISTRICT_URL_MAPPING_V2 + EducGradTraxApiConstants.GET_DISTRICT_BY_DISTNO_MAPPING)
+    @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
+    @Operation(summary = "Find Schools Clob data by District Number for GRAD Algorithm Data from cache", description = "Get Schools Clob data by District Number for GRAD Algorithm Data from cache", tags = { "Algorithm Data" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+    public ResponseEntity<List<School>> getSchoolsForClobDataByDistrictNumber(@PathVariable String distNo) {
+        log.debug("getSchoolsClob by districtNumber: {}", distNo);
+        return response.GET(commonService.getSchoolsByDistrictNumberFromRedisCache(distNo));
+    }
+
 }
