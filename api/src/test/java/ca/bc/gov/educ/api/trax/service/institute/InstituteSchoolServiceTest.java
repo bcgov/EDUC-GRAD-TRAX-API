@@ -247,7 +247,40 @@ public class InstituteSchoolServiceTest {
 				.thenReturn(schoolEntity);
 		when(this.schoolTransformer.transformToDTO(schoolEntity))
 				.thenReturn(school);
-		assertEquals(school, schoolService.getSchoolByMincodeFromRedisCache(mincode));
+		assertEquals(school, schoolService.getSchoolByMinCodeFromRedisCache(mincode));
+	}
+
+	@Test
+	public void whenGetSchoolDetailsByDistrictFromRedisCache_ReturnSchools() {
+		String districtId = "DistID";
+		String mincode = "12345678";
+		SchoolDetail schoolDetail = new SchoolDetail();
+		schoolDetail.setSchoolId("ID");
+		schoolDetail.setDistrictId(districtId);
+		schoolDetail.setSchoolNumber("12345");
+		schoolDetail.setMincode(mincode);
+		schoolDetail.setSchoolCategoryCode("SCC");
+		schoolDetail.setEmail("abc@xyz.ca");
+
+		List<SchoolDetail> schoolDetails = new ArrayList<>();
+		schoolDetails.add(schoolDetail);
+
+		SchoolDetailEntity schoolDetailEntity = new SchoolDetailEntity();
+		schoolDetailEntity.setSchoolId("ID");
+		schoolDetailEntity.setDistrictId(districtId);
+		schoolDetailEntity.setSchoolNumber("12345");
+		schoolDetailEntity.setMincode(mincode);
+		schoolDetailEntity.setSchoolCategoryCode("SCC");
+		schoolDetailEntity.setEmail("abc@xyz.ca");
+
+		List<SchoolDetailEntity> schoolDetailEntities = new ArrayList<>();
+		schoolDetailEntities.add(schoolDetailEntity);
+
+		when(this.schoolDetailRedisRepository.findByDistrictId(districtId))
+				.thenReturn(List.of(schoolDetailEntity));
+		when(this.schoolDetailTransformer.transformToDTO(schoolDetailEntities))
+				.thenReturn(schoolDetails);
+		assertEquals(schoolDetails, schoolService.getSchoolDetailsByDistrictFromRedisCache(districtId));
 	}
 
 	@Test

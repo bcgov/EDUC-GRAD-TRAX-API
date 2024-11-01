@@ -44,7 +44,7 @@ public class SchoolController {
     @Operation(summary = "Find All Schools from Cache", description = "Get All Schools from Cache", tags = { "School" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
     public List<School> getAllSchools() {
-    	log.debug("getAllSchools : ");
+    	log.debug("getAllSchools V2 : ");
         return schoolService.getSchoolsFromRedisCache();
     }
 
@@ -54,8 +54,8 @@ public class SchoolController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "204", description = "NO CONTENT")})
     public ResponseEntity<School> getSchoolByMincode(@PathVariable String minCode) {
-        log.debug("getSchoolByMincode : ");
-        School schoolResponse = schoolService.getSchoolByMincodeFromRedisCache(minCode);
+        log.debug("getSchoolByMincode V2 : ");
+        School schoolResponse = schoolService.getSchoolByMinCodeFromRedisCache(minCode);
         if(schoolResponse != null) {
             return response.GET(schoolResponse);
         }else {
@@ -68,7 +68,7 @@ public class SchoolController {
     @Operation(summary = "Find All School details from Cache", description = "Get All School details from Cache", tags = { "School" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
     public List<SchoolDetail> getAllSchoolDetails() {
-        log.debug("getAllSchoolDetails : ");
+        log.debug("getAllSchoolDetails V2: ");
         return schoolService.getSchoolDetailsFromRedisCache();
     }
 
@@ -96,7 +96,7 @@ public class SchoolController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "204", description = "NO CONTENT")})
     public ResponseEntity<SchoolDetail> getSchoolDetailsByMincode(@PathVariable String minCode) {
-        log.debug("getSchoolDetails : ");
+        log.debug("getSchoolDetails V2 : ");
         SchoolDetail schoolDetailResponse = schoolService.getSchoolDetailByMincodeFromRedisCache(minCode);
         if(schoolDetailResponse != null) {
             return response.GET(schoolDetailResponse);

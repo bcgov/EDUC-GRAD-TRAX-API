@@ -11,6 +11,7 @@ import ca.bc.gov.educ.api.trax.model.entity.TraxUpdatedPubEvent;
 import ca.bc.gov.educ.api.trax.model.transformer.TraxUpdateInGradTransformer;
 import ca.bc.gov.educ.api.trax.repository.TraxUpdateInGradRepository;
 import ca.bc.gov.educ.api.trax.repository.TraxUpdatedPubEventRepository;
+import ca.bc.gov.educ.api.trax.service.institute.CommonService;
 import ca.bc.gov.educ.api.trax.util.JsonUtil;
 import ca.bc.gov.educ.api.trax.util.RestUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -59,6 +60,9 @@ public class TraxUpdateServiceTest {
 
     @MockBean
     TraxCommonService traxCommonService;
+
+    @MockBean
+    CommonService commonService;
 
     @Autowired
     TraxUpdateInGradTransformer traxUpdateInGradTransformer;
@@ -179,7 +183,7 @@ public class TraxUpdateServiceTest {
         when(traxUpdateInGradRepository.findOutstandingUpdates(any())).thenReturn(Arrays.asList(traxUpdateInGradEntity));
         when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
         when(traxCommonService.getStudentMasterDataFromTrax(pen)).thenReturn(Arrays.asList(traxStudent));
-        when(traxCommonService.getSchoolIdFromRedisCache(mincode)).thenReturn(schoolOfRecordId);
+        when(commonService.getSchoolIdFromRedisCache(mincode)).thenReturn(schoolOfRecordId);
 
         traxUpdateService.publishTraxUpdatedEvent(traxUpdateInGradEntity);
         traxUpdateService.updateStatus(traxUpdateInGradEntity);
@@ -342,7 +346,7 @@ public class TraxUpdateServiceTest {
         when(restUtils.getTokenResponseObject()).thenReturn(tokenObj);
         when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
         when(traxCommonService.getStudentMasterDataFromTrax(pen)).thenReturn(Arrays.asList(traxStudent));
-        when(traxCommonService.getSchoolIdFromRedisCache(mincode)).thenReturn(schoolOfRecordId);
+        when(commonService.getSchoolIdFromRedisCache(mincode)).thenReturn(schoolOfRecordId);
 
         traxUpdateService.publishTraxUpdatedEvent(traxUpdateInGradEntity);
         traxUpdateService.updateStatus(traxUpdateInGradEntity);
@@ -397,7 +401,7 @@ public class TraxUpdateServiceTest {
         when(restUtils.getTokenResponseObject()).thenReturn(tokenObj);
         when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
         when(traxCommonService.getStudentMasterDataFromTrax(pen)).thenReturn(Arrays.asList(traxStudent));
-        when(traxCommonService.getSchoolIdFromRedisCache(mincode)).thenReturn(schoolOfRecordId);
+        when(commonService.getSchoolIdFromRedisCache(mincode)).thenReturn(schoolOfRecordId);
 
         traxUpdateService.publishTraxUpdatedEvent(traxUpdateInGradEntity);
         traxUpdateService.updateStatus(traxUpdateInGradEntity);

@@ -47,7 +47,8 @@ public class EducGradTraxApiConstants {
     public static final String GRAD_TSW_URL_MAPPING_V2 = GRAD_TRAX_API_ROOT_MAPPING_V2 + "/tsw";
     public static final String GRAD_EDW_URL_MAPPING_V1 = GRAD_TRAX_API_ROOT_MAPPING_V1 + "/edw";
     public static final String GRAD_EDW_URL_MAPPING_V2 = GRAD_TRAX_API_ROOT_MAPPING_V2 + "/edw";
-
+    public static final String GRAD_SCHOOL_CLOB_URL_MAPPING_V2 = GRAD_TRAX_API_ROOT_MAPPING_V2  + "/school-clob";
+    public static final String GRAD_SCHOOLS_BY_DISTRICT_URL_MAPPING_V2 = GRAD_TRAX_API_ROOT_MAPPING_V2  + "/schools-by-district";
 
     // Service Methods Mappings
     public static final String GET_ALL_COUNTRY_MAPPING = "/country";
@@ -86,6 +87,9 @@ public class EducGradTraxApiConstants {
     public static final String GET_COURSE_REQUIREMENT_LIST_MAPPING = "/course-requirements";
     public static final String POST_SAVE_TRAX_STUDENT_NO_MAPPING = "/trax-student-no";
     public static final String DELETE_TRAX_STUDENT_NO_MAPPING = "/trax-student-no/{pen}";
+
+    // Event urls
+    public static final String EVENT_HISTORY_MAPPING_V1 = GRAD_TRAX_API_ROOT_MAPPING_V1 + "/event/history";
 
     //Default Attribute value constants
     public static final String DEFAULT_CREATED_BY = "API_GRAD_TRAX";
@@ -174,6 +178,15 @@ public class EducGradTraxApiConstants {
 
     @Value("${endpoint.institute-api.get-all-school-funding-group-codes.url}")
     private String allSchoolFundingGroupCodesFromInstituteApiUrl;
+
+    @Value("${endpoint.student-admin.school-details.url}")
+    private String studentAdminSchoolDetailsUrl;
+
+    @Value("${endpoint.student-admin.district-details.url}")
+    private String studentAdminDistrictDetailsUrl;
+
+    @Value("${endpoint.student-admin.authority-details.url}")
+    private String studentAdminAuthorityDetailsUrl;
 
     // Scheduler: ongoing updates from TRAX to GRAD
     @Value("${cron.scheduled.process.events.trax-to-grad.run}")

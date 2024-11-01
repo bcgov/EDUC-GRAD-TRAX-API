@@ -101,6 +101,8 @@ public class intstituteSchoolServiceTestToo {
 
     @MockBean
     private Subscriber subscriber;
+    @Autowired
+    private ca.bc.gov.educ.api.trax.model.transformer.SchoolTransformer schoolTransformer;
 
     @TestConfiguration
     static class TestConfigInstitute {
@@ -120,14 +122,17 @@ public class intstituteSchoolServiceTestToo {
         SchoolDetail schoolDetail = TestUtils.createSchoolDetail();
         SchoolDetailEntity schoolDetailEntity = schoolDetailTransformer.transformToEntity(schoolDetail);
         Optional<SchoolDetailEntity> schoolDetailEntityOptional = Optional.of(schoolDetailEntity);
+        Optional<SchoolEntity> schoolEntityOptional = Optional.of(schoolDetailTransformer.transformToSchoolEntity(schoolDetail));
         when(this.restServiceMock.get(String.format(constants.getSchoolDetailsByIdFromInstituteApiUrl(), schoolDetail.getSchoolId()),
                 SchoolDetail.class, this.webClientMock)).thenReturn(schoolDetail);
         when(this.schoolDetailRedisRepository.findById(schoolDetail.getSchoolId())).thenReturn(schoolDetailEntityOptional);
+        when(this.schoolRedisRepository.findById(schoolDetail.getSchoolId())).thenReturn(schoolEntityOptional);
         doNothing().when(this.schoolService).updateSchoolCache(schoolDetail.getSchoolId());
         this.schoolService.updateSchoolCache(schoolDetail.getSchoolId());
         Optional<SchoolDetailEntity> response = this.schoolDetailRedisRepository.findById(schoolDetail.getSchoolId());
+        Optional<SchoolEntity> schoolResponse = this.schoolRedisRepository.findById(schoolDetail.getSchoolId());
         if (response.isPresent()) {
-            Assert.assertEquals(response.get().getSchoolId(), schoolDetail.getSchoolId());
+            Assert.assertEquals(response.get().getSchoolId(), schoolResponse.get().getSchoolId());
         } else {
             Assert.fail();
         }

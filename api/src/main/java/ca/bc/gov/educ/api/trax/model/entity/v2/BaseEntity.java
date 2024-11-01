@@ -4,12 +4,18 @@ import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.ThreadLocalStateUtil;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.PastOrPresent;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalDateTime;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@SuperBuilder
 @MappedSuperclass
 public class BaseEntity {
 
@@ -43,7 +49,10 @@ public class BaseEntity {
 
 	private void initUserInfo() {
 		String user = ThreadLocalStateUtil.getCurrentUser();
-		this.updateUser = (StringUtils.isBlank(user)) ? EducGradTraxApiConstants.DEFAULT_UPDATED_BY : user;
+		if(this.updateUser == null){
+			this.updateUser = (StringUtils.isBlank(user)) ? EducGradTraxApiConstants.DEFAULT_UPDATED_BY : user;
+		}
 		this.createUser = (StringUtils.isBlank(createUser) && StringUtils.isBlank(user)) ? EducGradTraxApiConstants.DEFAULT_CREATED_BY : user;
 	}
+
 }

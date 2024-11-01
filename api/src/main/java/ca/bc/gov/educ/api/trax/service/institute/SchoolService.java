@@ -69,9 +69,9 @@ public class SchoolService {
 		return  schoolTransformer.transformToDTO(schoolRedisRepository.findAll());
 	}
 
-	public School getSchoolByMincodeFromRedisCache(String mincode) {
-		log.debug("Get School by Mincode from Redis Cache");
-		return schoolTransformer.transformToDTO(schoolRedisRepository.findByMincode(mincode));
+	public School getSchoolByMinCodeFromRedisCache(String minCode) {
+		log.debug("Get School by Mincode from Redis Cache: {}", minCode);
+		return schoolTransformer.transformToDTO(schoolRedisRepository.findByMincode(minCode));
 	}
 
 	public boolean checkIfSchoolExists(String minCode) {
@@ -133,6 +133,11 @@ public class SchoolService {
 				schoolDetailRedisRepository.findBySchoolCategoryCode(schoolCategoryCode));
 	}
 
+	public List<SchoolDetail> getSchoolDetailsByDistrictFromRedisCache(String districtId) {
+		return schoolDetailTransformer.transformToDTO(
+				schoolDetailRedisRepository.findByDistrictId(districtId));
+	}
+
 	/**
 	 * Updates the school and school details in the cache
 	 * based on schoolId
@@ -144,7 +149,7 @@ public class SchoolService {
 		SchoolDetail schoolDetail = this.restService.get(String.format(constants.getSchoolDetailsByIdFromInstituteApiUrl(), schoolId),
 				SchoolDetail.class, webClient);
 		log.debug("Retrieved school: {} from Institute API", schoolDetail.getSchoolId());
-		schoolDetailRedisRepository.save(schoolDetailTransformer.transformToEntity(schoolDetail));
+		updateSchoolCache(schoolDetail);
 	}
 
 	/**
@@ -153,6 +158,7 @@ public class SchoolService {
 	 */
 	public void updateSchoolCache(SchoolDetail schoolDetail) throws ServiceException {
 		schoolDetailRedisRepository.save(schoolDetailTransformer.transformToEntity(schoolDetail));
+		schoolRedisRepository.save(schoolDetailTransformer.transformToSchoolEntity(schoolDetail));
 	}
 
 	/**
