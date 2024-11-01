@@ -26,23 +26,26 @@ import java.util.List;
 @Service("InstituteSchoolService")
 public class SchoolService {
 
-	@Autowired
-	private EducGradTraxApiConstants constants;
-	@Autowired
-	@Qualifier("instituteWebClient")
-	private WebClient webClient;
-	@Autowired
+	private final EducGradTraxApiConstants constants;
+	private final WebClient webClient;
 	SchoolRedisRepository schoolRedisRepository;
-	@Autowired
 	SchoolDetailRedisRepository schoolDetailRedisRepository;
-	@Autowired
 	SchoolTransformer schoolTransformer;
-	@Autowired
 	SchoolDetailTransformer schoolDetailTransformer;
-	@Autowired
 	ServiceHelper<SchoolService> serviceHelper;
-	@Autowired
 	RESTService restService;
+
+	@Autowired
+	public SchoolService(EducGradTraxApiConstants constants, @Qualifier("instituteWebClient") WebClient webClient, SchoolRedisRepository schoolRedisRepository, SchoolDetailRedisRepository schoolDetailRedisRepository, SchoolTransformer schoolTransformer, SchoolDetailTransformer schoolDetailTransformer, ServiceHelper<SchoolService> serviceHelper, RESTService restService) {
+		this.constants = constants;
+		this.webClient = webClient;
+		this.schoolRedisRepository = schoolRedisRepository;
+		this.schoolDetailRedisRepository = schoolDetailRedisRepository;
+		this.schoolTransformer = schoolTransformer;
+		this.schoolDetailTransformer = schoolDetailTransformer;
+		this.serviceHelper = serviceHelper;
+		this.restService = restService;
+	}
 
 	public List<School> getSchoolsFromInstituteApi() {
 		try {
@@ -139,12 +142,7 @@ public class SchoolService {
 	 * @param schoolId the school id guid
 	 */
 	public void updateSchoolCache(String schoolId) throws ServiceException {
-		// get details from institute
-		log.debug("Updating school {} in cache.",  schoolId);
-		SchoolDetail schoolDetail = this.restService.get(String.format(constants.getSchoolDetailsByIdFromInstituteApiUrl(), schoolId),
-				SchoolDetail.class, webClient);
-		log.debug("Retrieved school: {} from Institute API", schoolDetail.getSchoolId());
-		updateSchoolCache(schoolDetail);
+		updateSchoolCache(this.getSchoolDetailByIdFromInstituteApi(schoolId));
 	}
 
 	/**
