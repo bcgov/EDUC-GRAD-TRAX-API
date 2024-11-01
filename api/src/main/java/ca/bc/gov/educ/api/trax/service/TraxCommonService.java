@@ -16,7 +16,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -189,7 +188,7 @@ public class TraxCommonService {
     }
 
     public UUID getSchoolIdFromRedisCache(String mincode) {
-        ca.bc.gov.educ.api.trax.model.dto.institute.School school = schoolService.getSchoolByMincodeFromRedisCache(mincode);
+        ca.bc.gov.educ.api.trax.model.dto.institute.School school = schoolService.getSchoolByMinCodeFromRedisCache(mincode);
         return school != null && StringUtils.isNotBlank(school.getSchoolId())? UUID.fromString(school.getSchoolId()) : null;
     }
 
