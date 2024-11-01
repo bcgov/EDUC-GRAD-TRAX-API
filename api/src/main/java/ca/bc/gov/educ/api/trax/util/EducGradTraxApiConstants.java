@@ -47,7 +47,8 @@ public class EducGradTraxApiConstants {
     public static final String GRAD_TSW_URL_MAPPING_V2 = GRAD_TRAX_API_ROOT_MAPPING_V2 + "/tsw";
     public static final String GRAD_EDW_URL_MAPPING_V1 = GRAD_TRAX_API_ROOT_MAPPING_V1 + "/edw";
     public static final String GRAD_EDW_URL_MAPPING_V2 = GRAD_TRAX_API_ROOT_MAPPING_V2 + "/edw";
-
+    public static final String GRAD_SCHOOL_CLOB_URL_MAPPING_V2 = GRAD_TRAX_API_ROOT_MAPPING_V2  + "/school-clob";
+    public static final String GRAD_SCHOOLS_BY_DISTRICT_URL_MAPPING_V2 = GRAD_TRAX_API_ROOT_MAPPING_V2  + "/schools-by-district";
 
     // Service Methods Mappings
     public static final String GET_ALL_COUNTRY_MAPPING = "/country";

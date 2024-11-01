@@ -17,6 +17,7 @@ public class SchoolTransformer {
     ModelMapper modelMapper;
 
     public School transformToDTO (SchoolEntity schoolEntity) {
+        if (schoolEntity == null) return null;
         return modelMapper.map(schoolEntity, School.class);
     }
 

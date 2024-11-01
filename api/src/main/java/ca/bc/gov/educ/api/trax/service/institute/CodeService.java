@@ -62,6 +62,11 @@ public class CodeService {
 		log.info(String.format("%s School Category Codes Loaded into cache.", schoolCategoryCodes.size()));
 	}
 
+	public SchoolCategoryCode getSchoolCategoryCodeFromRedisCache(String schoolCategoryCode) {
+		log.debug("**** Getting school category codes from Redis Cache.");
+		return  schoolCategoryCodeTransformer.transformToDTO(schoolCategoryCodeRedisRepository.findById(schoolCategoryCode));
+	}
+
 	public List<SchoolCategoryCode> getSchoolCategoryCodesFromRedisCache() {
 		log.debug("**** Getting school category codes from Redis Cache.");
 		return  schoolCategoryCodeTransformer.transformToDTO(schoolCategoryCodeRedisRepository.findAll());

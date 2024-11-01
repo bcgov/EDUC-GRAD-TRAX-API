@@ -8,6 +8,7 @@ import ca.bc.gov.educ.api.trax.model.transformer.TraxStudentNoTransformer;
 import ca.bc.gov.educ.api.trax.repository.GradCourseRepository;
 import ca.bc.gov.educ.api.trax.repository.TraxStudentNoRepository;
 import ca.bc.gov.educ.api.trax.repository.TraxStudentRepository;
+import ca.bc.gov.educ.api.trax.service.institute.CommonService;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +26,8 @@ import java.util.*;
 @Service
 @Slf4j
 public class TraxCommonService {
+
+    private final CommonService commonSerivce;
     private final TraxStudentRepository traxStudentRepository;
     private final TraxStudentNoRepository traxStudentNoRepository;
     private final GradCourseRepository gradCourseRepository;
@@ -35,12 +38,14 @@ public class TraxCommonService {
     private final EducGradTraxApiConstants constants;
 
     @Autowired
-    public TraxCommonService(TraxStudentRepository traxStudentRepository,
+    public TraxCommonService(CommonService commonService,
+                             TraxStudentRepository traxStudentRepository,
                              TraxStudentNoRepository traxStudentNoRepository,
                              GradCourseRepository gradCourseRepository,
                              TraxStudentNoTransformer traxStudentNoTransformer,
                              GradCourseTransformer gradCourseTransformer,
                              EducGradTraxApiConstants constants) {
+        this.commonSerivce = commonService;
         this.traxStudentRepository = traxStudentRepository;
         this.traxStudentNoRepository = traxStudentNoRepository;
         this.gradCourseRepository = gradCourseRepository;

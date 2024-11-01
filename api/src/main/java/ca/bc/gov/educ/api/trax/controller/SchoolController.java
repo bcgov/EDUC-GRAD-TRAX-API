@@ -58,9 +58,9 @@ public class SchoolController {
     @Operation(summary = "Find a School by Mincode", description = "Get a School by Mincode", tags = { "School" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
 			@ApiResponse(responseCode = "204", description = "NO CONTENT")})
-    public ResponseEntity<School> getSchoolDetails(@PathVariable String minCode, @RequestHeader(name="Authorization") String accessToken) {
+    public ResponseEntity<School> getSchoolDetails(@PathVariable String minCode) {
     	log.debug("getSchoolDetails : ");
-    	School schoolResponse = schoolService.getSchoolDetails(minCode, accessToken.replace(BEARER, ""));
+    	School schoolResponse = schoolService.getSchoolDetails(minCode);
     	if(schoolResponse != null) {
     		return response.GET(schoolResponse);
     	}else {

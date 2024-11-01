@@ -81,9 +81,9 @@ public class SchoolControllerTest {
         final School school = new School();
         school.setMinCode("1234567");
         school.setSchoolName("Test School");
-        Mockito.when(schoolService.getSchoolDetails("1234567", "accessToken")).thenReturn(school);
-        schoolController.getSchoolDetails("1234567", "accessToken");
-        Mockito.verify(schoolService).getSchoolDetails("1234567", "accessToken");
+        Mockito.when(schoolService.getSchoolDetails("1234567")).thenReturn(school);
+        schoolController.getSchoolDetails("1234567");
+        Mockito.verify(schoolService).getSchoolDetails("1234567");
 
     }
 
@@ -189,9 +189,9 @@ public class SchoolControllerTest {
         school.setDistrictId("9876543");
         school.setMincode(mincode);
 
-        Mockito.when(schoolServiceV2.getSchoolByMincodeFromRedisCache(mincode)).thenReturn(school);
+        Mockito.when(schoolServiceV2.getSchoolByMinCodeFromRedisCache(mincode)).thenReturn(school);
         schoolControllerV2.getSchoolByMincode(mincode);
-        Mockito.verify(schoolServiceV2).getSchoolByMincodeFromRedisCache(mincode);
+        Mockito.verify(schoolServiceV2).getSchoolByMinCodeFromRedisCache(mincode);
     }
 
     @Test
@@ -202,9 +202,9 @@ public class SchoolControllerTest {
         school.setDistrictId("9876543");
         school.setMincode(mincode);
 
-        Mockito.when(schoolServiceV2.getSchoolByMincodeFromRedisCache(mincode)).thenReturn(null);
+        Mockito.when(schoolServiceV2.getSchoolByMinCodeFromRedisCache(mincode)).thenReturn(null);
         schoolControllerV2.getSchoolByMincode(mincode);
-        Mockito.verify(schoolServiceV2).getSchoolByMincodeFromRedisCache(mincode);
+        Mockito.verify(schoolServiceV2).getSchoolByMinCodeFromRedisCache(mincode);
         assertEquals(responseHelper.NOT_FOUND(), schoolControllerV2.getSchoolByMincode(mincode));
     }
 
@@ -270,4 +270,5 @@ public class SchoolControllerTest {
         Mockito.verify(schoolServiceV2).getSchoolDetailByMincodeFromRedisCache(mincode);
         assertEquals(responseHelper.NOT_FOUND(), schoolControllerV2.getSchoolDetailsByMincode(mincode));
     }
+
 }

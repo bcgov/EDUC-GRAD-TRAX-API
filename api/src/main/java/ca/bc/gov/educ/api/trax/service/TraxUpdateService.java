@@ -7,6 +7,7 @@ import ca.bc.gov.educ.api.trax.model.entity.TraxUpdatedPubEvent;
 import ca.bc.gov.educ.api.trax.model.entity.TraxUpdateInGradEntity;
 import ca.bc.gov.educ.api.trax.repository.TraxUpdatedPubEventRepository;
 import ca.bc.gov.educ.api.trax.repository.TraxUpdateInGradRepository;
+import ca.bc.gov.educ.api.trax.service.institute.CommonService;
 import ca.bc.gov.educ.api.trax.util.JsonUtil;
 import ca.bc.gov.educ.api.trax.util.RestUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -32,6 +33,9 @@ public class TraxUpdateService {
 
     @Autowired
     private TraxCommonService traxCommonService;
+
+    @Autowired
+    private CommonService commonService;
 
     @Autowired
     private TraxUpdateInGradRepository traxUpdateInGradRepository;
@@ -102,7 +106,6 @@ public class TraxUpdateService {
 
     private ConvGradStudent populateNewStudent(String pen) {
         ConvGradStudent payload = null;
-        String accessToken = fetchAccessToken();
         List<ConvGradStudent> results = traxCommonService.getStudentMasterDataFromTrax(pen);
         if (results != null && !results.isEmpty()) {
             payload = results.get(0);
@@ -131,7 +134,6 @@ public class TraxUpdateService {
     private TraxStudentUpdateDTO populateEventPayload(String updateType, String pen) {
         TraxStudentUpdateDTO result = null;
         ConvGradStudent traxStudent;
-        String accessToken = fetchAccessToken();
         List<ConvGradStudent> results = traxCommonService.getStudentMasterDataFromTrax(pen);
         if (results != null && !results.isEmpty()) {
             traxStudent = results.get(0);
@@ -145,6 +147,8 @@ public class TraxUpdateService {
                     gradUpdate.setGraduationRequirementYear(traxStudent.getGraduationRequirementYear());
                     gradUpdate.setStudentGrade(traxStudent.getStudentGrade());
                     gradUpdate.setSchoolOfRecord(traxStudent.getSchoolOfRecord());
+                    // TODO(jsung): implement after GRAD2-2645 is merged
+//                    gradUpdate.setSchoolOfRecordId(commonService.getSchoolIdFromRedisCache(gradUpdate.getSchoolOfRecord()));
                     gradUpdate.setSlpDate(traxStudent.getSlpDate());
                     gradUpdate.setCitizenship(traxStudent.getStudentCitizenship());
                     gradUpdate.setStudentStatus(traxStudent.getStudentStatus());
@@ -184,11 +188,4 @@ public class TraxUpdateService {
         }
     }
 
-    private String fetchAccessToken() {
-        ResponseObj res = restUtils.getTokenResponseObject();
-        if (res != null) {
-            return res.getAccess_token();
-        }
-        return null;
-    }
 }

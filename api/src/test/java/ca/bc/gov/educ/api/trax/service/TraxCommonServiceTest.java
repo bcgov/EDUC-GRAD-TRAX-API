@@ -10,6 +10,7 @@ import ca.bc.gov.educ.api.trax.model.entity.TraxStudentNoEntity;
 import ca.bc.gov.educ.api.trax.model.transformer.GradCourseTransformer;
 import ca.bc.gov.educ.api.trax.model.transformer.TraxStudentNoTransformer;
 import ca.bc.gov.educ.api.trax.repository.*;
+import ca.bc.gov.educ.api.trax.service.institute.CommonService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -56,6 +57,9 @@ public class TraxCommonServiceTest {
 
     @MockBean
     TraxStudentNoRepository traxStudentNoRepository;
+
+    @MockBean
+    CommonService commonService;
 
     @MockBean
     SchoolService schoolService;
@@ -116,6 +120,7 @@ public class TraxCommonServiceTest {
         list.add(cols);
 
         when(this.traxStudentRepository.loadTraxStudent(pen)).thenReturn(results);
+        when(this.commonService.getSchoolIdFromRedisCache("12345678")).thenReturn(UUID.randomUUID());
 
         var result = traxCommonService.getStudentMasterDataFromTrax(pen);
 

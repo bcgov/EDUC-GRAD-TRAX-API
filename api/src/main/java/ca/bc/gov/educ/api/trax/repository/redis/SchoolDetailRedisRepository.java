@@ -12,5 +12,7 @@ public interface SchoolDetailRedisRepository extends CrudRepository<SchoolDetail
 
     List<SchoolDetailEntity> findBySchoolCategoryCode(String schoolCategoryCode);
 
+    List<SchoolDetailEntity> findByDistrictId(String districtId);
+
     SchoolDetailEntity findByMincode(String mincode);
 }
