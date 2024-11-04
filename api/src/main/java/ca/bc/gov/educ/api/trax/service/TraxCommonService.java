@@ -8,7 +8,7 @@ import ca.bc.gov.educ.api.trax.model.transformer.TraxStudentNoTransformer;
 import ca.bc.gov.educ.api.trax.repository.GradCourseRepository;
 import ca.bc.gov.educ.api.trax.repository.TraxStudentNoRepository;
 import ca.bc.gov.educ.api.trax.repository.TraxStudentRepository;
-import ca.bc.gov.educ.api.trax.service.institute.CommonService;
+import ca.bc.gov.educ.api.trax.service.institute.SchoolService;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +27,7 @@ import java.util.*;
 @Slf4j
 public class TraxCommonService {
 
-    private final CommonService commonSerivce;
+    private SchoolService schoolService;
     private final TraxStudentRepository traxStudentRepository;
     private final TraxStudentNoRepository traxStudentNoRepository;
     private final GradCourseRepository gradCourseRepository;
@@ -38,14 +38,14 @@ public class TraxCommonService {
     private final EducGradTraxApiConstants constants;
 
     @Autowired
-    public TraxCommonService(CommonService commonService,
+    public TraxCommonService(SchoolService schoolService,
                              TraxStudentRepository traxStudentRepository,
                              TraxStudentNoRepository traxStudentNoRepository,
                              GradCourseRepository gradCourseRepository,
                              TraxStudentNoTransformer traxStudentNoTransformer,
                              GradCourseTransformer gradCourseTransformer,
                              EducGradTraxApiConstants constants) {
-        this.commonSerivce = commonService;
+        this.schoolService = schoolService;
         this.traxStudentRepository = traxStudentRepository;
         this.traxStudentNoRepository = traxStudentNoRepository;
         this.gradCourseRepository = gradCourseRepository;
@@ -187,6 +187,11 @@ public class TraxCommonService {
         return null;
     }
 
+    public UUID getSchoolIdFromRedisCache(String mincode) {
+        ca.bc.gov.educ.api.trax.model.dto.institute.School school = schoolService.getSchoolByMinCodeFromRedisCache(mincode);
+        return school != null && StringUtils.isNotBlank(school.getSchoolId())? UUID.fromString(school.getSchoolId()) : null;
+    }
+
     private List<ConvGradStudent> buildConversionGradStudents(List<Object[]> traxStudents) {
         List<ConvGradStudent> students = new ArrayList<>();
         traxStudents.forEach(result -> {
@@ -214,6 +219,8 @@ public class TraxCommonService {
         Character studentStatus = (Character) fields[4];
         Character archiveFlag = (Character) fields[5];
         String graduationRequirementYear = (String) fields[6];
+
+        UUID schoolOfRecordId = this.getSchoolIdFromRedisCache(schoolOfRecord);
 
         // grad or non-grad
         Date programCompletionDate = null;
@@ -272,6 +279,7 @@ public class TraxCommonService {
                     .slpDate(slpDateStr)
                     .sccDate(sccDateStr)
                     .schoolOfRecord(schoolOfRecord)
+                    .schoolOfRecordId(schoolOfRecordId)
                     .schoolAtGrad(schoolAtGrad)
                     .studentGrade(studentGrade)
                     .studentStatus(studentStatus != null? studentStatus.toString() : null)
