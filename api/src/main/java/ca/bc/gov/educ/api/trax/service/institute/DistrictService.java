@@ -44,11 +44,30 @@ public class DistrictService {
             log.debug("****Before Calling Institute API");
             List<DistrictEntity> response = this.restService.get(constants.getAllDistrictsFromInstituteApiUrl(),
                     List.class, webClient);
-            return districtTransformer.transformToDTO(response);
+            List<District> dList = districtTransformer.transformToDTO(response);
+            List<District> districts = new ArrayList<>();
+            District dist;
+            for (District d : dList) {
+                dist = getDistrictByIdFromInstituteApi(d.getDistrictId());
+                districts.add(dist);
+            }
+            return districts;
         } catch (WebClientResponseException e) {
-            log.warn(String.format("Error getting Common School List: %s", e.getMessage()));
+            log.warn(String.format("Error getting Districts from Institute API: %s", e.getMessage()));
         } catch (Exception e) {
-            log.error(String.format("Error while calling school-api: %s", e.getMessage()));
+            log.error(String.format("Error while calling institute-api: %s", e.getMessage()));
+        }
+        return null;
+    }
+
+    public District getDistrictByIdFromInstituteApi(String districtId) {
+        try {
+            return this.restService.get(String.format(constants.getGetDistrictFromInstituteApiUrl(), districtId),
+                    District.class, webClient);
+        } catch (WebClientResponseException e) {
+            log.warn(String.format("Error getting District from Institute API: %s", e.getMessage()));
+        } catch (Exception e) {
+            log.error(String.format("Error while calling institute-api: %s", e.getMessage()));
         }
         return null;
     }
