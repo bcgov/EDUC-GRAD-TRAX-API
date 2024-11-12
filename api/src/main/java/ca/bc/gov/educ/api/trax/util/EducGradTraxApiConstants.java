@@ -59,6 +59,7 @@ public class EducGradTraxApiConstants {
 
     public static final String CHECK_SCHOOL_BY_CODE_MAPPING = "/check/{minCode}";
     public static final String GET_SCHOOL_BY_CODE_MAPPING = "/{minCode}";
+    public static final String GET_SCHOOL_BY_SCHOOL_ID = "/{schoolId}";
 
     public static final String GET_COMMON_SCHOOL_BY_CODE_MAPPING = GET_COMMON_SCHOOLS + GET_SCHOOL_BY_CODE_MAPPING;
     public static final String GET_SCHOOL_SEARCH_MAPPING = "/search";

@@ -182,33 +182,6 @@ public class SchoolControllerTest {
     }
 
     @Test
-    public void whenGetSchoolByMincode_ReturnsSchool() {
-        String mincode = "12345678";
-        ca.bc.gov.educ.api.trax.model.dto.institute.School school = new ca.bc.gov.educ.api.trax.model.dto.institute.School();
-        school.setSchoolId("1234567");
-        school.setDistrictId("9876543");
-        school.setMincode(mincode);
-
-        Mockito.when(schoolServiceV2.getSchoolByMinCodeFromRedisCache(mincode)).thenReturn(school);
-        schoolControllerV2.getSchoolByMincode(mincode);
-        Mockito.verify(schoolServiceV2).getSchoolByMinCodeFromRedisCache(mincode);
-    }
-
-    @Test
-    public void whenGetSchoolByMincode_Return_NOT_FOUND() {
-        String mincode = "12345678";
-        ca.bc.gov.educ.api.trax.model.dto.institute.School school = new ca.bc.gov.educ.api.trax.model.dto.institute.School();
-        school.setSchoolId("1234567");
-        school.setDistrictId("9876543");
-        school.setMincode(mincode);
-
-        Mockito.when(schoolServiceV2.getSchoolByMinCodeFromRedisCache(mincode)).thenReturn(null);
-        schoolControllerV2.getSchoolByMincode(mincode);
-        Mockito.verify(schoolServiceV2).getSchoolByMinCodeFromRedisCache(mincode);
-        assertEquals(responseHelper.NOT_FOUND(), schoolControllerV2.getSchoolByMincode(mincode));
-    }
-
-    @Test
     public void whenGetAllSchoolDetails_ReturnsListOfSchoolDetails() {
         final List<SchoolDetail> schoolDetails = new ArrayList<>();
         SchoolDetail schoolDetail = new SchoolDetail();

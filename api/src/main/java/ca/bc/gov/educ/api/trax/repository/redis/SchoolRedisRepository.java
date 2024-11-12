@@ -4,9 +4,13 @@ import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolEntity;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface SchoolRedisRepository extends CrudRepository<SchoolEntity, String> {
     String HASH_KEY = "School";
 
     SchoolEntity findByMincode(String mincode);
+    List<SchoolEntity> findAllByDistrictIdAndMincode(String districtId, String mincode);
+    List<SchoolEntity> findAllByDistrictId(String districtId);
 }

@@ -5,6 +5,7 @@ import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.connection.RedisClusterConfiguration;
 import org.springframework.data.redis.connection.RedisClusterNode;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
@@ -18,6 +19,7 @@ import java.util.Set;
 
 @Configuration
 @EnableRedisRepositories("ca.bc.gov.educ.api.trax.repository.redis")
+@Profile("!redisTest")
 public class RedisConfig {
     @Autowired
     private EducGradTraxApiConstants constants;

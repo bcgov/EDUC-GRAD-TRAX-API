@@ -20,6 +20,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @CrossOrigin
 @RestController("schoolControllerV2")
@@ -48,16 +50,16 @@ public class SchoolController {
         return schoolService.getSchoolsFromRedisCache();
     }
 
-    @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_URL_MAPPING_V2 + EducGradTraxApiConstants.GET_SCHOOL_BY_CODE_MAPPING)
+    @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_URL_MAPPING_V2 + EducGradTraxApiConstants.GET_SCHOOL_BY_SCHOOL_ID)
     @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
-    @Operation(summary = "Find a School by Mincode from cache", description = "Get a School by Mincode from cache", tags = { "School" })
+    @Operation(summary = "Find a School by schoolId from cache", description = "Get a School by schoolId from cache", tags = { "School" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "204", description = "NO CONTENT")})
-    public ResponseEntity<School> getSchoolByMincode(@PathVariable String minCode) {
-        log.debug("getSchoolByMincode V2 : ");
-        School schoolResponse = schoolService.getSchoolByMinCodeFromRedisCache(minCode);
-        if(schoolResponse != null) {
-            return response.GET(schoolResponse);
+    public ResponseEntity<School> getSchoolBySchoolId(@PathVariable UUID schoolId) {
+        log.debug("getSchoolBySchoolId V2 : ");
+        Optional<School> schoolResponse = schoolService.getSchoolBySchoolId(schoolId);
+        if(schoolResponse.isPresent()) {
+            return response.GET(schoolResponse.get());
         }else {
             return response.NOT_FOUND();
         }
@@ -104,6 +106,15 @@ public class SchoolController {
             return response.NOT_FOUND();
         }
     }
-
+    @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_URL_MAPPING_V2 + EducGradTraxApiConstants.GET_SCHOOL_SEARCH_MAPPING)
+    @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
+    @Operation(summary = "Search for a school", description = "Search for a School", tags = { "School" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
+    public ResponseEntity<List<School>> getSchoolsByParams(
+            @RequestParam(value = "districtId", required = false) UUID districtId,
+            @RequestParam(value = "mincode", required = false) String mincode) {
+        return response.GET(schoolService.getSchoolsByParams(districtId, mincode));
+    }
 
 }
