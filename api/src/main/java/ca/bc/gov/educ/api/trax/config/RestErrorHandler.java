@@ -23,6 +23,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.HashMap;
@@ -56,6 +57,17 @@ public class RestErrorHandler extends ResponseEntityExceptionHandler {
 		});
 		ApiError apiError = new ApiError(BAD_REQUEST);
 		apiError.setMessage(errors.toString());
+		return buildResponseEntity(apiError);
+	}
+
+	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
+	protected ResponseEntity<Object> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex) {
+		String requiredType = (ex.getRequiredType() != null) ? ex.getRequiredType().getSimpleName() : "unknown";
+		String message = String.format("Parameter '%s' with value '%s' could not be converted to type '%s'.",
+						ex.getName(), ex.getValue(), requiredType);
+		log.error("Method argument type mismatch: {}", message, ex);
+		ApiError apiError = new ApiError(BAD_REQUEST);
+		apiError.setMessage(message);
 		return buildResponseEntity(apiError);
 	}
 

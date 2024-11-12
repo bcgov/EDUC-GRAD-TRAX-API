@@ -12,6 +12,7 @@ import ca.bc.gov.educ.api.trax.repository.redis.SchoolDetailRedisRepository;
 import ca.bc.gov.educ.api.trax.repository.redis.SchoolRedisRepository;
 import ca.bc.gov.educ.api.trax.service.RESTService;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -19,10 +20,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service("InstituteSchoolService")
 public class SchoolService {
 
@@ -169,6 +170,23 @@ public class SchoolService {
 	public void updateSchoolCache(List<String> schoolIds) throws ServiceException {
 		for (String schoolId : schoolIds) {
 			updateSchoolCache(schoolId);
+		}
+	}
+
+	public Optional<School> getSchoolBySchoolId(UUID schoolId) {
+		return schoolRedisRepository.findById(String.valueOf(schoolId)).map(schoolTransformer::transformToDTO);
+	}
+
+	public List<School> getSchoolsByParams(UUID districtId, String mincode) {
+		if(districtId == null && mincode == null) {
+			return schoolTransformer.transformToDTO(schoolRedisRepository.findAll());
+		} else if (mincode == null) {
+			return schoolTransformer.transformToDTO(schoolRedisRepository.findAllByDistrictId(String.valueOf(districtId)));
+		} else if(districtId == null) {
+			SchoolEntity schoolEntity = schoolRedisRepository.findByMincode(mincode);
+			return schoolEntity != null ? List.of(schoolTransformer.transformToDTO(schoolEntity)) : Collections.emptyList();
+		} else {
+			return schoolTransformer.transformToDTO(schoolRedisRepository.findAllByDistrictIdAndMincode(String.valueOf(districtId), mincode));
 		}
 	}
 }
