@@ -161,6 +161,8 @@ public class InstituteDistrictServiceTest {
 				.thenReturn(districtEntities);
 		when(districtTransformerMock.transformToDTO(districtEntities))
 				.thenReturn(districts);
+		when(districtService.getDistrictByIdFromInstituteApi(district.getDistrictId()))
+				.thenReturn(district);
 
 		List<District> result = districtService.getDistrictsFromInstituteApi();
 		assertEquals(districts, result);
