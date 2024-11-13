@@ -7,6 +7,7 @@ import ca.bc.gov.educ.api.trax.model.transformer.institute.SchoolTransformer;
 import ca.bc.gov.educ.api.trax.model.transformer.institute.SchoolDetailTransformer;
 import ca.bc.gov.educ.api.trax.repository.redis.SchoolRedisRepository;
 import ca.bc.gov.educ.api.trax.repository.redis.SchoolDetailRedisRepository;
+import ca.bc.gov.educ.api.trax.service.institute.SchoolService;
 import ca.bc.gov.educ.api.trax.support.MockConfiguration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,6 +25,8 @@ import ca.bc.gov.educ.api.trax.support.TestRedisConfiguration;
 
 import java.util.UUID;
 
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -36,6 +39,8 @@ class SchoolControllerIntegrationTest {
 
   @Autowired
   private MockMvc mockMvc;
+  @Autowired
+  private SchoolService schoolService;
 
   @Autowired
   private SchoolRedisRepository schoolRedisRepository;
@@ -150,5 +155,31 @@ class SchoolControllerIntegrationTest {
                     .with(jwt().jwt(jwt -> jwt.claim("scope", "UPDATE_GRAD_TRAX_CACHE")))
                     .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk());
+  }
+
+  @Test
+  void testReloadSchoolsIntoCache_shouldReturnUnprocessableEntity() throws Exception {
+    doThrow(Exception.class).when(schoolService).initializeSchoolCache(true);
+    mockMvc.perform(MockMvcRequestBuilders.put("/api/v2/trax/school/cache/schools")
+                    .with(jwt().jwt(jwt -> jwt.claim("scope", "UPDATE_GRAD_TRAX_CACHE")))
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isUnprocessableEntity());
+  }
+
+  @Test
+  void testReloadSchoolDetailssIntoCache_shouldReturnOK() throws Exception {
+    mockMvc.perform(MockMvcRequestBuilders.put("/api/v2/trax/school/cache/school-details")
+                    .with(jwt().jwt(jwt -> jwt.claim("scope", "UPDATE_GRAD_TRAX_CACHE")))
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk());
+  }
+
+  @Test
+  void testReloadSchoolDetailsIntoCache_shouldReturnUnprocessableEntity() throws Exception {
+    doThrow(Exception.class).when(schoolService).initializeSchoolCache(true);
+    mockMvc.perform(MockMvcRequestBuilders.put("/api/v2/trax/school/cache/school-details")
+                    .with(jwt().jwt(jwt -> jwt.claim("scope", "UPDATE_GRAD_TRAX_CACHE")))
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isUnprocessableEntity());
   }
 }
