@@ -160,7 +160,7 @@ class SchoolControllerIntegrationTest {
   @Test
   void testReloadSchoolsIntoCache_shouldReturnUnprocessableEntity() throws Exception {
     SchoolService schoolServiceMock = mock(SchoolService.class);
-    doThrow(Exception.class).when(schoolServiceMock).initializeSchoolCache(true);
+    doThrow(RuntimeException.class).when(schoolServiceMock).initializeSchoolCache(true);
     mockMvc.perform(MockMvcRequestBuilders.put("/api/v2/trax/school/cache/schools")
                     .with(jwt().jwt(jwt -> jwt.claim("scope", "UPDATE_GRAD_TRAX_CACHE")))
                     .accept(MediaType.APPLICATION_JSON))
@@ -178,7 +178,7 @@ class SchoolControllerIntegrationTest {
   @Test
   void testReloadSchoolDetailsIntoCache_shouldReturnUnprocessableEntity() throws Exception {
     SchoolService schoolServiceMock = mock(SchoolService.class);
-    doThrow(Exception.class).when(schoolServiceMock).initializeSchoolDetailCache(true);
+    doThrow(RuntimeException.class).when(schoolServiceMock).initializeSchoolDetailCache(true);
     mockMvc.perform(MockMvcRequestBuilders.put("/api/v2/trax/school/cache/school-details")
                     .with(jwt().jwt(jwt -> jwt.claim("scope", "UPDATE_GRAD_TRAX_CACHE")))
                     .accept(MediaType.APPLICATION_JSON))
