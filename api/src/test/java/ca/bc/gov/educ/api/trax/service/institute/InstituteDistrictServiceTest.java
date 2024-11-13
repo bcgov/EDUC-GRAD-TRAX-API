@@ -360,7 +360,7 @@ public class InstituteDistrictServiceTest {
 	}
 
 	@Test
-	void whenReloadDistrictsIntoCache_ThenForceLoad() {
+	public void whenReloadDistrictsIntoCache_ThenForceLoad() {
 		District d = new District();
 		List<District> ds = new ArrayList<District>();
 		d.setDistrictId("123");
