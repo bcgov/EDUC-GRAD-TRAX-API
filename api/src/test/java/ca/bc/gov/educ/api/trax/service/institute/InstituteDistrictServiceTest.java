@@ -360,6 +360,26 @@ public class InstituteDistrictServiceTest {
 	}
 
 	@Test
+	void whenReloadDistrictsIntoCache_ThenForceLoad() {
+		District d = new District();
+		List<District> ds = new ArrayList<District>();
+		d.setDistrictId("123");
+		d.setDistrictNumber("456");
+		ds.add(d);
+		d = new District();
+		d.setDistrictId("789");
+		d.setDistrictNumber("012");
+		ds.add(d);
+
+		when(jedisClusterMock.get(CacheKey.DISTRICT_CACHE.name()))
+				.thenReturn(String.valueOf(CacheStatus.READY));
+		when(jedisClusterMock.set(CacheKey.DISTRICT_CACHE.name(), CacheStatus.READY.name()))
+				.thenReturn("OK");
+		districtService.initializeDistrictCache(true);
+		verify(serviceHelper).initializeCache(true, CacheKey.DISTRICT_CACHE, districtService);
+	}
+
+	@Test
 	public void whenGetDistrictsBySchoolCategoryCode_ReturnDistricts() {
 		String schoolCategoryCode = "ABC";
 		List<District> districts = new ArrayList<>();

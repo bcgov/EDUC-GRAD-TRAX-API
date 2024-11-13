@@ -143,4 +143,12 @@ class SchoolControllerIntegrationTest {
                     .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isForbidden());
   }
+
+  @Test
+  void testReloadSchoolsIntoCache_shouldReturnOK() throws Exception {
+    mockMvc.perform(MockMvcRequestBuilders.put("/api/v2/trax/school/cache/schools")
+                    .with(jwt().jwt(jwt -> jwt.claim("scope", "UPDATE_GRAD_TRAX_CACHE")))
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk());
+  }
 }
