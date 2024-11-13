@@ -43,7 +43,7 @@ public class DistrictController {
     @Operation(summary = "Reload Districts in the cache", description = "Reload Districts in the cache", tags = {"Cache"})
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "422", description = "UNPROCESSABLE CONTENT")})
-    public ResponseEntity reloadDistrictsIntoCache() {
+    public ResponseEntity<String> reloadDistrictsIntoCache() {
         log.debug("reloadDistrictsIntoCache : ");
         try {
             districtService.initializeDistrictCache(true);

@@ -17,6 +17,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -57,7 +58,7 @@ public class DistrictService {
         } catch (Exception e) {
             log.error(String.format("Error while calling institute-api: %s", e.getMessage()));
         }
-        return null;
+        return Collections.emptyList();
     }
 
     public District getDistrictByIdFromInstituteApi(String districtId) {

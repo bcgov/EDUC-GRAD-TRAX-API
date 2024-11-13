@@ -12,21 +12,19 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
-public class CodeControllerTest {
+class CodeControllerTest {
 
 	@Mock
 	private CodeService codeService;
 	
 	@Mock
 	ResponseHelper response;
-	
+
 	@InjectMocks
 	private CodeController codeController;
 	
@@ -37,7 +35,7 @@ public class CodeControllerTest {
 	MessageHelper messagesHelper;
 
 	@Test
-	public void testGetAllCountryList() {
+	void testGetAllCountryList() {
 		List<GradCountry> gradCountryList = new ArrayList<>();
 		GradCountry obj = new GradCountry();
 		obj.setCountryCode("CA");
@@ -53,7 +51,7 @@ public class CodeControllerTest {
 	}
 	
 	@Test
-	public void testGetSpecificCountryCode() {
+	void testGetSpecificCountryCode() {
 		String countryCode = "CA";
 		GradCountry obj = new GradCountry();
 		obj.setCountryCode("CA");
@@ -64,7 +62,7 @@ public class CodeControllerTest {
 	}
 	
 	@Test
-	public void testGetSpecificCountryCode_noContent() {
+	void testGetSpecificCountryCode_noContent() {
 		String countryCode = "AB";	
 		Mockito.when(codeService.getSpecificCountryCode(countryCode)).thenReturn(null);
 		codeController.getSpecificCountryCode(countryCode);
@@ -72,7 +70,7 @@ public class CodeControllerTest {
 	}
 	
 	@Test
-	public void testGetAllProvinceList() {
+	void testGetAllProvinceList() {
 		List<GradProvince> gradProvinceList = new ArrayList<>();
 		GradProvince obj = new GradProvince();
 		obj.setProvCode("CA");
@@ -88,7 +86,7 @@ public class CodeControllerTest {
 	}
 	
 	@Test
-	public void testGetSpecificProvinceCode() {
+	void testGetSpecificProvinceCode() {
 		String countryCode = "CA";
 		GradProvince obj = new GradProvince();
 		obj.setProvCode("CA");
@@ -99,7 +97,7 @@ public class CodeControllerTest {
 	}
 	
 	@Test
-	public void testGetSpecificProvinceCode_noContent() {
+	void testGetSpecificProvinceCode_noContent() {
 		String countryCode = "AB";	
 		Mockito.when(codeService.getSpecificProvinceCode(countryCode)).thenReturn(null);
 		codeController.getSpecificProvinceCode(countryCode);

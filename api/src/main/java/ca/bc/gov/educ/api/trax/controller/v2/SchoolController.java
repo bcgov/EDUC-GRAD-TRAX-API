@@ -46,7 +46,7 @@ public class SchoolController {
     @Operation(summary = "Reload Schools in the cache", description = "Reload Schools in the cache", tags = {"Cache"})
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "422", description = "UNPROCESSABLE CONTENT")})
-    public ResponseEntity reloadSchoolsIntoCache() {
+    public ResponseEntity<String> reloadSchoolsIntoCache() {
         log.debug("reloadSchoolsIntoCache : ");
         try {
             schoolService.initializeSchoolCache(true);
@@ -85,7 +85,7 @@ public class SchoolController {
     @Operation(summary = "Reload School Details in the cache", description = "Reload School Details in the cache", tags = {"Cache"})
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "422", description = "UNPROCESSABLE CONTENT")})
-    public ResponseEntity reloadSchoolDetailsIntoCache() {
+    public ResponseEntity<String> reloadSchoolDetailsIntoCache() {
         log.debug("reloadSchoolDetailsIntoCache : ");
         try {
             schoolService.initializeSchoolDetailCache(true);

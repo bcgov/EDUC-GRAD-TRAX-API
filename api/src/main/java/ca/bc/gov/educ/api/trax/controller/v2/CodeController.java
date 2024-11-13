@@ -44,7 +44,7 @@ public class CodeController {
     @Operation(summary = "Reload School Category Codes in the cache", description = "Reload School Category Codes in the cache", tags = {"Cache"})
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "422", description = "UNPROCESSABLE CONTENT")})
-    public ResponseEntity reloadSchoolCategoryCodesIntoCache() {
+    public ResponseEntity<String> reloadSchoolCategoryCodesIntoCache() {
         log.debug("reloadSchoolCategoryCodesIntoCache : ");
         try {
             codeService.initializeSchoolCategoryCodeCache(true);
@@ -59,7 +59,7 @@ public class CodeController {
     @Operation(summary = "Reload School Funding Group Codes in the cache", description = "Reload School Funding Group Codes in the cache", tags = {"Cache"})
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "422", description = "UNPROCESSABLE CONTENT")})
-    public ResponseEntity reloadSchoolFundingGroupCodesIntoCache() {
+    public ResponseEntity<String> reloadSchoolFundingGroupCodesIntoCache() {
         log.debug("reloadSchoolFundingGroupCodesIntoCache : ");
         try {
             codeService.initializeSchoolFundingGroupCodeCache(true);
