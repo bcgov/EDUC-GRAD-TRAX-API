@@ -1,6 +1,5 @@
 package ca.bc.gov.educ.api.trax.controller.v2;
 
-import ca.bc.gov.educ.api.trax.service.institute.CodeService;
 import ca.bc.gov.educ.api.trax.service.institute.DistrictService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
