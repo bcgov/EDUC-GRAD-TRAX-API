@@ -26,8 +26,7 @@ import ca.bc.gov.educ.api.trax.support.TestRedisConfiguration;
 
 import java.util.UUID;
 
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -40,8 +39,8 @@ class SchoolControllerIntegrationTest {
 
   @Autowired
   private MockMvc mockMvc;
-  @MockBean
-  private SchoolService schoolServiceMock;
+  @Autowired
+  private SchoolService schoolService;
 
   @Autowired
   private SchoolRedisRepository schoolRedisRepository;
@@ -160,6 +159,7 @@ class SchoolControllerIntegrationTest {
 
   @Test
   void testReloadSchoolsIntoCache_shouldReturnUnprocessableEntity() throws Exception {
+    SchoolService schoolServiceMock = mock(SchoolService.class);
     doThrow(Exception.class).when(schoolServiceMock).initializeSchoolCache(true);
     mockMvc.perform(MockMvcRequestBuilders.put("/api/v2/trax/school/cache/schools")
                     .with(jwt().jwt(jwt -> jwt.claim("scope", "UPDATE_GRAD_TRAX_CACHE")))
@@ -177,6 +177,7 @@ class SchoolControllerIntegrationTest {
 
   @Test
   void testReloadSchoolDetailsIntoCache_shouldReturnUnprocessableEntity() throws Exception {
+    SchoolService schoolServiceMock = mock(SchoolService.class);
     doThrow(Exception.class).when(schoolServiceMock).initializeSchoolDetailCache(true);
     mockMvc.perform(MockMvcRequestBuilders.put("/api/v2/trax/school/cache/school-details")
                     .with(jwt().jwt(jwt -> jwt.claim("scope", "UPDATE_GRAD_TRAX_CACHE")))
