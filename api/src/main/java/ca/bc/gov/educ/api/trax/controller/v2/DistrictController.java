@@ -38,6 +38,21 @@ public class DistrictController {
         this.response = response;
     }
 
+    @PutMapping(EducGradTraxApiConstants.GRAD_DISTRICT_URL_MAPPING_V2 + EducGradTraxApiConstants.PUT_DISTRICTS_MAPPING)
+    @PreAuthorize(PermissionsConstants.UPDATE_GRAD_TRAX_CACHE)
+    @Operation(summary = "Reload Districts in the cache", description = "Reload Districts in the cache", tags = {"Cache"})
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "422", description = "UNPROCESSABLE CONTENT")})
+    public ResponseEntity<String> reloadDistrictsIntoCache() {
+        log.debug("reloadDistrictsIntoCache : ");
+        try {
+            districtService.initializeDistrictCache(true);
+        } catch (Exception e) {
+            return ResponseEntity.unprocessableEntity().body("Error loading Districts into cache");
+        }
+        return ResponseEntity.ok("Districts loaded into cache!");
+    }
+
     @GetMapping(EducGradTraxApiConstants.GRAD_DISTRICT_URL_MAPPING_V2 + EducGradTraxApiConstants.GET_DISTRICT_BY_DISTNO_MAPPING)
     @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
     @Operation(summary = "Find a District by District Number V2", description = "Get District by District Number V2", tags = { "District" })
@@ -54,7 +69,7 @@ public class DistrictController {
 
     @GetMapping(EducGradTraxApiConstants.GRAD_DISTRICT_URL_MAPPING_V2 + EducGradTraxApiConstants.GET_DISTRICTS_BY_SCHOOL_CATEGORY_MAPPING)
     @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
-    @Operation(summary = "Get District by school category code V2", description = "Get District by school category code V2", tags = { "School" })
+    @Operation(summary = "Get District by school category code V2", description = "Get District by school category code V2", tags = { "District" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "204", description = "NO CONTENT")})
     public ResponseEntity<List<District>> getDistrictsBySchoolCategoryCode(@RequestParam(required = false) String schoolCategoryCode) {

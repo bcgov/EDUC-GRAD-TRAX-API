@@ -89,6 +89,13 @@ public class EducGradTraxApiConstants {
     public static final String POST_SAVE_TRAX_STUDENT_NO_MAPPING = "/trax-student-no";
     public static final String DELETE_TRAX_STUDENT_NO_MAPPING = "/trax-student-no/{pen}";
 
+    //cache endpoints
+    public static final String PUT_SCHOOL_CATEGORY_CODES_MAPPING = "/cache/school-category-codes";
+    public static final String PUT_SCHOOL_FUNDING_GROUP_CODES_MAPPING = "/cache/school-funding-group-codes";
+    public static final String PUT_DISTRICTS_MAPPING = "/cache/districts";
+    public static final String PUT_SCHOOLS_MAPPING = "/cache/schools";
+    public static final String PUT_SCHOOL_DETAILS_MAPPING = "/cache/school-details";
+
     // Event urls
     public static final String EVENT_HISTORY_MAPPING_V1 = GRAD_TRAX_API_ROOT_MAPPING_V1 + "/event/history";
 

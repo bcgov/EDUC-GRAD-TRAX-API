@@ -161,6 +161,8 @@ public class InstituteDistrictServiceTest {
 				.thenReturn(districtEntities);
 		when(districtTransformerMock.transformToDTO(districtEntities))
 				.thenReturn(districts);
+		when(districtService.getDistrictByIdFromInstituteApi(district.getDistrictId()))
+				.thenReturn(district);
 
 		List<District> result = districtService.getDistrictsFromInstituteApi();
 		assertEquals(districts, result);
@@ -338,17 +340,6 @@ public class InstituteDistrictServiceTest {
 
 	@Test
 	public void whenInitializeDistrictCache_WithReadyAndTrue_ThenForceLoad() {
-
-		District d = new District();
-		List<District> ds = new ArrayList<District>();
-		d.setDistrictId("123");
-		d.setDistrictNumber("456");
-		ds.add(d);
-		d = new District();
-		d.setDistrictId("789");
-		d.setDistrictNumber("012");
-		ds.add(d);
-
 		when(jedisClusterMock.get(CacheKey.DISTRICT_CACHE.name()))
 				.thenReturn(String.valueOf(CacheStatus.READY));
 		when(jedisClusterMock.set(CacheKey.DISTRICT_CACHE.name(), CacheStatus.READY.name()))
