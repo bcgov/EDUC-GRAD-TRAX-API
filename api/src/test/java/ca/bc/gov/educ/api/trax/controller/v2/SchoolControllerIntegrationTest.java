@@ -15,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -39,8 +40,8 @@ class SchoolControllerIntegrationTest {
 
   @Autowired
   private MockMvc mockMvc;
-  @Autowired
-  private SchoolService schoolService;
+  @MockBean
+  private SchoolService schoolServiceMock;
 
   @Autowired
   private SchoolRedisRepository schoolRedisRepository;
@@ -159,7 +160,7 @@ class SchoolControllerIntegrationTest {
 
   @Test
   void testReloadSchoolsIntoCache_shouldReturnUnprocessableEntity() throws Exception {
-    doThrow(Exception.class).when(schoolService).initializeSchoolCache(true);
+    doThrow(Exception.class).when(schoolServiceMock).initializeSchoolCache(true);
     mockMvc.perform(MockMvcRequestBuilders.put("/api/v2/trax/school/cache/schools")
                     .with(jwt().jwt(jwt -> jwt.claim("scope", "UPDATE_GRAD_TRAX_CACHE")))
                     .accept(MediaType.APPLICATION_JSON))
@@ -176,7 +177,7 @@ class SchoolControllerIntegrationTest {
 
   @Test
   void testReloadSchoolDetailsIntoCache_shouldReturnUnprocessableEntity() throws Exception {
-    doThrow(Exception.class).when(schoolService).initializeSchoolDetailCache(true);
+    doThrow(Exception.class).when(schoolServiceMock).initializeSchoolDetailCache(true);
     mockMvc.perform(MockMvcRequestBuilders.put("/api/v2/trax/school/cache/school-details")
                     .with(jwt().jwt(jwt -> jwt.claim("scope", "UPDATE_GRAD_TRAX_CACHE")))
                     .accept(MediaType.APPLICATION_JSON))
