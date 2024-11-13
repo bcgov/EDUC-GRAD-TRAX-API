@@ -176,7 +176,7 @@ class SchoolControllerIntegrationTest {
 
   @Test
   void testReloadSchoolDetailsIntoCache_shouldReturnUnprocessableEntity() throws Exception {
-    doThrow(Exception.class).when(schoolService).initializeSchoolCache(true);
+    doThrow(Exception.class).when(schoolService).initializeSchoolDetailCache(true);
     mockMvc.perform(MockMvcRequestBuilders.put("/api/v2/trax/school/cache/school-details")
                     .with(jwt().jwt(jwt -> jwt.claim("scope", "UPDATE_GRAD_TRAX_CACHE")))
                     .accept(MediaType.APPLICATION_JSON))
