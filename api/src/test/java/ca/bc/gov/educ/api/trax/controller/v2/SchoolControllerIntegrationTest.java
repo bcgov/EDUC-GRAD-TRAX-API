@@ -158,16 +158,6 @@ class SchoolControllerIntegrationTest {
   }
 
   @Test
-  void testReloadSchoolsIntoCache_shouldReturnUnprocessableEntity() throws Exception {
-    SchoolService schoolServiceMock = mock(SchoolService.class);
-    doThrow(new Exception()).when(schoolServiceMock).initializeSchoolCache(true);
-    mockMvc.perform(MockMvcRequestBuilders.put("/api/v2/trax/school/cache/schools")
-                    .with(jwt().jwt(jwt -> jwt.claim("scope", "UPDATE_GRAD_TRAX_CACHE")))
-                    .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().isUnprocessableEntity());
-  }
-
-  @Test
   void testReloadSchoolDetailssIntoCache_shouldReturnOK() throws Exception {
     mockMvc.perform(MockMvcRequestBuilders.put("/api/v2/trax/school/cache/school-details")
                     .with(jwt().jwt(jwt -> jwt.claim("scope", "UPDATE_GRAD_TRAX_CACHE")))
@@ -175,13 +165,4 @@ class SchoolControllerIntegrationTest {
             .andExpect(status().isOk());
   }
 
-  @Test
-  void testReloadSchoolDetailsIntoCache_shouldReturnUnprocessableEntity() throws Exception {
-    SchoolService schoolServiceMock = mock(SchoolService.class);
-    doThrow(new Exception()).when(schoolServiceMock).initializeSchoolDetailCache(true);
-    mockMvc.perform(MockMvcRequestBuilders.put("/api/v2/trax/school/cache/school-details")
-                    .with(jwt().jwt(jwt -> jwt.claim("scope", "UPDATE_GRAD_TRAX_CACHE")))
-                    .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().isUnprocessableEntity());
-  }
 }

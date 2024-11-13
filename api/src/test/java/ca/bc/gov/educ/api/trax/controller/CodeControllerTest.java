@@ -12,14 +12,23 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 @ExtendWith(MockitoExtension.class)
 public class CodeControllerTest {
 
+	@Autowired
+	private MockMvc mockMvc;
 	@Mock
 	private CodeService codeService;
 	
@@ -103,6 +112,22 @@ public class CodeControllerTest {
 		Mockito.when(codeService.getSpecificProvinceCode(countryCode)).thenReturn(null);
 		codeController.getSpecificProvinceCode(countryCode);
 		Mockito.verify(codeService).getSpecificProvinceCode(countryCode);
+	}
+
+	@Test
+	void testReloadSchoolCategoryCodesIntoCache_shouldReturnOK() throws Exception {
+		mockMvc.perform(MockMvcRequestBuilders.put("/api/v2/trax/school/cache/school-category-codes")
+						.with(jwt().jwt(jwt -> jwt.claim("scope", "UPDATE_GRAD_TRAX_CACHE")))
+						.accept(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk());
+	}
+
+	@Test
+	void testReloadSchoolFundingGroupCodesIntoCache_shouldReturnOK() throws Exception {
+		mockMvc.perform(MockMvcRequestBuilders.put("/api/v2/trax/school/cache/school-funding-group-codes")
+						.with(jwt().jwt(jwt -> jwt.claim("scope", "UPDATE_GRAD_TRAX_CACHE")))
+						.accept(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk());
 	}
 
 }
