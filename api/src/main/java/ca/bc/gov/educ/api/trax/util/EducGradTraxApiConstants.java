@@ -69,6 +69,7 @@ public class EducGradTraxApiConstants {
 
     public static final String GET_STUDENT_PSI_BY_CODE_MAPPING = "/student";
 
+    public static final String GET_DISTRICT_BY_ID_MAPPING = "/{districtId}";
     public static final String GET_DISTRICT_BY_DISTNO_MAPPING = "/{distNo}";
     public static final String GET_DISTRICTS_BY_SCHOOL_CATEGORY_MAPPING = "/schoolCategories";
     public static final String GET_SCHOOLS_BY_SCHOOL_CATEGORY_MAPPING = "/schoolCategories";
