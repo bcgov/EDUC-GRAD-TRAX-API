@@ -115,7 +115,7 @@ public class CommonServiceTest {
         assertThat(result).isNotNull();
         assertThat(result.getSchoolId()).isEqualTo(schoolDetail.getSchoolId());
         assertThat(result.getMinCode()).isEqualTo(schoolDetail.getMincode());
-        assertThat(result.getSchoolCategoryCode()).isEqualTo(schoolCategoryLegacyCode);
+        assertThat(result.getSchoolCategoryLegacyCode()).isEqualTo(schoolCategoryLegacyCode);
         assertThat(result.getDistrictName()).isNotNull();
         assertThat(result.getAddress1()).isNotNull();
     }

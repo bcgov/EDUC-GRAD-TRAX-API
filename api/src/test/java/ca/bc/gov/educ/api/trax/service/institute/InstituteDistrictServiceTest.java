@@ -333,7 +333,7 @@ public class InstituteDistrictServiceTest {
 
 		when(this.districtRedisRepository.findById("ID"))
 				.thenReturn(Optional.of(districtEntity));
-		when(this.districtTransformerMock.transformToDTO(Optional.of(districtEntity)))
+		when(this.districtTransformerMock.transformToDTO(districtEntity))
 				.thenReturn(district);
 		assertEquals(district, districtService.getDistrictByIdFromRedisCache("ID"));
 	}
@@ -390,7 +390,7 @@ public class InstituteDistrictServiceTest {
 		schoolDetail.setSchoolId("ID");
 		schoolDetail.setDistrictId("DistID");
 		schoolDetail.setSchoolNumber("12345");
-		schoolDetail.setSchoolCategoryCode("SCC");
+		schoolDetail.setSchoolCategoryCode(schoolCategoryCode);
 		schoolDetail.setEmail("abc@xyz.ca");
 		schoolDetails.add(schoolDetail);
 
@@ -398,7 +398,7 @@ public class InstituteDistrictServiceTest {
 		schoolDetail.setSchoolId("ID");
 		schoolDetail.setDistrictId("DistID");
 		schoolDetail.setSchoolNumber("12345");
-		schoolDetail.setSchoolCategoryCode("SCC");
+		schoolDetail.setSchoolCategoryCode(schoolCategoryCode);
 		schoolDetail.setEmail("abc@xyz.ca");
 		schoolDetails.add(schoolDetail);
 
@@ -407,7 +407,7 @@ public class InstituteDistrictServiceTest {
 		schoolDetailEntity.setSchoolId("ID");
 		schoolDetailEntity.setDistrictId("DistID");
 		schoolDetailEntity.setSchoolNumber("12345");
-		schoolDetailEntity.setSchoolCategoryCode("SCC");
+		schoolDetailEntity.setSchoolCategoryCode(schoolCategoryCode);
 		schoolDetailEntity.setEmail("abc@xyz.ca");
 		schoolDetailEntities.add(schoolDetailEntity);
 
@@ -415,7 +415,7 @@ public class InstituteDistrictServiceTest {
 		schoolDetailEntity.setSchoolId("ID");
 		schoolDetailEntity.setDistrictId("DistID");
 		schoolDetailEntity.setSchoolNumber("12345");
-		schoolDetailEntity.setSchoolCategoryCode("SCC");
+		schoolDetailEntity.setSchoolCategoryCode(schoolCategoryCode);
 		schoolDetailEntity.setEmail("abc@xyz.ca");
 		schoolDetailEntities.add(schoolDetailEntity);
 
@@ -424,7 +424,9 @@ public class InstituteDistrictServiceTest {
 				.thenReturn(schoolDetailEntities);
 		when(this.schoolDetailTransformer.transformToDTO(schoolDetailEntities))
 				.thenReturn(schoolDetails);
-		when(this.districtService.getDistrictByIdFromRedisCache("ID"))
+		when(this.districtRedisRepository.findById("DistID"))
+				.thenReturn(Optional.of(districtEntity));
+		when(this.districtService.getDistrictByIdFromRedisCache("DistID"))
 				.thenReturn(district);
 		when(this.districtTransformerMock.transformToDTO(districtEntities))
 				.thenReturn(districts);
