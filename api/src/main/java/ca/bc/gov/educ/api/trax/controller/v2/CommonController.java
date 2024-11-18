@@ -20,6 +20,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @CrossOrigin
 @RestController
@@ -47,22 +48,22 @@ public class CommonController {
         return response.GET(commonService.getSchoolsForClobDataFromRedisCache());
     }
 
-    @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_CLOB_URL_MAPPING_V2 + EducGradTraxApiConstants.GET_SCHOOL_BY_CODE_MAPPING)
+    @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_CLOB_URL_MAPPING_V2 + EducGradTraxApiConstants.GET_SCHOOL_BY_SCHOOL_ID)
     @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
-    @Operation(summary = "Find a School Clob data by MinCode for GRAD Algorithm Data from cache", description = "Get a School Clob data by MinCode for GRAD Algorithm Data from cache", tags = { "Algorithm Data" })
+    @Operation(summary = "Find a School Clob data by SchoolId for GRAD Algorithm Data from cache", description = "Get a School Clob data by SchoolId for GRAD Algorithm Data from cache", tags = { "Algorithm Data" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "400", description = "BAD REQUEST"),
             @ApiResponse(responseCode = "422", description = "UNPROCESSABLE CONTENT"),
             @ApiResponse(responseCode = "204", description = "NO CONTENT")})
-    public ResponseEntity<School> getSchoolForClobDataByMinCode(@PathVariable String minCode) {
-        log.debug("getSchoolClobData by minCode: {}", minCode);
-        validation.requiredField(minCode, "minCode");
+    public ResponseEntity<School> getSchoolForClobDataBySchoolId(@PathVariable UUID schoolId) {
+        log.debug("getSchoolClobData by schoolId: {}", schoolId);
+        validation.requiredField(schoolId, "schoolId");
         if (validation.hasErrors()) {
             validation.stopOnErrors();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        School schoolResponse = commonService.getSchoolForClobDataByMinCodeFromRedisCache(minCode);
+        School schoolResponse = commonService.getSchoolForClobDataBySchoolIdFromRedisCache(schoolId);
         if (schoolResponse != null) {
             return response.GET(schoolResponse);
         } else {

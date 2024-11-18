@@ -17,6 +17,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import redis.clients.jedis.JedisCluster;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -50,9 +51,10 @@ public class CommonServiceTest {
 
     @Test
     public void testGetSchoolIdFromRedisCache() {
+        UUID schoolId = UUID.randomUUID();
         String minCode = "12345678";
         String distNo = "123";
-        SchoolDetail schoolDetail = mockInstituteData(minCode, distNo, "PUBLIC", "01");
+        SchoolDetail schoolDetail = mockInstituteData(schoolId, minCode, distNo, "PUBLIC", "01");
 
         var result = commonService.getSchoolIdFromRedisCache(minCode);
         assertThat(result).isEqualTo(UUID.fromString(schoolDetail.getSchoolId()));
@@ -60,9 +62,10 @@ public class CommonServiceTest {
 
     @Test
     public void testGetSchoolIdStrFromRedisCache() {
+        UUID schoolId = UUID.randomUUID();
         String minCode = "12345678";
         String distNo = "123";
-        SchoolDetail schoolDetail = mockInstituteData(minCode, distNo, "PUBLIC", "01");
+        SchoolDetail schoolDetail = mockInstituteData(schoolId, minCode, distNo, "PUBLIC", "01");
 
         var result = commonService.getSchoolIdStrFromRedisCache(minCode);
         assertThat(result).isEqualTo(schoolDetail.getSchoolId());
@@ -70,9 +73,10 @@ public class CommonServiceTest {
 
     @Test
     public void testGetAllSchoolClobs() {
+        UUID schoolId = UUID.randomUUID();
         String minCode = "12345678";
         String distNo = "123";
-        SchoolDetail schoolDetail = mockInstituteData(minCode, distNo, "PUBLIC", "01");
+        SchoolDetail schoolDetail = mockInstituteData(schoolId, minCode, distNo, "PUBLIC", "01");
 
         var result = commonService.getSchoolsForClobDataFromRedisCache();
         assertThat(result).hasSize(1);
@@ -81,9 +85,10 @@ public class CommonServiceTest {
 
     @Test
     public void testGetSchoolsByDistrictNumber() {
+        UUID schoolId = UUID.randomUUID();
         String minCode = "12345678";
         String distNo = "123";
-        SchoolDetail schoolDetail = mockInstituteData(minCode, distNo, "PUBLIC", "01");
+        SchoolDetail schoolDetail = mockInstituteData(schoolId, minCode, distNo, "PUBLIC", "01");
 
         when(schoolService.getSchoolDetailsByDistrictFromRedisCache(schoolDetail.getDistrictId())).thenReturn(List.of(schoolDetail));
 
@@ -100,12 +105,13 @@ public class CommonServiceTest {
 
     @Test
     public void testGetSchoolClob() {
+        UUID schoolId = UUID.randomUUID();
         String minCode = "12345678";
         String distNo = "123";
         String schoolCategoryLegacyCode = "01";
-        SchoolDetail schoolDetail = mockInstituteData(minCode, distNo, "PUBLIC", schoolCategoryLegacyCode);
+        SchoolDetail schoolDetail = mockInstituteData(schoolId, minCode, distNo, "PUBLIC", schoolCategoryLegacyCode);
 
-        var result = commonService.getSchoolForClobDataByMinCodeFromRedisCache(minCode);
+        var result = commonService.getSchoolForClobDataBySchoolIdFromRedisCache(schoolId);
         assertThat(result).isNotNull();
         assertThat(result.getSchoolId()).isEqualTo(schoolDetail.getSchoolId());
         assertThat(result.getMinCode()).isEqualTo(schoolDetail.getMincode());
@@ -114,7 +120,7 @@ public class CommonServiceTest {
         assertThat(result.getAddress1()).isNotNull();
     }
 
-    public SchoolDetail mockInstituteData(String minCode, String distNo, String schoolCategoryCode, String schoolCategoryLegacyCode) {
+    public SchoolDetail mockInstituteData(UUID schoolId, String minCode, String distNo, String schoolCategoryCode, String schoolCategoryLegacyCode) {
         District district = new District();
         district.setDistrictId(UUID.randomUUID().toString());
         district.setDistrictNumber(distNo);
@@ -125,7 +131,7 @@ public class CommonServiceTest {
         schoolCategory.setSchoolCategoryCode(schoolCategoryCode);
 
         SchoolDetail schoolDetail = new SchoolDetail();
-        schoolDetail.setSchoolId(UUID.randomUUID().toString());
+        schoolDetail.setSchoolId(schoolId.toString());
         schoolDetail.setMincode(minCode);
         schoolDetail.setDisplayName("Test School");
         schoolDetail.setDistrictId(district.getDistrictId());
@@ -151,10 +157,11 @@ public class CommonServiceTest {
         when(this.codeService.getSchoolCategoryCodeFromRedisCache(schoolCategoryCode)).thenReturn(schoolCategory);
         when(this.districtService.getDistrictByIdFromRedisCache(district.getDistrictId())).thenReturn(district);
         when(this.districtService.getDistrictByDistNoFromRedisCache(district.getDistrictNumber())).thenReturn(district);
+        when(this.schoolService.getSchoolDetailBySchoolId(schoolId)).thenReturn(schoolDetail);
         when(this.schoolService.getSchoolDetailByMincodeFromRedisCache(minCode)).thenReturn(schoolDetail);
         when(this.schoolService.getSchoolDetailsFromRedisCache()).thenReturn(List.of(schoolDetail));
-        when(this.schoolService.getSchoolDetailByMincodeFromRedisCache(minCode)).thenReturn(schoolDetail);
         when(this.schoolService.getSchoolByMinCodeFromRedisCache(minCode)).thenReturn(school);
+        when(this.schoolService.getSchoolBySchoolId(schoolId)).thenReturn(Optional.of(school));
 
         return schoolDetail;
     }

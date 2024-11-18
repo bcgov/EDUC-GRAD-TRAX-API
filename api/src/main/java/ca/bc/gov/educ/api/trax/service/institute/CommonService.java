@@ -43,7 +43,14 @@ public class CommonService {
     public ca.bc.gov.educ.api.trax.model.dto.School getSchoolForClobDataByMinCodeFromRedisCache(String minCode) {
         log.debug("Get a School Clob data by MinCode from Redis Cache: {}", minCode);
         SchoolDetail schoolDetail = schoolService.getSchoolDetailByMincodeFromRedisCache(minCode);
-        return schoolDetail != null? convertSchoolDetailIntoSchoolClob(schoolDetail) : null;
+        return schoolDetail != null? convertSchoolDetailIntoSchoolClob((schoolDetail)) : null;
+    }
+
+    // School Clob data for Algorithm Data by schoolId from RedisCache
+    public ca.bc.gov.educ.api.trax.model.dto.School getSchoolForClobDataBySchoolIdFromRedisCache(UUID schoolId) {
+        log.debug("Get a School Clob data by SchoolId from Redis Cache: {}", schoolId);
+        SchoolDetail schoolDetail = schoolService.getSchoolDetailBySchoolId(schoolId);
+        return schoolDetail != null? convertSchoolDetailIntoSchoolClob((schoolDetail)) : null;
     }
 
     public UUID getSchoolIdFromRedisCache(String minCode) {
@@ -81,8 +88,8 @@ public class CommonService {
             school.setDistrictName(district.getDisplayName());
         }
 
-        // School Category Code
-        school.setSchoolCategoryCodeInstitute(schoolDetail.getSchoolCategoryCode());
+        // School Category
+        school.setSchoolCategoryCode(schoolDetail.getSchoolCategoryCode());
         populateSchoolCategoryLegacyCode(school, schoolDetail.getSchoolCategoryCode());
 
         // Address
@@ -112,7 +119,7 @@ public class CommonService {
         if (StringUtils.isNotBlank(schoolCategoryCode)) {
             SchoolCategoryCode schoolCategoryCodeObj = codeService.getSchoolCategoryCodeFromRedisCache(schoolCategoryCode);
             if (schoolCategoryCodeObj != null) {
-                school.setSchoolCategoryCode(schoolCategoryCodeObj.getLegacyCode());
+                school.setSchoolCategoryLegacyCode(schoolCategoryCodeObj.getLegacyCode());
             }
         }
     }

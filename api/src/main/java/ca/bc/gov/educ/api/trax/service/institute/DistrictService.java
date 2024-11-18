@@ -90,12 +90,12 @@ public class DistrictService {
 
     public District getDistrictByDistNoFromRedisCache(String districtNumber) {
         log.debug("**** Getting district by district no. from Redis Cache.");
-        return  districtTransformer.transformToDTO(districtRedisRepository.findByDistrictNumber(districtNumber));
+        return districtRedisRepository.findByDistrictNumber(districtNumber).map(districtTransformer::transformToDTO).orElse(null);
     }
 
     public District getDistrictByIdFromRedisCache(String districtId) {
         log.debug("**** Getting district by ID from Redis Cache.");
-        return  districtTransformer.transformToDTO(districtRedisRepository.findById(districtId));
+        return districtRedisRepository.findById(districtId).map(districtTransformer::transformToDTO).orElse(null);
     }
 
     public List<District> getDistrictsBySchoolCategoryCode(String schoolCategoryCode) {

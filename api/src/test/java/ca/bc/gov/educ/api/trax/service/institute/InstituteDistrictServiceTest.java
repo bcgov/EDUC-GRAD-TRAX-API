@@ -309,7 +309,7 @@ public class InstituteDistrictServiceTest {
 		districtEntity.setContacts(Arrays.asList(new DistrictContactEntity(), new DistrictContactEntity()));
 
 		when(this.districtRedisRepository.findByDistrictNumber(distNo))
-				.thenReturn(districtEntity);
+				.thenReturn(Optional.of(districtEntity));
 		when(this.districtTransformerMock.transformToDTO(districtEntity))
 				.thenReturn(district);
 		assertEquals(district, districtService.getDistrictByDistNoFromRedisCache(distNo));
