@@ -71,28 +71,29 @@ public class CommonControllerTest {
     @Test
     public void testGetSchoolClobData() {
         School school = new School();
-        school.setSchoolId(UUID.randomUUID().toString());
+        UUID schoolId = UUID.randomUUID();
+        school.setSchoolId(schoolId.toString());
         school.setSchoolName("Test School");
         school.setMinCode("12345678");
 
-        Mockito.when(commonService.getSchoolForClobDataByMinCodeFromRedisCache(school.getMinCode())).thenReturn(school);
-        commonController.getSchoolForClobDataByMinCode(school.getMinCode());
-        Mockito.verify(commonService).getSchoolForClobDataByMinCodeFromRedisCache(school.getMinCode());
+        Mockito.when(commonService.getSchoolForClobDataBySchoolIdFromRedisCache(schoolId)).thenReturn(school);
+        commonController.getSchoolForClobDataBySchoolId(schoolId);
+        Mockito.verify(commonService).getSchoolForClobDataBySchoolIdFromRedisCache(schoolId);
     }
 
     @Test
     public void testGetSchoolClobData_whenMinCode_isNot_Provided() {
         Mockito.when(validation.hasErrors()).thenReturn(true);
-        commonController.getSchoolForClobDataByMinCode("");
+        commonController.getSchoolForClobDataBySchoolId(null);
         Mockito.verify(validation).stopOnErrors();
     }
 
     @Test
     public void testGetSchoolClobData_whenMinCode_isNot_Found() {
-        String minCode = "12345678";
-        Mockito.when(commonService.getSchoolForClobDataByMinCodeFromRedisCache(minCode)).thenReturn(null);
-        commonController.getSchoolForClobDataByMinCode(minCode);
-        Mockito.verify(commonService).getSchoolForClobDataByMinCodeFromRedisCache(minCode);
+        UUID schoolId = UUID.randomUUID();
+        Mockito.when(commonService.getSchoolForClobDataBySchoolIdFromRedisCache(schoolId)).thenReturn(null);
+        commonController.getSchoolForClobDataBySchoolId(schoolId);
+        Mockito.verify(commonService).getSchoolForClobDataBySchoolIdFromRedisCache(schoolId);
     }
 
 }

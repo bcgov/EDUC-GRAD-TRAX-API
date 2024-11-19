@@ -1,9 +1,6 @@
 package ca.bc.gov.educ.api.trax.service.institute;
 
 import ca.bc.gov.educ.api.trax.constant.CacheKey;
-import ca.bc.gov.educ.api.trax.messaging.NatsConnection;
-import ca.bc.gov.educ.api.trax.messaging.jetstream.Publisher;
-import ca.bc.gov.educ.api.trax.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.trax.model.dto.ResponseObj;
 import ca.bc.gov.educ.api.trax.model.dto.institute.School;
 import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolDetail;
@@ -211,7 +208,7 @@ class InstituteSchoolServiceTest {
 		schoolEntity.setEmail("abc@xyz.ca");
 
 		when(this.schoolRedisRepository.findByMincode(mincode))
-				.thenReturn(schoolEntity);
+				.thenReturn(Optional.of(schoolEntity));
 		when(this.schoolTransformer.transformToDTO(schoolEntity))
 				.thenReturn(school);
 		assertEquals(school, schoolService.getSchoolByMinCodeFromRedisCache(mincode));
@@ -261,14 +258,14 @@ class InstituteSchoolServiceTest {
 		schoolEntity.setSchoolCategoryCode("SCC");
 		schoolEntity.setEmail("abc@xyz.ca");
 
-		when(schoolRedisRepository.findByMincode(minCode)).thenReturn(schoolEntity);
+		when(schoolRedisRepository.findByMincode(minCode)).thenReturn(Optional.of(schoolEntity));
 		assertEquals(true, schoolService.checkIfSchoolExists(minCode));
 	}
 
 	@Test
 	void whenCheckIfSchoolExists_returnFalse() {
 		String minCode = "12345678";
-		when(schoolRedisRepository.findByMincode(minCode)).thenReturn(null);
+		when(schoolRedisRepository.findByMincode(minCode)).thenReturn(Optional.empty());
 		assertEquals(false, schoolService.checkIfSchoolExists(minCode));
 	}
 
@@ -440,7 +437,7 @@ class InstituteSchoolServiceTest {
 		schoolDetailEntity.setEmail("abc@xyz.ca");
 
 		when(this.schoolDetailRedisRepository.findByMincode(mincode))
-				.thenReturn(schoolDetailEntity);
+				.thenReturn(Optional.of(schoolDetailEntity));
 		when(this.schoolDetailTransformer.transformToDTO(schoolDetailEntity))
 				.thenReturn(schoolDetail);
 		assertEquals(schoolDetail, schoolService.getSchoolDetailByMincodeFromRedisCache(mincode));
@@ -536,7 +533,7 @@ class InstituteSchoolServiceTest {
 
 		Mockito.when(schoolRedisRepository.findAll()).thenReturn(List.of(schoolEntity));
 		Mockito.when(schoolRedisRepository.findAllByDistrictId(districtId.toString())).thenReturn(List.of(schoolEntity));
-		Mockito.when(schoolRedisRepository.findByMincode(mincode)).thenReturn(schoolEntity);
+		Mockito.when(schoolRedisRepository.findByMincode(mincode)).thenReturn(Optional.of(schoolEntity));
 		Mockito.when(schoolRedisRepository.findAllByDistrictIdAndMincode(districtId.toString(), mincode)).thenReturn(List.of(schoolEntity));
 		Mockito.when(schoolTransformer.transformToDTO(List.of(schoolEntity))).thenReturn(List.of(school));
 		Mockito.when(schoolTransformer.transformToDTO(schoolEntity)).thenReturn(school);
@@ -569,7 +566,7 @@ class InstituteSchoolServiceTest {
 
 		Mockito.when(schoolRedisRepository.findAll()).thenReturn(Collections.emptyList());
 		Mockito.when(schoolRedisRepository.findAllByDistrictId(districtId.toString())).thenReturn(Collections.emptyList());
-		Mockito.when(schoolRedisRepository.findByMincode(mincode)).thenReturn(null);
+		Mockito.when(schoolRedisRepository.findByMincode(mincode)).thenReturn(Optional.empty());
 		Mockito.when(schoolRedisRepository.findAllByDistrictIdAndMincode(districtId.toString(), mincode)).thenReturn(Collections.emptyList());
 
 		// Test case when both districtId and mincode are null

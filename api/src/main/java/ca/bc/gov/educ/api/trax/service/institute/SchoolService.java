@@ -72,12 +72,12 @@ public class SchoolService {
 
 	public School getSchoolByMinCodeFromRedisCache(String minCode) {
 		log.debug("Get School by Mincode from Redis Cache: {}", minCode);
-		return schoolTransformer.transformToDTO(schoolRedisRepository.findByMincode(minCode));
+		return schoolRedisRepository.findByMincode(minCode).map(schoolTransformer::transformToDTO).orElse(null);
 	}
 
 	public boolean checkIfSchoolExists(String minCode) {
-		SchoolEntity schoolEntity = schoolRedisRepository.findByMincode(minCode);
-		return schoolEntity != null;
+		Optional<SchoolEntity> schoolOptional = schoolRedisRepository.findByMincode(minCode);
+		return schoolOptional.isPresent();
 	}
 
 	public void initializeSchoolCache(boolean force) {
@@ -121,7 +121,12 @@ public class SchoolService {
 
 	public SchoolDetail getSchoolDetailByMincodeFromRedisCache(String mincode) {
 		log.debug("**** Getting school Details By Mincode from Redis Cache.");
-		return schoolDetailTransformer.transformToDTO(schoolDetailRedisRepository.findByMincode(mincode));
+		return schoolDetailRedisRepository.findByMincode(mincode).map(schoolDetailTransformer::transformToDTO).orElse(null);
+	}
+
+	public SchoolDetail getSchoolDetailBySchoolId(UUID schoolId) {
+		log.debug("**** Getting school Details By SchoolId from Redis Cache.");
+		return schoolDetailRedisRepository.findById(String.valueOf(schoolId)).map(schoolDetailTransformer::transformToDTO).orElse(null);
 	}
 
 	public void initializeSchoolDetailCache(boolean force) {
@@ -183,8 +188,8 @@ public class SchoolService {
 		} else if (mincode == null) {
 			return schoolTransformer.transformToDTO(schoolRedisRepository.findAllByDistrictId(String.valueOf(districtId)));
 		} else if(districtId == null) {
-			SchoolEntity schoolEntity = schoolRedisRepository.findByMincode(mincode);
-			return schoolEntity != null ? List.of(schoolTransformer.transformToDTO(schoolEntity)) : Collections.emptyList();
+			Optional<SchoolEntity> schoolOptional = schoolRedisRepository.findByMincode(mincode);
+			return schoolOptional.map(schoolEntity -> List.of(schoolTransformer.transformToDTO(schoolEntity))).orElse(Collections.emptyList());
 		} else {
 			return schoolTransformer.transformToDTO(schoolRedisRepository.findAllByDistrictIdAndMincode(String.valueOf(districtId), mincode));
 		}

@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -53,18 +54,30 @@ public class DistrictController {
         return ResponseEntity.ok("Districts loaded into cache!");
     }
 
-    @GetMapping(EducGradTraxApiConstants.GRAD_DISTRICT_URL_MAPPING_V2 + EducGradTraxApiConstants.GET_DISTRICT_BY_DISTNO_MAPPING)
+    @GetMapping(EducGradTraxApiConstants.GRAD_DISTRICT_URL_MAPPING_V2)
     @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
     @Operation(summary = "Find a District by District Number V2", description = "Get District by District Number V2", tags = { "District" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
-    public ResponseEntity<District> getDistrictDetailsByDistNo(@PathVariable String distNo) {
+    public ResponseEntity<District> getDistrictDetailsByDistNo(@RequestParam(required = true) String distNo) {
         if(distNo.length() <=3) {
             District distResponse = districtService.getDistrictByDistNoFromRedisCache(distNo);
             if (distResponse != null) {
                 return response.GET(distResponse);
             }
         }
-        return null;
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @GetMapping(EducGradTraxApiConstants.GRAD_DISTRICT_URL_MAPPING_V2 + EducGradTraxApiConstants.GET_DISTRICT_BY_ID_MAPPING)
+    @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
+    @Operation(summary = "Find a District by ID V2", description = "Get District by ID V2", tags = { "District" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+    public ResponseEntity<District> getDistrictDetailsById(@PathVariable String districtId) {
+        District distResponse = districtService.getDistrictByIdFromRedisCache(districtId);
+        if (distResponse != null) {
+            return response.GET(distResponse);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @GetMapping(EducGradTraxApiConstants.GRAD_DISTRICT_URL_MAPPING_V2 + EducGradTraxApiConstants.GET_DISTRICTS_BY_SCHOOL_CATEGORY_MAPPING)

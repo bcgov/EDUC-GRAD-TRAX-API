@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
@@ -90,7 +91,7 @@ public class DistrictControllerTest {
 
         districtControllerV2.getDistrictDetailsByDistNo(distNo);
         Mockito.verify(districtServiceV2, never()).getDistrictByDistNoFromRedisCache(distNo);
-        Assertions.assertEquals(null, districtControllerV2.getDistrictDetailsByDistNo(distNo));
+        Assertions.assertEquals(new ResponseEntity<>(HttpStatus.NOT_FOUND), districtControllerV2.getDistrictDetailsByDistNo(distNo));
     }
 
     @Test
