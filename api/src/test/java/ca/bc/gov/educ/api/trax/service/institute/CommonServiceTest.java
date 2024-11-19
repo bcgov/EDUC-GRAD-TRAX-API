@@ -21,6 +21,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
@@ -164,6 +166,31 @@ public class CommonServiceTest {
         when(this.schoolService.getSchoolBySchoolId(schoolId)).thenReturn(Optional.of(school));
 
         return schoolDetail;
+    }
+
+    @Test
+    public void testGetSchoolForClobDataBySchoolIdFromRedisCache_shouldReturnSchool() {
+        UUID schoolId = UUID.randomUUID();
+        String schoolIdString = schoolId.toString();
+        SchoolDetail schoolDetail = new SchoolDetail();
+        schoolDetail.setSchoolId(schoolIdString);
+        schoolDetail.setMincode("12345");
+        schoolDetail.setDisplayName("My School");
+        ca.bc.gov.educ.api.trax.model.dto.School expected = new ca.bc.gov.educ.api.trax.model.dto.School();
+        expected.setSchoolId(schoolIdString);
+        expected.setMinCode("12345");
+        expected.setSchoolName("My School");
+        when(schoolService.getSchoolDetailBySchoolId(schoolId)).thenReturn(schoolDetail);
+        ca.bc.gov.educ.api.trax.model.dto.School actual = commonService.getSchoolForClobDataBySchoolIdFromRedisCache(schoolId);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testGetSchoolForClobDataBySchoolIdFromRedisCache_shouldReturnNull() {
+        UUID schoolId = UUID.randomUUID();
+        when(schoolService.getSchoolDetailBySchoolId(schoolId)).thenReturn(null);
+        ca.bc.gov.educ.api.trax.model.dto.School actual = commonService.getSchoolForClobDataBySchoolIdFromRedisCache(schoolId);
+        assertNull(actual);
     }
 
 }
