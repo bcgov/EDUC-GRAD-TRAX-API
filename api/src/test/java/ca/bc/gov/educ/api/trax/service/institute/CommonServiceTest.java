@@ -169,7 +169,7 @@ public class CommonServiceTest {
     }
 
     @Test
-    public void testGetSchoolForClobDataBySchoolIdFromRedisCache_shouldReturnSchool() {
+    public void whenGetSchoolForClobDataBySchoolIdFromRedisCache_shouldReturnSchool() {
         UUID schoolId = UUID.randomUUID();
         String schoolIdString = schoolId.toString();
         SchoolDetail schoolDetail = new SchoolDetail();
@@ -186,11 +186,35 @@ public class CommonServiceTest {
     }
 
     @Test
-    public void testGetSchoolForClobDataBySchoolIdFromRedisCache_shouldReturnNull() {
+    public void whenGetSchoolForClobDataBySchoolIdFromRedisCache_shouldReturnNull() {
         UUID schoolId = UUID.randomUUID();
         when(schoolService.getSchoolDetailBySchoolId(schoolId)).thenReturn(null);
         ca.bc.gov.educ.api.trax.model.dto.School actual = commonService.getSchoolForClobDataBySchoolIdFromRedisCache(schoolId);
         assertNull(actual);
     }
 
+    @Test
+    public void whenGetSchoolForClobDataByMinCodeFromRedisCache_shouldReturnSchool() {
+        UUID schoolId = UUID.randomUUID();
+        String schoolIdString = schoolId.toString();
+        SchoolDetail schoolDetail = new SchoolDetail();
+        schoolDetail.setSchoolId(schoolIdString);
+        schoolDetail.setMincode("12345");
+        schoolDetail.setDisplayName("My School");
+        ca.bc.gov.educ.api.trax.model.dto.School expected = new ca.bc.gov.educ.api.trax.model.dto.School();
+        expected.setSchoolId(schoolIdString);
+        expected.setMinCode("12345");
+        expected.setSchoolName("My School");
+        when(schoolService.getSchoolDetailByMincodeFromRedisCache(schoolDetail.getMincode())).thenReturn(schoolDetail);
+        ca.bc.gov.educ.api.trax.model.dto.School actual = commonService.getSchoolForClobDataByMinCodeFromRedisCache(schoolDetail.getMincode());
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void whenGetSchoolForClobDataByMinCodeFromRedisCache_shouldReturnNull() {
+        String mincode = "12345";
+        when(schoolService.getSchoolDetailByMincodeFromRedisCache(mincode)).thenReturn(null);
+        ca.bc.gov.educ.api.trax.model.dto.School actual = commonService.getSchoolForClobDataByMinCodeFromRedisCache(mincode);
+        assertNull(actual);
+    }
 }
