@@ -23,6 +23,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 
 @Slf4j
@@ -217,10 +218,10 @@ public class SchoolService {
 	private List<SchoolEntity> filterByCriteria(SchoolSearchCriteria criteria, List<SchoolEntity> schoolEntities) {
 		List<SchoolEntity> schools = new ArrayList<SchoolEntity>();
 		for (SchoolEntity school : schoolEntities) {
-			if (school.getDistrictId().matches(criteria.getDistrictId())
-			&& school.getMincode().matches(criteria.getMincode())
-			&& school.getDisplayName().matches(criteria.getDisplayName())
-			&& school.getMincode().substring(0, 3).matches(criteria.getDistNo()))
+			if (school.getDistrictId().matches(Pattern.quote(criteria.getDistrictId()))
+			&& school.getMincode().matches(Pattern.quote(criteria.getMincode()))
+			&& school.getDisplayName().matches(Pattern.quote(criteria.getDisplayName()))
+			&& school.getMincode().substring(0, 3).matches(Pattern.quote(criteria.getDistNo())))
 				schools.add(school);
 		}
 		return schools;
