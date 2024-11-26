@@ -12,15 +12,18 @@ import ca.bc.gov.educ.api.trax.repository.redis.SchoolDetailRedisRepository;
 import ca.bc.gov.educ.api.trax.repository.redis.SchoolRedisRepository;
 import ca.bc.gov.educ.api.trax.service.RESTService;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
+import com.google.common.base.Strings;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.util.*;
+
 
 @Slf4j
 @RequiredArgsConstructor
@@ -182,16 +185,55 @@ public class SchoolService {
 		return schoolRedisRepository.findById(String.valueOf(schoolId)).map(schoolTransformer::transformToDTO);
 	}
 
-	public List<School> getSchoolsByParams(UUID districtId, String mincode) {
-		if(districtId == null && mincode == null) {
-			return schoolTransformer.transformToDTO(schoolRedisRepository.findAll());
-		} else if (mincode == null) {
-			return schoolTransformer.transformToDTO(schoolRedisRepository.findAllByDistrictId(String.valueOf(districtId)));
-		} else if(districtId == null) {
-			Optional<SchoolEntity> schoolOptional = schoolRedisRepository.findByMincode(mincode);
-			return schoolOptional.map(schoolEntity -> List.of(schoolTransformer.transformToDTO(schoolEntity))).orElse(Collections.emptyList());
-		} else {
-			return schoolTransformer.transformToDTO(schoolRedisRepository.findAllByDistrictIdAndMincode(String.valueOf(districtId), mincode));
-		}
+	/**
+	 * Get a list of schools that match the given params with wildcards
+	 * @param districtId
+	 * @param mincode
+	 * @param displayName
+	 * @param distNo
+	 * @return
+	 */
+	@Transactional(readOnly = true)
+	public List<School> getSchoolsByParams(String districtId, String mincode, String displayName, String distNo) {
+
+		SchoolSearchCriteria criteria = SchoolSearchCriteria.builder()
+				.districtId(transformToWildcard(districtId))
+				.mincode(transformToWildcard(mincode))
+				.displayName(transformToWildcard(displayName))
+				.distNo(transformToWildcard(distNo))
+				.build();
+
+		log.debug(criteria.toString());
+		List<SchoolEntity> schools = filterByCriteria(criteria, schoolRedisRepository.findAll());
+		return schoolTransformer.transformToDTO(schools);
 	}
+
+	/**
+	 * Filter a list of SchoolEntities by given criteria
+	 * @param criteria
+	 * @param schoolEntities
+	 * @return
+	 */
+	private List<SchoolEntity> filterByCriteria(SchoolSearchCriteria criteria, List<SchoolEntity> schoolEntities) {
+		List<SchoolEntity> schools = new ArrayList<SchoolEntity>();
+		for (SchoolEntity school : schoolEntities) {
+			if (school.getDistrictId().matches(criteria.getDistrictId())
+			&& school.getMincode().matches(criteria.getMincode())
+			&& school.getDisplayName().matches(criteria.getDisplayName())
+			&& school.getMincode().substring(0, 3).matches(criteria.getDistNo()))
+				schools.add(school);
+		}
+		return schools;
+	}
+
+	/**
+	 * Transform '*' wildcard into Regex format
+	 * @param value
+	 * @return
+	 */
+	private String transformToWildcard(String value) {
+		return Strings.isNullOrEmpty(value) ? "(.*)" : value.replaceAll("\\*", "(.*)");
+	}
+
+
 }

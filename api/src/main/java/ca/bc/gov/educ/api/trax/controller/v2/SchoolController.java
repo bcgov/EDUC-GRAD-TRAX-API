@@ -7,6 +7,7 @@ import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.GradValidation;
 import ca.bc.gov.educ.api.trax.util.PermissionsConstants;
 import ca.bc.gov.educ.api.trax.util.ResponseHelper;
+import com.electronwill.nightconfig.core.conversion.Path;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.info.Info;
@@ -122,12 +123,27 @@ public class SchoolController {
         return response.GET(schoolService.getSchoolDetailsBySchoolCategoryCode(schoolCategoryCode));
     }
 
-    @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_DETAIL_URL_MAPPING_V2 + EducGradTraxApiConstants.GET_SCHOOL_BY_CODE_MAPPING)
+    @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_DETAIL_URL_MAPPING_V2 + EducGradTraxApiConstants.GET_SCHOOL_BY_SCHOOL_ID)
+    @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
+    @Operation(summary = "Find School Details by ID from cache", description = "Get School Details by ID from cache", tags = { "School" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "204", description = "NO CONTENT")})
+    public ResponseEntity<SchoolDetail> getSchoolDetailsById(@PathVariable UUID schoolId) {
+        log.debug("getSchoolDetails V2 : ");
+        SchoolDetail schoolDetailResponse = schoolService.getSchoolDetailBySchoolId(schoolId);
+        if(schoolDetailResponse != null) {
+            return response.GET(schoolDetailResponse);
+        }else {
+            return response.NOT_FOUND();
+        }
+    }
+
+    @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_DETAIL_URL_MAPPING_V2 + EducGradTraxApiConstants.GET_SCHOOL_DETAIL_SEARCH_MAPPING)
     @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
     @Operation(summary = "Find School Details by Mincode from cache", description = "Get School Details by Mincode from cache", tags = { "School" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "204", description = "NO CONTENT")})
-    public ResponseEntity<SchoolDetail> getSchoolDetailsByMincode(@PathVariable String minCode) {
+    public ResponseEntity<SchoolDetail> getSchoolDetailsByParams(@RequestParam(required = false) String minCode) {
         log.debug("getSchoolDetails V2 : ");
         SchoolDetail schoolDetailResponse = schoolService.getSchoolDetailByMincodeFromRedisCache(minCode);
         if(schoolDetailResponse != null) {
@@ -136,15 +152,26 @@ public class SchoolController {
             return response.NOT_FOUND();
         }
     }
+
+    /**
+     * School wildcard Search with given params
+     * @param districtId
+     * @param mincode
+     * @param displayName
+     * @param distNo
+     * @return
+     */
     @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_URL_MAPPING_V2 + EducGradTraxApiConstants.GET_SCHOOL_SEARCH_MAPPING)
     @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
-    @Operation(summary = "Search for a school", description = "Search for a School", tags = { "School" })
+    @Operation(summary = "Search for a school v2", description = "Search for a School v2", tags = { "School" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
     public ResponseEntity<List<School>> getSchoolsByParams(
-            @RequestParam(value = "districtId", required = false) UUID districtId,
-            @RequestParam(value = "mincode", required = false) String mincode) {
-        return response.GET(schoolService.getSchoolsByParams(districtId, mincode));
+            @RequestParam(value = "districtId", required = false) String districtId,
+            @RequestParam(value = "mincode", required = false) String mincode,
+            @RequestParam(value = "displayName", required = false) String displayName,
+            @RequestParam(value = "distNo", required = false) String distNo)
+            {
+        return response.GET(schoolService.getSchoolsByParams(districtId, mincode, displayName, distNo));
     }
-
 }
