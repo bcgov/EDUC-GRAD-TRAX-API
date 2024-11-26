@@ -1,10 +1,10 @@
 package ca.bc.gov.educ.api.trax.repository.redis;
 
 import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolCategoryCodeEntity;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface SchoolCategoryCodeRedisRepository extends CrudRepository<SchoolCategoryCodeEntity, String> {
+public interface SchoolCategoryCodeRedisRepository extends JpaRepository<SchoolCategoryCodeEntity, String> {
     String HASH_KEY = "SchoolCategoryCode";
 }

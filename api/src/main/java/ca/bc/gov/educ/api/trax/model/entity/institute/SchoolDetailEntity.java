@@ -1,20 +1,23 @@
 package ca.bc.gov.educ.api.trax.model.entity.institute;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.index.Indexed;
 
 import java.util.List;
 
+@Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @RedisHash("SchoolDetail")
 public class SchoolDetailEntity {
 
+    @org.springframework.data.annotation.Id
     @Id
     private String schoolId;
     @Indexed
