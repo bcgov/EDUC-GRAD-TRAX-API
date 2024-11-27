@@ -8,6 +8,7 @@ import ca.bc.gov.educ.api.trax.model.entity.EventEntity;
 import ca.bc.gov.educ.api.trax.service.institute.SchoolService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -17,7 +18,7 @@ import java.util.Arrays;
 public class SchoolMovedService extends SchoolEventBaseService<MoveSchoolData> {
 
     @Autowired
-    public SchoolMovedService(SchoolService schoolService) {
+    public SchoolMovedService(@Qualifier("instituteSchoolService") SchoolService schoolService) {
         super(schoolService);
     }
 

@@ -3,6 +3,7 @@ package ca.bc.gov.educ.api.trax.service;
 import ca.bc.gov.educ.api.trax.model.dto.institute.School;
 import ca.bc.gov.educ.api.trax.service.institute.SchoolService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -11,7 +12,7 @@ public abstract class SchoolEventBaseService<T> extends EventBaseService<T> {
 
     protected SchoolService schoolService;
 
-    protected SchoolEventBaseService(SchoolService schoolService) {
+    protected SchoolEventBaseService(@Qualifier("instituteSchoolService") SchoolService schoolService) {
         this.schoolService = schoolService;
     }
 

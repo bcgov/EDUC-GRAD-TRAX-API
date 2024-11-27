@@ -226,7 +226,7 @@ public class SchoolControllerTest {
         schoolDetail.setMincode(mincode);
 
         Mockito.when(schoolServiceV2.getSchoolDetailByMincodeFromRedisCache(mincode)).thenReturn(schoolDetail);
-        schoolControllerV2.getSchoolDetailsByMincode(mincode);
+        schoolControllerV2.getSchoolDetailsByParams(mincode);
         Mockito.verify(schoolServiceV2).getSchoolDetailByMincodeFromRedisCache(mincode);
     }
 
@@ -239,9 +239,9 @@ public class SchoolControllerTest {
         schoolDetail.setMincode(mincode);
 
         Mockito.when(schoolServiceV2.getSchoolDetailByMincodeFromRedisCache(mincode)).thenReturn(null);
-        schoolControllerV2.getSchoolDetailsByMincode(mincode);
+        schoolControllerV2.getSchoolDetailsByParams(mincode);
         Mockito.verify(schoolServiceV2).getSchoolDetailByMincodeFromRedisCache(mincode);
-        assertEquals(responseHelper.NOT_FOUND(), schoolControllerV2.getSchoolDetailsByMincode(mincode));
+        assertEquals(responseHelper.NOT_FOUND(), schoolControllerV2.getSchoolDetailsByParams(mincode));
     }
 
 }

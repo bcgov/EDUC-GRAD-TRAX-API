@@ -128,7 +128,7 @@ class InstituteSchoolServiceTest {
 		when(webClientMock.get())
 				.thenReturn(requestHeadersUriSpecMock);
 
-		List<School> result = schoolService.getSchoolsFromInstituteApi();
+		schoolService.getSchoolsFromInstituteApi();
 	}
 
 	@Test
@@ -521,71 +521,71 @@ class InstituteSchoolServiceTest {
 
 	@Test
 	void testGetSchoolsByParams() {
-		UUID districtId = UUID.randomUUID();
+		String districtId = UUID.randomUUID().toString();
 		String mincode = "1234567";
+		String displayName = "ABC Elementary School";
 		SchoolEntity schoolEntity = new SchoolEntity();
 		schoolEntity.setSchoolId(UUID.randomUUID().toString());
 		schoolEntity.setMincode(mincode);
+		schoolEntity.setDistrictId(districtId);
+		schoolEntity.setDisplayName(displayName);
 
 		School school = new School();
 		school.setSchoolId(schoolEntity.getSchoolId());
 		school.setMincode(mincode);
+		school.setDistrictId(districtId);
+		school.setDisplayName(displayName);
 
 		Mockito.when(schoolRedisRepository.findAll()).thenReturn(List.of(schoolEntity));
-		Mockito.when(schoolRedisRepository.findAllByDistrictId(districtId.toString())).thenReturn(List.of(schoolEntity));
-		Mockito.when(schoolRedisRepository.findByMincode(mincode)).thenReturn(Optional.of(schoolEntity));
-		Mockito.when(schoolRedisRepository.findAllByDistrictIdAndMincode(districtId.toString(), mincode)).thenReturn(List.of(schoolEntity));
 		Mockito.when(schoolTransformer.transformToDTO(List.of(schoolEntity))).thenReturn(List.of(school));
 		Mockito.when(schoolTransformer.transformToDTO(schoolEntity)).thenReturn(school);
 
 		// Test case when both districtId and mincode are null
-		List<School> result = schoolService.getSchoolsByParams(null, null);
+		List<School> result = schoolService.getSchoolsByParams(null, null, null, null);
 		assertNotNull(result);
 		assertEquals(1, result.size());
 
 		// Test case when mincode is null
-		result = schoolService.getSchoolsByParams(districtId, null);
+		result = schoolService.getSchoolsByParams(districtId, null, displayName, "12*");
 		assertNotNull(result);
 		assertEquals(1, result.size());
 
 		// Test case when districtId is null
-		result = schoolService.getSchoolsByParams(null, mincode);
+		result = schoolService.getSchoolsByParams(null, mincode, "ABC*", "12*");
 		assertNotNull(result);
 		assertEquals(1, result.size());
 
 		// Test case when both districtId and mincode are provided
-		result = schoolService.getSchoolsByParams(districtId, mincode);
+		result = schoolService.getSchoolsByParams(districtId, mincode, "ABC*", "12*");
 		assertNotNull(result);
 		assertEquals(1, result.size());
 	}
 
 	@Test
 	void testGetSchoolsByParams_EmptyResults() {
-		UUID districtId = UUID.randomUUID();
+		String districtId = UUID.randomUUID().toString();
 		String mincode = "1234567";
+		String displayName = "ABC Elementary School";
 
 		Mockito.when(schoolRedisRepository.findAll()).thenReturn(Collections.emptyList());
-		Mockito.when(schoolRedisRepository.findAllByDistrictId(districtId.toString())).thenReturn(Collections.emptyList());
-		Mockito.when(schoolRedisRepository.findByMincode(mincode)).thenReturn(Optional.empty());
-		Mockito.when(schoolRedisRepository.findAllByDistrictIdAndMincode(districtId.toString(), mincode)).thenReturn(Collections.emptyList());
 
 		// Test case when both districtId and mincode are null
-		List<School> result = schoolService.getSchoolsByParams(null, null);
+		List<School> result = schoolService.getSchoolsByParams(null, null, null, null);
 		assertNotNull(result);
 		assertTrue(result.isEmpty());
 
 		// Test case when mincode is null
-		result = schoolService.getSchoolsByParams(districtId, null);
+		result = schoolService.getSchoolsByParams(districtId, null, displayName, "12*");
 		assertNotNull(result);
 		assertTrue(result.isEmpty());
 
 		// Test case when districtId is null
-		result = schoolService.getSchoolsByParams(null, mincode);
+		result = schoolService.getSchoolsByParams(null, mincode, "ABC*", "12*");
 		assertNotNull(result);
 		assertTrue(result.isEmpty());
 
 		// Test case when both districtId and mincode are provided
-		result = schoolService.getSchoolsByParams(districtId, mincode);
+		result = schoolService.getSchoolsByParams(districtId, mincode, "ABC*", "12*");
 		assertNotNull(result);
 		assertTrue(result.isEmpty());
 	}
