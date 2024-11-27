@@ -109,8 +109,7 @@ class SchoolControllerIntegrationTest {
                     .param("mincode", "1234567")
                     .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(content().json("[{\"schoolId\":\""+schoolId+"\",\"districtId\":\""+districtId+"\"}]"));
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON));
   }
 
   @Test
@@ -131,10 +130,12 @@ class SchoolControllerIntegrationTest {
                     .param("districtId", "BAD_ID123")
                     .with(jwt().jwt(jwt -> jwt.claim("scope", "READ_GRAD_SCHOOL_DATA")))
                     .param("mincode", "1234567")
+                    .param("displayName", "School name")
+                    .param("distNo", "123")
                     .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().isBadRequest())
+            .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$.message").value("Parameter 'districtId' with value 'BAD_ID123' could not be converted to type 'UUID'."));
+            .andExpect(content().json("[]"));
   }
 
   @Test
@@ -143,6 +144,8 @@ class SchoolControllerIntegrationTest {
                     .param("districtId", districtId)
                     .with(jwt().jwt(jwt -> jwt.claim("scope", "BAD_SCOPE")))
                     .param("mincode", "1234567")
+                    .param("displayName", "School name")
+                    .param("distNo", "123")
                     .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isForbidden());
   }

@@ -541,7 +541,7 @@ class InstituteSchoolServiceTest {
 		Mockito.when(schoolTransformer.transformToDTO(schoolEntity)).thenReturn(school);
 
 		// Test case when both districtId and mincode are null
-		List<School> result = schoolService.getSchoolsByParams("", "", "", "");
+		List<School> result = schoolService.getSchoolsByParams(null, null, null, null);
 		assertNotNull(result);
 		assertEquals(1, result.size());
 
