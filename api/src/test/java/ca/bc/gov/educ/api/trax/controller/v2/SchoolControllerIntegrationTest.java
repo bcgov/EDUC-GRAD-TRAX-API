@@ -52,8 +52,8 @@ class SchoolControllerIntegrationTest {
   @Autowired
   private SchoolDetailTransformer schoolDetailTransformer;
 
-  private final String schoolId = UUID.randomUUID().toString();
-  private final String districtId = UUID.randomUUID().toString();
+  private final UUID schoolId = UUID.randomUUID();
+  private final UUID districtId = UUID.randomUUID();
 
   @BeforeEach
   void setup() {
@@ -61,14 +61,14 @@ class SchoolControllerIntegrationTest {
     schoolDetailRedisRepository.deleteAll();
 
     School school = new School();
-    school.setSchoolId(schoolId);
+    school.setSchoolId(schoolId.toString());
     school.setMincode("1234567");
-    school.setDistrictId(districtId);
+    school.setDistrictId(districtId.toString());
     schoolRedisRepository.save(schoolTransformer.transformToEntity(school));
 
     SchoolDetail schoolDetail = new SchoolDetail();
-    schoolDetail.setSchoolId(schoolId);
-    schoolDetail.setDistrictId(districtId);
+    schoolDetail.setSchoolId(schoolId.toString());
+    schoolDetail.setDistrictId(districtId.toString());
     schoolDetailRedisRepository.save(schoolDetailTransformer.transformToEntity(schoolDetail));
   }
 
@@ -104,7 +104,7 @@ class SchoolControllerIntegrationTest {
   @Test
   void testGetSchoolsByParams_givenValidPayload_shouldReturnOk() throws Exception {
     mockMvc.perform(MockMvcRequestBuilders.get("/api/v2/trax/school/search")
-                    .param("districtId", districtId)
+                    .param("districtId", districtId.toString())
                     .with(jwt().jwt(jwt -> jwt.claim("scope", "READ_GRAD_SCHOOL_DATA")))
                     .param("mincode", "1234567")
                     .param("displayName", "School name")
@@ -143,7 +143,7 @@ class SchoolControllerIntegrationTest {
   @Test
   void testGetSchoolsByParams_givenScope_shouldReturnForbidden() throws Exception {
     mockMvc.perform(MockMvcRequestBuilders.get("/api/v2/trax/school/search")
-                    .param("districtId", districtId)
+                    .param("districtId", districtId.toString())
                     .with(jwt().jwt(jwt -> jwt.claim("scope", "BAD_SCOPE")))
                     .param("mincode", "1234567")
                     .param("displayName", "School name")
