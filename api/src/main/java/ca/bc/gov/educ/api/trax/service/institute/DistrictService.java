@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Slf4j
-@Service("InstituteDistrictService")
+@Service("instituteDistrictService")
 public class DistrictService {
 
     @Autowired

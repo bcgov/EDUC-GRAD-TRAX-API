@@ -21,7 +21,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import java.util.List;
 
 @Slf4j
-@Service("InstituteCodeService")
+@Service("instituteCodeService")
 public class CodeService {
 
 	@Autowired
