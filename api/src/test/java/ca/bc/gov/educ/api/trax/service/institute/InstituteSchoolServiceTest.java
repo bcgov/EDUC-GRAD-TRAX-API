@@ -533,15 +533,15 @@ class InstituteSchoolServiceTest {
 		School school = new School();
 		school.setSchoolId(schoolEntity.getSchoolId());
 		school.setMincode(mincode);
-		schoolEntity.setDistrictId(districtId);
-		schoolEntity.setDisplayName(displayName);
+		school.setDistrictId(districtId);
+		school.setDisplayName(displayName);
 
 		Mockito.when(schoolRedisRepository.findAll()).thenReturn(List.of(schoolEntity));
 		Mockito.when(schoolTransformer.transformToDTO(List.of(schoolEntity))).thenReturn(List.of(school));
 		Mockito.when(schoolTransformer.transformToDTO(schoolEntity)).thenReturn(school);
 
 		// Test case when both districtId and mincode are null
-		List<School> result = schoolService.getSchoolsByParams(null, null, null, null);
+		List<School> result = schoolService.getSchoolsByParams("", "", "", "");
 		assertNotNull(result);
 		assertEquals(1, result.size());
 

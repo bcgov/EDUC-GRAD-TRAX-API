@@ -67,7 +67,7 @@ public class TraxCommonServiceTest {
     SchoolService schoolService;
 
     @MockBean
-    @Qualifier("InstituteSchoolService")
+    @Qualifier("instituteSchoolService")
     ca.bc.gov.educ.api.trax.service.institute.SchoolService schoolServiceV2;
 
     // NATS

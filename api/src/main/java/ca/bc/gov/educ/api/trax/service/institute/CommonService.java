@@ -23,9 +23,9 @@ public class CommonService {
     private SchoolService schoolService;
 
     @Autowired
-    public CommonService(@Qualifier("InstituteCodeService") CodeService codeService,
-                         @Qualifier("InstituteDistrictService") DistrictService districtService,
-                         @Qualifier("InstituteSchoolService") SchoolService schoolService) {
+    public CommonService(@Qualifier("instituteCodeService") CodeService codeService,
+                         @Qualifier("instituteDistrictService") DistrictService districtService,
+                         @Qualifier("instituteSchoolService") SchoolService schoolService) {
         this.codeService = codeService;
         this.districtService = districtService;
         this.schoolService = schoolService;

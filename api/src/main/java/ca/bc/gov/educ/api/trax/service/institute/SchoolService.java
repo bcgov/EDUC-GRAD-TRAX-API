@@ -231,6 +231,6 @@ public class SchoolService {
 	 * @return
 	 */
 	private String transformToWildcard(String value) {
-		return Strings.isNullOrEmpty(value) ? "(.*)" : value.replaceAll("\\*", "(.*)");
+		return Strings.isNullOrEmpty(value) ? "(.*)" : "*".concat(value).concat("*").replaceAll("\\*", "(.*)");
 	}
 }
