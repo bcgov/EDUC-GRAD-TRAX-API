@@ -128,7 +128,7 @@ public class SchoolController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "204", description = "NO CONTENT")})
     public ResponseEntity<SchoolDetail> getSchoolDetailsById(@PathVariable UUID schoolId) {
-        log.debug("getSchoolDetails V2 : ");
+        log.debug("getSchoolDetailsById V2 : ");
         SchoolDetail schoolDetailResponse = schoolService.getSchoolDetailBySchoolId(schoolId);
         if(schoolDetailResponse != null) {
             return response.GET(schoolDetailResponse);
@@ -143,7 +143,7 @@ public class SchoolController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "204", description = "NO CONTENT")})
     public ResponseEntity<SchoolDetail> getSchoolDetailsByParams(@RequestParam(required = false) String minCode) {
-        log.debug("getSchoolDetails V2 : ");
+        log.debug("getSchoolDetailsByParams V2 : ");
         SchoolDetail schoolDetailResponse = schoolService.getSchoolDetailByMincodeFromRedisCache(minCode);
         if(schoolDetailResponse != null) {
             return response.GET(schoolDetailResponse);
@@ -171,6 +171,7 @@ public class SchoolController {
             @RequestParam(value = "displayName", required = false) String displayName,
             @RequestParam(value = "distNo", required = false) String distNo)
     {
+        log.debug("getSchoolsByParams V2 : ");
         return response.GET(schoolService.getSchoolsByParams(districtId, mincode, displayName, distNo));
     }
 
