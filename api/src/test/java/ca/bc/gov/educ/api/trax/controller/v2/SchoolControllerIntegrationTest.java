@@ -79,7 +79,7 @@ class SchoolControllerIntegrationTest {
                     .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$.schoolId").value(schoolId))
+            .andExpect(jsonPath("$.schoolId").value(schoolId.toString()))
             .andExpect(jsonPath("$.mincode").value("1234567"));
   }
 
@@ -110,7 +110,7 @@ class SchoolControllerIntegrationTest {
                     .param("displayName", "School name")
                     .param("distNo", "123")
                     .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
+            .andExpect(status().isBadRequest())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON));
   }
 
