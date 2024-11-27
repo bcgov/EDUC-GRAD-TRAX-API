@@ -107,6 +107,8 @@ class SchoolControllerIntegrationTest {
                     .param("districtId", districtId)
                     .with(jwt().jwt(jwt -> jwt.claim("scope", "READ_GRAD_SCHOOL_DATA")))
                     .param("mincode", "1234567")
+                    .param("displayName", "School name")
+                    .param("distNo", "123")
                     .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON));
