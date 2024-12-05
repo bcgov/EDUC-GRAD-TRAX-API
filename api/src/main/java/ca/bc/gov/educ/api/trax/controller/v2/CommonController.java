@@ -71,6 +71,19 @@ public class CommonController {
         }
     }
 
+    @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_CLOB_URL_MAPPING_V2 + EducGradTraxApiConstants.GET_SCHOOL_SEARCH_MAPPING)
+    @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
+    @Operation(summary = "Find a School Clob data by MinCode for GRAD Algorithm Data from cache", description = "Get a School Clob data by MinCode for GRAD Algorithm Data from cache", tags = { "Algorithm Data" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "400", description = "BAD REQUEST"),
+            @ApiResponse(responseCode = "422", description = "UNPROCESSABLE CONTENT"),
+            @ApiResponse(responseCode = "204", description = "NO CONTENT")})
+    public ResponseEntity<School> getSchoolForClobDataByMinCode(@RequestParam(value = "mincode", required = false) String mincode) {
+        log.debug("getSchoolClobData by minCode: {}", mincode);
+        return response.GET(commonService.getSchoolForClobDataByMinCodeFromRedisCache(mincode));
+
+    }
+
     @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOLS_BY_DISTRICT_URL_MAPPING_V2 + EducGradTraxApiConstants.GET_DISTRICT_BY_DISTNO_MAPPING)
     @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
     @Operation(summary = "Find Schools Clob data by District Number for GRAD Algorithm Data from cache", description = "Get Schools Clob data by District Number for GRAD Algorithm Data from cache", tags = { "Algorithm Data" })
