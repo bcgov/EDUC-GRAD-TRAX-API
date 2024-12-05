@@ -96,4 +96,18 @@ public class CommonControllerTest {
         Mockito.verify(commonService).getSchoolForClobDataBySchoolIdFromRedisCache(schoolId);
     }
 
+    @Test
+    public void testGetSchoolClobDataByParams() {
+        School school = new School();
+        UUID schoolId = UUID.randomUUID();
+        school.setSchoolId(schoolId.toString());
+        school.setSchoolName("Test School");
+        school.setMinCode("12345678");
+
+        Mockito.when(commonService.getSchoolForClobDataByMinCodeFromRedisCache(school.getMinCode())).thenReturn(school);
+        commonController.getSchoolForClobDataByMinCode(school.getMinCode());
+        Mockito.verify(commonService).getSchoolForClobDataByMinCodeFromRedisCache(school.getMinCode());
+    }
+
+
 }
