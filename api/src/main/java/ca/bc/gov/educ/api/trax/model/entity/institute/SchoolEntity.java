@@ -14,9 +14,7 @@ public class SchoolEntity {
 
     @Id
     private String schoolId;
-    @Indexed
     private String districtId;
-    @Indexed
     private String mincode;
     private String independentAuthorityId;
     private String schoolNumber;
@@ -28,14 +26,11 @@ public class SchoolEntity {
     private String displayNameNoSpecialChars;
     private String schoolReportingRequirementCode;
     private String schoolOrganizationCode;
-    @Indexed
     private String schoolCategoryCode;
     private String facilityTypeCode;
     private String openedDate;
     private String closedDate;
-    @Indexed
     private boolean canIssueTranscripts;
-    @Indexed
     private boolean canIssueCertificates;
     private String createUser;
     private String updateUser;

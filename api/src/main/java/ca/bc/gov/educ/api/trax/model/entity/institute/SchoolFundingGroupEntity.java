@@ -15,11 +15,8 @@ public class SchoolFundingGroupEntity {
 
     @Id
     private String schoolFundingGroupID;
-    @Indexed
     private String schoolId;
-    @Indexed
     private String schoolGradeCode;
-    @Indexed
     private String schoolFundingGroupCode;
     private String createUser;
     private String updateUser;

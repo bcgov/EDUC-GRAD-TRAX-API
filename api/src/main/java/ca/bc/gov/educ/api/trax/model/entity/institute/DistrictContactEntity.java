@@ -17,7 +17,6 @@ public class DistrictContactEntity {
     private String districtContactId;
     @Indexed
     private String districtId;
-    @Indexed
     private String districtContactTypeCode;
     private String phoneNumber;
     private String jobTitle;
