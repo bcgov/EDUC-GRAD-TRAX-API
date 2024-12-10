@@ -15,7 +15,9 @@ public class NoteEntity {
 
     @Id
     private String noteId;
+    @Indexed
     private String schoolId;
+    @Indexed
     private String districtId;
     private String independentAuthorityId;
     private String content;

@@ -15,7 +15,9 @@ public class SchoolMoveEntity {
 
     @Id
     private String schoolMoveId;
+    @Indexed
     private String toSchoolId;
+    @Indexed
     private String fromSchoolId;
     private String moveDate;
     private String createUser;

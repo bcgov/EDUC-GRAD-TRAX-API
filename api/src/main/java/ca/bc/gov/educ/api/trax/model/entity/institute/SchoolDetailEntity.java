@@ -17,7 +17,9 @@ public class SchoolDetailEntity {
 
     @Id
     private String schoolId;
+    @Indexed
     private String districtId;
+    @Indexed
     private String mincode;
     private String independentAuthorityId;
     private String schoolNumber;
