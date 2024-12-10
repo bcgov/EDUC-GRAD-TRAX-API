@@ -15,6 +15,7 @@ public class NeighborhoodLearningEntity {
 
     @Id
     private String neighborhoodLearningId;
+    @Indexed
     private String schoolId;
     private String neighborhoodLearningTypeCode;
     private String createUser;

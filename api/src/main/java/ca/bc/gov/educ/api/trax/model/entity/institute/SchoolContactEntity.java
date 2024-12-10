@@ -15,6 +15,7 @@ public class SchoolContactEntity {
 
     @Id
     private String schoolContactId;
+    @Indexed
     private String schoolId;
     private String schoolContactTypeCode;
     private String phoneNumber;

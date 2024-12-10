@@ -15,6 +15,7 @@ public class SchoolFundingGroupEntity {
 
     @Id
     private String schoolFundingGroupID;
+    @Indexed
     private String schoolId;
     private String schoolGradeCode;
     private String schoolFundingGroupCode;
