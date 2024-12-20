@@ -120,6 +120,8 @@ class InstituteSchoolServiceTest {
 		school.setSchoolNumber("12345");
 		school.setSchoolCategoryCode("SCC");
 		school.setEmail("abc@xyz.ca");
+		school.setDisplayName("Tk̓emlúps te Secwépemc");
+		school.setDisplayNameNoSpecialChars("Tkkemlups te Secwepemc");
 
 		schools.add(school);
 
@@ -338,6 +340,8 @@ class InstituteSchoolServiceTest {
 		schoolDetail.setSchoolNumber("12345");
 		schoolDetail.setSchoolCategoryCode("SCC");
 		schoolDetail.setEmail("abc@xyz.ca");
+		schoolDetail.setDisplayName("Stitó:s Lá:lém Totí:lt Elementary");
+		schoolDetail.setDisplayNameNoSpecialChars("Stitos Lalem Totilt Elementary");
 
 		SchoolDetailEntity schoolDetailEntity = new SchoolDetailEntity();
 		schoolDetailEntity.setSchoolId("1");
@@ -345,6 +349,8 @@ class InstituteSchoolServiceTest {
 		schoolDetailEntity.setSchoolNumber("12345");
 		schoolDetailEntity.setSchoolCategoryCode("SCC");
 		schoolDetailEntity.setEmail("abc@xyz.ca");
+		schoolDetailEntity.setDisplayName("Stitó:s Lá:lém Totí:lt Elementary");
+		schoolDetailEntity.setDisplayNameNoSpecialChars("Stitos Lalem Totilt Elementary");
 
 		when(this.schoolDetailTransformer.transformToDTO(schoolDetailEntity)).thenReturn(schoolDetail);
 		when(this.restServiceMock.get(String.format(constants.getSchoolDetailsByIdFromInstituteApiUrl(), "1"),
