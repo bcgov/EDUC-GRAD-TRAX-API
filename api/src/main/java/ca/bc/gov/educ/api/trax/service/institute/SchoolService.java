@@ -52,7 +52,15 @@ public class SchoolService {
 			log.debug("****Before Calling Institute API");
 			List<SchoolEntity> response = this.restService.get(constants.getAllSchoolsFromInstituteApiUrl(),
 					List.class, webClient);
-			return schoolTransformer.transformToDTO(response);
+			List<School> schools = schoolTransformer.transformToDTO(response);
+
+			//Remove this loop and reload cache when grad supports Special Characters
+			for (School school : schools) {
+				 if (school.getDisplayNameNoSpecialChars() != null && !school.getDisplayNameNoSpecialChars().isEmpty())
+					 school.setDisplayName(school.getDisplayNameNoSpecialChars());
+			}
+
+			return schools;
 		} catch (WebClientResponseException e) {
 			log.warn(String.format("Error getting Common School List: %s", e.getMessage()));
 		} catch (Exception e) {
@@ -91,6 +99,9 @@ public class SchoolService {
 			log.debug("****Before Calling Institute API");
 			SchoolDetailEntity sde = this.restService.get(String.format(constants.getSchoolDetailsByIdFromInstituteApiUrl(), schoolId),
 					SchoolDetailEntity.class, webClient);
+			//Remove this IF block and reload cache when grad supports Special Characters
+			if (sde.getDisplayNameNoSpecialChars() != null && !sde.getDisplayNameNoSpecialChars().isEmpty())
+				sde.setDisplayName(sde.getDisplayNameNoSpecialChars());
 			return schoolDetailTransformer.transformToDTO(sde);
         } catch (WebClientResponseException e) {
             log.warn("Error getting School Details");
