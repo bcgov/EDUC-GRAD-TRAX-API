@@ -112,23 +112,35 @@ class InstituteSchoolServiceTest {
 
 	@Test
 	void whenGetSchoolsFromInstituteApi_returnsListOfSchools() {
-		List<SchoolEntity> schools = new ArrayList<>();
-		SchoolEntity school = new SchoolEntity();
+		List<SchoolEntity> schoolEntities = new ArrayList<>();
+		SchoolEntity schoolEntity = new SchoolEntity();
 
+		schoolEntity.setSchoolId("ID");
+		schoolEntity.setDistrictId("DistID");
+		schoolEntity.setSchoolNumber("12345");
+		schoolEntity.setSchoolCategoryCode("SCC");
+		schoolEntity.setEmail("abc@xyz.ca");
+		schoolEntity.setDisplayName("Tk̓emlúps te Secwépemc");
+		schoolEntity.setDisplayNameNoSpecialChars("Tkkemlups te Secwepemc");
+		schoolEntities.add(schoolEntity);
+
+		List<School> schools = new ArrayList<>();
+		School school = new School();
 		school.setSchoolId("ID");
 		school.setDistrictId("DistID");
 		school.setSchoolNumber("12345");
 		school.setSchoolCategoryCode("SCC");
 		school.setEmail("abc@xyz.ca");
-
+		school.setDisplayName("Tk̓emlúps te Secwépemc");
+		school.setDisplayNameNoSpecialChars("Tkkemlups te Secwepemc");
 		schools.add(school);
 
-		when(this.restUtils.getTokenResponseObject(anyString(), anyString()))
-				.thenReturn(responseObjectMock);
-		when(webClientMock.get())
-				.thenReturn(requestHeadersUriSpecMock);
+		when(this.schoolTransformer.transformToDTO(schoolEntities)).thenReturn(schools);
+		when(this.restServiceMock.get(constants.getAllSchoolsFromInstituteApiUrl(),
+				List.class, instWebClient)).thenReturn(schoolEntities);
 
-		schoolService.getSchoolsFromInstituteApi();
+		List<School> result = schoolService.getSchoolsFromInstituteApi();
+		assertEquals(schools, result);
 	}
 
 	@Test
@@ -310,11 +322,11 @@ class InstituteSchoolServiceTest {
 		schoolDetailEntity1.setSchoolCategoryCode("SCC");
 		schoolDetailEntity1.setEmail("abc@xyz.ca");
 		SchoolDetailEntity schoolDetailEntity2 = new SchoolDetailEntity();
-		schoolDetailEntity1.setSchoolId("2");
-		schoolDetailEntity1.setDistrictId("DistID");
-		schoolDetailEntity1.setSchoolNumber("12345");
-		schoolDetailEntity1.setSchoolCategoryCode("SCC");
-		schoolDetailEntity1.setEmail("abc@xyz.ca");
+		schoolDetailEntity2.setSchoolId("2");
+		schoolDetailEntity2.setDistrictId("DistID");
+		schoolDetailEntity2.setSchoolNumber("12345");
+		schoolDetailEntity2.setSchoolCategoryCode("SCC");
+		schoolDetailEntity2.setEmail("abc@xyz.ca");
 
 		when(this.schoolService.getSchoolsFromRedisCache()).thenReturn(schools);
 		when(this.schoolDetailTransformer.transformToDTO(schoolDetailEntity1)).thenReturn(schoolDetail1);
@@ -338,6 +350,8 @@ class InstituteSchoolServiceTest {
 		schoolDetail.setSchoolNumber("12345");
 		schoolDetail.setSchoolCategoryCode("SCC");
 		schoolDetail.setEmail("abc@xyz.ca");
+		schoolDetail.setDisplayName("Stitó:s Lá:lém Totí:lt Elementary");
+		schoolDetail.setDisplayNameNoSpecialChars("Stitos Lalem Totilt Elementary");
 
 		SchoolDetailEntity schoolDetailEntity = new SchoolDetailEntity();
 		schoolDetailEntity.setSchoolId("1");
@@ -345,6 +359,8 @@ class InstituteSchoolServiceTest {
 		schoolDetailEntity.setSchoolNumber("12345");
 		schoolDetailEntity.setSchoolCategoryCode("SCC");
 		schoolDetailEntity.setEmail("abc@xyz.ca");
+		schoolDetailEntity.setDisplayName("Stitó:s Lá:lém Totí:lt Elementary");
+		schoolDetailEntity.setDisplayNameNoSpecialChars("Stitos Lalem Totilt Elementary");
 
 		when(this.schoolDetailTransformer.transformToDTO(schoolDetailEntity)).thenReturn(schoolDetail);
 		when(this.restServiceMock.get(String.format(constants.getSchoolDetailsByIdFromInstituteApiUrl(), "1"),
