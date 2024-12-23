@@ -28,6 +28,7 @@ public class SchoolEntity {
     private String displayNameNoSpecialChars;
     private String schoolReportingRequirementCode;
     private String schoolOrganizationCode;
+    @Indexed
     private String schoolCategoryCode;
     private String facilityTypeCode;
     private String openedDate;
