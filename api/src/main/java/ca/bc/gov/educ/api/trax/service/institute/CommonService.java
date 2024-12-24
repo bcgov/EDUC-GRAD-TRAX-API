@@ -83,6 +83,7 @@ public class CommonService {
         school.setOpenFlag(schoolDetail.getClosedDate() == null? "Y" : "N");
 
         // District
+        school.setDistrictId(schoolDetail.getDistrictId());
         ca.bc.gov.educ.api.trax.model.dto.institute.District district = districtService.getDistrictByIdFromRedisCache(schoolDetail.getDistrictId());
         if (district != null) {
             school.setDistrictName(district.getDisplayName());
