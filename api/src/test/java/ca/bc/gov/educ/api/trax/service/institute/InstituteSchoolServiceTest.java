@@ -15,6 +15,8 @@ import ca.bc.gov.educ.api.trax.repository.redis.SchoolRedisRepository;
 import ca.bc.gov.educ.api.trax.service.RESTService;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.RestUtils;
+import ca.bc.gov.educ.api.trax.util.SearchUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,9 +40,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import redis.clients.jedis.JedisCluster;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -57,6 +57,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings({"unchecked","rawtypes"})
 public class InstituteSchoolServiceTest {
+
+
 
 	@Autowired
 	private EducGradTraxApiConstants constants;
@@ -165,6 +167,57 @@ public class InstituteSchoolServiceTest {
 				.thenReturn(schoolsMock);
 
 		List<School> result = schoolService.getSchoolsFromInstituteApi();
+	}
+
+	@Test
+	public void whenGetSchoolsFromRedisCache_returnsNoSchools() {
+		List<School> schools = new ArrayList<>();
+		String mincode = "12345678";
+		School school = new School();
+		school.setSchoolId("ID1");
+		school.setDistrictId("DistID");
+		school.setSchoolNumber("12345");
+		school.setMincode(mincode);
+		school.setSchoolCategoryCode("SCC");
+		school.setEmail("abc@xyz.ca");
+		schools.add(school);
+
+		school = new School();
+		school.setSchoolId("ID2");
+		school.setDistrictId("DistID");
+		school.setSchoolNumber("12345");
+		school.setMincode(mincode);
+		school.setSchoolCategoryCode("SCC");
+		school.setEmail("abc@xyz.ca");
+		schools.add(school);
+
+		List<SchoolEntity> schoolEntities = new ArrayList<>();
+		SchoolEntity schoolEntity = new SchoolEntity();
+		schoolEntity.setSchoolId("ID1");
+		schoolEntity.setDistrictId("DistID");
+		schoolEntity.setSchoolNumber("12345");
+		schoolEntity.setMincode(mincode);
+		schoolEntity.setSchoolCategoryCode("SCC");
+		schoolEntity.setEmail("abc@xyz.ca");
+		schoolEntities.add(schoolEntity);
+
+		schoolEntity = new SchoolEntity();
+		schoolEntity.setSchoolId("ID2");
+		schoolEntity.setDistrictId("DistID");
+		schoolEntity.setSchoolNumber("12345");
+		schoolEntity.setMincode(mincode);
+		schoolEntity.setSchoolCategoryCode("SCC");
+		schoolEntity.setEmail("abc@xyz.ca");
+		schoolEntities.add(schoolEntity);
+
+		when(this.schoolTransformerMock.transformToDTO(schoolEntities))
+				.thenReturn(schools);
+		when (this.schoolRedisRepository.findAll()).thenReturn(Collections.emptyList());
+		when (this.restServiceMock.get(constants.getAllSchoolsFromInstituteApiUrl(),
+				List.class, instWebClient)).thenReturn(schoolEntities);
+		List<School> result = schoolService.getSchoolsFromRedisCache();
+		assertEquals(schools, result);
+
 	}
 
 	@Test
@@ -357,6 +410,88 @@ public class InstituteSchoolServiceTest {
 		assertEquals(schoolDetail, result);
 	}
 
+
+	@Test
+	public void whenGetSchoolByMinCodeFromInstituteApi_ReturnSchool()  {
+
+		String mincode = "12345678";
+		School school = new School();
+		school.setSchoolId("ID");
+		school.setDistrictId("DistID");
+		school.setSchoolNumber("12345");
+		school.setMincode(mincode);
+		school.setSchoolCategoryCode("SCC");
+		school.setEmail("abc@xyz.ca");
+
+		List<SchoolEntity> schoolEntities = new ArrayList<>();
+		SchoolEntity schoolEntity = new SchoolEntity();
+		schoolEntity.setSchoolId("ID");
+		schoolEntity.setDistrictId("DistID");
+		schoolEntity.setSchoolNumber("12345");
+		schoolEntity.setMincode(mincode);
+		schoolEntity.setSchoolCategoryCode("SCC");
+		schoolEntity.setEmail("abc@xyz.ca");
+		schoolEntities.add(schoolEntity);
+		HashMap<String, String> params;
+		HashMap<String, String> searchInput = new HashMap<>();
+		searchInput.put("mincode", mincode);
+
+		try {
+			params  = SearchUtil.searchStringsToHTTPParams(searchInput);
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException(e);
+		}
+		when(this.restServiceMock.get(constants.getSchoolsPaginated(), params,
+				List.class, instWebClient)).thenReturn(schoolEntities);
+		when(this.schoolTransformer.transformToDTO(schoolEntities))
+				.thenReturn(List.of(school));
+		School result = schoolService.getSchoolsBySearchCriteriaFromInstituteApi("mincode",mincode).get(0);
+
+
+		assertEquals(school, result);
+	}
+
+	@Test
+	public void whenGetSchoolByMincodeFromRedisCache_ReturnNoSchool() {
+		String mincode = "12345678";
+		School school = new School();
+		school.setSchoolId("ID");
+		school.setDistrictId("DistID");
+		school.setSchoolNumber("12345");
+		school.setMincode(mincode);
+		school.setSchoolCategoryCode("SCC");
+		school.setEmail("abc@xyz.ca");
+
+		List<SchoolEntity > schoolEntities  = new ArrayList<>();
+		SchoolEntity schoolEntity = new SchoolEntity();
+		schoolEntity.setSchoolId("ID");
+		schoolEntity.setDistrictId("DistID");
+		schoolEntity.setSchoolNumber("12345");
+		schoolEntity.setMincode(mincode);
+		schoolEntity.setSchoolCategoryCode("SCC");
+		schoolEntity.setEmail("abc@xyz.ca");
+		schoolEntities.add(schoolEntity);
+		HashMap<String, String> params;
+		HashMap<String, String> searchInput = new HashMap<>();
+		searchInput.put("mincode", mincode);
+
+        try {
+			params  =SearchUtil.searchStringsToHTTPParams(searchInput);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
+		when(this.restServiceMock.get(constants.getSchoolsPaginated(), params,
+				List.class, instWebClient)).thenReturn(schoolEntities);
+		when(this.schoolTransformer.transformToDTO(schoolEntities))
+				.thenReturn(List.of(school));
+
+		when(this.schoolRedisRepository.findByMincode(mincode))
+				.thenReturn(null);
+		assertEquals(school, schoolService.getSchoolByMincodeFromRedisCache(mincode));
+
+	}
+
 	@Test
 	public void whenLoadSchoolDetailsIntoRedisCache_DoesNotThrow() {
 		List<SchoolDetailEntity> schoolDetailEntities = Arrays.asList(new SchoolDetailEntity());
@@ -421,6 +556,104 @@ public class InstituteSchoolServiceTest {
 	}
 
 	@Test
+	public void whenGetSchoolDetailsFromRedisCache_ReturnNoSchoolDetails() {
+		String mincode = "12345678";
+		List<School> schools = new ArrayList<>();
+
+		School school = new School();
+		school.setSchoolId("ID1");
+		school.setDistrictId("DistID");
+		school.setSchoolNumber("12345");
+		school.setMincode(mincode);
+		school.setSchoolCategoryCode("SCC");
+		school.setEmail("abc@xyz.ca");
+		schools.add(school);
+
+		school = new School();
+		school.setSchoolId("ID2");
+		school.setDistrictId("DistID");
+		school.setSchoolNumber("12345");
+		school.setMincode(mincode);
+		school.setSchoolCategoryCode("SCC");
+		school.setEmail("abc@xyz.ca");
+		schools.add(school);
+
+		List<SchoolEntity> schoolEntities = new ArrayList<>();
+		SchoolEntity schoolEntity = new SchoolEntity();
+		schoolEntity.setSchoolId("ID1");
+		schoolEntity.setDistrictId("DistID");
+		schoolEntity.setSchoolNumber("12345");
+		schoolEntity.setMincode(mincode);
+		schoolEntity.setSchoolCategoryCode("SCC");
+		schoolEntity.setEmail("abc@xyz.ca");
+		schoolEntities.add(schoolEntity);
+
+		schoolEntity = new SchoolEntity();
+		schoolEntity.setSchoolId("ID2");
+		schoolEntity.setDistrictId("DistID");
+		schoolEntity.setSchoolNumber("12345");
+		schoolEntity.setMincode(mincode);
+		schoolEntity.setSchoolCategoryCode("SCC");
+		schoolEntity.setEmail("abc@xyz.ca");
+		schoolEntities.add(schoolEntity);
+
+
+
+		List<SchoolDetail> schoolDetails = new ArrayList<>();
+		SchoolDetail schoolDetail1 = new SchoolDetail();
+		schoolDetail1.setSchoolId("ID1");
+		schoolDetail1.setDistrictId("DistID");
+		schoolDetail1.setSchoolNumber("12345");
+		schoolDetail1.setMincode(mincode);
+		schoolDetail1.setSchoolCategoryCode("SCC");
+		schoolDetail1.setEmail("abc@xyz.ca");
+		schoolDetails.add(schoolDetail1);
+
+		SchoolDetail schoolDetail2 = new SchoolDetail();
+		schoolDetail2.setSchoolId("ID2");
+		schoolDetail2.setDistrictId("DistID");
+		schoolDetail2.setSchoolNumber("12345");
+		schoolDetail2.setMincode(mincode);
+		schoolDetail2.setSchoolCategoryCode("SCC");
+		schoolDetail2.setEmail("abc@xyz.ca");
+		schoolDetails.add(schoolDetail2);
+
+		SchoolDetailEntity schoolDetailEntity1 = new SchoolDetailEntity();
+		schoolDetailEntity1.setSchoolId("ID1");
+		schoolDetailEntity1.setDistrictId("DistID");
+		schoolDetailEntity1.setSchoolNumber("12345");
+		schoolDetailEntity1.setMincode(mincode);
+		schoolDetailEntity1.setSchoolCategoryCode("SCC");
+		schoolDetailEntity1.setEmail("abc@xyz.ca");
+
+		SchoolDetailEntity schoolDetailEntity2 = new SchoolDetailEntity();
+		schoolDetailEntity2.setSchoolId("ID2");
+		schoolDetailEntity2.setDistrictId("DistID");
+		schoolDetailEntity2.setSchoolNumber("12345");
+		schoolDetailEntity2.setMincode(mincode);
+		schoolDetailEntity2.setSchoolCategoryCode("SCC");
+		schoolDetailEntity2.setEmail("abc@xyz.ca");
+
+		when(this.schoolTransformerMock.transformToDTO(schoolEntities))
+				.thenReturn(schools);
+		when(this.schoolDetailTransformerMock.transformToDTO(schoolDetailEntity1)).thenReturn(schoolDetail1);
+		when(this.schoolDetailTransformerMock.transformToDTO(schoolDetailEntity2)).thenReturn(schoolDetail2);
+		when (this.schoolRedisRepository.findAll()).thenReturn(Collections.emptyList());
+		when (this.restServiceMock.get(constants.getAllSchoolsFromInstituteApiUrl(),
+				List.class, instWebClient)).thenReturn(schoolEntities);
+
+		when(this.schoolDetailRedisRepository.findAll())
+				.thenReturn(Collections.emptyList());
+
+		when (this.restServiceMock.get(String.format(constants.getSchoolDetailsByIdFromInstituteApiUrl(), schoolDetailEntity1.getSchoolId()),
+				SchoolDetailEntity.class, instWebClient)).thenReturn(schoolDetailEntity1);
+		when (this.restServiceMock.get(String.format(constants.getSchoolDetailsByIdFromInstituteApiUrl(), schoolDetailEntity2.getSchoolId()),
+				SchoolDetailEntity.class, instWebClient)).thenReturn(schoolDetailEntity2);
+
+		assertEquals(schoolDetails, schoolService.getSchoolDetailsFromRedisCache());
+	}
+
+	@Test
 	public void whenGetSchoolDetailByMincodeFromRedisCache_ReturnSchoolDetail() {
 		String mincode = "12345678";
 		SchoolDetail schoolDetail = new SchoolDetail();
@@ -445,6 +678,70 @@ public class InstituteSchoolServiceTest {
 				.thenReturn(schoolDetail);
 		assertEquals(schoolDetail, schoolService.getSchoolDetailByMincodeFromRedisCache(mincode));
 	}
+
+	@Test
+	public void whenGetSchoolDetailByMincodeFromRedisCache_ReturnNoSchool() {
+		String mincode = "12345678";
+		SchoolDetail schoolDetail = new SchoolDetail();
+		schoolDetail.setSchoolId("ID");
+		schoolDetail.setDistrictId("DistID");
+		schoolDetail.setSchoolNumber("12345");
+		schoolDetail.setMincode(mincode);
+		schoolDetail.setSchoolCategoryCode("SCC");
+		schoolDetail.setEmail("abc@xyz.ca");
+
+		SchoolDetailEntity schoolDetailEntity = new SchoolDetailEntity();
+		schoolDetailEntity.setSchoolId("ID");
+		schoolDetailEntity.setDistrictId("DistID");
+		schoolDetailEntity.setSchoolNumber("12345");
+		schoolDetailEntity.setMincode(mincode);
+		schoolDetailEntity.setSchoolCategoryCode("SCC");
+		schoolDetailEntity.setEmail("abc@xyz.ca");
+
+		School school = new School();
+		school.setSchoolId("ID");
+		school.setDistrictId("DistID");
+		school.setSchoolNumber("12345");
+		school.setMincode(mincode);
+		school.setSchoolCategoryCode("SCC");
+		school.setEmail("abc@xyz.ca");
+
+		List<SchoolEntity> schoolEntities = new ArrayList<>();
+		SchoolEntity schoolEntity = new SchoolEntity();
+		schoolEntity.setSchoolId("ID");
+		schoolEntity.setDistrictId("DistID");
+		schoolEntity.setSchoolNumber("12345");
+		schoolEntity.setMincode(mincode);
+		schoolEntity.setSchoolCategoryCode("SCC");
+		schoolEntities.add(schoolEntity);
+
+		when(this.schoolDetailRedisRepository.findByMincode(mincode))
+				.thenReturn(null);
+		when(this.schoolDetailRedisRepository.findByMincode(mincode))
+				.thenReturn(null);
+		HashMap<String, String> searchInput = new HashMap<>();
+		searchInput.put("mincode", mincode);
+
+		HashMap<String, String> params;
+		try {
+			params  =SearchUtil.searchStringsToHTTPParams(searchInput);
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException(e);
+		}
+
+		when(this.restServiceMock.get(constants.getSchoolsPaginated(), params,
+				List.class, instWebClient)).thenReturn(schoolEntities);
+		when(this.schoolTransformer.transformToDTO(schoolEntities))
+				.thenReturn(List.of(school));
+
+		when (this.restServiceMock.get(String.format(constants.getSchoolDetailsByIdFromInstituteApiUrl(), schoolEntity.getSchoolId()),
+				SchoolDetailEntity.class, instWebClient)).thenReturn(schoolDetailEntity);
+
+		when(this.schoolDetailTransformer.transformToDTO(schoolDetailEntity))
+				.thenReturn(schoolDetail);
+		assertEquals(schoolDetail, schoolService.getSchoolDetailByMincodeFromRedisCache(mincode));
+	}
+
 
 	@Test
 	public void whenGetSchoolDetailBySchoolCategoryCode_ReturnSchoolDetail() {
@@ -489,4 +786,113 @@ public class InstituteSchoolServiceTest {
 				.thenReturn(schoolDetails);
 		assertEquals(schoolDetails, schoolService.getSchoolDetailsBySchoolCategoryCode(schoolCategoryCode));
 	}
+
+	@Test
+	public void whenGetSchoolDetailBySchoolCategoryCode_ReturnNoSchoolDetail() {
+		String schoolCategoryCode = "ABC";
+		List<SchoolDetail> schoolDetails = new ArrayList<>();
+		SchoolDetail schoolDetail1 = new SchoolDetail();
+		schoolDetail1.setSchoolId("ID1");
+		schoolDetail1.setDistrictId("DistID");
+		schoolDetail1.setSchoolNumber("12345");
+		schoolDetail1.setSchoolCategoryCode(schoolCategoryCode);
+		schoolDetail1.setEmail("abc@xyz.ca");
+		schoolDetails.add(schoolDetail1);
+
+		SchoolDetail schoolDetail2 = new SchoolDetail();
+		schoolDetail2.setSchoolId("ID2");
+		schoolDetail2.setDistrictId("DistID");
+		schoolDetail2.setSchoolNumber("12345");
+		schoolDetail2.setSchoolCategoryCode(schoolCategoryCode);
+		schoolDetail2.setEmail("abc@xyz.ca");
+		schoolDetails.add(schoolDetail2);
+
+		List<SchoolDetailEntity> schoolDetailEntities = new ArrayList<>();
+		SchoolDetailEntity schoolDetailEntity1 = new SchoolDetailEntity();
+		schoolDetailEntity1.setSchoolId("ID1");
+		schoolDetailEntity1.setDistrictId("DistID");
+		schoolDetailEntity1.setSchoolNumber("12345");
+		schoolDetailEntity1.setSchoolCategoryCode(schoolCategoryCode);
+		schoolDetailEntity1.setEmail("abc@xyz.ca");
+		schoolDetailEntities.add(schoolDetailEntity1);
+
+		SchoolDetailEntity schoolDetailEntity2 = new SchoolDetailEntity();
+		schoolDetailEntity2.setSchoolId("ID2");
+		schoolDetailEntity2.setDistrictId("DistID");
+		schoolDetailEntity2.setSchoolNumber("12345");
+		schoolDetailEntity2.setSchoolCategoryCode(schoolCategoryCode);
+		schoolDetailEntity2.setEmail("abc@xyz.ca");
+		schoolDetailEntities.add(schoolDetailEntity2);
+
+		List<SchoolEntity > schoolEntities  = new ArrayList<>();
+		SchoolEntity schoolEntity1 = new SchoolEntity();
+		schoolEntity1.setSchoolId("ID1");
+		schoolEntity1.setDistrictId("DistID");
+		schoolEntity1.setSchoolNumber("12345");
+		schoolEntity1.setMincode("2569");
+		schoolEntity1.setSchoolCategoryCode(schoolCategoryCode);
+		schoolEntity1.setEmail("abc@xyz.ca");
+		schoolEntities.add(schoolEntity1);
+
+		SchoolEntity schoolEntity2 = new SchoolEntity();
+		schoolEntity2.setSchoolId("ID2");
+		schoolEntity2.setDistrictId("DistID");
+		schoolEntity2.setSchoolNumber("12345");
+		schoolEntity2.setMincode("2569");
+		schoolEntity2.setSchoolCategoryCode(schoolCategoryCode);
+		schoolEntity2.setEmail("abc@xyz.ca");
+		schoolEntities.add(schoolEntity2);
+		List<School > schools  = new ArrayList<>();
+
+		School school1 = new School();
+		school1.setSchoolId("ID1");
+		school1.setDistrictId("DistID");
+		school1.setSchoolNumber("12345");
+		school1.setMincode("589");
+		school1.setSchoolCategoryCode(schoolCategoryCode);
+		school1.setEmail("abc@xyz.ca");
+		schools.add(school1);
+
+		School school2 = new School();
+		school2.setSchoolId("ID2");
+		school2.setDistrictId("DistID");
+		school2.setSchoolNumber("12345");
+		school2.setMincode("589");
+		school2.setSchoolCategoryCode(schoolCategoryCode);
+		school2.setEmail("abc@xyz.ca");
+		schools.add(school2);
+
+		HashMap<String, String> params;
+		HashMap<String, String> searchInput = new HashMap<>();
+		searchInput.put("schoolCategoryCode", schoolCategoryCode);
+
+		try {
+			params  =SearchUtil.searchStringsToHTTPParams(searchInput);
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException(e);
+		}
+
+		when(this.restServiceMock.get(constants.getSchoolsPaginated(), params,
+				List.class, instWebClient)).thenReturn(schoolEntities);
+		when(this.schoolTransformer.transformToDTO(schoolEntities))
+				.thenReturn(schools);
+
+		when(this.schoolDetailRedisRepository.findBySchoolCategoryCode(schoolCategoryCode))
+				.thenReturn(null);
+
+		when (this.restServiceMock.get(String.format(constants.getSchoolDetailsByIdFromInstituteApiUrl(), school1.getSchoolId()),
+				SchoolDetailEntity.class, instWebClient)).thenReturn(schoolDetailEntity1);
+		when(this.schoolDetailTransformer.transformToDTO(schoolDetailEntity1))
+				.thenReturn(schoolDetail1);
+
+		when (this.restServiceMock.get(String.format(constants.getSchoolDetailsByIdFromInstituteApiUrl(), school2.getSchoolId()),
+				SchoolDetailEntity.class, instWebClient)).thenReturn(schoolDetailEntity2);
+		when(this.schoolDetailTransformer.transformToDTO(schoolDetailEntity2))
+				.thenReturn(schoolDetail2);
+
+		when(this.schoolDetailTransformer.transformToDTO(schoolDetailEntities))
+				.thenReturn(schoolDetails);
+		assertEquals(schoolDetails, schoolService.getSchoolDetailsBySchoolCategoryCode(schoolCategoryCode));
+	}
 }
+
