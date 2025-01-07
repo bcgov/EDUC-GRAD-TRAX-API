@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
@@ -16,6 +18,8 @@ import static org.mockito.MockitoAnnotations.openMocks;
 
 class SchoolEventBaseServiceTest {
 
+    private static final String SCHOOL_ID = UUID.randomUUID().toString();
+    
     @Mock
     private SchoolService schoolService;
     private AutoCloseable closeable;
@@ -36,33 +40,33 @@ class SchoolEventBaseServiceTest {
     @Test
     void shouldCreateHistory_whenSchoolCanIssueTranscriptsChanged() {
         School school = new School();
-        school.setSchoolId("123");
+        school.setSchoolId(SCHOOL_ID);
         school.setCanIssueTranscripts(false);
         SchoolDetail schoolDetail = new SchoolDetail();
         schoolDetail.setCanIssueTranscripts(true);
-        when(schoolService.getSchoolDetailByIdFromInstituteApi("123")).thenReturn(schoolDetail);
+        when(schoolService.getSchoolDetailBySchoolId(UUID.fromString(SCHOOL_ID))).thenReturn(schoolDetail);
         assertTrue(schoolEventBaseService.shouldCreateHistory(school));
     }
 
     @Test
     void shouldCreateHistory_whenSchoolCanIssueTranscriptsIsTrue() {
         School school = new School();
-        school.setSchoolId("123");
+        school.setSchoolId(SCHOOL_ID);
         school.setCanIssueTranscripts(true);
         SchoolDetail schoolDetail = new SchoolDetail();
         schoolDetail.setCanIssueTranscripts(true);
-        when(schoolService.getSchoolDetailByIdFromInstituteApi("123")).thenReturn(schoolDetail);
+        when(schoolService.getSchoolDetailBySchoolId(UUID.fromString(SCHOOL_ID))).thenReturn(schoolDetail);
         assertTrue(schoolEventBaseService.shouldCreateHistory(school));
     }
 
     @Test
     void shouldNotCreateHistory_whenSchoolCanIssueTranscriptsIsFalse() {
         School school = new School();
-        school.setSchoolId("123");
+        school.setSchoolId(SCHOOL_ID);
         school.setCanIssueTranscripts(false);
         SchoolDetail schoolDetail = new SchoolDetail();
         schoolDetail.setCanIssueTranscripts(false);
-        when(schoolService.getSchoolDetailByIdFromInstituteApi("123")).thenReturn(schoolDetail);
+        when(schoolService.getSchoolDetailBySchoolId(UUID.fromString(SCHOOL_ID))).thenReturn(schoolDetail);
         assertFalse(schoolEventBaseService.shouldCreateHistory(school));
     }
 }

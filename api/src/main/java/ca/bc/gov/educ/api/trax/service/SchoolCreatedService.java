@@ -22,8 +22,9 @@ public class SchoolCreatedService extends SchoolEventBaseService<School> {
     public void processEvent(final School school, EventEntity eventEntity) {
         log.debug("Processing School Created");
         try{
+            boolean shouldCreateHistory = this.shouldCreateHistory(school);
             schoolService.updateSchoolCache(school.getSchoolId());
-            this.updateEvent(eventEntity, this.shouldCreateHistory(school));
+            this.updateEvent(eventEntity, shouldCreateHistory);
         } catch (ServiceException e) {
             log.error(e.getMessage());
         }

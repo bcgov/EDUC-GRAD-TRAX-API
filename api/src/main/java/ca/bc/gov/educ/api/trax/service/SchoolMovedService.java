@@ -26,11 +26,11 @@ public class SchoolMovedService extends SchoolEventBaseService<MoveSchoolData> {
     public void processEvent(final MoveSchoolData moveSchoolData, EventEntity eventEntity) {
         log.debug("Processing School Moved");
         try{
-            schoolService.updateSchoolCache(Arrays.asList(moveSchoolData.getFromSchoolId(), moveSchoolData.getToSchool().getSchoolId()));
             // have to check event history eligibility on from and to schools for move.
             // if one can issue transcripts, set history eligibility
             SchoolDetail schoolDetail = this.schoolService.getSchoolDetailByIdFromInstituteApi(moveSchoolData.getFromSchoolId());
-            boolean shouldCreateHistory = (schoolDetail.isCanIssueTranscripts() || this.shouldCreateHistory(moveSchoolData.getToSchool()));
+            boolean shouldCreateHistory = (moveSchoolData.getToSchool().isCanIssueTranscripts() || this.shouldCreateHistory(schoolDetail));
+            schoolService.updateSchoolCache(Arrays.asList(moveSchoolData.getFromSchoolId(), moveSchoolData.getToSchool().getSchoolId()));
             this.updateEvent(eventEntity, shouldCreateHistory);
         } catch (ServiceException e) {
             log.error(e.getMessage());
