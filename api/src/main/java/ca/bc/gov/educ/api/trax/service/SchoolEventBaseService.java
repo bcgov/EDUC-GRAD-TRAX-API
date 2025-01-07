@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.trax.service;
 
 import ca.bc.gov.educ.api.trax.model.dto.institute.School;
+import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolDetail;
 import ca.bc.gov.educ.api.trax.service.institute.SchoolService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -23,6 +24,11 @@ public abstract class SchoolEventBaseService<T> extends EventBaseService<T> {
      */
     protected boolean shouldCreateHistory(School school) {
         // currently only schools that can issue transcripts qualify
+        SchoolDetail schoolDetail = this.schoolService.getSchoolDetailByIdFromInstituteApi(school.getSchoolId());
+        // if the school's ability to issue transcripts has changed, return true
+        if (schoolDetail.isCanIssueTranscripts() != school.isCanIssueTranscripts()){
+            return true;
+        }
         return school.isCanIssueTranscripts();
     }
 }
