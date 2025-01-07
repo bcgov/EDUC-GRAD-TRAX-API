@@ -187,6 +187,12 @@ public class EducGradTraxApiConstants {
     @Value("${endpoint.student-admin.authority-details.url}")
     private String studentAdminAuthorityDetailsUrl;
 
+    @Value("${endpoint.institute-api.get-schools-paginated.url}")
+    private String schoolsPaginated;
+
+    @Value("${endpoint.institute-api.get-districts-paginated.url}")
+    private String districtsPaginated;
+
     // Scheduler: ongoing updates from TRAX to GRAD
     @Value("${cron.scheduled.process.events.trax-to-grad.run}")
     private String traxToGradCronRun;
