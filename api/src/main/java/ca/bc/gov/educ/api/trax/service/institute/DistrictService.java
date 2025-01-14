@@ -118,9 +118,8 @@ public class DistrictService {
     }
 
     public District getDistrictByIdFromRedisCache(String districtId) {
-        log.debug("**** Getting district by ID from Redis Cache.");
 
-       // return districtRedisRepository.findById(districtId).map(districtTransformer::transformToDTO).orElse(null);
+
         log.debug("**** Getting district by ID from Redis Cache.");
         return districtRedisRepository.findById(districtId)
                 .map(districtTransformer::transformToDTO)
@@ -133,8 +132,6 @@ public class DistrictService {
                     return district;
                 });
     }
-
-
 
 
     public List<District> getDistrictsBySchoolCategoryCode(String schoolCategoryCode) {
