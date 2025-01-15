@@ -10,8 +10,8 @@ import java.util.List;
 
 @Service
 public class EdwService {
-    final private SnapshotRepository snapshotRepository;
-    final private SchoolService schoolService;
+    private final SnapshotRepository snapshotRepository;
+    private final SchoolService schoolService;
 
     public EdwService(SnapshotRepository snapshotRepository, SchoolService schoolService) {
         this.snapshotRepository = snapshotRepository;
