@@ -146,8 +146,7 @@ public class TraxUpdateService {
                     gradUpdate.setPen(pen);
                     gradUpdate.setGraduationRequirementYear(traxStudent.getGraduationRequirementYear());
                     gradUpdate.setStudentGrade(traxStudent.getStudentGrade());
-                    gradUpdate.setSchoolOfRecord(traxStudent.getSchoolOfRecord());
-                    gradUpdate.setSchoolOfRecordId(commonService.getSchoolIdFromRedisCache(gradUpdate.getSchoolOfRecord()));
+                    gradUpdate.setSchoolOfRecordId(traxStudent.getSchoolOfRecordId());
                     gradUpdate.setSlpDate(traxStudent.getSlpDate());
                     gradUpdate.setCitizenship(traxStudent.getStudentCitizenship());
                     gradUpdate.setStudentStatus(traxStudent.getStudentStatus());

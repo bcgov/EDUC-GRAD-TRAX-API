@@ -4,7 +4,9 @@ import ca.bc.gov.educ.api.trax.messaging.NatsConnection;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.trax.model.dto.SnapshotResponse;
+import ca.bc.gov.educ.api.trax.model.dto.institute.School;
 import ca.bc.gov.educ.api.trax.repository.SnapshotRepository;
+import ca.bc.gov.educ.api.trax.service.institute.SchoolService;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import org.junit.After;
 import org.junit.Before;
@@ -25,6 +27,7 @@ import redis.clients.jedis.JedisCluster;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -40,6 +43,9 @@ public class EdwServiceTest {
 
     @MockBean
     private SnapshotRepository snapshotRepository;
+
+    @MockBean
+    private SchoolService schoolService;
 
     @Autowired
     private EducGradTraxApiConstants constants;
@@ -97,18 +103,29 @@ public class EdwServiceTest {
     @Test
     public void testGetStudents() {
         Integer gradYear = 2023;
+        String minCode = "12345678";
+        UUID schoolId = UUID.randomUUID();
         // graduated student
         SnapshotResponse snapshot1 = new SnapshotResponse();
         snapshot1.setPen("123456789");
         snapshot1.setGraduatedDate("202306");
         snapshot1.setGpa(BigDecimal.valueOf(3.60));
+        snapshot1.setSchoolOfRecord(minCode);
         // non-graduated student
         SnapshotResponse snapshot2 = new SnapshotResponse();
         snapshot1.setPen("111222333");
 
         List<SnapshotResponse> snapshots = Arrays.asList(snapshot1, snapshot2);
-
         when(this.snapshotRepository.getStudentsByGradYear(gradYear)).thenReturn(snapshots);
+
+        // School
+        School school = new School();
+        school.setSchoolId(schoolId.toString());
+        school.setMincode(minCode);
+        school.setDisplayName("Test School");
+        school.setSchoolCategoryCode("PUBLIC");
+
+        when(this.schoolService.getSchoolByMinCodeFromRedisCache(minCode)).thenReturn(school);
 
         var result = edwService.getStudents(gradYear);
 
@@ -119,18 +136,30 @@ public class EdwServiceTest {
     public void testGetStudentsByGradYearAndSchool() {
         Integer gradYear = 2023;
         String minCode = "12345678";
+        UUID schoolId = UUID.randomUUID();
         // graduated student
         SnapshotResponse snapshot1 = new SnapshotResponse();
         snapshot1.setPen("123456789");
         snapshot1.setGraduatedDate("202306");
         snapshot1.setGpa(BigDecimal.valueOf(3.60));
+        snapshot1.setSchoolOfRecord(minCode);
         // non-graduated student
         SnapshotResponse snapshot2 = new SnapshotResponse();
-        snapshot1.setPen("111222333");
+        snapshot2.setPen("111222333");
+        snapshot2.setSchoolOfRecord(minCode);
 
         List<SnapshotResponse> snapshots = Arrays.asList(snapshot1, snapshot2);
 
         when(this.snapshotRepository.getStudentsByGradYearAndSchoolOfRecord(gradYear, minCode)).thenReturn(snapshots);
+
+        // School
+        School school = new School();
+        school.setSchoolId(schoolId.toString());
+        school.setMincode(minCode);
+        school.setDisplayName("Test School");
+        school.setSchoolCategoryCode("PUBLIC");
+
+        when(this.schoolService.getSchoolByMinCodeFromRedisCache(minCode)).thenReturn(school);
 
         var result = edwService.getStudents(gradYear, minCode);
 
