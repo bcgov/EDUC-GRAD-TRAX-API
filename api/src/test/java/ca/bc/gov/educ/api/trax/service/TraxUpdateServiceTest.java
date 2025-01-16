@@ -137,7 +137,7 @@ public class TraxUpdateServiceTest {
     public void testScheduledRunForTraxUpdates() throws JsonProcessingException {
         String pen = "123456789";
         String mincode = "12345678";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
         LockAssert.TestHelper.makeAllAssertsPass(true);
 
         TraxUpdateInGradEntity traxUpdateInGradEntity = new TraxUpdateInGradEntity();
@@ -149,8 +149,7 @@ public class TraxUpdateServiceTest {
         TraxGraduationUpdateDTO payload = new TraxGraduationUpdateDTO();
         payload.setPen(pen);
         payload.setStudentGrade("12");
-        payload.setSchoolOfRecord(mincode);
-        payload.setSchoolOfRecordId(schoolOfRecordId);
+        payload.setSchoolOfRecordId(schoolId);
         payload.setCitizenship("C");
         payload.setGraduationRequirementYear("2018");
         String jsonString = JsonUtil.getJsonStringFromObject(payload);
@@ -158,11 +157,11 @@ public class TraxUpdateServiceTest {
         ConvGradStudent traxStudent = new ConvGradStudent();
         traxStudent.setPen(pen);
         traxStudent.setStudentGrade("12");
-        traxStudent.setSchoolOfRecord(mincode);
         traxStudent.setGraduationRequirementYear("2018");
         traxStudent.setStudentStatus("A");
         traxStudent.setArchiveFlag("A");
         traxStudent.setStudentCitizenship("C");
+        traxStudent.setSchoolOfRecordId(schoolId);
 
         TraxUpdatedPubEvent traxUpdatedPubEvent = TraxUpdatedPubEvent.builder()
                 .eventType(EventType.UPD_GRAD.toString())
@@ -183,7 +182,7 @@ public class TraxUpdateServiceTest {
         when(traxUpdateInGradRepository.findOutstandingUpdates(any())).thenReturn(Arrays.asList(traxUpdateInGradEntity));
         when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
         when(traxCommonService.getStudentMasterDataFromTrax(pen)).thenReturn(Arrays.asList(traxStudent));
-        when(commonService.getSchoolIdFromRedisCache(mincode)).thenReturn(schoolOfRecordId);
+        when(commonService.getSchoolIdFromRedisCache(mincode)).thenReturn(schoolId );
 
         traxUpdateService.publishTraxUpdatedEvent(traxUpdateInGradEntity);
         traxUpdateService.updateStatus(traxUpdateInGradEntity);
@@ -210,7 +209,7 @@ public class TraxUpdateServiceTest {
         ConvGradStudent traxStudent = new ConvGradStudent();
         traxStudent.setPen(pen);
         traxStudent.setStudentGrade("12");
-        traxStudent.setSchoolOfRecord("12345678");
+        traxStudent.setSchoolOfRecordId(UUID.randomUUID());
         traxStudent.setGraduationRequirementYear("2018");
         traxStudent.setStudentStatus("A");
         traxStudent.setArchiveFlag("A");
@@ -260,7 +259,7 @@ public class TraxUpdateServiceTest {
         ConvGradStudent traxStudent = new ConvGradStudent();
         traxStudent.setPen(pen);
         traxStudent.setStudentGrade("12");
-        traxStudent.setSchoolOfRecord("12345678");
+        traxStudent.setSchoolOfRecordId(UUID.randomUUID());
         traxStudent.setGraduationRequirementYear("2018");
         traxStudent.setStudentStatus("A");
         traxStudent.setArchiveFlag("A");
@@ -302,7 +301,7 @@ public class TraxUpdateServiceTest {
     public void testProcess_whenGraduation_isUpdated() throws JsonProcessingException {
         String pen = "123456789";
         String mincode = "12345678";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         TraxUpdateInGradEntity traxUpdateInGradEntity = new TraxUpdateInGradEntity();
         traxUpdateInGradEntity.setPen(pen);
@@ -313,8 +312,7 @@ public class TraxUpdateServiceTest {
         TraxGraduationUpdateDTO payload = new TraxGraduationUpdateDTO();
         payload.setPen(pen);
         payload.setStudentGrade("12");
-        payload.setSchoolOfRecord(mincode);
-        payload.setSchoolOfRecordId(schoolOfRecordId);
+        payload.setSchoolOfRecordId(schoolId);
         payload.setCitizenship("C");
         payload.setGraduationRequirementYear("2018");
         String jsonString = JsonUtil.getJsonStringFromObject(payload);
@@ -322,11 +320,11 @@ public class TraxUpdateServiceTest {
         ConvGradStudent traxStudent = new ConvGradStudent();
         traxStudent.setPen(pen);
         traxStudent.setStudentGrade("12");
-        traxStudent.setSchoolOfRecord(mincode);
         traxStudent.setGraduationRequirementYear("2018");
         traxStudent.setStudentStatus("A");
         traxStudent.setArchiveFlag("A");
         traxStudent.setStudentCitizenship("C");
+        traxStudent.setSchoolOfRecordId(schoolId);
 
         TraxUpdatedPubEvent traxUpdatedPubEvent = TraxUpdatedPubEvent.builder()
                 .eventType(EventType.UPD_GRAD.toString())
@@ -346,7 +344,7 @@ public class TraxUpdateServiceTest {
         when(restUtils.getTokenResponseObject()).thenReturn(tokenObj);
         when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
         when(traxCommonService.getStudentMasterDataFromTrax(pen)).thenReturn(Arrays.asList(traxStudent));
-        when(commonService.getSchoolIdFromRedisCache(mincode)).thenReturn(schoolOfRecordId);
+        when(commonService.getSchoolIdFromRedisCache(mincode)).thenReturn(schoolId );
 
         traxUpdateService.publishTraxUpdatedEvent(traxUpdateInGradEntity);
         traxUpdateService.updateStatus(traxUpdateInGradEntity);
@@ -358,7 +356,7 @@ public class TraxUpdateServiceTest {
     public void testProcess_whenStudentStatus_isUpdated() throws JsonProcessingException {
         String pen = "123456789";
         String mincode = "12345678";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         TraxUpdateInGradEntity traxUpdateInGradEntity = new TraxUpdateInGradEntity();
         traxUpdateInGradEntity.setPen(pen);
@@ -370,18 +368,17 @@ public class TraxUpdateServiceTest {
         payload.setPen(pen);
         payload.setStudentStatus("A");
         payload.setStudentStatus("A");
-        payload.setSchoolOfRecord(mincode);
-        payload.setSchoolOfRecordId(schoolOfRecordId);
+        payload.setSchoolOfRecordId(schoolId);
         String jsonString = JsonUtil.getJsonStringFromObject(payload);
 
         ConvGradStudent traxStudent = new ConvGradStudent();
         traxStudent.setPen(pen);
         traxStudent.setStudentGrade("12");
-        traxStudent.setSchoolOfRecord(mincode);
         traxStudent.setGraduationRequirementYear("2018");
         traxStudent.setStudentStatus("A");
         traxStudent.setArchiveFlag("A");
         traxStudent.setStudentCitizenship("C");
+        traxStudent.setSchoolOfRecordId(schoolId);
 
         TraxUpdatedPubEvent traxUpdatedPubEvent = TraxUpdatedPubEvent.builder()
                 .eventType(EventType.UPD_GRAD.toString())
@@ -401,7 +398,7 @@ public class TraxUpdateServiceTest {
         when(restUtils.getTokenResponseObject()).thenReturn(tokenObj);
         when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
         when(traxCommonService.getStudentMasterDataFromTrax(pen)).thenReturn(Arrays.asList(traxStudent));
-        when(commonService.getSchoolIdFromRedisCache(mincode)).thenReturn(schoolOfRecordId);
+        when(commonService.getSchoolIdFromRedisCache(mincode)).thenReturn(schoolId );
 
         traxUpdateService.publishTraxUpdatedEvent(traxUpdateInGradEntity);
         traxUpdateService.updateStatus(traxUpdateInGradEntity);
@@ -427,7 +424,7 @@ public class TraxUpdateServiceTest {
         ConvGradStudent traxStudent = new ConvGradStudent();
         traxStudent.setPen(pen);
         traxStudent.setStudentGrade("12");
-        traxStudent.setSchoolOfRecord("12345678");
+        traxStudent.setSchoolOfRecordId(UUID.randomUUID());
         traxStudent.setGraduationRequirementYear("2018");
         traxStudent.setStudentStatus("A");
         traxStudent.setArchiveFlag("A");
@@ -476,7 +473,7 @@ public class TraxUpdateServiceTest {
         ConvGradStudent traxStudent = new ConvGradStudent();
         traxStudent.setPen(pen);
         traxStudent.setStudentGrade("12");
-        traxStudent.setSchoolOfRecord("12345678");
+        traxStudent.setSchoolOfRecordId(UUID.randomUUID());
         traxStudent.setGraduationRequirementYear("2018");
         traxStudent.setStudentStatus("A");
         traxStudent.setArchiveFlag("A");
@@ -525,7 +522,7 @@ public class TraxUpdateServiceTest {
         ConvGradStudent traxStudent = new ConvGradStudent();
         traxStudent.setPen(pen);
         traxStudent.setStudentGrade("12");
-        traxStudent.setSchoolOfRecord("12345678");
+        traxStudent.setSchoolOfRecordId(UUID.randomUUID());
         traxStudent.setGraduationRequirementYear("2018");
         traxStudent.setStudentStatus("A");
         traxStudent.setArchiveFlag("A");
@@ -577,7 +574,7 @@ public class TraxUpdateServiceTest {
         ConvGradStudent traxStudent = new ConvGradStudent();
         traxStudent.setPen(pen);
         traxStudent.setStudentGrade("12");
-        traxStudent.setSchoolOfRecord("12345678");
+        traxStudent.setSchoolOfRecordId(UUID.randomUUID());
         traxStudent.setGraduationRequirementYear("2018");
         traxStudent.setStudentStatus("A");
         traxStudent.setArchiveFlag("A");

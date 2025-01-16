@@ -1,19 +1,21 @@
 package ca.bc.gov.educ.api.trax.service;
 
 import ca.bc.gov.educ.api.trax.model.dto.SnapshotResponse;
+import ca.bc.gov.educ.api.trax.model.dto.institute.School;
 import ca.bc.gov.educ.api.trax.repository.SnapshotRepository;
+import ca.bc.gov.educ.api.trax.service.institute.SchoolService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 public class EdwService {
-    final SnapshotRepository snapshotRepository;
+    private final SnapshotRepository snapshotRepository;
+    private final SchoolService schoolService;
 
-    public EdwService(
-            SnapshotRepository snapshotRepository
-    ) {
+    public EdwService(SnapshotRepository snapshotRepository, SchoolService schoolService) {
         this.snapshotRepository = snapshotRepository;
+        this.schoolService = schoolService;
     }
 
     public List<String> getUniqueSchoolList(Integer gradYear) {
@@ -21,10 +23,23 @@ public class EdwService {
     }
 
     public List<SnapshotResponse> getStudents(Integer gradYear) {
-        return snapshotRepository.getStudentsByGradYear(gradYear);
+        List<SnapshotResponse> results = snapshotRepository.getStudentsByGradYear(gradYear);
+        populateSchoolId(results);
+        return results;
     }
 
     public List<SnapshotResponse> getStudents(Integer gradYear, String schoolOfRecord) {
-        return snapshotRepository.getStudentsByGradYearAndSchoolOfRecord(gradYear, schoolOfRecord);
+        List<SnapshotResponse> results = snapshotRepository.getStudentsByGradYearAndSchoolOfRecord(gradYear, schoolOfRecord);
+        populateSchoolId(results);
+        return results;
+    }
+
+    private void populateSchoolId(List<SnapshotResponse> list) {
+        list.forEach(r -> {
+            School sch = schoolService.getSchoolByMinCodeFromRedisCache(r.getSchoolOfRecord());
+            if (sch != null) {
+                r.setSchoolOfRecordId(sch.getSchoolId());
+            }
+        });
     }
 }

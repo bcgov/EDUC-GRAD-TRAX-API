@@ -81,6 +81,7 @@ oc create -n "$GRAD_NAMESPACE"-"$envValue" configmap "$APP_NAME"-config-map \
   --from-literal=MIN_IDLE='15' \
   --from-literal=IDLE_TIMEOUT='600000' \
   --from-literal=MAX_LIFETIME='1500000' \
+  --from-literal=ENABLE_COMPRESSION="true" \
   --dry-run=client -o yaml | oc apply -f -
 
 echo Creating config map "$APP_NAME"-flb-sc-config-map

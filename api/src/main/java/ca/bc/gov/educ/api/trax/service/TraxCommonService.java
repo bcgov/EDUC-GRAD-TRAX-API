@@ -221,6 +221,7 @@ public class TraxCommonService {
         String graduationRequirementYear = (String) fields[6];
 
         UUID schoolOfRecordId = this.getSchoolIdFromRedisCache(schoolOfRecord);
+        UUID schoolAtGradId = this.getSchoolIdFromRedisCache(schoolAtGrad);
 
         // grad or non-grad
         Date programCompletionDate = null;
@@ -278,9 +279,8 @@ public class TraxCommonService {
                     .pen(pen)
                     .slpDate(slpDateStr)
                     .sccDate(sccDateStr)
-                    .schoolOfRecord(schoolOfRecord)
                     .schoolOfRecordId(schoolOfRecordId)
-                    .schoolAtGrad(schoolAtGrad)
+                    .schoolAtGradId(schoolAtGradId)
                     .studentGrade(studentGrade)
                     .studentStatus(studentStatus != null? studentStatus.toString() : null)
                     .archiveFlag(archiveFlag != null? archiveFlag.toString() : null)

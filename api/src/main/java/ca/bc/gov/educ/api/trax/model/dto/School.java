@@ -26,34 +26,6 @@ public class School implements Comparable<School> {
 	private String schoolCategoryCode;
 	private String schoolCategoryLegacyCode;
 
-	public String getSchoolName() {
-		return  schoolName != null ? schoolName.trim(): "";
-	}
-	
-	public String getDistrictName() {
-		return districtName != null ? districtName.trim(): "";
-	}
-	
-	public String getAddress1() {
-		return address1 != null ? address1.trim(): "";
-	}
-
-	public String getAddress2() {
-		return address2 != null ? address2.trim(): "";
-	}
-
-	public String getCity() {
-		return city != null ? city.trim(): "";
-	}
-	
-	public String getPostal() {
-		return postal != null ? postal.trim(): "";
-	}
-
-	public String getMinCode() {
-		return minCode != null ? minCode.trim(): "";
-	}
-
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
