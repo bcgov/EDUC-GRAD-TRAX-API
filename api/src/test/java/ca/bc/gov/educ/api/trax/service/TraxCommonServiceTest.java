@@ -104,7 +104,9 @@ public class TraxCommonServiceTest {
 
     @After
     public void tearDown() {
-
+        /**
+         * Placeholder method
+         */
     }
 
     @Test
@@ -134,8 +136,7 @@ public class TraxCommonServiceTest {
 
         var result = traxCommonService.getStudentMasterDataFromTrax(pen);
 
-        assertThat(result).isNotNull();
-        assertThat(result).hasSize(1);
+        assertThat(result).isNotNull().hasSize(1);
         ConvGradStudent responseObject = result.get(0);
         assertThat(responseObject.getPen()).isEqualTo(pen);
         assertThat(responseObject.getStudentStatus()).isEqualTo(status.toString());
@@ -189,8 +190,7 @@ public class TraxCommonServiceTest {
 
         var result = traxCommonService.getTotalNumberOfTraxStudentNo();
 
-        assertThat(result).isNotNull();
-        assertThat(result).isEqualTo(1);
+        assertThat(result).isNotNull().isEqualTo(1);
     }
 
     @Test
@@ -201,8 +201,6 @@ public class TraxCommonServiceTest {
         List<Object[]> results = new ArrayList<>();
         results.add(obj);
 
-        String pen = (String) obj[0];
-        Character status = (Character)obj[4];
 
         when(this.traxStudentRepository.loadInitialCourseRestrictionRawData()).thenReturn(results);
 
@@ -256,72 +254,6 @@ public class TraxCommonServiceTest {
         assertThat(traxStudentNo.getStatus()).isEqualTo(result.getStatus());
     }
 
-//    @Test
-//    public void testStudentIsNotGraduated() {
-//        // Student is graduated or not
-//        Boolean result = isStudentGraduated("2004", 0, 0, false);
-//
-//        assertThat(result).isNotNull();
-//        assertThat(result).isFalse();
-//    }
-//
-//    @Test
-//    public void testStudent_whenStatus_isNotInGraduatedOrUnGraduated_then_ReturnsNone() {
-//        // Student is graduated or not
-//        Boolean result = isStudentGraduated("SCCP", 202206, 0, false);
-//
-//        assertThat(result).isNotNull();
-//        assertThat(result).isFalse();
-//    }
-//
-//    @Test
-//    public void testStudent_whenUTG_Data_doesNotExist_then_ReturnsUnGraduated() {
-//        // Student is graduated or not
-//        Boolean result = isStudentGraduated("1996", 202206, 0, false);
-//
-//        when(this.tswService.existsTranscriptStudentDemog("123456789")).thenReturn(false);
-//
-//        assertThat(result).isNotNull();
-//        assertThat(result).isFalse();
-//    }
-//
-//    @Test
-//    public void testStudentForTwoPrograms_whenUTG_Data_doesNotExist_then_ReturnsNO_UTG() {
-//        // Student is graduated or not
-//        Boolean result = isStudentGraduated("1996", 202206, 202206, false);
-//
-//        when(this.tswService.existsTranscriptStudentDemog("123456789")).thenReturn(false);
-//
-//        assertThat(result).isNotNull();
-//        assertThat(result).isFalse();
-//    }
-//
-//    @ParameterizedTest
-//    @CsvSource({
-//            "'1950', 202206, 0",  // graduated 1 program
-//            "'SCCP', 0, 202206",  // graduated 1 program
-//            "'1950', 0, 202206"   // graduated 2 programs
-//    })
-//    void testStudentIsGraduated(String gradReqtYear, int gradDate, int sccDate) {
-//        // Student is graduated or not
-//        Boolean result = isStudentGraduated(gradReqtYear, gradDate, sccDate, true);
-//
-//        assertThat(result).isNotNull();
-//        assertThat(result).isTrue();
-//    }
-//
-//    private Boolean isStudentGraduated(String gradReqtYear, int gradDate, int sccDate, boolean existsUTG) {
-//        final String pen = "123456789";
-//
-//        Object[] cols = new Object[] {
-//                gradReqtYear, gradDate, sccDate, Integer.valueOf(0)
-//        };
-//        List<Object[]> list = new ArrayList<>();
-//        list.add(cols);
-//
-//        when(this.tswService.existsTranscriptStudentDemog(pen)).thenReturn(existsUTG);
-//        when(this.traxStudentRepository.getGraduationData(pen)).thenReturn(list);
-//        return traxCommonService.isGraduatedStudent(pen);
-//    }
+
 
 }

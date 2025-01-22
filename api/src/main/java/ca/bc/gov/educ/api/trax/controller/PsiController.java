@@ -12,8 +12,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -25,15 +25,13 @@ import java.util.List;
 @RestController
 //@RequestMapping(EducGradTraxApiConstants.GRAD_PSI_URL_MAPPING)
 @OpenAPIDefinition(info = @Info(title = "API for PSI Data.", description = "This API is for PSI.", version = "1"))
+@AllArgsConstructor
 public class PsiController {
 
-    @Autowired
     PsiService psiService;
     
-    @Autowired
 	GradValidation validation;
     
-    @Autowired
 	ResponseHelper response;
 
     @GetMapping(EducGradTraxApiConstants.GRAD_PSI_URL_MAPPING_V1)

@@ -438,12 +438,7 @@ class SchoolServiceTest {
         province.setProvCode("BC");
         province.setProvName("British Columbia");
 
-        TraxSchoolSearchCriteria searchCriteria = TraxSchoolSearchCriteria.builder()
-                .district(null)
-                .schoolName(null)
-                .minCode(school.getMinCode())
-                .build();
-        Specification<SchoolEntity> spec = new TraxSchoolSearchSpecification(searchCriteria);
+
 
         Mockito.when(schoolRepository.findAll(Mockito.any(Specification.class))).thenReturn(List.of(school));
         Mockito.when(districtRepository.findById("021")).thenReturn(Optional.of(district));

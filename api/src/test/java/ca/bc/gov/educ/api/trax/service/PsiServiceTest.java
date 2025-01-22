@@ -91,7 +91,9 @@ public class PsiServiceTest {
 
     @After
     public void tearDown() {
-
+		/**
+		 * Placeholder method
+		 */
     }
 
     @Test
@@ -133,8 +135,7 @@ public class PsiServiceTest {
         when(psiRepository.findAll()).thenReturn(gradPSIList);
         List<Psi> results = psiService.getPSIList();
 
-        assertThat(results).isNotNull();
-        assertThat(results.size()).isEqualTo(2);
+        assertThat(results).isNotNull().hasSize(2);
     }
 
     @Test

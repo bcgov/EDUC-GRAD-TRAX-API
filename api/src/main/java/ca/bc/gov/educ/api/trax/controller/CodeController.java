@@ -12,8 +12,8 @@ import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -29,11 +29,11 @@ import java.util.List;
                 scopes = {"READ_GRAD_COUNTRY_CODE_DATA",
                         "READ_GRAD_PROVINCE_CODE_DATA",
                 })})
+@AllArgsConstructor
 public class CodeController {
 
-    @Autowired
     CodeService codeService;
-    @Autowired
+
     ResponseHelper response;
 
     @GetMapping(EducGradTraxApiConstants.GRAD_TRAX_CODE_URL_MAPPING_V1 + EducGradTraxApiConstants.GET_ALL_COUNTRY_MAPPING)
