@@ -5,10 +5,10 @@ import ca.bc.gov.educ.api.trax.model.dto.District;
 import ca.bc.gov.educ.api.trax.model.entity.DistrictEntity;
 import ca.bc.gov.educ.api.trax.model.transformer.DistrictTransformer;
 import ca.bc.gov.educ.api.trax.repository.DistrictRepository;
+import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -16,12 +16,12 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class DistrictService {
 
-    @Autowired DistrictRepository districtRepository;
-    @Autowired DistrictTransformer districtTransformer;
+    DistrictRepository districtRepository;
+    DistrictTransformer districtTransformer;
 
-	@Autowired
 	private SchoolService schoolService;
 
     @SuppressWarnings("unused")

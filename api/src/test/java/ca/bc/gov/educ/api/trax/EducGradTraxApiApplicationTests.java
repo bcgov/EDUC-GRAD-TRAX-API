@@ -6,6 +6,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 class EducGradTraxApiApplicationTests {
 
 	//@Test
-	void contextLoads() {}
+	void contextLoads() {
+		/**
+		 * Placeholder method
+		 */
+	}
 
 }

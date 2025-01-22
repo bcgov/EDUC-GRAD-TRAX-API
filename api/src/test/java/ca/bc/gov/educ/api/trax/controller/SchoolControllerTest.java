@@ -150,6 +150,7 @@ public class SchoolControllerTest {
         Mockito.verify(schoolService).getCommonSchool("1234567");
     }
 
+    @SuppressWarnings("unused")
     private void mockCommonSchool(String minCode, String schoolName) {
         CommonSchool commonSchool = new CommonSchool();
         commonSchool.setSchlNo(minCode);

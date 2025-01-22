@@ -225,7 +225,7 @@ public class InstituteDistrictServiceTest {
 		when(jedisClusterMock.get(CacheKey.DISTRICT_CACHE.name()))
 				.thenReturn(String.valueOf(CacheStatus.LOADING));
 		doThrow(new MockitoException("")).when(jedisClusterMock).set(CacheKey.DISTRICT_CACHE.name(), CacheStatus.LOADING.name());
-		districtService.initializeDistrictCache(false);
+		assertDoesNotThrow(() -> districtService.initializeDistrictCache(false));
 	}
 
 	@Test
@@ -233,7 +233,7 @@ public class InstituteDistrictServiceTest {
 		when(jedisClusterMock.get(CacheKey.DISTRICT_CACHE.name()))
 				.thenReturn(String.valueOf(CacheStatus.READY));
 		doThrow(new MockitoException("")).when(jedisClusterMock).set(CacheKey.DISTRICT_CACHE.name(), CacheStatus.READY.name());
-		districtService.initializeDistrictCache(false);
+		assertDoesNotThrow(() -> districtService.initializeDistrictCache(false));
 	}
 
 	@Test
@@ -288,7 +288,7 @@ public class InstituteDistrictServiceTest {
 		when(districtServiceMock.getDistrictsFromInstituteApi()).thenReturn(ds);
 		doNothing().when(districtServiceMock).loadDistrictsIntoRedisCache(ds);
 
-		districtService.initializeDistrictCache(true);
+		assertDoesNotThrow(() -> districtService.initializeDistrictCache(true));
 	}
 
 	@Test
@@ -472,6 +472,7 @@ public class InstituteDistrictServiceTest {
 		assertTrue(this.districtRedisRepository.findById(districtEntity.getDistrictId()).isPresent());
 	}
 
+	@SuppressWarnings("unused")
 	private DistrictEntity createDistrictEntity() {
 		District d = TestUtils.createDistrict();
         return districtTransformer.transformToEntity(d);

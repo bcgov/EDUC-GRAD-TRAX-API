@@ -74,9 +74,7 @@ public class CommonSchoolCache {
         List<CommonSchool> commonSchools = new ArrayList<>();
         try {
             commonSchools = webClient.get().uri(constants.getAllSchoolSchoolApiUrl())
-                    .headers(h -> {
-                        h.set(EducGradTraxApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                    })
+                    .headers(h -> h.set(EducGradTraxApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()))
                     .retrieve().bodyToMono(new ParameterizedTypeReference<List<CommonSchool>>() {
                     }).block();
         } catch (Exception e) {

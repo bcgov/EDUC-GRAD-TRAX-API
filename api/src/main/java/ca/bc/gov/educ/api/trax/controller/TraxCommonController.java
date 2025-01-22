@@ -8,8 +8,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -25,15 +25,13 @@ import java.util.List;
 @RestController
 //@RequestMapping(EducGradTraxApiConstants.GRAD_TRAX_COMMON_URL_MAPPING)
 @OpenAPIDefinition(info = @Info(title = "API for TRAX Data.", description = "This API is for TRAX.", version = "1"))
+@AllArgsConstructor
 public class TraxCommonController {
 
-    @Autowired
     TraxCommonService traxCommonService;
 
-    @Autowired
     GradValidation validation;
 
-    @Autowired
     ResponseHelper response;
 
     @GetMapping(EducGradTraxApiConstants.GRAD_TRAX_COMMON_URL_MAPPING_V1 + EducGradTraxApiConstants.GET_TRAX_STUDENT_DEMOG_MAPPING)

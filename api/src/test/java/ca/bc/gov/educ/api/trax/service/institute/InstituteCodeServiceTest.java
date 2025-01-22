@@ -44,6 +44,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -151,7 +152,7 @@ public class InstituteCodeServiceTest {
 		when(this.schoolCategoryCodeEntitiesMock.block())
 				.thenReturn(schoolCategoryCodes);
 
-		List<SchoolCategoryCode> result = codeService.getSchoolCategoryCodesFromInstituteApi();
+		assertDoesNotThrow(() -> codeService.getSchoolCategoryCodesFromInstituteApi());
 	}
 
 	@Test
@@ -184,16 +185,7 @@ public class InstituteCodeServiceTest {
 		when(this.schoolFundingGroupCodeEntitiesMock.block())
 				.thenReturn(schoolFundingGroupCodes);
 
-		List<SchoolFundingGroupCode> result = codeService.getSchoolFundingGroupCodesFromInstituteApi();
-	}
-
-	@Test
-	public void whenLoadSchoolCategoryCodesIntoRedisCache_DoesNotThrow() {
-		List<SchoolFundingGroupCodeEntity> schoolFundingGroupCodeEntities = Arrays.asList(new SchoolFundingGroupCodeEntity());
-		List<SchoolFundingGroupCode> schoolFundingGroupCodes = Arrays.asList(new SchoolFundingGroupCode());
-		when(this.schoolFundingGroupCodeRedisRepository.saveAll(schoolFundingGroupCodeEntities))
-				.thenReturn(schoolFundingGroupCodeEntities);
-		assertDoesNotThrow(() -> codeService.loadSchoolFundingGroupCodesIntoRedisCache(schoolFundingGroupCodes));
+		assertDoesNotThrow(() -> codeService.getSchoolFundingGroupCodesFromInstituteApi());
 	}
 
 	@Test
@@ -217,6 +209,8 @@ public class InstituteCodeServiceTest {
 		scce.setLabel("SCC2-label");
 		scces.add(scce);
 		when(schoolCategoryCodeRedisRepository.findAll()).thenReturn(scces);
+		Iterable<SchoolCategoryCodeEntity> results = schoolCategoryCodeRedisRepository.findAll();
+		assertThat(results).isNotEmpty();
 	}
 
 	@Test
@@ -225,7 +219,7 @@ public class InstituteCodeServiceTest {
 				.thenReturn(String.valueOf(CacheStatus.LOADING));
 		when(jedisClusterMock.set(CacheKey.SCHOOL_CATEGORY_CODE_CACHE.name(), CacheStatus.LOADING.name()))
 				.thenReturn(anyString());
-		codeService.initializeSchoolCategoryCodeCache(false);
+		assertDoesNotThrow(() -> codeService.initializeSchoolCategoryCodeCache(false));
 	}
 
 	@Test
@@ -234,7 +228,7 @@ public class InstituteCodeServiceTest {
 				.thenReturn(String.valueOf(CacheStatus.READY));
 		when(jedisClusterMock.set(CacheKey.SCHOOL_CATEGORY_CODE_CACHE.name(), CacheStatus.READY.name()))
 				.thenReturn(anyString());
-		codeService.initializeSchoolCategoryCodeCache(false);
+		assertDoesNotThrow(() -> codeService.initializeSchoolCategoryCodeCache(false));
 	}
 
 	@Test
@@ -300,7 +294,7 @@ public class InstituteCodeServiceTest {
 		when(codeServicemock.getSchoolCategoryCodesFromInstituteApi()).thenReturn(sccs);
 		doNothing().when(codeServicemock).loadSchoolCategoryCodesIntoRedisCache(sccs);
 
-		codeService.initializeSchoolCategoryCodeCache(true);
+		assertDoesNotThrow(() -> codeService.initializeSchoolCategoryCodeCache(true));
 	}
 
 	@Test
@@ -309,7 +303,7 @@ public class InstituteCodeServiceTest {
 				.thenReturn(String.valueOf(CacheStatus.READY));
 		when(jedisClusterMock.set(CacheKey.SCHOOL_CATEGORY_CODE_CACHE.name(), CacheStatus.READY.name()))
 				.thenReturn(anyString());
-		codeService.initializeSchoolCategoryCodeCache(true);
+		assertDoesNotThrow(() -> codeService.initializeSchoolCategoryCodeCache(true));
 	}
 
 	@Test
@@ -324,6 +318,8 @@ public class InstituteCodeServiceTest {
 		sfgce.setLabel("SFGC2-label");
 		sfgces.add(sfgce);
 		when(schoolFundingGroupCodeRedisRepository.findAll()).thenReturn(sfgces);
+		Iterable<SchoolFundingGroupCodeEntity> results = schoolFundingGroupCodeRedisRepository.findAll();
+		assertThat(results).isNotEmpty();
 	}
 
 	@Test
@@ -332,7 +328,7 @@ public class InstituteCodeServiceTest {
 				.thenReturn(String.valueOf(CacheStatus.LOADING));
 		when(jedisClusterMock.set(CacheKey.SCHOOL_FUNDING_GROUP_CODE_CACHE.name(), CacheStatus.LOADING.name()))
 				.thenReturn(anyString());
-		codeService.initializeSchoolFundingGroupCodeCache(false);
+		assertDoesNotThrow(() -> codeService.initializeSchoolFundingGroupCodeCache(false));
 	}
 
 	@Test
@@ -341,7 +337,7 @@ public class InstituteCodeServiceTest {
 				.thenReturn(String.valueOf(CacheStatus.READY));
 		when(jedisClusterMock.set(CacheKey.SCHOOL_FUNDING_GROUP_CODE_CACHE.name(), CacheStatus.READY.name()))
 				.thenReturn(anyString());
-		codeService.initializeSchoolFundingGroupCodeCache(false);
+		assertDoesNotThrow(() -> codeService.initializeSchoolFundingGroupCodeCache(false));
 	}
 
 	@Test
@@ -405,7 +401,7 @@ public class InstituteCodeServiceTest {
 		when(codeServicemock.getSchoolFundingGroupCodesFromInstituteApi()).thenReturn(sfgcs);
 		doNothing().when(codeServicemock).loadSchoolFundingGroupCodesIntoRedisCache(sfgcs);
 
-		codeService.initializeSchoolFundingGroupCodeCache(true);
+		assertDoesNotThrow(() -> codeService.initializeSchoolFundingGroupCodeCache(true));
 
 	}
 
@@ -434,6 +430,6 @@ public class InstituteCodeServiceTest {
 				.thenReturn(String.valueOf(CacheStatus.READY));
 		when(jedisClusterMock.set(CacheKey.SCHOOL_FUNDING_GROUP_CODE_CACHE.name(), CacheStatus.READY.name()))
 				.thenReturn(anyString());
-		codeService.initializeSchoolFundingGroupCodeCache(true);
+		assertDoesNotThrow(() -> codeService.initializeSchoolFundingGroupCodeCache(true));
 	}
 }

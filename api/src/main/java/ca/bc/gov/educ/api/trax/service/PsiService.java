@@ -11,6 +11,7 @@ import ca.bc.gov.educ.api.trax.repository.PsiRepository;
 import ca.bc.gov.educ.api.trax.repository.PsiSearchCriteria;
 import ca.bc.gov.educ.api.trax.repository.PsiSearchSpecification;
 import ca.bc.gov.educ.api.trax.repository.StudentPsiRepository;
+import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,19 +25,16 @@ import java.util.Locale;
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class PsiService {
 
-    @Autowired
     private PsiRepository psiRepository;
 
-    @Autowired
     private PsiTransformer psiTransformer;
 
-    @Autowired
     private StudentPsiRepository studentPsiRepository;
     
-    @Autowired
-    CodeService codeService;
+    private CodeService codeService;
 
     @SuppressWarnings("unused")
 	private static Logger logger = LoggerFactory.getLogger(PsiService.class);

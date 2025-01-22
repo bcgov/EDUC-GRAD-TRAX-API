@@ -42,6 +42,6 @@ public class DistrictTransformer {
         return districts
                 .stream()
                 .map(district -> modelMapper.map(district, DistrictEntity.class))
-                .collect(Collectors.toList());
+                .toList();
     }
 }

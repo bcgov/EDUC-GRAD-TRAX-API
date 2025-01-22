@@ -11,10 +11,10 @@ import ca.bc.gov.educ.api.trax.repository.GradProvinceRepository;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.GradValidation;
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import java.util.List;
@@ -24,36 +24,27 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
+@AllArgsConstructor
 public class CodeService {
 
-	@Autowired
 	private GradCountryTransformer gradCountryTransformer;
 
-	@Autowired
 	private GradProvinceTransformer gradProvinceTransformer;
 
-	@Autowired
 	private GradCountryRepository gradCountryRepository;
 
-	@Autowired
 	private GradProvinceRepository gradProvinceRepository;
 
-	@Autowired
 	GradValidation validation;
 
-	@Autowired
 	private EducGradTraxApiConstants constants;
 
-	@Autowired
 	private WebClient webClient;
 
-	@Autowired
 	private RestUtils restUtils;
 
+	@SuppressWarnings("unused")
 	private static Logger logger = LoggerFactory.getLogger(CodeService.class);
-	private static final String EXCEPTION_MSG = "Exception: %s";
-	private static final String CREATED_BY="createdBy";
-	private static final String CREATED_TIMESTAMP="createdTimestamp";
 
 	@Transactional
 	public List<GradCountry> getAllCountryCodeList() {

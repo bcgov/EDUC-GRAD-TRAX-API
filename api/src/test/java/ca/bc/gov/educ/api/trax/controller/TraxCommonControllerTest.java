@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.UUID;
 
 @ExtendWith(MockitoExtension.class)
-public class TraxCommonControllerTest {
+class TraxCommonControllerTest {
 
 	@Mock
 	private TraxCommonService traxCommonService;
@@ -38,7 +38,7 @@ public class TraxCommonControllerTest {
 	MessageHelper messagesHelper;
 
 	@Test
-	public void testGetStudentDemographicsDataFromTrax() {
+	void testGetStudentDemographicsDataFromTrax() {
 		final String pen = "123456789";
 		List<Student> studentList = new ArrayList<>();
 		Student obj = Student.builder()
@@ -58,7 +58,7 @@ public class TraxCommonControllerTest {
 	}
 	
 	@Test
-	public void testGetStudentMasterDataFromTrax() {
+	void testGetStudentMasterDataFromTrax() {
 		final String pen = "123456789";
 		List<ConvGradStudent> studentList = new ArrayList<>();
 		ConvGradStudent obj = ConvGradStudent.builder()
@@ -75,7 +75,7 @@ public class TraxCommonControllerTest {
 	}
 
 	@Test
-	public void testGetTraxStudentNoListByPaging() {
+	void testGetTraxStudentNoListByPaging() {
 		final String pen = "123456789";
 		List<TraxStudentNo> studentList = new ArrayList<>();
 		TraxStudentNo obj = new TraxStudentNo();
@@ -93,15 +93,14 @@ public class TraxCommonControllerTest {
 	}
 
 	@Test
-	public void testGetToralNumberOfTraxStudentNoList() {
+	void testGetToralNumberOfTraxStudentNoList() {
 		Mockito.when(traxCommonService.getTotalNumberOfTraxStudentNo()).thenReturn(1);
 		traxCommonController.getTotalNumberOfTraxStudentNoList();
 		Mockito.verify(traxCommonService).getTotalNumberOfTraxStudentNo();
 	}
 
 	@Test
-	public void testGetCourseRestrictions() {
-		final String pen = "123456789";
+	void testGetCourseRestrictions() {
 		List<CourseRestriction> courseRestrictionList = new ArrayList<>();
 		CourseRestriction obj = new CourseRestriction();
 		obj.setMainCourse("main");
@@ -118,8 +117,7 @@ public class TraxCommonControllerTest {
 	}
 
 	@Test
-	public void testGetCourseRequirements() {
-		final String pen = "123456789";
+	void testGetCourseRequirements() {
 		List<GradCourse> courseRequirementList = new ArrayList<>();
 		GradCourse obj = new GradCourse();
 		obj.setCourseCode("main");
@@ -135,7 +133,7 @@ public class TraxCommonControllerTest {
 	}
 
 	@Test
-	public void testSaveTraxStudentNo() {
+	void testSaveTraxStudentNo() {
 		final String pen = "123456789";
 		TraxStudentNo obj = new TraxStudentNo();
 		obj.setStudNo(pen);
@@ -145,10 +143,4 @@ public class TraxCommonControllerTest {
 		Mockito.verify(traxCommonService).saveTraxStudentNo(obj);
 	}
 
-//	@Test
-//	public void testGetStudentIsGraduatedByPen() {
-//		Mockito.when(traxCommonService.isGraduatedStudent("123456789")).thenReturn(true);
-//		traxCommonController.getStudentIsGraduatedByPen("123456789");
-//		Mockito.verify(traxCommonService).isGraduatedStudent("123456789");
-//	}
 }

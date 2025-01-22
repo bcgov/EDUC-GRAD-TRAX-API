@@ -10,7 +10,6 @@ import ca.bc.gov.educ.api.trax.model.entity.GradProvinceEntity;
 import ca.bc.gov.educ.api.trax.repository.GradCountryRepository;
 import ca.bc.gov.educ.api.trax.repository.GradProvinceRepository;
 import ca.bc.gov.educ.api.trax.util.GradValidation;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -91,7 +90,7 @@ public class CodeServiceTest {
 		gradProvinceList.add(obj);
 		Mockito.when(gradProvinceRepository.findAll()).thenReturn(gradProvinceList);
 		List<GradProvince> provinces = codeService.getAllProvinceCodeList();
-		Assert.assertTrue(provinces.size() == 2);
+		assertThat(provinces).isNotEmpty().hasSize(2);
 	}
 	
 	@Test

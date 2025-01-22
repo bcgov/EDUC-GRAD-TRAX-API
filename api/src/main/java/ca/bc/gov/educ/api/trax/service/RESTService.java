@@ -78,7 +78,7 @@ public class RESTService {
             obj = webClient
                     .get()
                     .uri(url)
-                    .headers(h -> { h.set(EducGradTraxApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()); })
+                    .headers(h -> h.set(EducGradTraxApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()))
                     .retrieve()
                     // if 5xx errors, throw Service error
                     .onStatus(HttpStatusCode::is5xxServerError,
@@ -96,7 +96,7 @@ public class RESTService {
             // catches IOExceptions and the like
             throw new ServiceException(
                     getErrorMessage(url, e.getLocalizedMessage()),
-                    (e instanceof WebClientResponseException) ? ((WebClientResponseException) e).getStatusCode().value() : HttpStatus.SERVICE_UNAVAILABLE.value(),
+                    (e instanceof WebClientResponseException webClientResponseException) ? webClientResponseException.getStatusCode().value() : HttpStatus.SERVICE_UNAVAILABLE.value(),
                     e);
         }
         return obj;
@@ -141,7 +141,7 @@ public class RESTService {
         try {
             obj = webClient.post()
                     .uri(url)
-                    .headers(h -> { h.set(EducGradTraxApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()); })
+                    .headers(h -> h.set(EducGradTraxApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()))
                     .body(BodyInserters.fromValue(body))
                     .retrieve()
                     .onStatus(HttpStatusCode::is5xxServerError,

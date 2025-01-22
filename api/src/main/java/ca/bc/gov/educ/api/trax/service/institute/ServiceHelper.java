@@ -2,16 +2,16 @@ package ca.bc.gov.educ.api.trax.service.institute;
 
 import ca.bc.gov.educ.api.trax.constant.CacheKey;
 import ca.bc.gov.educ.api.trax.constant.CacheStatus;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import redis.clients.jedis.JedisCluster;
 
 @Slf4j
 @Component
+@AllArgsConstructor
 public class ServiceHelper<T> {
 
-    @Autowired
     JedisCluster jedisCluster;
 
     public void initializeCache(boolean force, CacheKey cacheKey, T service) {
@@ -42,39 +42,27 @@ public class ServiceHelper<T> {
     private void loadDataIntoRedisCache(CacheKey cacheKey, T service) {
         try {
             switch (cacheKey) {
-                case SCHOOL_CATEGORY_CODE_CACHE -> {
+                case SCHOOL_CATEGORY_CODE_CACHE ->
                     ((CodeService)service).loadSchoolCategoryCodesIntoRedisCache(
                             ((CodeService)service).getSchoolCategoryCodesFromInstituteApi()
                     );
-                    break;
-                }
-                case SCHOOL_FUNDING_GROUP_CODE_CACHE -> {
+                case SCHOOL_FUNDING_GROUP_CODE_CACHE ->
                     ((CodeService)service).loadSchoolFundingGroupCodesIntoRedisCache(
                             ((CodeService)service).getSchoolFundingGroupCodesFromInstituteApi()
                     );
-                    break;
-                }
-                case DISTRICT_CACHE -> {
+                case DISTRICT_CACHE ->
                     ((DistrictService)service).loadDistrictsIntoRedisCache(
                             ((DistrictService)service).getDistrictsFromInstituteApi()
                     );
-                    break;
-                }
-                case SCHOOL_CACHE -> {
+                case SCHOOL_CACHE ->
                     ((SchoolService)service).loadSchoolsIntoRedisCache(
                             ((SchoolService)service).getSchoolsFromInstituteApi()
                     );
-                    break;
-                }
-                case SCHOOL_DETAIL_CACHE -> {
+                case SCHOOL_DETAIL_CACHE ->
                     ((SchoolService)service).loadSchoolDetailsIntoRedisCache(
                             ((SchoolService)service).getSchoolDetailsFromInstituteApi()
                     );
-                    break;
-                }
-                default -> {
-                    log.info(String.format("Invalid Cache Key %s", cacheKey));
-                }
+                default -> log.info(String.format("Invalid Cache Key %s", cacheKey));
             }
         } catch (Exception e) {
             log.info(String.format("Exception thrown while loading cache %s. \n%s", cacheKey, e));
