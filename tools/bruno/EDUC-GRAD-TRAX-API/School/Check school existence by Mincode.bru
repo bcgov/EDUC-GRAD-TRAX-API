@@ -1,0 +1,15 @@
+meta {
+  name: Check school existence by Mincode
+  type: http
+  seq: 15
+}
+
+get {
+  url: {{baseUrl}}/api/v1/trax/school/check/:minCode
+  body: none
+  auth: none
+}
+
+params:path {
+  minCode: 
+}

@@ -1,0 +1,15 @@
+meta {
+  name: Get Schools by School Category Code V2
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/v2/trax/school/schoolCategories
+  body: none
+  auth: none
+}
+
+params:query {
+  ~schoolCategoryCode: 
+}

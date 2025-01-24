@@ -1,0 +1,15 @@
+meta {
+  name: Find a School by Mincode
+  type: http
+  seq: 10
+}
+
+get {
+  url: {{baseUrl}}/api/v1/trax/school/:minCode
+  body: none
+  auth: none
+}
+
+params:path {
+  minCode: 
+}

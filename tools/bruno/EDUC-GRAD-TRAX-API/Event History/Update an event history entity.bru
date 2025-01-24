@@ -1,0 +1,36 @@
+meta {
+  name: Update an event history entity
+  type: http
+  seq: 1
+}
+
+put {
+  url: {{baseUrl}}/api/v1/trax/event/history
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "createUser": "",
+    "createDate": "",
+    "updateUser": "",
+    "updateDate": "",
+    "id": "",
+    "event": {
+      "createUser": "",
+      "createDate": "",
+      "updateUser": "",
+      "updateDate": "",
+      "replicationEventId": "",
+      "eventId": "",
+      "eventPayload": "",
+      "eventStatus": "",
+      "eventType": "",
+      "eventOutcome": "",
+      "activityCode": ""
+    },
+    "eventHistoryUrl": "",
+    "acknowledgeFlag": ""
+  }
+}

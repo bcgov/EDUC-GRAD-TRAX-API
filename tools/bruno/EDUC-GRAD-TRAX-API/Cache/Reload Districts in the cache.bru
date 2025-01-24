@@ -1,0 +1,11 @@
+meta {
+  name: Reload Districts in the cache
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{baseUrl}}/api/v2/trax/district/cache/districts
+  body: none
+  auth: none
+}

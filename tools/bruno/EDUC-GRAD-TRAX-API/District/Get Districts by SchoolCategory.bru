@@ -1,0 +1,15 @@
+meta {
+  name: Get Districts by SchoolCategory
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/api/v1/trax/district/schoolCategories
+  body: none
+  auth: none
+}
+
+params:query {
+  ~schoolCategory: 
+}

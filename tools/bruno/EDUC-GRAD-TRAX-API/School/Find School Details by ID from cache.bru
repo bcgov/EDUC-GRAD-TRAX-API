@@ -1,0 +1,15 @@
+meta {
+  name: Find School Details by ID from cache
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/api/v2/trax/school-detail/:schoolId
+  body: none
+  auth: none
+}
+
+params:path {
+  schoolId: 
+}

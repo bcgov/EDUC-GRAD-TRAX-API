@@ -1,0 +1,15 @@
+meta {
+  name: Find a District by District Number V2
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v2/trax/district
+  body: none
+  auth: none
+}
+
+params:query {
+  distNo: 
+}

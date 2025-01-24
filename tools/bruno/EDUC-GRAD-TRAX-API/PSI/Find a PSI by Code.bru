@@ -1,0 +1,17 @@
+meta {
+  name: Find a PSI by Code
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/v1/trax/psi/student
+  body: none
+  auth: none
+}
+
+params:query {
+  transmissionMode: 
+  psiCode: 
+  psiYear: 
+}
