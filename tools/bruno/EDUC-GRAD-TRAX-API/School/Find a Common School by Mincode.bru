@@ -1,0 +1,15 @@
+meta {
+  name: Find a Common School by Mincode
+  type: http
+  seq: 14
+}
+
+get {
+  url: {{baseUrl}}/api/v1/trax/school/common/:minCode
+  body: none
+  auth: none
+}
+
+params:path {
+  minCode: 
+}

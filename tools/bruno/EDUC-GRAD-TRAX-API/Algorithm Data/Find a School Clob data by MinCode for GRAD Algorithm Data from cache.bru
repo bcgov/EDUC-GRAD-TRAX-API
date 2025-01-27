@@ -1,0 +1,15 @@
+meta {
+  name: Find a School Clob data by MinCode for GRAD Algorithm Data from cache
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/v2/trax/school-clob/search
+  body: none
+  auth: none
+}
+
+params:query {
+  ~mincode: 
+}

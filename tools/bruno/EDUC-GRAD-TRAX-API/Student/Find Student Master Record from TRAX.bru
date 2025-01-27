@@ -1,0 +1,15 @@
+meta {
+  name: Find Student Master Record from TRAX
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/v1/trax/common/student-master/:pen
+  body: none
+  auth: none
+}
+
+params:path {
+  pen: 
+}
