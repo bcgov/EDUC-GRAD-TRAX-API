@@ -12,8 +12,12 @@ import ca.bc.gov.educ.api.trax.repository.redis.SchoolDetailRedisRepository;
 import ca.bc.gov.educ.api.trax.repository.redis.SchoolRedisRepository;
 import ca.bc.gov.educ.api.trax.service.RESTService;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
+
 import com.google.common.base.Strings;
 import lombok.RequiredArgsConstructor;
+
+
+import ca.bc.gov.educ.api.trax.util.SearchUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -21,6 +25,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+
+
 
 import java.util.*;
 
@@ -77,12 +83,31 @@ public class SchoolService {
 
 	public List<School> getSchoolsFromRedisCache() {
 		log.debug("**** Getting schools from Redis Cache.");
-		return  schoolTransformer.transformToDTO(schoolRedisRepository.findAll());
+		Iterable<SchoolEntity> schoolEntities = schoolRedisRepository.findAll();
+		if ( (!schoolEntities.iterator().hasNext())){
+			log.debug("Get Schools  from Redis Cache returned empty");
+			List<School> schools = getSchoolsFromInstituteApi();
+			return schools;
+		}
+		return  schoolTransformer.transformToDTO(schoolEntities);
 	}
+
 
 	public School getSchoolByMinCodeFromRedisCache(String minCode) {
 		log.debug("Get School by Mincode from Redis Cache: {}", minCode);
-		return schoolRedisRepository.findByMincode(minCode).map(schoolTransformer::transformToDTO).orElse(null);
+		return schoolRedisRepository.findByMincode(minCode).map(schoolTransformer::transformToDTO).orElseGet(() -> {
+				log.debug("Get School by Mincode from Redis Cache returned null");
+				List<School> schools = getSchoolsBySearchCriteriaFromInstituteApi("mincode", minCode);
+				if ((schools != null) && (!schools.isEmpty())) {
+					School school = schools.get(0);
+					if (school != null) {
+						loadSchoolsIntoRedisCache(List.of(school));
+						return school;
+					}
+				}
+
+			return null;
+		});
 	}
 
 	public boolean checkIfSchoolExists(String minCode) {
@@ -111,6 +136,26 @@ public class SchoolService {
         return null;
     }
 
+
+
+	public List <School> getSchoolsBySearchCriteriaFromInstituteApi(String key, String value) {
+		try {
+			log.debug("****Before Calling Institute API");
+			Map<String, String> searchInput = new HashMap<>();
+			searchInput.put(key, value);
+			Map<String, String>  params  = SearchUtil.searchStringsToHTTPParams(searchInput);
+			List <SchoolEntity> schoolEntities = this.restService.get(constants.getSchoolsPaginated(),params,
+					List.class, webClient);
+			return schoolTransformer.transformToDTO(schoolEntities);
+		} catch (ServiceException e) {
+			log.warn("Error getting School By search Criteria from Institute API");
+		} catch (Exception e) {
+			log.error(String.format("Error while calling Institute api: %s", e.getMessage()));
+		}
+		return null;
+	}
+
+
     public List<SchoolDetail> getSchoolDetailsFromInstituteApi() {
 
         List<School> schools = getSchoolsFromRedisCache();
@@ -124,22 +169,43 @@ public class SchoolService {
 	public void loadSchoolDetailsIntoRedisCache(List<SchoolDetail> schoolDetails) {
 		schoolDetailRedisRepository
 				.saveAll(schoolDetailTransformer.transformToEntity(schoolDetails));
-		log.info(String.format("%s School Details Loaded into cache.", schoolDetails.size()));
+		log.debug(String.format("%s School Details Loaded into cache.", schoolDetails.size()));
 	}
 
 	public List<SchoolDetail> getSchoolDetailsFromRedisCache() {
 		log.debug("**** Getting school Details from Redis Cache.");
-		return schoolDetailTransformer.transformToDTO(schoolDetailRedisRepository.findAll());
+
+		Iterable<SchoolDetailEntity> schoolDetailEntities = schoolDetailRedisRepository.findAll();
+		if ( (!schoolDetailEntities.iterator().hasNext())){
+			log.debug("Get Schools details  from Redis Cache returned empty");
+			List<SchoolDetail> schoolDetails = this.getSchoolDetailsFromInstituteApi();
+				return schoolDetails;
+		}
+		return schoolDetailTransformer.transformToDTO(schoolDetailEntities);
 	}
 
-	public SchoolDetail getSchoolDetailByMincodeFromRedisCache(String mincode) {
-		log.debug("**** Getting school Details By Mincode from Redis Cache.");
-		return schoolDetailRedisRepository.findByMincode(mincode).map(schoolDetailTransformer::transformToDTO).orElse(null);
-	}
+
 
 	public SchoolDetail getSchoolDetailBySchoolId(UUID schoolId) {
 		log.debug("**** Getting school Details By SchoolId from Redis Cache.");
 		return schoolDetailRedisRepository.findById(String.valueOf(schoolId)).map(schoolDetailTransformer::transformToDTO).orElse(null);
+	}
+
+	public SchoolDetail getSchoolDetailByMincodeFromRedisCache(String mincode) {
+			log.debug("**** Getting school Details By Mincode from Redis Cache.");
+			return schoolDetailRedisRepository.findByMincode(mincode).map(schoolDetailTransformer::transformToDTO).orElseGet(() -> {
+			log.debug("Get Schools details  by mincode from Redis Cache returned empty");
+			List<School> schools = this.getSchoolsBySearchCriteriaFromInstituteApi("mincode", mincode);
+			if ((schools!= null) &&(!schools.isEmpty())){
+				School school = schools.get(0);
+				SchoolDetail schoolDetail = this.getSchoolDetailByIdFromInstituteApi(school.getSchoolId());
+				if ((schoolDetail  != null) ) {
+					loadSchoolDetailsIntoRedisCache(List.of(schoolDetail));
+				}
+				return schoolDetail;
+			}
+			return null;
+		});
 	}
 
 	public void initializeSchoolDetailCache(boolean force) {
@@ -148,8 +214,23 @@ public class SchoolService {
 
 	public List<SchoolDetail> getSchoolDetailsBySchoolCategoryCode(String schoolCategoryCode) {
 
-		return schoolDetailTransformer.transformToDTO(
-				schoolDetailRedisRepository.findBySchoolCategoryCode(schoolCategoryCode));
+		log.debug("**** Getting school Details By school category from Redis Cache.");
+		List<SchoolDetailEntity> schoolDetailEntities = schoolDetailRedisRepository.findBySchoolCategoryCode(schoolCategoryCode);
+
+		if ( (schoolDetailEntities == null) ||(schoolDetailEntities.isEmpty())){
+			log.debug("Get Schools details  by category code from Redis Cache returned empty");
+
+			List<School> schools = this.getSchoolsBySearchCriteriaFromInstituteApi("schoolCategoryCode",schoolCategoryCode);
+			ArrayList<SchoolDetail> schoolDetails = new ArrayList<>();
+			if ((schools != null) && (!schools.isEmpty())) {
+				schools.forEach(school -> {
+					schoolDetails.add(this.getSchoolDetailByIdFromInstituteApi(school.getSchoolId()));
+				});
+				loadSchoolDetailsIntoRedisCache(schoolDetails);
+				return schoolDetails;
+			}
+		}
+		return schoolDetailTransformer.transformToDTO(schoolDetailEntities);
 	}
 
 	public List<SchoolDetail> getSchoolDetailsByDistrictFromRedisCache(String districtId) {

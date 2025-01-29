@@ -3,12 +3,15 @@ package ca.bc.gov.educ.api.trax.service.institute;
 import ca.bc.gov.educ.api.trax.constant.CacheKey;
 import ca.bc.gov.educ.api.trax.exception.ServiceException;
 import ca.bc.gov.educ.api.trax.model.dto.institute.District;
+
 import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolDetail;
 import ca.bc.gov.educ.api.trax.model.entity.institute.DistrictEntity;
+
 import ca.bc.gov.educ.api.trax.model.transformer.institute.DistrictTransformer;
 import ca.bc.gov.educ.api.trax.repository.redis.DistrictRedisRepository;
 import ca.bc.gov.educ.api.trax.service.RESTService;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
+import ca.bc.gov.educ.api.trax.util.SearchUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -16,9 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 @Service("instituteDistrictService")
@@ -61,17 +62,7 @@ public class DistrictService {
         return Collections.emptyList();
     }
 
-    public District getDistrictByIdFromInstituteApi(String districtId) {
-        try {
-            return this.restService.get(String.format(constants.getGetDistrictFromInstituteApiUrl(), districtId),
-                    District.class, webClient);
-        } catch (WebClientResponseException e) {
-            log.warn(String.format("Error getting District from Institute API: %s", e.getMessage()));
-        } catch (Exception e) {
-            log.error(String.format("Error while calling institute-api: %s", e.getMessage()));
-        }
-        return null;
-    }
+
 
     public void loadDistrictsIntoRedisCache(List<District> districts) {
         districtRedisRepository
@@ -79,9 +70,33 @@ public class DistrictService {
         log.info(String.format("%s Districts Loaded into cache.", districts.size()));
     }
 
+    public List <District> getDistrictsBySearchCriteriaFromInstituteApi(String key, String value) {
+        try {
+            log.debug("****Before Calling Institute API");
+
+            Map<String, String> searchInput = new HashMap<>();
+            searchInput.put(key, value);
+            Map<String, String> params  = SearchUtil.searchStringsToHTTPParams(searchInput);
+            List <DistrictEntity> districtEntities = this.restService.get(constants.getDistrictsPaginated(),params,
+                    List.class, webClient);
+            return districtTransformer.transformToDTO(districtEntities);
+        } catch (ServiceException e) {
+            log.warn("Error getting District By search Criteria from Institute API");
+        } catch (Exception e) {
+            log.error(String.format("Error while calling Institute api: %s", e.getMessage()));
+        }
+        return null;
+    }
+
     public List<District> getDistrictsFromRedisCache() {
         log.debug("**** Getting districts from Redis Cache.");
-        return  districtTransformer.transformToDTO(districtRedisRepository.findAll());
+        Iterable<DistrictEntity> districtEntities= districtRedisRepository.findAll();
+        if ( (!districtEntities.iterator().hasNext())){
+            log.debug("Get District  from Redis Cache returned empty");
+            List<District> districts = this.getDistrictsFromInstituteApi();
+            return districts;
+        }
+        return  districtTransformer.transformToDTO(districtEntities);
     }
 
     public void initializeDistrictCache(boolean force) {
@@ -90,13 +105,34 @@ public class DistrictService {
 
     public District getDistrictByDistNoFromRedisCache(String districtNumber) {
         log.debug("**** Getting district by district no. from Redis Cache.");
-        return districtRedisRepository.findByDistrictNumber(districtNumber).map(districtTransformer::transformToDTO).orElse(null);
+
+        return districtRedisRepository.findByDistrictNumber(districtNumber).map(districtTransformer::transformToDTO).
+                orElseGet(() -> {
+                    log.debug("Getting district by district no from Redis Cache returned empty");
+                    List<District> districts = this.getDistrictsBySearchCriteriaFromInstituteApi("districtNumber", districtNumber);
+                    if ((districts != null) && (!districts.isEmpty())) {
+                        this.loadDistrictsIntoRedisCache(districts);
+                    }
+                        return districts.get(0);
+                    });
     }
 
     public District getDistrictByIdFromRedisCache(String districtId) {
+
+
         log.debug("**** Getting district by ID from Redis Cache.");
-        return districtRedisRepository.findById(districtId).map(districtTransformer::transformToDTO).orElse(null);
+        return districtRedisRepository.findById(districtId)
+                .map(districtTransformer::transformToDTO)
+                .orElseGet(() -> {
+                    log.debug("Getting district by ID from Redis Cache returned empty");
+                    District district = this.getDistrictByIdFromInstituteApi(districtId);
+                    if (district != null) {
+                        this.loadDistrictsIntoRedisCache(List.of(district));
+                    }
+                    return district;
+                });
     }
+
 
     public List<District> getDistrictsBySchoolCategoryCode(String schoolCategoryCode) {
         List<SchoolDetail> schoolDetails;
@@ -111,6 +147,13 @@ public class DistrictService {
             districts.add(getDistrictByIdFromRedisCache(schoolDetail.getDistrictId()));
         }
         return districts;
+    }
+
+    public District getDistrictByIdFromInstituteApi(String districtId)  throws ServiceException {
+            log.debug("****Before Calling Institute API");
+            Optional<DistrictEntity> districtEntity = this.restService.get(String.format(constants.getGetDistrictFromInstituteApiUrl(), districtId),
+                    Optional.class, webClient);
+            return districtTransformer.transformToDTO(districtEntity);
     }
 
     /**

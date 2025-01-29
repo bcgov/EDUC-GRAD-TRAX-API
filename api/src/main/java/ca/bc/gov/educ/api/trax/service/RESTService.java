@@ -12,9 +12,11 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
+import org.springframework.web.util.UriComponentsBuilder;
 import reactor.util.retry.Retry;
 
 import java.time.Duration;
+import java.util.Map;
 
 @Service
 public class RESTService {
@@ -78,6 +80,42 @@ public class RESTService {
             obj = webClient
                     .get()
                     .uri(url)
+                    .headers(h -> { h.set(EducGradTraxApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()); })
+                    .retrieve()
+                    // if 5xx errors, throw Service error
+                    .onStatus(HttpStatusCode::is5xxServerError,
+                            clientResponse -> Mono.error(new ServiceException(getErrorMessage(url, SERVER_ERROR), clientResponse.statusCode().value())))
+                    .bodyToMono(clazz)
+                    // only does retry if initial error was 5xx as service may be temporarily down
+                    // 4xx errors will always happen if 404, 401, 403 etc, so does not retry
+                    .retryWhen(Retry.backoff(3, Duration.ofSeconds(2))
+                            .filter(ServiceException.class::isInstance)
+                            .onRetryExhaustedThrow((retryBackoffSpec, retrySignal) -> {
+                                throw new ServiceException(getErrorMessage(url, SERVICE_FAILED_ERROR), HttpStatus.SERVICE_UNAVAILABLE.value());
+                            }))
+                    .block();
+        } catch (Exception e) {
+            // catches IOExceptions and the like
+            throw new ServiceException(
+                    getErrorMessage(url, e.getLocalizedMessage()),
+                    (e instanceof WebClientResponseException) ? ((WebClientResponseException) e).getStatusCode().value() : HttpStatus.SERVICE_UNAVAILABLE.value(),
+                    e);
+        }
+        return obj;
+    }
+
+    public <T> T get(String url, Map<String, String > params, Class<T> clazz, WebClient webClient) {
+        T obj;
+        if (webClient == null)
+            webClient = this.webClient;
+        try {
+            UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(url);
+            params.forEach((key, value) -> uriBuilder.queryParam(key, value));
+            String uri = uriBuilder.build().toUriString();
+
+            obj = webClient
+                    .get()
+                    .uri(uri)
                     .headers(h -> { h.set(EducGradTraxApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()); })
                     .retrieve()
                     // if 5xx errors, throw Service error
