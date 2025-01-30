@@ -50,16 +50,13 @@ public abstract class EventHistoryMapper {
         try {
             switch (evenHistoryPair.getLeft()) {
                 case SCHOOL -> {
-                    val school = JsonUtil.getJsonObjectFromString(ca.bc.gov.educ.api.trax.model.dto.institute.School.class, eventEntity.getEventPayload());
-                    return this.getStudentAdminSchoolDetailsUrl(school.getSchoolId());
+                    return this.getStudentAdminSchoolDetailsUrl(evenHistoryPair.getRight().toString());
                 }
                 case DISTRICT -> {
-                    val district = JsonUtil.getJsonObjectFromString(ca.bc.gov.educ.api.trax.model.dto.institute.District.class, eventEntity.getEventPayload());
-                    return this.getStudentAdminDistrictDetailsUrl(district.getDistrictId());
+                    return this.getStudentAdminDistrictDetailsUrl(evenHistoryPair.getRight().toString());
                 }
                 case INDEPENDENT_AUTHORITY -> {
-                    val authorityContact = JsonUtil.getJsonObjectFromString(AuthorityContact.class, eventEntity.getEventPayload());
-                    return this.getStudentAdminAuthorityDetailsUrl(authorityContact.getIndependentAuthorityId());
+                    return this.getStudentAdminAuthorityDetailsUrl(evenHistoryPair.getRight().toString());
                 }
                 default -> {
                     return null;
