@@ -23,6 +23,9 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 @SpringBootTest(classes = { EducGradTraxApiApplication.class })
 @ActiveProfiles("test")
 class MapperTest extends BaseEventHistoryTest {
@@ -50,7 +53,7 @@ class MapperTest extends BaseEventHistoryTest {
 
     @Test
     void testUUIDMapper_givenBlankString_shouldReturnNull() {
-        Assertions.assertNull(uuidMapper.map(""));
+        assertNull(uuidMapper.map(""));
     }
 
 
@@ -59,7 +62,7 @@ class MapperTest extends BaseEventHistoryTest {
         School school = TestUtils.createSchool();
         Pair<String, EventHistoryEntity> pair = createUrlAndEntity("CREATE_SCHOOL", school, school.getSchoolId());
         EventHistory eventHistory = eventHistoryMapper.toStructure(pair.getRight());
-        Assertions.assertEquals(true, eventHistory.getEventHistoryUrl().equals(pair.getLeft()));
+        assertEquals(true, eventHistory.getEventHistoryUrl().equals(pair.getLeft()));
     }
 
     @Test
@@ -67,7 +70,7 @@ class MapperTest extends BaseEventHistoryTest {
         MoveSchoolData school = TestUtils.createMoveSchoolData();
         Pair<String, EventHistoryEntity> pair = createUrlAndEntity("MOVE_SCHOOL", school, school.getToSchool().getSchoolId());
         EventHistory eventHistory = eventHistoryMapper.toStructure(pair.getRight());
-        Assertions.assertEquals(true, eventHistory.getEventHistoryUrl().equals(pair.getLeft()));
+        assertEquals(true, eventHistory.getEventHistoryUrl().equals(pair.getLeft()));
     }
 
     @Test
@@ -75,7 +78,7 @@ class MapperTest extends BaseEventHistoryTest {
         District district = TestUtils.createDistrict();
         Pair<String, EventHistoryEntity> pair = createUrlAndEntity("CREATE_DISTRICT", district, district.getDistrictId());
         EventHistory eventHistory = eventHistoryMapper.toStructure(pair.getRight());
-        Assertions.assertEquals(true, eventHistory.getEventHistoryUrl().equals(pair.getLeft()));
+        assertEquals(true, eventHistory.getEventHistoryUrl().equals(pair.getLeft()));
     }
 
     @Test
@@ -83,7 +86,7 @@ class MapperTest extends BaseEventHistoryTest {
         District district = TestUtils.createDistrict();
         Pair<String, EventHistoryEntity> pair = createUrlAndEntity("CREATE_DISTRICT_CONTACT", district, district.getDistrictId());
         EventHistory eventHistory = eventHistoryMapper.toStructure(pair.getRight());
-        Assertions.assertEquals(true, eventHistory.getEventHistoryUrl().equals(pair.getLeft()));
+        assertEquals(true, eventHistory.getEventHistoryUrl().equals(pair.getLeft()));
     }
 
     @Test
@@ -91,7 +94,7 @@ class MapperTest extends BaseEventHistoryTest {
         AuthorityContact authorityContact = TestUtils.createAuthorityContact();
         Pair<String, EventHistoryEntity> pair = createUrlAndEntity("CREATE_AUTHORITY_CONTACT", authorityContact, authorityContact.getIndependentAuthorityId());
         EventHistory eventHistory = eventHistoryMapper.toStructure(pair.getRight());
-        Assertions.assertEquals(true, eventHistory.getEventHistoryUrl().equals(pair.getLeft()));
+        assertEquals(true, eventHistory.getEventHistoryUrl().equals(pair.getLeft()));
     }
 
     private Pair<String, EventHistoryEntity> createUrlAndEntity(String eventType, Object eventPayload, String id) throws JsonProcessingException {

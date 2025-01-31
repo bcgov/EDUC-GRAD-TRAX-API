@@ -32,7 +32,7 @@ public abstract class EventHistoryMapper {
         this.constants = constants;
     }
 
-    @Mapping(source = "event", target = "eventHistoryUrl", qualifiedByName = "getUrlFromEventHistoryEntity")
+    @Mapping(source = "event", target = "eventHistoryUrl", qualifiedByName = "getUrlFromEventEntity")
     @Mapping(source = "event", target = "instituteId", qualifiedByName = "getInstituteIdFromEventEntity")
     public abstract EventHistory toStructure(EventHistoryEntity eventHistoryEntity);
 
@@ -41,12 +41,12 @@ public abstract class EventHistoryMapper {
 
     @Named("getInstituteIdFromEventEntity")
     UUID getInstituteIdFromEventEntity(EventEntity eventEntity){
-        return this.getInstituteIdFromEvent(eventEntity).getRight();
+        return this.getTypeAndIdFromEventEntity(eventEntity).getRight();
     }
 
-    @Named("getUrlFromEventHistoryEntity")
-    String getUrlFromEventHistoryEntity(EventEntity eventEntity) {
-        Pair<EventHistoryType, UUID> evenHistoryPair = this.getInstituteIdFromEvent(eventEntity);
+    @Named("getUrlFromEventEntity")
+    String getUrlFromEventEntity(EventEntity eventEntity) {
+        Pair<EventHistoryType, UUID> evenHistoryPair = this.getTypeAndIdFromEventEntity(eventEntity);
         try {
             switch (evenHistoryPair.getLeft()) {
                 case SCHOOL -> {
@@ -68,7 +68,7 @@ public abstract class EventHistoryMapper {
         return null;
     }
 
-    private Pair<EventHistoryType, UUID> getInstituteIdFromEvent(EventEntity eventEntity) {
+    private Pair<EventHistoryType, UUID> getTypeAndIdFromEventEntity(EventEntity eventEntity) {
         if (eventEntity != null) {
             try {
                 switch (EventType.valueOf(eventEntity.getEventType())) {
