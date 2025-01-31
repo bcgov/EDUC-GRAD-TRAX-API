@@ -17,17 +17,20 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = { EducGradTraxApiApplication.class })
 @ActiveProfiles("test")
+@ExtendWith(OutputCaptureExtension.class)
 class MapperTest extends BaseEventHistoryTest {
 
     @Autowired
@@ -98,8 +101,14 @@ class MapperTest extends BaseEventHistoryTest {
     }
 
     @Test
-    void testGetTypeAndIdFromEventEntity_givenNullEventEntity_shouldReturnNull() {
-        assertNull(eventHistoryMapper.toStructure(null));
+    void getUrlFromEventEntity_givenNullEventEntity_shouldReturnNull() {
+        assertNull(eventHistoryMapper.getUrlFromEventEntity(null));
+    }
+
+    @Test
+    void getUrlFromEventEntity_givenNullEventEntity_shouldLogNullPointerError(CapturedOutput capturedOutput) {
+        eventHistoryMapper.getUrlFromEventEntity(null);
+        assertTrue(capturedOutput.getAll().contains("Cannot invoke \"org.apache.commons.lang3.tuple.Pair.getLeft()\" because \"evenHistoryPair\" is null"));
     }
 
     private Pair<String, EventHistoryEntity> createUrlAndEntity(String eventType, Object eventPayload, String id) throws JsonProcessingException {
