@@ -11,7 +11,9 @@ import org.hibernate.annotations.GenericGenerator;
 
 import java.util.UUID;
 
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
