@@ -97,6 +97,11 @@ class MapperTest extends BaseEventHistoryTest {
         assertEquals(true, eventHistory.getEventHistoryUrl().equals(pair.getLeft()));
     }
 
+    @Test
+    void testGetTypeAndIdFromEventEntity_givenNullEventEntity_shouldReturnNull() {
+        assertNull(eventHistoryMapper.toStructure(null));
+    }
+
     private Pair<String, EventHistoryEntity> createUrlAndEntity(String eventType, Object eventPayload, String id) throws JsonProcessingException {
         EventEntity eventEntity = this.createEventData();
         eventEntity.setEventType(eventType);
