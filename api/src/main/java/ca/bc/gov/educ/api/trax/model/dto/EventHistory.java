@@ -16,6 +16,7 @@ public class EventHistory extends BaseModel {
     private UUID id;
     private Event event;
     private String eventHistoryUrl;
+    private UUID instituteId;
     @Pattern(regexp = "^[Yy|Nn]$", message = "acknowledge flag must be either Y or N.")
     private String acknowledgeFlag;
 
