@@ -59,9 +59,6 @@ class SchoolServiceTest {
     private DistrictRepository districtRepository;
 
     @MockBean
-    private CodeService codeService;
-
-    @MockBean
     private CommonService commonService;
 
     @Autowired
@@ -174,8 +171,6 @@ class SchoolServiceTest {
         gA.setProvName("British Columbia");
 
         Mockito.when(schoolRepository.findAll()).thenReturn(gradSchoolList);
-        Mockito.when(codeService.getSpecificCountryCode("CA")).thenReturn(gC);
-        Mockito.when(codeService.getSpecificProvinceCode("BC")).thenReturn(gA);
         Mockito.when(districtRepository.findById("123")).thenReturn(Optional.of(districtEntity));
 
         District district = districtTransformer.transformToDTO(districtEntity);
@@ -210,8 +205,6 @@ class SchoolServiceTest {
         districtEntity.setDistrictName("Test District");
 
         Mockito.when(schoolRepository.findAll()).thenReturn(gradSchoolList);
-        Mockito.when(codeService.getSpecificCountryCode("CA")).thenReturn(null);
-        Mockito.when(codeService.getSpecificProvinceCode("BC")).thenReturn(null);
         Mockito.when(districtRepository.findById("123")).thenReturn(Optional.of(districtEntity));
 
         District district = districtTransformer.transformToDTO(districtEntity);
@@ -262,9 +255,6 @@ class SchoolServiceTest {
         District district = districtTransformer.transformToDTO(districtEntity);
         assertThat(district).isNotNull();
 
-        Mockito.when(codeService.getSpecificCountryCode(country.getCountryCode())).thenReturn(country);
-        Mockito.when(codeService.getSpecificProvinceCode(province.getProvCode())).thenReturn(province);
-
         mockCommonSchool("02121000", "Test School");
         var result = schoolService.getSchoolDetails("02121000");
 
@@ -303,9 +293,6 @@ class SchoolServiceTest {
         Mockito.when(schoolRepository.findById("02121000")).thenReturn(Optional.empty());
         Mockito.when(districtRepository.findById("021")).thenReturn(Optional.of(district));
 
-        Mockito.when(codeService.getSpecificCountryCode(country.getCountryCode())).thenReturn(country);
-        Mockito.when(codeService.getSpecificProvinceCode(province.getProvCode())).thenReturn(province);
-
         mockCommonSchool("02121000", null);
         var result = schoolService.getSchoolDetails("02121000");
 
@@ -341,9 +328,6 @@ class SchoolServiceTest {
 
         Mockito.when(schoolRepository.findById("02121000")).thenReturn(Optional.of(school));
         Mockito.when(districtRepository.findById("021")).thenReturn(null);
-
-        Mockito.when(codeService.getSpecificCountryCode(country.getCountryCode())).thenReturn(null);
-        Mockito.when(codeService.getSpecificProvinceCode(province.getProvCode())).thenReturn(null);
 
         mockCommonSchool("02121000", null);
 
@@ -388,9 +372,6 @@ class SchoolServiceTest {
 
         Mockito.when(schoolRepository.findAll(Specification.where(spec))).thenReturn(List.of(school));
         Mockito.when(districtRepository.findById("021")).thenReturn(Optional.of(district));
-
-        Mockito.when(codeService.getSpecificCountryCode(country.getCountryCode())).thenReturn(country);
-        Mockito.when(codeService.getSpecificProvinceCode(province.getProvCode())).thenReturn(province);
 
         mockCommonSchool("02121000", "THE GATEWAY COMMUNITY LEARNING CENTRE");
 
@@ -447,9 +428,6 @@ class SchoolServiceTest {
 
         Mockito.when(schoolRepository.findAll(Mockito.any(Specification.class))).thenReturn(List.of(school));
         Mockito.when(districtRepository.findById("021")).thenReturn(Optional.of(district));
-
-        Mockito.when(codeService.getSpecificCountryCode(country.getCountryCode())).thenReturn(country);
-        Mockito.when(codeService.getSpecificProvinceCode(province.getProvCode())).thenReturn(province);
 
         mockCommonSchool("02121000", "THE GATEWAY COMMUNITY LEARNING CENTRE");
 

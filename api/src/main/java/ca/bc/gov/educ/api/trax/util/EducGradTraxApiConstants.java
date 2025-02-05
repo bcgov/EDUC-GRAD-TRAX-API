@@ -51,11 +51,6 @@ public class EducGradTraxApiConstants {
     public static final String GRAD_SCHOOLS_BY_DISTRICT_URL_MAPPING_V2 = GRAD_TRAX_API_ROOT_MAPPING_V2  + "/schools-by-district";
 
     // Service Methods Mappings
-    public static final String GET_ALL_COUNTRY_MAPPING = "/country";
-    public static final String GET_ALL_COUNTRY_BY_CODE_MAPPING = "/country/{countryCode}";
-
-    public static final String GET_ALL_PROVINCE_MAPPING = "/province";
-    public static final String GET_ALL_PROVINCE_BY_CODE_MAPPING = "/province/{provinceCode}";
 
     public static final String CHECK_SCHOOL_BY_CODE_MAPPING = "/check/{minCode}";
     public static final String GET_SCHOOL_BY_CODE_MAPPING = "/{minCode}";

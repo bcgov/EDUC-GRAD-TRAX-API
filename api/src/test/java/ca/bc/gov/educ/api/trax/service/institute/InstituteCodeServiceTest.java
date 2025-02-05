@@ -11,8 +11,6 @@ import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolFundingGroupCode;
 import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolCategoryCodeEntity;
 import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolFundingGroupCodeEntity;
 import ca.bc.gov.educ.api.trax.model.transformer.institute.SchoolCategoryCodeTransformer;
-import ca.bc.gov.educ.api.trax.repository.GradCountryRepository;
-import ca.bc.gov.educ.api.trax.repository.GradProvinceRepository;
 import ca.bc.gov.educ.api.trax.repository.redis.SchoolCategoryCodeRedisRepository;
 import ca.bc.gov.educ.api.trax.repository.redis.SchoolFundingGroupCodeRedisRepository;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
@@ -64,10 +62,6 @@ public class InstituteCodeServiceTest {
 	private SchoolCategoryCodeRedisRepository schoolCategoryCodeRedisRepository;
 	@MockBean
 	private SchoolFundingGroupCodeRedisRepository schoolFundingGroupCodeRedisRepository;
-	@MockBean
-	private GradCountryRepository gradCountryRepository;
-	@MockBean
-	private GradProvinceRepository gradProvinceRepository;
 	@MockBean
 	private JedisConnectionFactory jedisConnectionFactoryMock;
 	@MockBean
