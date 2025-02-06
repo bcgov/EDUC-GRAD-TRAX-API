@@ -54,9 +54,6 @@ public class PsiServiceTest {
 	@MockBean
 	private StudentPsiRepository studentPsiRepository;
 
-    @MockBean
-    private CodeService codeService;
-
 	// NATS
 	@MockBean
 	private NatsConnection natsConnection;
@@ -169,9 +166,6 @@ public class PsiServiceTest {
 
         when(psiRepository.findById("AB")).thenReturn(Optional.of(obj));
 
-        when(codeService.getSpecificCountryCode(obj.getCountryCode())).thenReturn(country);
-        when(codeService.getSpecificProvinceCode(obj.getProvinceCode())).thenReturn(province);
-
         var result = psiService.getPSIDetails("AB");
 
         assertThat(result).isNotNull();
@@ -205,9 +199,6 @@ public class PsiServiceTest {
 		province.setProvName("British Columbia");
 
 		when(psiRepository.findById("AB")).thenReturn(Optional.of(obj));
-
-		when(codeService.getSpecificCountryCode(obj.getCountryCode())).thenReturn(null);
-		when(codeService.getSpecificProvinceCode(obj.getProvinceCode())).thenReturn(province);
 
 		var result = psiService.getPSIDetails("AB");
 
@@ -246,9 +237,6 @@ public class PsiServiceTest {
 		province.setProvName("British Columbia");
 
 		when(psiRepository.findById("AB")).thenReturn(Optional.empty());
-
-		when(codeService.getSpecificCountryCode(obj.getCountryCode())).thenReturn(country);
-		when(codeService.getSpecificProvinceCode(obj.getProvinceCode())).thenReturn(province);
 
 		var result = psiService.getPSIDetails("AB");
 
@@ -296,9 +284,6 @@ public class PsiServiceTest {
 		Specification<PsiEntity> spec = new PsiSearchSpecification(searchCriteria);
         when(psiRepository.findAll(Specification.where(spec))).thenReturn(list);
 
-        when(codeService.getSpecificCountryCode(obj.getCountryCode())).thenReturn(country);
-        when(codeService.getSpecificProvinceCode(obj.getProvinceCode())).thenReturn(province);
-
         var result = psiService.getPSIByParams("Autobody", "AB*", null,null,null);
         assertThat(result).isNotNull();
     }
@@ -343,9 +328,6 @@ public class PsiServiceTest {
 				.build();
 		Specification<PsiEntity> spec = new PsiSearchSpecification(searchCriteria);
 		when(psiRepository.findAll(Specification.where(spec))).thenReturn(list);
-
-		when(codeService.getSpecificCountryCode(obj.getCountryCode())).thenReturn(country);
-		when(codeService.getSpecificProvinceCode(obj.getProvinceCode())).thenReturn(province);
 
 		var result = psiService.getPSIByParams("Autobody*", "AB*", "C*","P*","Y");
 		assertThat(result).isNotNull();
