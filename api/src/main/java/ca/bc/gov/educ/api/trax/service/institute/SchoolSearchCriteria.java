@@ -12,8 +12,9 @@ public class SchoolSearchCriteria {
     private String mincode;
     private String displayName;
     private String distNo;
+    private String schoolCategoryCode;
 
     public String toString() {
-        return String.format("DistrictId: %s, Mincode: %s, DisplayName: %s, DisNo: %s", districtId, mincode, displayName, distNo);
+        return String.format("DistrictId: %s, Mincode: %s, DisplayName: %s, DisNo: %s, SchoolCategoryCode: %s", districtId, mincode, displayName, distNo, schoolCategoryCode);
     }
 }
