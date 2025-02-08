@@ -36,7 +36,6 @@ import redis.clients.jedis.JedisCluster;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
@@ -145,8 +144,8 @@ class InstituteSchoolServiceTest {
 
 	@Test
 	void whenLoadSchoolsIntoRedisCache_DoesNotThrow() {
-		List<SchoolEntity> schoolEntities = Arrays.asList(new SchoolEntity());
-		List<School> schools = Arrays.asList(new School());
+		List<SchoolEntity> schoolEntities = List.of(new SchoolEntity());
+		List<School> schools = List.of(new School());
 		when(this.schoolRedisRepository.saveAll(schoolEntities))
 				.thenReturn(schoolEntities);
 		assertDoesNotThrow(() -> schoolService.loadSchoolsIntoRedisCache(schools));
@@ -271,14 +270,14 @@ class InstituteSchoolServiceTest {
 		schoolEntity.setEmail("abc@xyz.ca");
 
 		when(schoolRedisRepository.findByMincode(minCode)).thenReturn(Optional.of(schoolEntity));
-		assertEquals(true, schoolService.checkIfSchoolExists(minCode));
+    assertTrue(schoolService.checkIfSchoolExists(minCode));
 	}
 
 	@Test
 	void whenCheckIfSchoolExists_returnFalse() {
 		String minCode = "12345678";
 		when(schoolRedisRepository.findByMincode(minCode)).thenReturn(Optional.empty());
-		assertEquals(false, schoolService.checkIfSchoolExists(minCode));
+    assertFalse(schoolService.checkIfSchoolExists(minCode));
 	}
 
 	@Test
@@ -372,8 +371,8 @@ class InstituteSchoolServiceTest {
 
 	@Test
 	void whenLoadSchoolDetailsIntoRedisCache_DoesNotThrow() {
-		List<SchoolDetailEntity> schoolDetailEntities = Arrays.asList(new SchoolDetailEntity());
-		List<SchoolDetail> schoolDetails = Arrays.asList(new SchoolDetail());
+		List<SchoolDetailEntity> schoolDetailEntities = List.of(new SchoolDetailEntity());
+		List<SchoolDetail> schoolDetails = List.of(new SchoolDetail());
 		when(this.schoolDetailRedisRepository.saveAll(schoolDetailEntities))
 				.thenReturn(schoolDetailEntities);
 		assertDoesNotThrow(() -> schoolService.loadSchoolDetailsIntoRedisCache(schoolDetails));
@@ -545,34 +544,41 @@ class InstituteSchoolServiceTest {
 		schoolEntity.setMincode(mincode);
 		schoolEntity.setDistrictId(districtId);
 		schoolEntity.setDisplayName(displayName);
+		schoolEntity.setSchoolCategoryCode("PUBLIC");
 
 		School school = new School();
 		school.setSchoolId(schoolEntity.getSchoolId());
 		school.setMincode(mincode);
 		school.setDistrictId(districtId);
 		school.setDisplayName(displayName);
+		school.setSchoolCategoryCode(schoolEntity.getSchoolCategoryCode());
 
 		Mockito.when(schoolRedisRepository.findAll()).thenReturn(List.of(schoolEntity));
 		Mockito.when(schoolTransformer.transformToDTO(List.of(schoolEntity))).thenReturn(List.of(school));
 		Mockito.when(schoolTransformer.transformToDTO(schoolEntity)).thenReturn(school);
 
 		// Test case when both districtId and mincode are null
-		List<School> result = schoolService.getSchoolsByParams(null, null, null, null);
+		List<School> result = schoolService.getSchoolsByParams(null, null, null, null, null);
 		assertNotNull(result);
 		assertEquals(1, result.size());
 
 		// Test case when mincode is null
-		result = schoolService.getSchoolsByParams(districtId, null, displayName, "12*");
+		result = schoolService.getSchoolsByParams(districtId, null, displayName, "12*", null);
 		assertNotNull(result);
 		assertEquals(1, result.size());
 
 		// Test case when districtId is null
-		result = schoolService.getSchoolsByParams(null, mincode, "ABC*", "12*");
+		result = schoolService.getSchoolsByParams(null, mincode, "ABC*", "12*", null);
 		assertNotNull(result);
 		assertEquals(1, result.size());
 
 		// Test case when both districtId and mincode are provided
-		result = schoolService.getSchoolsByParams(districtId, mincode, "ABC*", "12*");
+		result = schoolService.getSchoolsByParams(districtId, mincode, "ABC*", "12*", null);
+		assertNotNull(result);
+		assertEquals(1, result.size());
+
+		// Test schoolCategoryCode
+		result = schoolService.getSchoolsByParams(null, null, null, null, "PUBLIC");
 		assertNotNull(result);
 		assertEquals(1, result.size());
 	}
@@ -586,22 +592,22 @@ class InstituteSchoolServiceTest {
 		Mockito.when(schoolRedisRepository.findAll()).thenReturn(Collections.emptyList());
 
 		// Test case when both districtId and mincode are null
-		List<School> result = schoolService.getSchoolsByParams(null, null, null, null);
+		List<School> result = schoolService.getSchoolsByParams(null, null, null, null, null);
 		assertNotNull(result);
 		assertTrue(result.isEmpty());
 
 		// Test case when mincode is null
-		result = schoolService.getSchoolsByParams(districtId, null, displayName, "12*");
+		result = schoolService.getSchoolsByParams(districtId, null, displayName, "12*", null);
 		assertNotNull(result);
 		assertTrue(result.isEmpty());
 
 		// Test case when districtId is null
-		result = schoolService.getSchoolsByParams(null, mincode, "ABC*", "12*");
+		result = schoolService.getSchoolsByParams(null, mincode, "ABC*", "12*", null);
 		assertNotNull(result);
 		assertTrue(result.isEmpty());
 
 		// Test case when both districtId and mincode are provided
-		result = schoolService.getSchoolsByParams(districtId, mincode, "ABC*", "12*");
+		result = schoolService.getSchoolsByParams(districtId, mincode, "ABC*", "12*", null);
 		assertNotNull(result);
 		assertTrue(result.isEmpty());
 	}

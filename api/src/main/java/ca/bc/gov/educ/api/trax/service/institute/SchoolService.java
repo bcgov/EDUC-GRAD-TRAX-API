@@ -193,13 +193,14 @@ public class SchoolService {
 	 * @return
 	 */
 	@Transactional(readOnly = true)
-	public List<School> getSchoolsByParams(String districtId, String mincode, String displayName, String distNo) {
+	public List<School> getSchoolsByParams(String districtId, String mincode, String displayName, String distNo, String schoolCategoryCode) {
 
 		SchoolSearchCriteria criteria = SchoolSearchCriteria.builder()
 				.districtId(transformToWildcard(districtId))
 				.mincode(transformToWildcard(mincode))
 				.displayName(transformToWildcard(displayName))
 				.distNo(transformToWildcard(distNo))
+				.schoolCategoryCode(transformToWildcard(schoolCategoryCode))
 				.build();
 
 		log.debug(criteria.toString());
