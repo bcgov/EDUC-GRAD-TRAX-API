@@ -64,6 +64,8 @@ class SchoolControllerIntegrationTest {
     school.setSchoolId(schoolId.toString());
     school.setMincode("1234567");
     school.setDistrictId(districtId.toString());
+    school.setSchoolCategoryCode("PUBLIC");
+    school.setDisplayName("Test School");
     schoolRedisRepository.save(schoolTransformer.transformToEntity(school));
 
     SchoolDetail schoolDetail = new SchoolDetail();
@@ -110,7 +112,7 @@ class SchoolControllerIntegrationTest {
                     .param("displayName", "School name")
                     .param("distNo", "123")
                     .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().isBadRequest())
+            .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON));
   }
 
@@ -138,6 +140,39 @@ class SchoolControllerIntegrationTest {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(content().json("[]"));
+  }
+
+  @Test
+  void testGetSchoolsByParams_givenEmptyCategoryCode_shouldReturnOneSchool() throws Exception {
+    mockMvc.perform(MockMvcRequestBuilders.get("/api/v2/trax/school/search")
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "READ_GRAD_SCHOOL_DATA")))
+            .param("schoolCategoryCodes", "")
+            .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.length()").value(1));
+  }
+
+  @Test
+  void testGetSchoolsByParams_givenCategoryCodes_shouldReturnOneSchool() throws Exception {
+    mockMvc.perform(MockMvcRequestBuilders.get("/api/v2/trax/school/search")
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "READ_GRAD_SCHOOL_DATA")))
+            .param("schoolCategoryCodes", "PUBLIC")
+            .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.length()").value(1));
+  }
+
+  @Test
+  void testGetSchoolsByParams_givenCategoryCodesDNE_shouldReturnOk() throws Exception {
+    mockMvc.perform(MockMvcRequestBuilders.get("/api/v2/trax/school/search")
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "READ_GRAD_SCHOOL_DATA")))
+            .param("schoolCategoryCodes", "BAD_CODE")
+            .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(content().json("[]"));
   }
 
   @Test
