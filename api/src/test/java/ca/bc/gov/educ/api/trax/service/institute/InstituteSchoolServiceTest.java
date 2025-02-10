@@ -610,5 +610,10 @@ class InstituteSchoolServiceTest {
 		result = schoolService.getSchoolsByParams(districtId, mincode, "ABC*", "12*", null);
 		assertNotNull(result);
 		assertTrue(result.isEmpty());
+
+		// Empty school category codes
+		result = schoolService.getSchoolsByParams(districtId, mincode, "ABC*", "12*", Collections.emptyList());
+		assertNotNull(result);
+		assertTrue(result.isEmpty());
 	}
 }
