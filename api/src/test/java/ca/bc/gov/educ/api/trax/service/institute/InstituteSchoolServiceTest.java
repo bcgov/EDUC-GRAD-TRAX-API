@@ -578,7 +578,7 @@ class InstituteSchoolServiceTest {
 		assertEquals(1, result.size());
 
 		// Test schoolCategoryCode
-		result = schoolService.getSchoolsByParams(null, null, null, null, "PUBLIC");
+		result = schoolService.getSchoolsByParams(null, null, null, null, List.of("PUBLIC"));
 		assertNotNull(result);
 		assertEquals(1, result.size());
 	}

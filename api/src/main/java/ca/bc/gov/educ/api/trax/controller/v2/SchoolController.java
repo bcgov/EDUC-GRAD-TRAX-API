@@ -170,10 +170,10 @@ public class SchoolController {
             @RequestParam(value = "mincode", required = false) String mincode,
             @RequestParam(value = "displayName", required = false) String displayName,
             @RequestParam(value = "distNo", required = false) String distNo,
-            @RequestParam(value = "schoolCategoryCode", required = false) String schoolCategoryCode)
+            @RequestParam(value = "schoolCategoryCodes", required = false) List<String> schoolCategoryCodes)
     {
         log.debug("getSchoolsByParams V2 : ");
-        return response.GET(schoolService.getSchoolsByParams(districtId, mincode, displayName, distNo, schoolCategoryCode));
+        return response.GET(schoolService.getSchoolsByParams(districtId, mincode, displayName, distNo, schoolCategoryCodes));
     }
 
 }
