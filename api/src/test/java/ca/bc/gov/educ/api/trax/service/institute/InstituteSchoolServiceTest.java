@@ -578,7 +578,7 @@ class InstituteSchoolServiceTest {
 		assertEquals(1, result.size());
 
 		// Test schoolCategoryCode
-		result = schoolService.getSchoolsByParams(null, null, null, null, "PUBLIC");
+		result = schoolService.getSchoolsByParams(null, null, null, null, List.of("PUBLIC"));
 		assertNotNull(result);
 		assertEquals(1, result.size());
 	}
@@ -608,6 +608,11 @@ class InstituteSchoolServiceTest {
 
 		// Test case when both districtId and mincode are provided
 		result = schoolService.getSchoolsByParams(districtId, mincode, "ABC*", "12*", null);
+		assertNotNull(result);
+		assertTrue(result.isEmpty());
+
+		// Empty school category codes
+		result = schoolService.getSchoolsByParams(districtId, mincode, "ABC*", "12*", Collections.emptyList());
 		assertNotNull(result);
 		assertTrue(result.isEmpty());
 	}

@@ -193,14 +193,14 @@ public class SchoolService {
 	 * @return
 	 */
 	@Transactional(readOnly = true)
-	public List<School> getSchoolsByParams(String districtId, String mincode, String displayName, String distNo, String schoolCategoryCode) {
+	public List<School> getSchoolsByParams(String districtId, String mincode, String displayName, String distNo, List<String> schoolCategoryCodes) {
 
 		SchoolSearchCriteria criteria = SchoolSearchCriteria.builder()
 				.districtId(transformToWildcard(districtId))
 				.mincode(transformToWildcard(mincode))
 				.displayName(transformToWildcard(displayName))
 				.distNo(transformToWildcard(distNo))
-				.schoolCategoryCode(transformToWildcard(schoolCategoryCode))
+				.schoolCategoryCodes(schoolCategoryCodes)
 				.build();
 
 		log.debug(criteria.toString());
@@ -220,7 +220,9 @@ public class SchoolService {
 			if (school.getDistrictId().matches(criteria.getDistrictId())
 					&& school.getMincode().matches(criteria.getMincode())
 					&& school.getDisplayName().matches(criteria.getDisplayName())
-					&& school.getMincode().substring(0, 3).matches(criteria.getDistNo()))
+					&& school.getMincode().substring(0, 3).matches(criteria.getDistNo())
+					&& (criteria.getSchoolCategoryCodes() == null || criteria.getSchoolCategoryCodes().isEmpty() || criteria.getSchoolCategoryCodes().contains(school.getSchoolCategoryCode()))
+			)
 				schools.add(school);
 		}
 		return schools;
