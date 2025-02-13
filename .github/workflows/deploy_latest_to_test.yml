@@ -81,7 +81,10 @@ jobs:
           ${{ env.BUSINESS_NAMESPACE }} \
           ${{ secrets.SPLUNK_TOKEN }} \
           ${{ vars.APP_LOG_LEVEL }} \
-          ${{ secrets.STUDENT_ADMIN_URL_ROOT }}
+          ${{ secrets.STUDENT_ADMIN_URL_ROOT }} \
+          ${{ secrets.REDIS_URL }} \
+          ${{ secrets.REDIS_PORT }} \
+          ${{ secrets.REDIS_USER }}
           
           # Start rollout (if necessary) and follow it
           oc rollout restart deployment/${{ env.SPRING_BOOT_IMAGE_NAME }}

@@ -89,3 +89,12 @@ oc create -n "$GRAD_NAMESPACE"-"$envValue" configmap "$APP_NAME"-flb-sc-config-m
   --from-literal=fluent-bit.conf="$FLB_CONFIG" \
   --from-literal=parsers.conf="$PARSER_CONFIG" \
   --dry-run=client -o yaml | oc apply -f -
+
+# Create/Update secret to access Redis cluster
+REDIS_SECRET=$(oc get secret -n "$GRAD_NAMESPACE"-"$envValue" redis-ha -o json | jq --raw-output '.data.REDIS_PASSWORD' | base64 --decode)
+oc create secret generic -n "$GRAD_NAMESPACE"-"$envValue" redis-cache-secret \
+  --from-literal=REDIS_URL=$9 \
+  --from-literal=REDIS_PORT=$10 \
+  --from-literal=REDIS_USER=$11 \
+  --from-literal=REDIS_SECRET="$REDIS_SECRET" \
+  --dry-run=client -o yaml | oc apply -f -
