@@ -137,7 +137,10 @@ jobs:
           ${{ env.BUSINESS_NAMESPACE }} \
           ${{ secrets.SPLUNK_TOKEN }} \
           ${{ vars.APP_LOG_LEVEL }} \
-          ${{ secrets.STUDENT_ADMIN_URL_ROOT }}
+          ${{ secrets.STUDENT_ADMIN_URL_ROOT }} \
+          ${{ secrets.REDIS_URL }} \
+          ${{ secrets.REDIS_PORT }} \
+          ${{ secrets.REDIS_USER }}
           
           # OVERRIDE Configmaps
           curl -s https://raw.githubusercontent.com/bcgov/${{ env.REPO_NAME }}/${{ github.event.inputs.choice }}/tools/config/override-configmap-dev.sh \
