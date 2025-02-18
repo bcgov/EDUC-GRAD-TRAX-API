@@ -159,7 +159,7 @@ public class CommonServiceTest {
         when(this.codeService.getSchoolCategoryCodeFromRedisCache(schoolCategoryCode)).thenReturn(schoolCategory);
         when(this.districtService.getDistrictByIdFromRedisCache(district.getDistrictId())).thenReturn(district);
         when(this.districtService.getDistrictByDistNoFromRedisCache(district.getDistrictNumber())).thenReturn(district);
-        when(this.schoolService.getSchoolDetailBySchoolId(schoolId)).thenReturn(schoolDetail);
+        when(this.schoolService.getSchoolDetailBySchoolIdFromRedisCache(schoolId)).thenReturn(schoolDetail);
         when(this.schoolService.getSchoolDetailByMincodeFromRedisCache(minCode)).thenReturn(schoolDetail);
         when(this.schoolService.getSchoolDetailsFromRedisCache()).thenReturn(List.of(schoolDetail));
         when(this.schoolService.getSchoolByMinCodeFromRedisCache(minCode)).thenReturn(school);
@@ -180,7 +180,7 @@ public class CommonServiceTest {
         expected.setSchoolId(schoolIdString);
         expected.setMinCode("12345");
         expected.setSchoolName("My School");
-        when(schoolService.getSchoolDetailBySchoolId(schoolId)).thenReturn(schoolDetail);
+        when(schoolService.getSchoolDetailBySchoolIdFromRedisCache(schoolId)).thenReturn(schoolDetail);
         ca.bc.gov.educ.api.trax.model.dto.School actual = commonService.getSchoolForClobDataBySchoolIdFromRedisCache(schoolId);
         assertEquals(expected, actual);
     }
@@ -188,7 +188,7 @@ public class CommonServiceTest {
     @Test
     public void whenGetSchoolForClobDataBySchoolIdFromRedisCache_shouldReturnNull() {
         UUID schoolId = UUID.randomUUID();
-        when(schoolService.getSchoolDetailBySchoolId(schoolId)).thenReturn(null);
+        when(schoolService.getSchoolDetailBySchoolIdFromRedisCache(schoolId)).thenReturn(null);
         ca.bc.gov.educ.api.trax.model.dto.School actual = commonService.getSchoolForClobDataBySchoolIdFromRedisCache(schoolId);
         assertNull(actual);
     }

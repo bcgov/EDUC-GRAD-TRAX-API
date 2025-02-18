@@ -49,7 +49,7 @@ public class CommonService {
     // School Clob data for Algorithm Data by schoolId from RedisCache
     public ca.bc.gov.educ.api.trax.model.dto.School getSchoolForClobDataBySchoolIdFromRedisCache(UUID schoolId) {
         log.debug("Get a School Clob data by SchoolId from Redis Cache: {}", schoolId);
-        SchoolDetail schoolDetail = schoolService.getSchoolDetailBySchoolId(schoolId);
+        SchoolDetail schoolDetail = schoolService.getSchoolDetailBySchoolIdFromRedisCache(schoolId);
         return schoolDetail != null? convertSchoolDetailIntoSchoolClob((schoolDetail)) : null;
     }
 

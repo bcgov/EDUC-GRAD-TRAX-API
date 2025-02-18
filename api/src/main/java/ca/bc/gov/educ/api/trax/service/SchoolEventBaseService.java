@@ -26,7 +26,7 @@ public abstract class SchoolEventBaseService<T> extends EventBaseService<T> {
      */
     protected boolean shouldCreateHistory(School school) {
         // currently only schools that can issue transcripts qualify
-        SchoolDetail schoolDetail = this.schoolService.getSchoolDetailBySchoolId(UUID.fromString(school.getSchoolId()));
+        SchoolDetail schoolDetail = this.schoolService.getSchoolDetailBySchoolIdFromRedisCache(UUID.fromString(school.getSchoolId()));
         // if the school's ability to issue transcripts has changed, return true
         if (schoolDetail != null && (schoolDetail.isCanIssueTranscripts() != school.isCanIssueTranscripts())){
             return true;
