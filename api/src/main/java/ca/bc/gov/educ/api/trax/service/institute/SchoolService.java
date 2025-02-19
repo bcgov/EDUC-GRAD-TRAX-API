@@ -126,13 +126,9 @@ public class SchoolService {
 		return schoolDetailRedisRepository.findByMincode(mincode).map(schoolDetailTransformer::transformToDTO).orElse(null);
 	}
 
-	public SchoolDetail getSchoolDetailBySchoolId(UUID schoolId) {
+	public SchoolDetail getSchoolDetailBySchoolIdFromRedisCache(UUID schoolId) {
 		log.debug("**** Getting school Details By SchoolId from Redis Cache.");
 		return schoolDetailRedisRepository.findById(String.valueOf(schoolId)).map(schoolDetailTransformer::transformToDTO).orElse(null);
-	}
-
-	public void initializeSchoolDetailCache(boolean force) {
-		serviceHelper.initializeCache(force, CacheKey.SCHOOL_DETAIL_CACHE, this);
 	}
 
 	public List<SchoolDetail> getSchoolDetailsBySchoolCategoryCode(String schoolCategoryCode) {

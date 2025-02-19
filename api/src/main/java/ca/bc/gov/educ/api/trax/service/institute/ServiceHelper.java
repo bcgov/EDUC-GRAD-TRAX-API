@@ -64,9 +64,6 @@ public class ServiceHelper<T> {
                     ((SchoolService)service).loadSchoolsIntoRedisCache(
                             ((SchoolService)service).getSchoolsFromInstituteApi()
                     );
-                    break;
-                }
-                case SCHOOL_DETAIL_CACHE -> {
                     ((SchoolService)service).loadSchoolDetailsIntoRedisCache(
                             ((SchoolService)service).getSchoolDetailsFromInstituteApi()
                     );

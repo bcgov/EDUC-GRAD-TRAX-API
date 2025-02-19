@@ -41,19 +41,19 @@ public class CommonService {
 
     // School Clob data for Algorithm Data by minCode from RedisCache
     public ca.bc.gov.educ.api.trax.model.dto.School getSchoolForClobDataByMinCodeFromRedisCache(String minCode) {
-        log.debug("Get a School Clob data by MinCode from Redis Cache: {}", minCode);
         if(StringUtils.isNotEmpty(minCode)) {
+            log.debug("Get a School Clob data by MinCode from Redis Cache: {}", minCode);
             SchoolDetail schoolDetail = schoolService.getSchoolDetailByMincodeFromRedisCache(minCode);
-            return schoolDetail != null ? convertSchoolDetailIntoSchoolClob((schoolDetail)) : null;
+            return schoolDetail != null? convertSchoolDetailIntoSchoolClob((schoolDetail)) : null;
         }
         return null;
     }
 
     // School Clob data for Algorithm Data by schoolId from RedisCache
     public ca.bc.gov.educ.api.trax.model.dto.School getSchoolForClobDataBySchoolIdFromRedisCache(UUID schoolId) {
-        log.debug("Get a School Clob data by SchoolId from Redis Cache: {}", schoolId);
         if(schoolId != null) {
-            SchoolDetail schoolDetail = schoolService.getSchoolDetailBySchoolId(schoolId);
+            log.debug("Get a School Clob data by SchoolId from Redis Cache: {}", schoolId);
+            SchoolDetail schoolDetail = schoolService.getSchoolDetailBySchoolIdFromRedisCache(schoolId);
             return schoolDetail != null ? convertSchoolDetailIntoSchoolClob((schoolDetail)) : null;
         }
         return null;
