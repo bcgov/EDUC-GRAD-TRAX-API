@@ -88,7 +88,7 @@ public abstract class EventCommonService<T> extends EventBaseService<T> {
                 // below timeout is in milli seconds, so it is 10 seconds.
                 tx.begin();
                 em.createNativeQuery(buildUpdateQuery(gradStatusUpdate.getPen(), updateFieldsMap))
-                        .setHint("javax.persistence.query.timeout", 10000).executeUpdate();
+                        .setHint("jakarta.persistence.query.timeout", 10000).executeUpdate();
                 tx.commit();
                 log.debug("  === Update Transaction is committed! ===");
             } else {
