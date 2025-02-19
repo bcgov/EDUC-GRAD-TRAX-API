@@ -185,12 +185,12 @@ public abstract class EventCommonService<T> extends EventBaseService<T> {
         // Mincode
         if (fields.contains(FIELD_MINCODE)) {
             ca.bc.gov.educ.api.trax.model.dto.School school = commonService.getSchoolForClobDataBySchoolIdFromRedisCache(gradStatus.getSchoolOfRecordId());
-            handleStringField(updateFieldsMap, FIELD_MINCODE, traxStudentEntity.getMincode(), school.getMinCode());
+            handleStringField(updateFieldsMap, FIELD_MINCODE, traxStudentEntity.getMincode(),  school != null ? school.getMinCode() : null);
         }
         // Mincode_Grad
         if (fields.contains(FIELD_MINCODE_GRAD)) {
             ca.bc.gov.educ.api.trax.model.dto.School school = commonService.getSchoolForClobDataBySchoolIdFromRedisCache(gradStatus.getSchoolAtGradId());
-            handleStringField(updateFieldsMap, FIELD_MINCODE_GRAD, traxStudentEntity.getMincodeGrad(), school.getMinCode());
+            handleStringField(updateFieldsMap, FIELD_MINCODE_GRAD, traxStudentEntity.getMincodeGrad(),  school != null ? school.getMinCode() : null);
         }
         // Student Grade
         if (fields.contains(FIELD_STUD_GRADE)) {
