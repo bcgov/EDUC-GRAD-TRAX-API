@@ -70,6 +70,7 @@ class SchoolControllerIntegrationTest {
 
     SchoolDetail schoolDetail = new SchoolDetail();
     schoolDetail.setSchoolId(schoolId.toString());
+    schoolDetail.setMincode("1234567");
     schoolDetail.setDistrictId(districtId.toString());
     schoolDetailRedisRepository.save(schoolDetailTransformer.transformToEntity(schoolDetail));
   }
