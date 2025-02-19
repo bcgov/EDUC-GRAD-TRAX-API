@@ -379,12 +379,6 @@ class InstituteSchoolServiceTest {
 	}
 
 	@Test
-	void whenInitializeSchoolDetailCache_DoNothing() {
-		doNothing().when(serviceHelperMock).initializeCache(false, CacheKey.SCHOOL_DETAIL_CACHE, serviceHelperMock);
-		Assertions.assertDoesNotThrow(() -> schoolService.initializeSchoolDetailCache(false));
-	}
-
-	@Test
 	void whenGetSchoolDetailsFromRedisCache_ReturnSchoolDetails() {
 		String mincode = "12345678";
 		List<SchoolDetail> schoolDetails = new ArrayList<>();

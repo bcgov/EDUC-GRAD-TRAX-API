@@ -44,7 +44,7 @@ class SchoolEventBaseServiceTest {
         school.setCanIssueTranscripts(false);
         SchoolDetail schoolDetail = new SchoolDetail();
         schoolDetail.setCanIssueTranscripts(true);
-        when(schoolService.getSchoolDetailBySchoolId(UUID.fromString(SCHOOL_ID))).thenReturn(schoolDetail);
+        when(schoolService.getSchoolDetailBySchoolIdFromRedisCache(UUID.fromString(SCHOOL_ID))).thenReturn(schoolDetail);
         assertTrue(schoolEventBaseService.shouldCreateHistory(school));
     }
 
@@ -55,7 +55,7 @@ class SchoolEventBaseServiceTest {
         school.setCanIssueTranscripts(true);
         SchoolDetail schoolDetail = new SchoolDetail();
         schoolDetail.setCanIssueTranscripts(true);
-        when(schoolService.getSchoolDetailBySchoolId(UUID.fromString(SCHOOL_ID))).thenReturn(schoolDetail);
+        when(schoolService.getSchoolDetailBySchoolIdFromRedisCache(UUID.fromString(SCHOOL_ID))).thenReturn(schoolDetail);
         assertTrue(schoolEventBaseService.shouldCreateHistory(school));
     }
 
@@ -66,7 +66,7 @@ class SchoolEventBaseServiceTest {
         school.setCanIssueTranscripts(false);
         SchoolDetail schoolDetail = new SchoolDetail();
         schoolDetail.setCanIssueTranscripts(false);
-        when(schoolService.getSchoolDetailBySchoolId(UUID.fromString(SCHOOL_ID))).thenReturn(schoolDetail);
+        when(schoolService.getSchoolDetailBySchoolIdFromRedisCache(UUID.fromString(SCHOOL_ID))).thenReturn(schoolDetail);
         assertFalse(schoolEventBaseService.shouldCreateHistory(school));
     }
 }

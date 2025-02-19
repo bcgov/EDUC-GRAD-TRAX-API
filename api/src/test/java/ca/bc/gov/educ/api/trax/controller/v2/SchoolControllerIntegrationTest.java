@@ -70,12 +70,13 @@ class SchoolControllerIntegrationTest {
 
     SchoolDetail schoolDetail = new SchoolDetail();
     schoolDetail.setSchoolId(schoolId.toString());
+    schoolDetail.setMincode("1234567");
     schoolDetail.setDistrictId(districtId.toString());
     schoolDetailRedisRepository.save(schoolDetailTransformer.transformToEntity(schoolDetail));
   }
 
   @Test
-  void testGetSchoolDetails_givenValidPayload_shouldReturnOk() throws Exception {
+  void testGetSchoolBySchoolId_givenValidPayload_shouldReturnOk() throws Exception {
     mockMvc.perform(MockMvcRequestBuilders.get("/api/v2/trax/school/{schoolId}", schoolId)
                     .with(jwt().jwt(jwt -> jwt.claim("scope", "READ_GRAD_SCHOOL_DATA")))
                     .accept(MediaType.APPLICATION_JSON))
@@ -86,7 +87,7 @@ class SchoolControllerIntegrationTest {
   }
 
   @Test
-  void testGetSchoolDetails_givenInvalidSchoolId_shouldReturnNotFound() throws Exception {
+  void testGetSchoolBySchoolId_givenInvalidSchoolId_shouldReturnNotFound() throws Exception {
     mockMvc.perform(MockMvcRequestBuilders.get("/api/v2/trax/school/{schoolId}", "invalid_id")
                     .with(jwt().jwt(jwt -> jwt.claim("scope", "READ_GRAD_SCHOOL_DATA")))
                     .accept(MediaType.APPLICATION_JSON))
@@ -96,8 +97,37 @@ class SchoolControllerIntegrationTest {
   }
 
   @Test
-  void testGetSchoolDetails_givenInvalidScope_shouldReturnUnauthorized() throws Exception {
+  void testGetSchoolBySchoolId_givenInvalidScope_shouldReturnUnauthorized() throws Exception {
     mockMvc.perform(MockMvcRequestBuilders.get("/api/v2/trax/school/{schoolId}", schoolId)
+                    .with(jwt().jwt(jwt -> jwt.claim("scope", "BAD_SCOPE")))
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isForbidden());
+  }
+
+  @Test
+  void testGetSchoolDetails_givenValidPayload_shouldReturnOk() throws Exception {
+    mockMvc.perform(MockMvcRequestBuilders.get("/api/v2/trax/school-detail/{schoolId}", schoolId)
+                    .with(jwt().jwt(jwt -> jwt.claim("scope", "READ_GRAD_SCHOOL_DATA")))
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.schoolId").value(schoolId.toString()))
+            .andExpect(jsonPath("$.mincode").value("1234567"));
+  }
+
+  @Test
+  void testGetSchoolDetails_givenInvalidSchoolId_shouldReturnNotFound() throws Exception {
+    mockMvc.perform(MockMvcRequestBuilders.get("/api/v2/trax/school-detail/{schoolId}", "invalid_id")
+                    .with(jwt().jwt(jwt -> jwt.claim("scope", "READ_GRAD_SCHOOL_DATA")))
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.message").value("Parameter 'schoolId' with value 'invalid_id' could not be converted to type 'UUID'."));
+  }
+
+  @Test
+  void testGetSchoolDetails_givenInvalidScope_shouldReturnUnauthorized() throws Exception {
+    mockMvc.perform(MockMvcRequestBuilders.get("/api/v2/trax/school-detail/{schoolId}", schoolId)
                     .with(jwt().jwt(jwt -> jwt.claim("scope", "BAD_SCOPE")))
                     .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isForbidden());
@@ -194,13 +224,4 @@ class SchoolControllerIntegrationTest {
                     .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk());
   }
-
-  @Test
-  void testReloadSchoolDetailssIntoCache_shouldReturnOK() throws Exception {
-    mockMvc.perform(MockMvcRequestBuilders.put("/api/v2/trax/school/cache/school-details")
-                    .with(jwt().jwt(jwt -> jwt.claim("scope", "UPDATE_GRAD_TRAX_CACHE")))
-                    .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk());
-  }
-
 }

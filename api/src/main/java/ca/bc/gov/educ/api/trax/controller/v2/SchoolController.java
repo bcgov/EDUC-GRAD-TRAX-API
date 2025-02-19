@@ -80,21 +80,6 @@ public class SchoolController {
         }
     }
 
-    @PutMapping(EducGradTraxApiConstants.GRAD_SCHOOL_URL_MAPPING_V2 + EducGradTraxApiConstants.PUT_SCHOOL_DETAILS_MAPPING)
-    @PreAuthorize(PermissionsConstants.UPDATE_GRAD_TRAX_CACHE)
-    @Operation(summary = "Reload School Details in the cache", description = "Reload School Details in the cache", tags = {"Cache"})
-    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
-            @ApiResponse(responseCode = "422", description = "UNPROCESSABLE CONTENT")})
-    public ResponseEntity<String> reloadSchoolDetailsIntoCache() {
-        log.debug("reloadSchoolDetailsIntoCache : ");
-        try {
-            schoolService.initializeSchoolDetailCache(true);
-        } catch (Exception e) {
-            return ResponseEntity.unprocessableEntity().body("Error loading School Details into cache");
-        }
-        return ResponseEntity.ok("School Details loaded into cache!");
-    }
-
     @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_DETAIL_URL_MAPPING_V2)
     @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
     @Operation(summary = "Find All School details from Cache", description = "Get All School details from Cache", tags = { "School" })
@@ -129,7 +114,7 @@ public class SchoolController {
             @ApiResponse(responseCode = "204", description = "NO CONTENT")})
     public ResponseEntity<SchoolDetail> getSchoolDetailsById(@PathVariable UUID schoolId) {
         log.debug("getSchoolDetailsById V2 : ");
-        SchoolDetail schoolDetailResponse = schoolService.getSchoolDetailBySchoolId(schoolId);
+        SchoolDetail schoolDetailResponse = schoolService.getSchoolDetailBySchoolIdFromRedisCache(schoolId);
         if(schoolDetailResponse != null) {
             return response.GET(schoolDetailResponse);
         }else {

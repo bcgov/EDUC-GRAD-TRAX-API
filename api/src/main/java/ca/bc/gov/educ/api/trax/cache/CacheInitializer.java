@@ -28,7 +28,6 @@ public class CacheInitializer implements CommandLineRunner {
         districtService.initializeDistrictCache(false);
         codeService.initializeSchoolCategoryCodeCache(false);
         codeService.initializeSchoolFundingGroupCodeCache(false);
-        schoolService.initializeSchoolDetailCache(false);
 
         log.info("Redis Cache initialized!");
     }
