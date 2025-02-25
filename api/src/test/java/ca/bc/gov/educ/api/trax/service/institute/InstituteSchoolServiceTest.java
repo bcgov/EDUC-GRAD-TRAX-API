@@ -34,15 +34,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import redis.clients.jedis.JedisCluster;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.net.URI;
 import java.util.*;
-import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
@@ -151,6 +145,7 @@ class InstituteSchoolServiceTest {
 
 		List<School> result = schoolService.getSchoolsFromInstituteApi();
 		assertEquals(schools, result);
+		assertDoesNotThrow(() -> schoolService.loadSchoolDetailsFromInstituteApiIntoRedisCacheAsync());
 	}
 
 	@Test
@@ -351,6 +346,7 @@ class InstituteSchoolServiceTest {
 				.thenReturn(response);
 
 		assertNotNull(response);
+		assertDoesNotThrow(() -> schoolService.loadSchoolDetailsFromInstituteApiIntoRedisCacheAsync());
 	}
 
 	@Test
