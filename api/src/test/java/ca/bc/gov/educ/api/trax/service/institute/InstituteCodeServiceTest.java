@@ -42,10 +42,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
+import static org.wildfly.common.Assert.assertNotNull;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -146,6 +148,7 @@ public class InstituteCodeServiceTest {
 				.thenReturn(schoolCategoryCodes);
 
 		List<SchoolCategoryCode> result = codeService.getSchoolCategoryCodesFromInstituteApi();
+		System.out.println(result);
 	}
 
 	@Test
@@ -183,11 +186,11 @@ public class InstituteCodeServiceTest {
 
 	@Test
 	public void whenLoadSchoolCategoryCodesIntoRedisCache_DoesNotThrow() {
-		List<SchoolFundingGroupCodeEntity> schoolFundingGroupCodeEntities = Arrays.asList(new SchoolFundingGroupCodeEntity());
-		List<SchoolFundingGroupCode> schoolFundingGroupCodes = Arrays.asList(new SchoolFundingGroupCode());
-		when(this.schoolFundingGroupCodeRedisRepository.saveAll(schoolFundingGroupCodeEntities))
-				.thenReturn(schoolFundingGroupCodeEntities);
-		assertDoesNotThrow(() -> codeService.loadSchoolFundingGroupCodesIntoRedisCache(schoolFundingGroupCodes));
+		List<SchoolCategoryCodeEntity> schoolCategoryCodeEntities = Arrays.asList(new SchoolCategoryCodeEntity());
+		List<SchoolCategoryCode> schoolCategoryCodes = Arrays.asList(new SchoolCategoryCode());
+		when(this.schoolCategoryCodeRedisRepository.saveAll(schoolCategoryCodeEntities))
+				.thenReturn(schoolCategoryCodeEntities);
+		assertDoesNotThrow(() -> codeService.loadSchoolCategoryCodesIntoRedisCache(schoolCategoryCodes));
 	}
 
 	@Test
@@ -211,6 +214,24 @@ public class InstituteCodeServiceTest {
 		scce.setLabel("SCC2-label");
 		scces.add(scce);
 		when(schoolCategoryCodeRedisRepository.findAll()).thenReturn(scces);
+		List<SchoolCategoryCode> result = codeService.getSchoolCategoryCodesFromRedisCache();
+		assertNotNull(result);
+	}
+
+	@Test
+	public void whenGetSchoolFundingCodesFromRedisCache_GetSchoolCategoryCodes() {
+		SchoolFundingGroupCodeEntity sfgce = new SchoolFundingGroupCodeEntity();
+		List<SchoolFundingGroupCodeEntity> sfgces = new ArrayList<SchoolFundingGroupCodeEntity>();
+		sfgce.setSchoolFundingGroupCode("SFGC1");
+		sfgce.setLabel("SFGC1-label");
+		sfgces.add(sfgce);
+		sfgce = new SchoolFundingGroupCodeEntity();
+		sfgce.setSchoolFundingGroupCode("SFGC2");
+		sfgce.setLabel("SFGC2-label");
+		sfgces.add(sfgce);
+		when(schoolFundingGroupCodeRedisRepository.findAll()).thenReturn(sfgces);
+		List<SchoolFundingGroupCode> result = codeService.getSchoolFundingGroupCodesFromRedisCache();
+		assertNotNull(result);
 	}
 
 	@Test
