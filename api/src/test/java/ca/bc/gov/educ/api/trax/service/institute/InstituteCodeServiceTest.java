@@ -11,8 +11,10 @@ import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolFundingGroupCode;
 import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolCategoryCodeEntity;
 import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolFundingGroupCodeEntity;
 import ca.bc.gov.educ.api.trax.model.transformer.institute.SchoolCategoryCodeTransformer;
+import ca.bc.gov.educ.api.trax.model.transformer.institute.SchoolFundingGroupCodeTransformer;
 import ca.bc.gov.educ.api.trax.repository.redis.SchoolCategoryCodeRedisRepository;
 import ca.bc.gov.educ.api.trax.repository.redis.SchoolFundingGroupCodeRedisRepository;
+import ca.bc.gov.educ.api.trax.service.RESTService;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.RestUtils;
 import org.junit.Test;
@@ -42,8 +44,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -72,6 +74,9 @@ public class InstituteCodeServiceTest {
 	@MockBean
 	@Qualifier("default")
 	WebClient webClientMock;
+	@MockBean
+	@Qualifier("instituteWebClient")
+	private WebClient instWebClient;
 	@Mock
 	private WebClient.RequestHeadersSpec requestHeadersSpecMock;
 	@Mock
@@ -90,9 +95,12 @@ public class InstituteCodeServiceTest {
 	private Mono<List<SchoolFundingGroupCodeEntity>> schoolFundingGroupCodeEntitiesMock;
 	@Mock
 	SchoolCategoryCodeTransformer schoolCategoryCodeTransformer;
+	@Mock
+	SchoolFundingGroupCodeTransformer schoolFundingGroupCodeTransformer;
 	@MockBean
 	private RestUtils restUtils;
-
+	@MockBean
+	private RESTService restServiceMock;
 	// NATS
 	@MockBean
 	private NatsConnection natsConnection;
@@ -118,70 +126,82 @@ public class InstituteCodeServiceTest {
 
 	@Test
 	public void whenGetSchoolCategoryCodesFromInstituteApi_returnsListOfSchoolCategoryCode() {
-		List<SchoolCategoryCodeEntity> schoolCategoryCodes = new ArrayList<>();
 		SchoolCategoryCodeEntity scce = new SchoolCategoryCodeEntity();
+		List<SchoolCategoryCodeEntity> scces = new ArrayList<SchoolCategoryCodeEntity>();
+		scce.setSchoolCategoryCode("SCC1");
+		scce.setLabel("SCC1-label");
+		scces.add(scce);
+		scce = new SchoolCategoryCodeEntity();
+		scce.setSchoolCategoryCode("SCC2");
+		scce.setLabel("SCC2-label");
+		scces.add(scce);
 
-		scce.setSchoolCategoryCode("11");
-		scce.setDescription("Description");
-		scce.setLegacyCode("LegacyCode");
-		scce.setLabel("Label");
-		scce.setEffectiveDate("01-01-2024");
-		scce.setExpiryDate("01-01-2024");
-		scce.setDisplayOrder("10");
-		schoolCategoryCodes.add(scce);
+		SchoolCategoryCode scc = new SchoolCategoryCode();
+		List<SchoolCategoryCode> sccs = new ArrayList<SchoolCategoryCode>();
+		scc.setSchoolCategoryCode("SCC1");
+		scc.setLabel("SCC1-label");
+		scc.setDescription("Desc");
+		scc.setLegacyCode("SCC1-legacy");
+		scc.setDisplayOrder("10");
+		scc.setEffectiveDate("01-01-2024");
+		scc.setExpiryDate("01-01-2024");
+		sccs.add(scc);
+		scc = new SchoolCategoryCode();
+		scc.setSchoolCategoryCode("SCC2");
+		scc.setLabel("SCC2-label");
+		scc.setDescription("Desc");
+		scc.setLegacyCode("SCC2-legacy");
+		scc.setDisplayOrder("20");
+		scc.setEffectiveDate("01-01-2024");
+		scc.setExpiryDate("01-01-2024");
+		sccs.add(scc);
 
-		when(this.restUtils.getTokenResponseObject(anyString(), anyString()))
-				.thenReturn(responseObjectMock);
-		when(this.responseObjectMock.getAccess_token())
-				.thenReturn("accessToken");
-		when(webClientMock.get())
-				.thenReturn(requestHeadersUriSpecMock);
-		when(requestHeadersUriSpecMock.uri(anyString()))
-				.thenReturn(requestHeadersSpecMock);
-		when(requestHeadersSpecMock.headers(any(Consumer.class)))
-				.thenReturn(requestHeadersSpecMock);
-		when(requestHeadersSpecMock.retrieve())
-				.thenReturn(responseSpecMock);
-		when(this.responseSpecMock.bodyToMono(new ParameterizedTypeReference<List<SchoolCategoryCodeEntity>>(){}))
-				.thenReturn(schoolCategoryCodeEntitiesMock);
-		when(this.schoolCategoryCodeEntitiesMock.block())
-				.thenReturn(schoolCategoryCodes);
-
+		when(restServiceMock.get(constants.getAllSchoolCategoryCodesFromInstituteApiUrl(), List.class, instWebClient)).thenReturn(scces);
+		when(schoolCategoryCodeTransformer.transformToDTO(scces))
+				.thenReturn(sccs);
 		List<SchoolCategoryCode> result = codeService.getSchoolCategoryCodesFromInstituteApi();
-		System.out.println(result);
+		assertNotNull(result);
+		assertDoesNotThrow(() -> codeService.loadSchoolCategoryCodesFromInstituteApiIntoRedisCacheAsync());
 	}
 
 	@Test
 	public void whenGetSchoolFundingGroupCodesFromInstituteApi_returnsListOfSchoolFundingGroupCode() {
 		List<SchoolFundingGroupCodeEntity> schoolFundingGroupCodes = new ArrayList<>();
-		SchoolFundingGroupCodeEntity sfgc = new SchoolFundingGroupCodeEntity();
+		SchoolFundingGroupCodeEntity sfgce = new SchoolFundingGroupCodeEntity();
 
-		sfgc.setSchoolFundingGroupCode("CODE");
-		sfgc.setDescription("Description");
-		sfgc.setLabel("Label");
+		sfgce.setSchoolFundingGroupCode("CODE");
+		sfgce.setDescription("Description");
+		sfgce.setLabel("Label");
+		sfgce.setEffectiveDate("01-01-2024");
+		sfgce.setExpiryDate("01-01-2024");
+		sfgce.setDisplayOrder("10");
+		schoolFundingGroupCodes.add(sfgce);
+
+		SchoolFundingGroupCode sfgc = new SchoolFundingGroupCode();
+		List<SchoolFundingGroupCode> sfgcs = new ArrayList<SchoolFundingGroupCode>();
+		sfgc.setSchoolFundingGroupCode("SCC1");
+		sfgc.setLabel("SCC1-label");
+		sfgc.setDescription("Desc");
+		sfgc.setDisplayOrder("10");
 		sfgc.setEffectiveDate("01-01-2024");
 		sfgc.setExpiryDate("01-01-2024");
-		sfgc.setDisplayOrder("10");
-		schoolFundingGroupCodes.add(sfgc);
+		sfgcs.add(sfgc);
+		sfgc = new SchoolFundingGroupCode();
+		sfgc.setSchoolFundingGroupCode("SCC2");
+		sfgc.setLabel("SCC2-label");
+		sfgc.setDescription("Desc");
+		sfgc.setDisplayOrder("20");
+		sfgc.setEffectiveDate("01-01-2024");
+		sfgc.setExpiryDate("01-01-2024");
+		sfgcs.add(sfgc);
 
-		when(this.restUtils.getTokenResponseObject(anyString(), anyString()))
-				.thenReturn(responseObjectMock);
-		when(this.responseObjectMock.getAccess_token())
-				.thenReturn("accessToken");
-		when(webClientMock.get())
-				.thenReturn(requestHeadersUriSpecMock);
-		when(requestHeadersUriSpecMock.uri(anyString()))
-				.thenReturn(requestHeadersSpecMock);
-		when(requestHeadersSpecMock.headers(any(Consumer.class)))
-				.thenReturn(requestHeadersSpecMock);
-		when(requestHeadersSpecMock.retrieve())
-				.thenReturn(responseSpecMock);
-		when(this.responseSpecMock.bodyToMono(new ParameterizedTypeReference<List<SchoolFundingGroupCodeEntity>>(){}))
-				.thenReturn(Mono.just(schoolFundingGroupCodes));
-		when(this.schoolFundingGroupCodeEntitiesMock.block())
-				.thenReturn(schoolFundingGroupCodes);
-
+		when(restServiceMock.get(constants.getAllSchoolFundingGroupCodesFromInstituteApiUrl(), List.class, instWebClient)).thenReturn(schoolFundingGroupCodes);
+		when(schoolFundingGroupCodeTransformer.transformToDTO(schoolFundingGroupCodes))
+				.thenReturn(sfgcs);
 		List<SchoolFundingGroupCode> result = codeService.getSchoolFundingGroupCodesFromInstituteApi();
+		assertNotNull(result);
+		assertDoesNotThrow(() -> codeService.loadSchoolFundingGroupCodesFromInstituteApiIntoRedisCacheAsync());
+
 	}
 
 	@Test
