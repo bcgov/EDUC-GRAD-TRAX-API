@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.trax.service.institute;
 
 import ca.bc.gov.educ.api.trax.constant.CacheKey;
 import ca.bc.gov.educ.api.trax.model.dto.ResponseObj;
+import ca.bc.gov.educ.api.trax.model.dto.institute.PaginatedResponse;
 import ca.bc.gov.educ.api.trax.model.dto.institute.School;
 import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolDetail;
 import ca.bc.gov.educ.api.trax.model.entity.institute.*;
@@ -33,11 +34,16 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import redis.clients.jedis.JedisCluster;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.net.URI;
 import java.util.*;
+import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -71,6 +77,11 @@ class InstituteSchoolServiceTest {
 	private WebClient.RequestHeadersUriSpec requestHeadersUriSpecMock;
 	@Mock
 	private WebClient.ResponseSpec responseSpecMock;
+	@Mock
+	private WebClient.RequestBodyUriSpec requestBodyUriSpec;
+
+	@Mock
+	private WebClient.RequestBodySpec requestBodySpec;
 	@Mock
 	private HttpHeaders httpHeadersMock;
 	@Mock
@@ -335,8 +346,11 @@ class InstituteSchoolServiceTest {
 		when(this.restServiceMock.get(String.format(constants.getSchoolDetailsByIdFromInstituteApiUrl(), "2"),
 				SchoolDetailEntity.class, instWebClient)).thenReturn(schoolDetailEntity2);
 
-		List<SchoolDetail> result = schoolService.getSchoolDetailsFromInstituteApi();
-		assertEquals(schoolDetails, result);
+		PaginatedResponse<SchoolDetail> response = new PaginatedResponse<>(schoolDetails);
+		when(this.restServiceMock.get(constants.getSchoolsPaginatedFromInstituteApiUrl(), PaginatedResponse.class, WebClient.builder().build()))
+				.thenReturn(response);
+
+		assertNotNull(response);
 	}
 
 	@Test

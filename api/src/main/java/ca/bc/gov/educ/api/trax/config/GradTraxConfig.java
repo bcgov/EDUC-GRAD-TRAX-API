@@ -17,6 +17,8 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.http.codec.json.Jackson2JsonDecoder;
 import org.springframework.http.codec.json.Jackson2JsonEncoder;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.security.oauth2.client.*;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction;
@@ -26,6 +28,7 @@ import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
 
+@EnableAsync
 @Configuration
 @Profile("!test")
 public class GradTraxConfig {
@@ -125,5 +128,16 @@ public class GradTraxConfig {
 		return new JdbcTemplateLockProvider(jdbcTemplate, transactionManager, "REPLICATION_SHEDLOCK");
 	}
 
+	/**
+	 * Thread pool task scheduler thread pool task scheduler.
+	 *
+	 * @return the thread pool task scheduler
+	 */
+	@Bean(name = "taskExecutor")
+	public ThreadPoolTaskScheduler threadPoolTaskScheduler() {
+		final ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
+		threadPoolTaskScheduler.setPoolSize(5);
+		return threadPoolTaskScheduler;
+	}
 
 }

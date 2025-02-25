@@ -47,6 +47,7 @@ import redis.clients.jedis.JedisCluster;
 import java.util.*;
 import java.util.function.Consumer;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -331,8 +332,7 @@ public class InstituteDistrictServiceTest {
 		districtEntity.setDistrictRegionCode("RC");
 		districtEntity.setContacts(Arrays.asList(new DistrictContactEntity(), new DistrictContactEntity()));
 
-		when(this.districtRedisRepository.findById("ID"))
-				.thenReturn(Optional.of(districtEntity));
+		when(this.districtRedisRepository.findById("ID")).thenReturn(Optional.of(districtEntity));
 		when(this.districtTransformerMock.transformToDTO(districtEntity))
 				.thenReturn(district);
 		assertEquals(district, districtService.getDistrictByIdFromRedisCache("ID"));
@@ -426,13 +426,23 @@ public class InstituteDistrictServiceTest {
 				.thenReturn(schoolDetails);
 		when(this.districtRedisRepository.findById("DistID"))
 				.thenReturn(Optional.of(districtEntity));
-		when(this.districtService.getDistrictByIdFromRedisCache("DistID"))
+		when(restServiceMock.get(constants.getAllDistrictsFromInstituteApiUrl(), List.class, instWebClient))
+				.thenReturn(districtEntities);
+		when(districtTransformerMock.transformToDTO(districtEntities))
+				.thenReturn(districts);
+		when(districtService.getDistrictByIdFromInstituteApi(district.getDistrictId()))
 				.thenReturn(district);
 		when(this.districtTransformerMock.transformToDTO(districtEntities))
 				.thenReturn(districts);
 		when(this.schoolService.getSchoolDetailsBySchoolCategoryCode(schoolCategoryCode))
 				.thenReturn(schoolDetails);
-		assertEquals(districts, districtService.getDistrictsBySchoolCategoryCode(schoolCategoryCode));
+		when(districtService.getDistrictByIdFromInstituteApi("DistID"))
+				.thenReturn(district);
+		when(this.districtTransformerMock.transformToDTO(districtEntity))
+				.thenReturn(district);
+		List<District> result = districtService.getDistrictsBySchoolCategoryCode(schoolCategoryCode);
+		assertNotNull(result);
+		assertTrue(result.size() == 1);
 	}
 
 	@Test

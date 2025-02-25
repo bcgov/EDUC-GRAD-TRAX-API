@@ -144,6 +144,8 @@ endpoint:
   institute-api:
     get-all-schools:
       url: https://school-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/institute/school
+    get-schools-paginated:
+      url: https://institute-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/institute/school/paginated
     get-school-details-by-id:
       url: https://school-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/institute/school/%s
     get-all-districts:
