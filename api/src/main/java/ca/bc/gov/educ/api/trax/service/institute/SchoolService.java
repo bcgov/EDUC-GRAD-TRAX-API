@@ -148,10 +148,8 @@ public class SchoolService {
 					.bodyToMono(new ParameterizedTypeReference<>() {
                     });
 		} catch (WebClientResponseException e) {
-			e.printStackTrace();
 			log.warn(String.format("Error getting School Details from Institute API: %s", e.getMessage()));
 		} catch (Exception e) {
-			e.printStackTrace();
 			log.error(String.format("Error while calling institute-api: %s", e.getMessage()));
 		}
 		log.warn("No school details found for the given search criteria.");
