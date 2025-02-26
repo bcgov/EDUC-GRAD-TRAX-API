@@ -317,6 +317,39 @@ public class InstituteDistrictServiceTest {
 	}
 
 	@Test
+	public void whenGetDistrictByDistNoFromRedisCache_NotFound_ReturnDistrict() {
+		String distNo = "1234";
+		List<DistrictEntity> districtEntities = new ArrayList<>();
+		DistrictEntity districtEntity = new DistrictEntity();
+		districtEntity.setDistrictId("ID");
+		districtEntity.setDistrictNumber("1234");
+		districtEntity.setDistrictStatusCode("SC");
+		districtEntity.setDistrictRegionCode("RC");
+		districtEntity.setContacts(Arrays.asList(new DistrictContactEntity(), new DistrictContactEntity()));
+		districtEntities.add(districtEntity);
+
+		List<District> districts = new ArrayList<>();
+		District district = new District();
+		district.setDistrictId("ID");
+		district.setDistrictNumber("1234");
+		district.setDistrictStatusCode("SC");
+		district.setDistrictRegionCode("RC");
+		district.setContacts(Arrays.asList(new DistrictContact(), new DistrictContact()));
+		districts.add(district);
+
+		when(restServiceMock.get(constants.getAllDistrictsFromInstituteApiUrl(), List.class, instWebClient))
+				.thenReturn(districtEntities);
+		when(districtTransformerMock.transformToDTO(districtEntities))
+				.thenReturn(districts);
+		when(districtService.getDistrictByIdFromInstituteApi(district.getDistrictId()))
+				.thenReturn(district);
+
+		when(this.districtRedisRepository.findByDistrictNumber(distNo))
+				.thenReturn(Optional.empty());
+		assertEquals(district, districtService.getDistrictByDistNoFromRedisCache(distNo));
+	}
+
+	@Test
 	public void whenGetDistrictByIdFromRedisCache_ReturnDistrict() {
 		District district = new District();
 		district.setDistrictId("ID");
@@ -336,6 +369,44 @@ public class InstituteDistrictServiceTest {
 		when(this.districtTransformerMock.transformToDTO(districtEntity))
 				.thenReturn(district);
 		assertEquals(district, districtService.getDistrictByIdFromRedisCache("ID"));
+	}
+
+	@Test
+	public void whenGetDistrictByIdFromRedisCache_NotFound_ReturnDistrict() {
+		String distId = "ID";
+		List<DistrictEntity> districtEntities = new ArrayList<>();
+		DistrictEntity districtEntity = new DistrictEntity();
+		districtEntity.setDistrictId("ID");
+		districtEntity.setDistrictNumber("1234");
+		districtEntity.setDistrictStatusCode("SC");
+		districtEntity.setDistrictRegionCode("RC");
+		districtEntity.setContacts(Arrays.asList(new DistrictContactEntity(), new DistrictContactEntity()));
+		districtEntities.add(districtEntity);
+
+		List<District> districts = new ArrayList<>();
+		District district = new District();
+		district.setDistrictId("ID");
+		district.setDistrictNumber("1234");
+		district.setDistrictStatusCode("SC");
+		district.setDistrictRegionCode("RC");
+		district.setContacts(Arrays.asList(new DistrictContact(), new DistrictContact()));
+		districts.add(district);
+
+		when(this.districtRedisRepository.findById("ID")).thenReturn(Optional.of(districtEntity));
+		when(this.districtTransformerMock.transformToDTO(districtEntity))
+				.thenReturn(district);
+		assertEquals(district, districtService.getDistrictByIdFromRedisCache("ID"));
+
+		when(restServiceMock.get(constants.getAllDistrictsFromInstituteApiUrl(), List.class, instWebClient))
+				.thenReturn(districtEntities);
+		when(districtTransformerMock.transformToDTO(districtEntities))
+				.thenReturn(districts);
+		when(districtService.getDistrictByIdFromInstituteApi(district.getDistrictId()))
+				.thenReturn(district);
+
+		when(this.districtRedisRepository.findById(distId))
+				.thenReturn(Optional.empty());
+		assertEquals(district, districtService.getDistrictByIdFromRedisCache(distId));
 	}
 
 	@Test

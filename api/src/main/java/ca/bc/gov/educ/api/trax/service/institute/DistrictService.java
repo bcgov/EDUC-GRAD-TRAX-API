@@ -109,7 +109,9 @@ public class DistrictService {
                 .orElseGet(() -> {
                     log.debug("district not found in cache for districtNumber: {}, , fetched from API.", districtNumber);
                     District district = getDistrictsFromInstituteApi().stream().filter(entry -> entry.getDistrictNumber().equals(districtNumber)).findFirst().orElse(null);
-                    cacheService.loadDistrictsIntoRedisCacheAsync(List.of(this.districtTransformer.transformToEntity(district)));
+                    if(district != null) {
+                        updateDistrictCache(district);
+                    }
                     return district;
                 });
     }
@@ -121,7 +123,9 @@ public class DistrictService {
                 .orElseGet(() -> {
                     log.debug("district not found in cache for districtId: {}, , fetched from API.", districtId);
                     District district = getDistrictByIdFromInstituteApi(districtId);
-                    cacheService.loadDistrictsIntoRedisCacheAsync(List.of(this.districtTransformer.transformToEntity(district)));
+                    if(district != null) {
+                        updateDistrictCache(district);
+                    }
                     return district;
                 });
     }
