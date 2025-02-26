@@ -528,6 +528,99 @@ class InstituteSchoolServiceTest {
 	}
 
 	@Test
+	void testUpdateSchoolCache_BySchoolDetail() {
+		String schoolId = "1";
+
+		SchoolDetail schoolDetail = new SchoolDetail();
+		schoolDetail.setSchoolId(schoolId);
+		schoolDetail.setDistrictId("DistID");
+		schoolDetail.setSchoolNumber("12345");
+		schoolDetail.setSchoolCategoryCode("SCC");
+		schoolDetail.setEmail("abc@xyz.ca");
+		schoolDetail.setDisplayName("Stitó:s Lá:lém Totí:lt Elementary");
+		schoolDetail.setDisplayNameNoSpecialChars("Stitos Lalem Totilt Elementary");
+
+		SchoolDetailEntity schoolDetailEntity = new SchoolDetailEntity();
+		schoolDetailEntity.setSchoolId(schoolId);
+		schoolDetailEntity.setDistrictId("DistID");
+		schoolDetailEntity.setSchoolNumber("12345");
+		schoolDetailEntity.setSchoolCategoryCode("SCC");
+		schoolDetailEntity.setEmail("abc@xyz.ca");
+		schoolDetailEntity.setDisplayName("Stitó:s Lá:lém Totí:lt Elementary");
+		schoolDetailEntity.setDisplayNameNoSpecialChars("Stitos Lalem Totilt Elementary");
+
+		when(this.schoolDetailTransformer.transformToDTO(schoolDetailEntity)).thenReturn(schoolDetail);
+		when(this.restServiceMock.get(String.format(constants.getSchoolDetailsByIdFromInstituteApiUrl(), schoolId),
+				SchoolDetailEntity.class, instWebClient)).thenReturn(schoolDetailEntity);
+
+		SchoolDetail result = schoolService.getSchoolDetailByIdFromInstituteApi(schoolId);
+		assertEquals(schoolDetail, result);
+		assertDoesNotThrow(() -> schoolService.updateSchoolCache(schoolDetail));
+	}
+
+	@Test
+	void testUpdateSchoolCache_BySchoolId() {
+		String schoolId = "1";
+
+		SchoolDetail schoolDetail = new SchoolDetail();
+		schoolDetail.setSchoolId(schoolId);
+		schoolDetail.setDistrictId("DistID");
+		schoolDetail.setSchoolNumber("12345");
+		schoolDetail.setSchoolCategoryCode("SCC");
+		schoolDetail.setEmail("abc@xyz.ca");
+		schoolDetail.setDisplayName("Stitó:s Lá:lém Totí:lt Elementary");
+		schoolDetail.setDisplayNameNoSpecialChars("Stitos Lalem Totilt Elementary");
+
+		SchoolDetailEntity schoolDetailEntity = new SchoolDetailEntity();
+		schoolDetailEntity.setSchoolId(schoolId);
+		schoolDetailEntity.setDistrictId("DistID");
+		schoolDetailEntity.setSchoolNumber("12345");
+		schoolDetailEntity.setSchoolCategoryCode("SCC");
+		schoolDetailEntity.setEmail("abc@xyz.ca");
+		schoolDetailEntity.setDisplayName("Stitó:s Lá:lém Totí:lt Elementary");
+		schoolDetailEntity.setDisplayNameNoSpecialChars("Stitos Lalem Totilt Elementary");
+
+		when(this.schoolDetailTransformer.transformToDTO(schoolDetailEntity)).thenReturn(schoolDetail);
+		when(this.restServiceMock.get(String.format(constants.getSchoolDetailsByIdFromInstituteApiUrl(), schoolId),
+				SchoolDetailEntity.class, instWebClient)).thenReturn(schoolDetailEntity);
+
+		SchoolDetail result = schoolService.getSchoolDetailByIdFromInstituteApi(schoolId);
+		assertEquals(schoolDetail, result);
+		assertDoesNotThrow(() -> schoolService.updateSchoolCache(schoolId));
+	}
+
+	@Test
+	void testUpdateSchoolCache_BySchoolIds() {
+		String schoolId = "1";
+
+		SchoolDetail schoolDetail = new SchoolDetail();
+		schoolDetail.setSchoolId(schoolId);
+		schoolDetail.setDistrictId("DistID");
+		schoolDetail.setSchoolNumber("12345");
+		schoolDetail.setSchoolCategoryCode("SCC");
+		schoolDetail.setEmail("abc@xyz.ca");
+		schoolDetail.setDisplayName("Stitó:s Lá:lém Totí:lt Elementary");
+		schoolDetail.setDisplayNameNoSpecialChars("Stitos Lalem Totilt Elementary");
+
+		SchoolDetailEntity schoolDetailEntity = new SchoolDetailEntity();
+		schoolDetailEntity.setSchoolId(schoolId);
+		schoolDetailEntity.setDistrictId("DistID");
+		schoolDetailEntity.setSchoolNumber("12345");
+		schoolDetailEntity.setSchoolCategoryCode("SCC");
+		schoolDetailEntity.setEmail("abc@xyz.ca");
+		schoolDetailEntity.setDisplayName("Stitó:s Lá:lém Totí:lt Elementary");
+		schoolDetailEntity.setDisplayNameNoSpecialChars("Stitos Lalem Totilt Elementary");
+
+		when(this.schoolDetailTransformer.transformToDTO(schoolDetailEntity)).thenReturn(schoolDetail);
+		when(this.restServiceMock.get(String.format(constants.getSchoolDetailsByIdFromInstituteApiUrl(), schoolId),
+				SchoolDetailEntity.class, instWebClient)).thenReturn(schoolDetailEntity);
+
+		SchoolDetail result = schoolService.getSchoolDetailByIdFromInstituteApi(schoolId);
+		assertEquals(schoolDetail, result);
+		assertDoesNotThrow(() -> schoolService.updateSchoolCache(List.of(schoolId)));
+	}
+
+	@Test
 	void testGetSchoolBySchoolId_NotFound() {
 		UUID schoolId = UUID.randomUUID();
 

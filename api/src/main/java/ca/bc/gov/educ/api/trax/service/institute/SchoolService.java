@@ -251,7 +251,7 @@ public class SchoolService {
 		log.debug("Updating school {} in cache.",  schoolId);
 		SchoolDetail schoolDetail = this.restService.get(String.format(constants.getSchoolDetailsByIdFromInstituteApiUrl(), schoolId),
 				SchoolDetail.class, webClient);
-		log.debug("Retrieved school: {} from Institute API", schoolDetail.getSchoolId());
+		log.debug("Retrieved school: {} from Institute API", schoolId);
 		updateSchoolCache(schoolDetail);
 	}
 
