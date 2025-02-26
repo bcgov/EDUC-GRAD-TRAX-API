@@ -108,7 +108,7 @@ public class SchoolService {
 		return Collections.emptyList();
 	}
 
-	private School getSchoolByMinCodeFromInstituteApi(String minCode) {
+	public School getSchoolByMinCodeFromInstituteApi(String minCode) {
 			return getSchoolsFromInstituteApi().stream().filter(school -> school.getMincode().equals(minCode)).findFirst().orElse(null);
 	}
 
