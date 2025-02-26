@@ -6,6 +6,7 @@ import ca.bc.gov.educ.api.trax.messaging.NatsConnection;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.trax.model.dto.ResponseObj;
+import ca.bc.gov.educ.api.trax.model.dto.institute.School;
 import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolCategoryCode;
 import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolFundingGroupCode;
 import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolCategoryCodeEntity;
@@ -17,6 +18,7 @@ import ca.bc.gov.educ.api.trax.repository.redis.SchoolFundingGroupCodeRedisRepos
 import ca.bc.gov.educ.api.trax.service.RESTService;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.RestUtils;
+import org.checkerframework.checker.nullness.Opt;
 import org.junit.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
@@ -42,6 +44,7 @@ import redis.clients.jedis.JedisCluster;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -162,6 +165,87 @@ public class InstituteCodeServiceTest {
 		List<SchoolCategoryCode> result = codeService.getSchoolCategoryCodesFromInstituteApi();
 		assertNotNull(result);
 		assertDoesNotThrow(() -> codeService.loadSchoolCategoryCodesFromInstituteApiIntoRedisCacheAsync());
+	}
+
+	@Test
+	public void whenGetSchoolCategoryCodeFromRedisCache_returnSchoolCategoryCode() {
+		SchoolCategoryCodeEntity scce = new SchoolCategoryCodeEntity();
+		List<SchoolCategoryCodeEntity> scces = new ArrayList<SchoolCategoryCodeEntity>();
+		scce.setSchoolCategoryCode("SCC1");
+		scce.setLabel("SCC1-label");
+		scces.add(scce);
+		scce = new SchoolCategoryCodeEntity();
+		scce.setSchoolCategoryCode("SCC2");
+		scce.setLabel("SCC2-label");
+		scces.add(scce);
+
+		SchoolCategoryCode scc = new SchoolCategoryCode();
+		List<SchoolCategoryCode> sccs = new ArrayList<SchoolCategoryCode>();
+		scc.setSchoolCategoryCode("SCC1");
+		scc.setLabel("SCC1-label");
+		scc.setDescription("Desc");
+		scc.setLegacyCode("SCC1-legacy");
+		scc.setDisplayOrder("10");
+		scc.setEffectiveDate("01-01-2024");
+		scc.setExpiryDate("01-01-2024");
+		sccs.add(scc);
+		scc = new SchoolCategoryCode();
+		scc.setSchoolCategoryCode("SCC2");
+		scc.setLabel("SCC2-label");
+		scc.setDescription("Desc");
+		scc.setLegacyCode("SCC2-legacy");
+		scc.setDisplayOrder("20");
+		scc.setEffectiveDate("01-01-2024");
+		scc.setExpiryDate("01-01-2024");
+		sccs.add(scc);
+
+		when(this.schoolCategoryCodeRedisRepository.findById("SCC1"))
+				.thenReturn(Optional.of(scce));
+		assertNotNull(codeService.getSchoolCategoryCodeFromRedisCache("SCC1"));
+	}
+
+	@Test
+	public void whenGetSchoolCategoryCodeFromRedisCache_NotFound_returnSchoolCategoryCode() {
+		SchoolCategoryCodeEntity scce = new SchoolCategoryCodeEntity();
+		List<SchoolCategoryCodeEntity> scces = new ArrayList<SchoolCategoryCodeEntity>();
+		scce.setSchoolCategoryCode("SCC1");
+		scce.setLabel("SCC1-label");
+		scces.add(scce);
+		scce = new SchoolCategoryCodeEntity();
+		scce.setSchoolCategoryCode("SCC2");
+		scce.setLabel("SCC2-label");
+		scces.add(scce);
+
+		SchoolCategoryCode scc = new SchoolCategoryCode();
+		List<SchoolCategoryCode> sccs = new ArrayList<SchoolCategoryCode>();
+		scc.setSchoolCategoryCode("SCC1");
+		scc.setLabel("SCC1-label");
+		scc.setDescription("Desc");
+		scc.setLegacyCode("SCC1-legacy");
+		scc.setDisplayOrder("10");
+		scc.setEffectiveDate("01-01-2024");
+		scc.setExpiryDate("01-01-2024");
+		sccs.add(scc);
+		scc = new SchoolCategoryCode();
+		scc.setSchoolCategoryCode("SCC2");
+		scc.setLabel("SCC2-label");
+		scc.setDescription("Desc");
+		scc.setLegacyCode("SCC2-legacy");
+		scc.setDisplayOrder("20");
+		scc.setEffectiveDate("01-01-2024");
+		scc.setExpiryDate("01-01-2024");
+		sccs.add(scc);
+
+		when(restServiceMock.get(constants.getAllSchoolCategoryCodesFromInstituteApiUrl(), List.class, instWebClient)).thenReturn(scces);
+		when(schoolCategoryCodeTransformer.transformToDTO(scces))
+				.thenReturn(sccs);
+		List<SchoolCategoryCode> result = codeService.getSchoolCategoryCodesFromInstituteApi();
+		assertNotNull(result);
+		assertDoesNotThrow(() -> codeService.loadSchoolCategoryCodesFromInstituteApiIntoRedisCacheAsync());
+
+		when(this.schoolCategoryCodeRedisRepository.findById("SCC1"))
+				.thenReturn(Optional.empty());
+		assertNotNull(codeService.getSchoolCategoryCodeFromRedisCache("SCC1"));
 	}
 
 	@Test

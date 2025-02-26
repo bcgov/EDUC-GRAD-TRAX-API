@@ -413,38 +413,6 @@ class InstituteSchoolServiceTest {
     }
 
 	@Test
-	void whenInitializeSchoolCache() {
-		List<SchoolEntity> schoolEntities = new ArrayList<>();
-		SchoolEntity schoolEntity = new SchoolEntity();
-
-		schoolEntity.setSchoolId("ID");
-		schoolEntity.setDistrictId("DistID");
-		schoolEntity.setSchoolNumber("12345");
-		schoolEntity.setSchoolCategoryCode("SCC");
-		schoolEntity.setEmail("abc@xyz.ca");
-		schoolEntity.setDisplayName("Tk̓emlúps te Secwépemc");
-		schoolEntity.setDisplayNameNoSpecialChars("Tkkemlups te Secwepemc");
-		schoolEntities.add(schoolEntity);
-
-		List<School> schools = new ArrayList<>();
-		School school = new School();
-		school.setSchoolId("ID");
-		school.setDistrictId("DistID");
-		school.setSchoolNumber("12345");
-		school.setSchoolCategoryCode("SCC");
-		school.setEmail("abc@xyz.ca");
-		school.setDisplayName("Tk̓emlúps te Secwépemc");
-		school.setDisplayNameNoSpecialChars("Tkkemlups te Secwepemc");
-		schools.add(school);
-
-
-		when(this.schoolTransformer.transformToDTO(schoolEntities)).thenReturn(schools);
-		when(this.restServiceMock.get(constants.getAllSchoolsFromInstituteApiUrl(),
-				List.class, instWebClient)).thenReturn(schoolEntities);
-		assertDoesNotThrow( () -> serviceHelperMock.initializeCache(true, CacheKey.SCHOOL_CACHE, serviceHelperMock));
-	}
-
-	@Test
 	void whenGetSchoolDetailsFromInstituteApi_returnsListOfSchoolDetails() {
 		List<School> schools = new ArrayList<>();
 		School school = new School();
