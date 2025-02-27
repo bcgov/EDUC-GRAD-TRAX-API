@@ -1,7 +1,9 @@
 package ca.bc.gov.educ.api.trax.service.institute;
 
 import ca.bc.gov.educ.api.trax.constant.CacheKey;
+import ca.bc.gov.educ.api.trax.exception.ServiceException;
 import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolCategoryCode;
+import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolDetail;
 import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolFundingGroupCode;
 import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolCategoryCodeEntity;
 import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolFundingGroupCodeEntity;
@@ -48,7 +50,7 @@ public class CodeService {
 
 	public List<SchoolCategoryCode> getSchoolCategoryCodesFromInstituteApi() {
 		try {
-			log.debug("****Before Calling Institute API");
+			log.debug("****Before Calling Institute API for SchoolCategoryCode");
 			List<SchoolCategoryCodeEntity> response = this.restService.get(constants.getAllSchoolCategoryCodesFromInstituteApiUrl(),
 					List.class, webClient);
 			return schoolCategoryCodeTransformer.transformToDTO(response);
@@ -75,13 +77,20 @@ public class CodeService {
 	}
 
 	public SchoolCategoryCode getSchoolCategoryCodeFromRedisCache(String schoolCategoryCode) {
-		log.debug("**** Getting school category codes from Redis Cache.");
+		log.debug("**** Getting school category codes from Redis Cache for : {}.", schoolCategoryCode);
 		return schoolCategoryCodeRedisRepository.findById(schoolCategoryCode)
 				.map(schoolCategoryCodeTransformer::transformToDTO)
-				.orElseGet(() -> getSchoolCategoryCodesFromInstituteApi().stream()
-						.filter(schoolCategoryCode1 -> schoolCategoryCode1.getSchoolCategoryCode().equals(schoolCategoryCode))
-						.findFirst()
-						.orElse(null));
+				.orElseGet(() -> {
+					SchoolCategoryCode schoolCategory = getSchoolCategoryCodesFromInstituteApi().stream()
+							.filter(schoolCategoryCode1 -> schoolCategoryCode1.getSchoolCategoryCode().equals(schoolCategoryCode))
+							.findFirst()
+							.orElse(null);
+					if(schoolCategory != null) {
+						updateSchoolCategoryCode(schoolCategory);
+					}
+					return schoolCategory;
+
+				});
 	}
 
 	public List<SchoolCategoryCode> getSchoolCategoryCodesFromRedisCache() {
@@ -96,7 +105,7 @@ public class CodeService {
 
 	public List<SchoolFundingGroupCode> getSchoolFundingGroupCodesFromInstituteApi() {
 		try {
-			log.debug("****Before Calling Institute API");
+			log.debug("****Before Calling Institute API for SchoolFundingGroupCode");
 			List<SchoolFundingGroupCodeEntity> response = this.restService.get(constants.getAllSchoolFundingGroupCodesFromInstituteApiUrl(),
 					List.class, webClient);
 			return schoolFundingGroupCodeTransformer.transformToDTO(response);
@@ -131,4 +140,13 @@ public class CodeService {
 	public void initializeSchoolFundingGroupCodeCache(boolean force) {
 		serviceHelper.initializeCache(force, CacheKey.SCHOOL_FUNDING_GROUP_CODE_CACHE, this);
 	}
+	
+	/**
+	 * Updates the school category code in the cache
+	 * @param schoolCategoryCode the school detail object
+	 */
+	public void updateSchoolCategoryCode(SchoolCategoryCode schoolCategoryCode) throws ServiceException {
+		schoolCategoryCodeRedisRepository.save(schoolCategoryCodeTransformer.transformToEntity(schoolCategoryCode));
+	}
+
 }

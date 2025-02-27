@@ -13,7 +13,11 @@ import ca.bc.gov.educ.api.trax.repository.redis.SchoolRedisRepository;
 import ca.bc.gov.educ.api.trax.service.RESTService;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.model.dto.institute.PaginatedResponse;
+import ca.bc.gov.educ.api.trax.util.JsonUtil;
 import ca.bc.gov.educ.api.trax.util.ThreadLocalStateUtil;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,10 +29,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import org.springframework.web.util.UriBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -54,6 +60,8 @@ public class SchoolService {
 	RESTService restService;
 	@Autowired
 	CacheService cacheService;
+
+	ObjectMapper mapper =  new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
 	public List<School> getSchoolsFromRedisCache() {
 		log.debug("**** Getting schools from Redis Cache.");
@@ -134,45 +142,39 @@ public class SchoolService {
         return null;
     }
 
-	private Mono<PaginatedResponse<SchoolDetail>> getSchoolDetailsPaginatedFromInstituteApi(int pageNumber) {
+	private PaginatedResponse<SchoolDetail> getSchoolDetailsPaginatedFromInstituteApi(int pageNumber) {
 		int pageSize = 1000;
 		try {
-			return this.webClient.get()
-							.uri(constants.getSchoolsPaginatedFromInstituteApiUrl(),
-									uri -> uri.queryParam("pageNumber", pageNumber)
-											.queryParam("pageSize", pageSize)
-											.build())
-							.headers(h -> {
-								h.set(EducGradTraxApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-							}) .retrieve()
-					.bodyToMono(new ParameterizedTypeReference<>() {
-                    });
+			return this.restService.get(String.format(constants.getSchoolsPaginatedFromInstituteApiUrl()+"?pageNumber=%d&pageSize=%d", pageNumber, pageSize),
+					PaginatedResponse.class, webClient);
 		} catch (WebClientResponseException e) {
 			log.warn(String.format("Error getting School Details from Institute API: %s", e.getMessage()));
 		} catch (Exception e) {
 			log.error(String.format("Error while calling institute-api: %s", e.getMessage()));
 		}
 		log.warn("No school details found for the given search criteria.");
-		return Mono.empty();
+		return null;
 	}
 
 	// Recursive method to fetch school details page by page
-	public Mono<List<SchoolDetail>> getSchoolDetailsPaginatedFromInstituteApi() {
-		return getSchoolDetailsPaginatedFromInstituteApi(0)
-				.expand(response -> {
-					if (response.hasNext()) {
-						return getSchoolDetailsPaginatedFromInstituteApi(response.nextPageable().getPageNumber());
-					}
-					return Mono.empty();
-				})
-				.flatMap(response -> Flux.fromIterable(response.getContent()))
-				.collectList();
+	public List<SchoolDetail> getSchoolDetailsPaginatedFromInstituteApi(int pageNumber, List<SchoolDetail> schoolDetails) {
+		PaginatedResponse response =  getSchoolDetailsPaginatedFromInstituteApi(pageNumber);
+		if (response == null) {
+			return schoolDetails;
+		}
+		schoolDetails.addAll(response.getContent().stream()
+				.map(entry -> mapper.convertValue(entry, SchoolDetail.class))
+				.toList());
+
+		if (response.hasNext()) {
+			return getSchoolDetailsPaginatedFromInstituteApi(response.nextPageable().getPageNumber(), schoolDetails);
+		}
+		return schoolDetails;
 	}
 
 	public List<SchoolDetail> getSchoolDetailsFromInstituteApi() {
 		log.debug("****Before Calling Institute API for school details");
-		List<SchoolDetail> test = getSchoolDetailsPaginatedFromInstituteApi().block();
-		return test;
+		return getSchoolDetailsPaginatedFromInstituteApi(0, new ArrayList<>());
 	}
 
 	public List<SchoolDetail> loadSchoolDetailsFromInstituteApiIntoRedisCacheAsync() {

@@ -37,10 +37,7 @@ public class ServiceHelper<T> {
     }
 
     private void loadCache(CacheKey cacheKey, T service) {
-        jedisCluster.set(cacheKey.name(), CacheStatus.LOADING.name());
         loadDataIntoRedisCache(cacheKey, service);
-        jedisCluster.set(cacheKey.name(), CacheStatus.READY.name());
-        log.info(String.format("Success! - %s is now READY", cacheKey));
     }
 
     private void loadDataIntoRedisCache(CacheKey cacheKey, T service) {
@@ -51,21 +48,18 @@ public class ServiceHelper<T> {
                     if(!CollectionUtils.isEmpty(schoolCategoryCodes)) {
                         ((CodeService)service).loadSchoolCategoryCodesIntoRedisCache(schoolCategoryCodes);
                     }
-                    break;
                 }
                 case SCHOOL_FUNDING_GROUP_CODE_CACHE -> {
                     List<SchoolFundingGroupCode> schoolFundingGroupCodes = ((CodeService)service).getSchoolFundingGroupCodesFromInstituteApi();
                     if(!CollectionUtils.isEmpty(schoolFundingGroupCodes)) {
                         ((CodeService)service).loadSchoolFundingGroupCodesIntoRedisCache(schoolFundingGroupCodes);
                     }
-                    break;
                 }
                 case DISTRICT_CACHE -> {
                     List<District> districts = ((DistrictService)service).getDistrictsFromInstituteApi();
                     if(!CollectionUtils.isEmpty(districts)) {
                         ((DistrictService) service).loadDistrictsIntoRedisCache(districts);
                     }
-                    break;
                 }
                 case SCHOOL_CACHE -> {
                     List<School> schools = ((SchoolService)service).getSchoolsFromInstituteApi();
@@ -76,7 +70,6 @@ public class ServiceHelper<T> {
                     if(!CollectionUtils.isEmpty(schoolDetails)) {
                         ((SchoolService) service).loadSchoolDetailsIntoRedisCache(schoolDetails);
                     }
-                    break;
                 }
                 default -> {
                     log.info(String.format("Invalid Cache Key %s", cacheKey));
