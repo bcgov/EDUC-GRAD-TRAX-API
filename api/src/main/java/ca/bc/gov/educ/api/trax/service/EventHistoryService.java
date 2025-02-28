@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.trax.service;
 
+import ca.bc.gov.educ.api.trax.constant.EventType;
 import ca.bc.gov.educ.api.trax.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.trax.exception.InvalidParameterException;
 import ca.bc.gov.educ.api.trax.exception.ServiceException;
@@ -126,7 +127,7 @@ public class EventHistoryService {
     }
 
     private Search getDefaultSearchCriteria() {
-        List<String> ignorableEvents = List.of("CREATE_SCHOOL_CONTACT", "UPDATE_SCHOOL_CONTACT", "DELETE_SCHOOL_CONTACT", "CREATE_DISTRICT_CONTACT", "UPDATE_DISTRICT_CONTACT", "DELETE_DISTRICT_CONTACT");
+        List<String> ignorableEvents = List.of(EventType.CREATE_SCHOOL_CONTACT.name(), EventType.UPDATE_SCHOOL_CONTACT.name(), EventType.DELETE_SCHOOL_CONTACT.name(), EventType.CREATE_DISTRICT_CONTACT.name(), EventType.UPDATE_DISTRICT_CONTACT.name(), EventType.DELETE_DISTRICT_CONTACT.name());
         SearchCriteria searchCriteria = new SearchCriteria();
         searchCriteria.setCondition(Condition.AND);
         searchCriteria.setValueType(ValueType.STRING);
