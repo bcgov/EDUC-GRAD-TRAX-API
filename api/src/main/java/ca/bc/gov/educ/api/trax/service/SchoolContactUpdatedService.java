@@ -25,7 +25,7 @@ public class SchoolContactUpdatedService extends SchoolEventBaseService<SchoolCo
         try{
             SchoolDetail schoolDetail = this.schoolService.getSchoolDetailByIdFromInstituteApi(schoolContact.getSchoolId());
             schoolService.updateSchoolCache(schoolDetail);
-            this.updateEvent(eventEntity, schoolDetail.isCanIssueTranscripts());
+            this.updateEvent(eventEntity, false);
         } catch (ServiceException e) {
             // do not mark eventEntity as processed
             log.error(e.getMessage());

@@ -62,7 +62,7 @@ public class SchoolContactUpdatedServiceTest extends BaseReplicationServiceTest 
         when(schoolServiceMock.getSchoolDetailByIdFromInstituteApi(request.getSchoolId())).thenReturn(schoolDetails);
         this.schoolContactUpdatedService.processEvent(request, event);
         var result = this.replicationTestUtils.getEventHistoryRepository().findByEvent_ReplicationEventId(event.getReplicationEventId());
-        Assert.assertTrue(result.isPresent());
+        Assert.assertFalse(result.isPresent());
     }
 
     @Test
