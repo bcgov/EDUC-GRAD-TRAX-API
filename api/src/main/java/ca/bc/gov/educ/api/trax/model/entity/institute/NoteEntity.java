@@ -19,7 +19,6 @@ public class NoteEntity {
     private String schoolId;
     @Indexed
     private String districtId;
-    @Indexed
     private String independentAuthorityId;
     private String content;
     private String createUser;

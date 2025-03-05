@@ -60,7 +60,7 @@ public class GradStudentUndoCompletionService<T> extends EventCommonService<T> {
             updateFieldsMap.remove(FIELD_SCC_DATE);
 
             // mincode_grad(= blank)
-            gradStatusUpdate.setSchoolAtGrad(null);
+            gradStatusUpdate.setSchoolAtGradId(null);
             updateFieldsMap.put(FIELD_MINCODE_GRAD, Pair.of(FieldType.TRAX_STRING, " "));
 
             // stud_grade_at_grad(= blank)

@@ -13,6 +13,7 @@ public class SnapshotResponse {
     private BigDecimal gpa;
     private String honourFlag;
     private String schoolOfRecord;
+    private String schoolOfRecordId;
     private String studentGrade;
 
     public SnapshotResponse(String pen, String graduatedDate, BigDecimal gpa, String honourFlag, String schoolOfRecord, String studentGrade) {

@@ -21,7 +21,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import java.util.List;
 
 @Slf4j
-@Service("InstituteCodeService")
+@Service("instituteCodeService")
 public class CodeService {
 
 	@Autowired
@@ -60,6 +60,11 @@ public class CodeService {
 		schoolCategoryCodeRedisRepository
 				.saveAll(schoolCategoryCodeTransformer.transformToEntity(schoolCategoryCodes));
 		log.info(String.format("%s School Category Codes Loaded into cache.", schoolCategoryCodes.size()));
+	}
+
+	public SchoolCategoryCode getSchoolCategoryCodeFromRedisCache(String schoolCategoryCode) {
+		log.debug("**** Getting school category codes from Redis Cache.");
+		return  schoolCategoryCodeTransformer.transformToDTO(schoolCategoryCodeRedisRepository.findById(schoolCategoryCode));
 	}
 
 	public List<SchoolCategoryCode> getSchoolCategoryCodesFromRedisCache() {

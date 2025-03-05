@@ -20,6 +20,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @CrossOrigin
 @RestController("schoolControllerV2")
@@ -39,6 +41,21 @@ public class SchoolController {
         this.response = response;
     }
 
+    @PutMapping(EducGradTraxApiConstants.GRAD_SCHOOL_URL_MAPPING_V2 + EducGradTraxApiConstants.PUT_SCHOOLS_MAPPING)
+    @PreAuthorize(PermissionsConstants.UPDATE_GRAD_TRAX_CACHE)
+    @Operation(summary = "Reload Schools in the cache", description = "Reload Schools in the cache", tags = {"Cache"})
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "422", description = "UNPROCESSABLE CONTENT")})
+    public ResponseEntity<String> reloadSchoolsIntoCache() {
+        log.debug("reloadSchoolsIntoCache : ");
+        try {
+            schoolService.initializeSchoolCache(true);
+        } catch (Exception e) {
+            return ResponseEntity.unprocessableEntity().body("Error loading Schools into cache");
+        }
+        return ResponseEntity.ok("Schools loaded into cache!");
+    }
+
     @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_URL_MAPPING_V2)
     @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
     @Operation(summary = "Find All Schools from Cache", description = "Get All Schools from Cache", tags = { "School" })
@@ -48,16 +65,16 @@ public class SchoolController {
         return schoolService.getSchoolsFromRedisCache();
     }
 
-    @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_URL_MAPPING_V2 + EducGradTraxApiConstants.GET_SCHOOL_BY_CODE_MAPPING)
+    @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_URL_MAPPING_V2 + EducGradTraxApiConstants.GET_SCHOOL_BY_SCHOOL_ID)
     @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
-    @Operation(summary = "Find a School by Mincode from cache", description = "Get a School by Mincode from cache", tags = { "School" })
+    @Operation(summary = "Find a School by schoolId from cache", description = "Get a School by schoolId from cache", tags = { "School" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "204", description = "NO CONTENT")})
-    public ResponseEntity<School> getSchoolByMincode(@PathVariable String minCode) {
-        log.debug("getSchoolByMincode V2 : ");
-        School schoolResponse = schoolService.getSchoolByMincodeFromRedisCache(minCode);
-        if(schoolResponse != null) {
-            return response.GET(schoolResponse);
+    public ResponseEntity<School> getSchoolBySchoolId(@PathVariable UUID schoolId) {
+        log.debug("getSchoolBySchoolId V2 : ");
+        Optional<School> schoolResponse = schoolService.getSchoolBySchoolId(schoolId);
+        if(schoolResponse.isPresent()) {
+            return response.GET(schoolResponse.get());
         }else {
             return response.NOT_FOUND();
         }
@@ -90,13 +107,28 @@ public class SchoolController {
         return response.GET(schoolService.getSchoolDetailsBySchoolCategoryCode(schoolCategoryCode));
     }
 
-    @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_DETAIL_URL_MAPPING_V2 + EducGradTraxApiConstants.GET_SCHOOL_BY_CODE_MAPPING)
+    @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_DETAIL_URL_MAPPING_V2 + EducGradTraxApiConstants.GET_SCHOOL_BY_SCHOOL_ID)
+    @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
+    @Operation(summary = "Find School Details by ID from cache", description = "Get School Details by ID from cache", tags = { "School" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "204", description = "NO CONTENT")})
+    public ResponseEntity<SchoolDetail> getSchoolDetailsById(@PathVariable UUID schoolId) {
+        log.debug("getSchoolDetailsById V2 : ");
+        SchoolDetail schoolDetailResponse = schoolService.getSchoolDetailBySchoolIdFromRedisCache(schoolId);
+        if(schoolDetailResponse != null) {
+            return response.GET(schoolDetailResponse);
+        }else {
+            return response.NOT_FOUND();
+        }
+    }
+
+    @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_DETAIL_URL_MAPPING_V2 + EducGradTraxApiConstants.GET_SCHOOL_DETAIL_SEARCH_MAPPING)
     @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
     @Operation(summary = "Find School Details by Mincode from cache", description = "Get School Details by Mincode from cache", tags = { "School" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "204", description = "NO CONTENT")})
-    public ResponseEntity<SchoolDetail> getSchoolDetailsByMincode(@PathVariable String minCode) {
-        log.debug("getSchoolDetails V2 : ");
+    public ResponseEntity<SchoolDetail> getSchoolDetailsByParams(@RequestParam(required = false) String minCode) {
+        log.debug("getSchoolDetailsByParams V2 : ");
         SchoolDetail schoolDetailResponse = schoolService.getSchoolDetailByMincodeFromRedisCache(minCode);
         if(schoolDetailResponse != null) {
             return response.GET(schoolDetailResponse);
@@ -105,5 +137,28 @@ public class SchoolController {
         }
     }
 
+    /**
+     * School wildcard Search with given params
+     * @param districtId
+     * @param mincode
+     * @param displayName
+     * @param distNo
+     * @return
+     */
+    @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_URL_MAPPING_V2 + EducGradTraxApiConstants.GET_SCHOOL_SEARCH_MAPPING)
+    @PreAuthorize(PermissionsConstants.READ_SCHOOL_DATA)
+    @Operation(summary = "Search for a school v2", description = "Search for a School v2", tags = { "School" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
+    public ResponseEntity<List<School>> getSchoolsByParams(
+            @RequestParam(value = "districtId", required = false) String districtId,
+            @RequestParam(value = "mincode", required = false) String mincode,
+            @RequestParam(value = "displayName", required = false) String displayName,
+            @RequestParam(value = "distNo", required = false) String distNo,
+            @RequestParam(value = "schoolCategoryCodes", required = false) List<String> schoolCategoryCodes)
+    {
+        log.debug("getSchoolsByParams V2 : ");
+        return response.GET(schoolService.getSchoolsByParams(districtId, mincode, displayName, distNo, schoolCategoryCodes));
+    }
 
 }

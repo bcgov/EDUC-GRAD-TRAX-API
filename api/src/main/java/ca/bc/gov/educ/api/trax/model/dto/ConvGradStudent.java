@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @Builder
@@ -24,8 +25,8 @@ public class ConvGradStudent {
     private String gpa;
     private String honoursStanding; // inc
     private String studentGradData;
-    private String schoolOfRecord; // inc
-    private String schoolAtGrad; // inc
+    private UUID schoolOfRecordId; // inc
+    private UUID schoolAtGradId; // inc
     private String studentGrade; // inc
     private String studentStatus; // inc
     private String archiveFlag; // inc

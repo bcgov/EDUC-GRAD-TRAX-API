@@ -4,8 +4,10 @@ import ca.bc.gov.educ.api.trax.constant.EventType;
 import ca.bc.gov.educ.api.trax.messaging.NatsConnection;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Subscriber;
+import ca.bc.gov.educ.api.trax.model.dto.School;
 import ca.bc.gov.educ.api.trax.repository.EventRepository;
 import ca.bc.gov.educ.api.trax.repository.TraxStudentRepository;
+import ca.bc.gov.educ.api.trax.service.institute.CommonService;
 import ca.bc.gov.educ.api.trax.support.TestUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.lang3.StringUtils;
@@ -25,6 +27,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import redis.clients.jedis.JedisCluster;
 
+import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
 @RunWith(SpringRunner.class)
@@ -39,6 +42,9 @@ public class GradStudentUndoCompletionServiceTest {
 
     @Autowired
     private TraxStudentRepository traxStudentRepository;
+
+    @MockBean
+    private CommonService commonService;
 
     // NATS
     @MockBean
@@ -155,6 +161,23 @@ public class GradStudentUndoCompletionServiceTest {
         request.setProgram(program);
         request.setStudentStatus(studentStatus);
         final var event = TestUtils.createEvent(EventType.GRAD_STUDENT_UNDO_COMPLETION.name(), request, eventRepository);
+
+        // SchoolOfRecord
+        if (request.getSchoolOfRecordId() != null) {
+            School school = new School();
+            school.setSchoolId(request.getSchoolOfRecordId().toString());
+
+            when(commonService.getSchoolForClobDataBySchoolIdFromRedisCache(request.getSchoolOfRecordId())).thenReturn(school);
+        }
+
+        // SchoolAtGrad
+        if (request.getSchoolAtGradId() != null) {
+            School schoolAtGrad = new School();
+            schoolAtGrad.setSchoolId(request.getSchoolAtGradId().toString());
+
+            when(commonService.getSchoolForClobDataBySchoolIdFromRedisCache(request.getSchoolAtGradId())).thenReturn(schoolAtGrad);
+        }
+
         this.gradStudentUndoCompletionService.processEvent(request, event);
     }
 

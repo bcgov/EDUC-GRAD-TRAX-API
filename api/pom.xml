@@ -6,7 +6,7 @@
 
     <groupId>ca.bc.gov.educ</groupId>
     <artifactId>educ-grad-trax-api</artifactId>
-    <version>1.8.61</version>
+    <version>1.8.62</version>
     <name>educ-grad-trax-api</name>
     <description>Ministry of Education GRAD TRAX API</description>
 
@@ -164,6 +164,12 @@
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>it.ozimov</groupId>
+            <artifactId>embedded-redis</artifactId>
+            <version>0.7.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>

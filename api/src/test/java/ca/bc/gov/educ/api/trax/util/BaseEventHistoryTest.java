@@ -39,10 +39,25 @@ public abstract class BaseEventHistoryTest {
     protected EventEntity createEventData() {
         return EventEntity.builder()
                 .eventId(UUID.randomUUID())
-                .eventPayload("")
+                .eventPayload("""
+                        {
+                          "authorityContactId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+                          "independentAuthorityId": "d3b07384-d9a0-4c1e-8b0e-6e2b6b7b8b8b",
+                          "authorityContactTypeCode": "string",
+                          "phoneNumber": "string",
+                          "jobTitle": "string",
+                          "phoneExtension": "string",
+                          "alternatePhoneNumber": "string",
+                          "alternatePhoneExtension": "string",
+                          "email": "string",
+                          "firstName": "string",
+                          "lastName": "string",
+                          "effectiveDate": "string",
+                          "expiryDate": "string"
+                        }""")
                 .eventStatus("PROCESSED")
-                .eventType("CREATE_SCHOOL_CONTACT")
-                .eventOutcome("SCHOOL_CONTACT_CREATED")
+                .eventType("CREATE_AUTHORITY_CONTACT")
+                .eventOutcome("AUTHORITY_CONTACT_CREATED")
                 .createUser(USER)
                 .createDate(LocalDateTime.now())
                 .updateUser(USER)

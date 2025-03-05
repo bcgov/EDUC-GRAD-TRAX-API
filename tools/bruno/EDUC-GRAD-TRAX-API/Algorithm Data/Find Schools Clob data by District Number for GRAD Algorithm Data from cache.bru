@@ -1,0 +1,15 @@
+meta {
+  name: Find Schools Clob data by District Number for GRAD Algorithm Data from cache
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v2/trax/schools-by-district/:distNo
+  body: none
+  auth: none
+}
+
+params:path {
+  distNo: 
+}

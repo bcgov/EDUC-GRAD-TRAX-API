@@ -26,7 +26,7 @@ public class DistrictContactUpdatedService extends EventBaseService<DistrictCont
         log.debug("Processing District Contact Deleted");
         try{
             districtService.updateDistrictCache(districtContact.getDistrictId());
-            this.updateEvent(eventEntity, true);
+            this.updateEvent(eventEntity, false);
         } catch (ServiceException e) {
             // do not mark eventEntity as processed
             log.error(e.getMessage());

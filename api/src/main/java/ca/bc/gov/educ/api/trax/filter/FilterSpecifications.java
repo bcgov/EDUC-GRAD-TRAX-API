@@ -78,8 +78,15 @@ public class FilterSpecifications<E, T extends Comparable<T>> {
     map.put(FilterOperation.IN, filterCriteria -> (root, criteriaQuery, criteriaBuilder) -> root
         .get(filterCriteria.getFieldName()).in(filterCriteria.getConvertedValues()));
 
-    map.put(FilterOperation.NOT_IN, filterCriteria -> (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder
-        .not(root.get(filterCriteria.getFieldName()).in(filterCriteria.getConvertedValues())));
+    map.put(FilterOperation.NOT_IN, filterCriteria -> (root, criteriaQuery, criteriaBuilder) -> {
+      if (filterCriteria.getFieldName().contains(".")) {
+        String[] splits = filterCriteria.getFieldName().split("\\.");
+        if (splits.length == 2) {
+          return criteriaBuilder.or(criteriaBuilder.not(root.join(splits[0]).get(splits[1]).in(filterCriteria.getConvertedValues())), criteriaBuilder.isNull(root.join(splits[0]).get(splits[1])));
+        }
+      }
+        return criteriaBuilder.or(criteriaBuilder.not(root.get(filterCriteria.getFieldName()).in(filterCriteria.getConvertedValues())), criteriaBuilder.isNull(root.get(filterCriteria.getFieldName())));
+    });
 
     map.put(FilterOperation.BETWEEN,
         filterCriteria -> (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.between(

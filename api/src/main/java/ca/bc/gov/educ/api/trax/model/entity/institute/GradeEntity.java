@@ -15,9 +15,7 @@ public class GradeEntity {
 
     @Id
     private String schoolGradeId;
-    @Indexed
     private String schoolId;
-    @Indexed
     private String schoolGradeCode;
     private String createUser;
     private String updateUser;

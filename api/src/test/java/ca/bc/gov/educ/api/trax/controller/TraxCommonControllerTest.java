@@ -66,7 +66,7 @@ public class TraxCommonControllerTest {
 								.graduationRequirementYear("2020")
 								.program("2018-EN")
 								.studentGrade("12")
-								.schoolOfRecord("12345678")
+								.schoolOfRecordId(UUID.randomUUID())
 							.build();
 		studentList.add(obj);
 		Mockito.when(traxCommonService.getStudentMasterDataFromTrax(pen)).thenReturn(studentList);

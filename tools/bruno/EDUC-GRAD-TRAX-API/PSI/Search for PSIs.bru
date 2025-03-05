@@ -1,0 +1,19 @@
+meta {
+  name: Search for PSIs
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/v1/trax/psi/search
+  body: none
+  auth: none
+}
+
+params:query {
+  ~psiName: 
+  ~psiCode: 
+  ~cslCode: 
+  ~transmissionMode: 
+  ~openFlag: 
+}

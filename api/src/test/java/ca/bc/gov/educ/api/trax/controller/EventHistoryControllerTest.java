@@ -156,7 +156,7 @@ class EventHistoryControllerTest extends BaseEventHistoryTest {
     }
 
     private EventHistory createEventHistoryData() throws JsonProcessingException {
-        var event = TestUtils.createEvent("DELETE_DISTRICT_CONTACT", TestUtils.createDistrictContact(), LocalDateTime.now(), eventRepository);
+        var event = TestUtils.createEvent("UPDATE_AUTHORITY_CONTACT", TestUtils.createAuthorityContact(), LocalDateTime.now(), eventRepository);
         var eventHistory = TestUtils.createEventHistory(event, LocalDateTime.now(), eventHistoryRepository);
         return mapper.toStructure(eventHistory);
     }

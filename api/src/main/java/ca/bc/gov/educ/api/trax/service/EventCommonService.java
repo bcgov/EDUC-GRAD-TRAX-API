@@ -5,6 +5,7 @@ import ca.bc.gov.educ.api.trax.model.dto.GradStatusEventPayloadDTO;
 import ca.bc.gov.educ.api.trax.model.entity.EventEntity;
 import ca.bc.gov.educ.api.trax.model.entity.TraxStudentEntity;
 import ca.bc.gov.educ.api.trax.repository.TraxStudentRepository;
+import ca.bc.gov.educ.api.trax.service.institute.CommonService;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiUtils;
 import ca.bc.gov.educ.api.trax.util.ReplicationUtils;
@@ -43,6 +44,8 @@ public abstract class EventCommonService<T> extends EventBaseService<T> {
     public static final String FIELD_HONOUR_FLAG = "HONOUR_FLAG";
     public static final String FIELD_XCRIPT_ACTV_DATE = "XCRIPT_ACTV_DATE";
 
+    @Autowired
+    private CommonService commonService;
     @Autowired
     private TraxStudentRepository traxStudentRepository;
     @Autowired
@@ -181,11 +184,13 @@ public abstract class EventCommonService<T> extends EventBaseService<T> {
         }
         // Mincode
         if (fields.contains(FIELD_MINCODE)) {
-            handleStringField(updateFieldsMap, FIELD_MINCODE, traxStudentEntity.getMincode(), gradStatus.getSchoolOfRecord());
+            ca.bc.gov.educ.api.trax.model.dto.School school = commonService.getSchoolForClobDataBySchoolIdFromRedisCache(gradStatus.getSchoolOfRecordId());
+            handleStringField(updateFieldsMap, FIELD_MINCODE, traxStudentEntity.getMincode(),  school != null ? school.getMinCode() : null);
         }
         // Mincode_Grad
         if (fields.contains(FIELD_MINCODE_GRAD)) {
-            handleStringField(updateFieldsMap, FIELD_MINCODE_GRAD, traxStudentEntity.getMincodeGrad(), gradStatus.getSchoolAtGrad());
+            ca.bc.gov.educ.api.trax.model.dto.School school = commonService.getSchoolForClobDataBySchoolIdFromRedisCache(gradStatus.getSchoolAtGradId());
+            handleStringField(updateFieldsMap, FIELD_MINCODE_GRAD, traxStudentEntity.getMincodeGrad(),  school != null ? school.getMinCode() : null);
         }
         // Student Grade
         if (fields.contains(FIELD_STUD_GRADE)) {

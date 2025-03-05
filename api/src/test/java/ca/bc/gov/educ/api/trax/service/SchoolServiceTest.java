@@ -11,6 +11,7 @@ import ca.bc.gov.educ.api.trax.repository.DistrictRepository;
 import ca.bc.gov.educ.api.trax.repository.SchoolRepository;
 import ca.bc.gov.educ.api.trax.repository.TraxSchoolSearchCriteria;
 import ca.bc.gov.educ.api.trax.repository.TraxSchoolSearchSpecification;
+import ca.bc.gov.educ.api.trax.service.institute.CommonService;
 import ca.bc.gov.educ.api.trax.util.CommonSchoolCache;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import org.apache.commons.lang3.StringUtils;
@@ -37,6 +38,7 @@ import redis.clients.jedis.JedisCluster;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -57,7 +59,7 @@ class SchoolServiceTest {
     private DistrictRepository districtRepository;
 
     @MockBean
-    private CodeService codeService;
+    private CommonService commonService;
 
     @Autowired
     private EducGradTraxApiConstants constants;
@@ -169,8 +171,6 @@ class SchoolServiceTest {
         gA.setProvName("British Columbia");
 
         Mockito.when(schoolRepository.findAll()).thenReturn(gradSchoolList);
-        Mockito.when(codeService.getSpecificCountryCode("CA")).thenReturn(gC);
-        Mockito.when(codeService.getSpecificProvinceCode("BC")).thenReturn(gA);
         Mockito.when(districtRepository.findById("123")).thenReturn(Optional.of(districtEntity));
 
         District district = districtTransformer.transformToDTO(districtEntity);
@@ -205,8 +205,6 @@ class SchoolServiceTest {
         districtEntity.setDistrictName("Test District");
 
         Mockito.when(schoolRepository.findAll()).thenReturn(gradSchoolList);
-        Mockito.when(codeService.getSpecificCountryCode("CA")).thenReturn(null);
-        Mockito.when(codeService.getSpecificProvinceCode("BC")).thenReturn(null);
         Mockito.when(districtRepository.findById("123")).thenReturn(Optional.of(districtEntity));
 
         District district = districtTransformer.transformToDTO(districtEntity);
@@ -257,11 +255,8 @@ class SchoolServiceTest {
         District district = districtTransformer.transformToDTO(districtEntity);
         assertThat(district).isNotNull();
 
-        Mockito.when(codeService.getSpecificCountryCode(country.getCountryCode())).thenReturn(country);
-        Mockito.when(codeService.getSpecificProvinceCode(province.getProvCode())).thenReturn(province);
-
         mockCommonSchool("02121000", "Test School");
-        var result = schoolService.getSchoolDetails("02121000", "accessToken");
+        var result = schoolService.getSchoolDetails("02121000");
 
         assertThat(result).isNotNull();
         assertThat(result.getMinCode()).isEqualTo("02121000");
@@ -298,11 +293,8 @@ class SchoolServiceTest {
         Mockito.when(schoolRepository.findById("02121000")).thenReturn(Optional.empty());
         Mockito.when(districtRepository.findById("021")).thenReturn(Optional.of(district));
 
-        Mockito.when(codeService.getSpecificCountryCode(country.getCountryCode())).thenReturn(country);
-        Mockito.when(codeService.getSpecificProvinceCode(province.getProvCode())).thenReturn(province);
-
         mockCommonSchool("02121000", null);
-        var result = schoolService.getSchoolDetails("02121000", "accessToken");
+        var result = schoolService.getSchoolDetails("02121000");
 
         assertThat(result).isNull();
     }
@@ -337,12 +329,9 @@ class SchoolServiceTest {
         Mockito.when(schoolRepository.findById("02121000")).thenReturn(Optional.of(school));
         Mockito.when(districtRepository.findById("021")).thenReturn(null);
 
-        Mockito.when(codeService.getSpecificCountryCode(country.getCountryCode())).thenReturn(null);
-        Mockito.when(codeService.getSpecificProvinceCode(province.getProvCode())).thenReturn(null);
-
         mockCommonSchool("02121000", null);
 
-        var result = schoolService.getSchoolDetails("1234567", "accessToken");
+        var result = schoolService.getSchoolDetails("1234567");
 
         assertThat(result).isNull();
     }
@@ -383,9 +372,6 @@ class SchoolServiceTest {
 
         Mockito.when(schoolRepository.findAll(Specification.where(spec))).thenReturn(List.of(school));
         Mockito.when(districtRepository.findById("021")).thenReturn(Optional.of(district));
-
-        Mockito.when(codeService.getSpecificCountryCode(country.getCountryCode())).thenReturn(country);
-        Mockito.when(codeService.getSpecificProvinceCode(province.getProvCode())).thenReturn(province);
 
         mockCommonSchool("02121000", "THE GATEWAY COMMUNITY LEARNING CENTRE");
 
@@ -443,9 +429,6 @@ class SchoolServiceTest {
         Mockito.when(schoolRepository.findAll(Mockito.any(Specification.class))).thenReturn(List.of(school));
         Mockito.when(districtRepository.findById("021")).thenReturn(Optional.of(district));
 
-        Mockito.when(codeService.getSpecificCountryCode(country.getCountryCode())).thenReturn(country);
-        Mockito.when(codeService.getSpecificProvinceCode(province.getProvCode())).thenReturn(province);
-
         mockCommonSchool("02121000", "THE GATEWAY COMMUNITY LEARNING CENTRE");
 
         var result = schoolService.getSchoolsByParams("TH*", null, "02*", "accessToken");
@@ -492,10 +475,12 @@ class SchoolServiceTest {
     }
 
     void mockCommonSchool(String minCode, String schoolName) {
+        String schoolCategoryCode = "02";
+
         CommonSchool commonSchool = new CommonSchool();
         commonSchool.setSchlNo(minCode);
         commonSchool.setSchoolName(schoolName);
-        commonSchool.setSchoolCategoryCode("02");
+        commonSchool.setSchoolCategoryCode(schoolCategoryCode);
 
         Mockito.when(this.commonSchoolCache.getAllCommonSchools()).thenReturn(List.of(commonSchool));
         Mockito.when(this.commonSchoolCache.getSchoolByMincode(minCode)).thenReturn(commonSchool);
@@ -512,13 +497,26 @@ class SchoolServiceTest {
         Mockito.when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
         Mockito.when(this.responseMock.bodyToMono(new ParameterizedTypeReference<List<CommonSchool>>() {
         })).thenReturn(Mono.just(List.of(commonSchool)));
+
+        // Institute School from Redis Cache
+        School school = new School();
+        school.setSchoolId(UUID.randomUUID().toString());
+        school.setMinCode(minCode);
+        school.setSchoolName(schoolName);
+        school.setSchoolCategoryCode(schoolCategoryCode);
+        Mockito.when(commonService.getSchoolIdFromRedisCache(any())).thenReturn(UUID.fromString(school.getSchoolId()));
+        Mockito.when(commonService.getSchoolIdStrFromRedisCache(any())).thenReturn(school.getSchoolId());
+        Mockito.when(commonService.getSchoolForClobDataByMinCodeFromRedisCache(any())).thenReturn(school);
+        Mockito.when(commonService.getSchoolsForClobDataFromRedisCache()).thenReturn(List.of(school));
     }
 
     void mockCommonSchools() {
+        String mincode = "1234567";
+        String schoolCategoryCode = "02";
         CommonSchool commonSchool = new CommonSchool();
-        commonSchool.setSchlNo("1234567");
+        commonSchool.setSchlNo(mincode);
         commonSchool.setSchoolName("Test School");
-        commonSchool.setSchoolCategoryCode("02");
+        commonSchool.setSchoolCategoryCode(schoolCategoryCode);
 
         Mockito.when(this.commonSchoolCache.getAllCommonSchools()).thenReturn(List.of(commonSchool));
 
@@ -528,5 +526,15 @@ class SchoolServiceTest {
         Mockito.when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
         Mockito.when(this.responseMock.bodyToMono(new ParameterizedTypeReference<List<CommonSchool>>() {
         })).thenReturn(Mono.just(List.of(commonSchool)));
+
+        // Institute School from Redis Cache
+        School school = new School();
+        school.setSchoolId(UUID.randomUUID().toString());
+        school.setMinCode(mincode);
+        school.setSchoolCategoryCode(schoolCategoryCode);
+        Mockito.when(commonService.getSchoolIdFromRedisCache(any())).thenReturn(UUID.fromString(school.getSchoolId()));
+        Mockito.when(commonService.getSchoolIdStrFromRedisCache(any())).thenReturn(school.getSchoolId());
+        Mockito.when(commonService.getSchoolForClobDataByMinCodeFromRedisCache(any())).thenReturn(school);
+        Mockito.when(commonService.getSchoolsForClobDataFromRedisCache()).thenReturn(List.of(school));
     }
 }

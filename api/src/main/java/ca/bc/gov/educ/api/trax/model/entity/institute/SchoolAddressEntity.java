@@ -17,7 +17,6 @@ public class SchoolAddressEntity {
     private String schoolAddressId;
     @Indexed
     private String schoolId;
-    @Indexed
     private String addressTypeCode;
     private String addressLine1;
     private String addressLine2;

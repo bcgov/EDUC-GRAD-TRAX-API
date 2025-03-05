@@ -27,14 +27,14 @@ import static ca.bc.gov.educ.api.trax.constant.EventStatus.DB_COMMITTED;
 public class TestUtils {
     public static GradStatusEventPayloadDTO createGraduationStatus(boolean isGraduated) {
         GradStatusEventPayloadDTO graduationStatus = new GradStatusEventPayloadDTO();
-        graduationStatus.setPen("123456789 ");
+        graduationStatus.setPen("123456789");
         graduationStatus.setProgram("2018-EN");
         graduationStatus.setStudentStatus("CUR");
         graduationStatus.setStudentGrade("12");
-        graduationStatus.setSchoolOfRecord("111222333");
+        graduationStatus.setSchoolOfRecordId(UUID.randomUUID());
         graduationStatus.setStudentGrade("12");
         if (isGraduated) {
-            graduationStatus.setSchoolAtGrad("111222333");
+            graduationStatus.setSchoolAtGradId(UUID.randomUUID());
             graduationStatus.setProgramCompletionDate("2022-06-30");
         }
         return graduationStatus;
@@ -167,7 +167,7 @@ public class TestUtils {
 
     public static TraxStudentEntity createTraxStudent(boolean isGraduated) {
         TraxStudentEntity entity = TraxStudentEntity.builder()
-                .studNo("123456789 ")
+                .studNo("123456789")
                 .gradReqtYear("2018")
                 .studGrade("12")
                 .mincode("111222333")

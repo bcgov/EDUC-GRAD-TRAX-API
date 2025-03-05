@@ -161,6 +161,8 @@ public class InstituteDistrictServiceTest {
 				.thenReturn(districtEntities);
 		when(districtTransformerMock.transformToDTO(districtEntities))
 				.thenReturn(districts);
+		when(districtService.getDistrictByIdFromInstituteApi(district.getDistrictId()))
+				.thenReturn(district);
 
 		List<District> result = districtService.getDistrictsFromInstituteApi();
 		assertEquals(districts, result);
@@ -307,7 +309,7 @@ public class InstituteDistrictServiceTest {
 		districtEntity.setContacts(Arrays.asList(new DistrictContactEntity(), new DistrictContactEntity()));
 
 		when(this.districtRedisRepository.findByDistrictNumber(distNo))
-				.thenReturn(districtEntity);
+				.thenReturn(Optional.of(districtEntity));
 		when(this.districtTransformerMock.transformToDTO(districtEntity))
 				.thenReturn(district);
 		assertEquals(district, districtService.getDistrictByDistNoFromRedisCache(distNo));
@@ -331,24 +333,13 @@ public class InstituteDistrictServiceTest {
 
 		when(this.districtRedisRepository.findById("ID"))
 				.thenReturn(Optional.of(districtEntity));
-		when(this.districtTransformerMock.transformToDTO(Optional.of(districtEntity)))
+		when(this.districtTransformerMock.transformToDTO(districtEntity))
 				.thenReturn(district);
 		assertEquals(district, districtService.getDistrictByIdFromRedisCache("ID"));
 	}
 
 	@Test
 	public void whenInitializeDistrictCache_WithReadyAndTrue_ThenForceLoad() {
-
-		District d = new District();
-		List<District> ds = new ArrayList<District>();
-		d.setDistrictId("123");
-		d.setDistrictNumber("456");
-		ds.add(d);
-		d = new District();
-		d.setDistrictId("789");
-		d.setDistrictNumber("012");
-		ds.add(d);
-
 		when(jedisClusterMock.get(CacheKey.DISTRICT_CACHE.name()))
 				.thenReturn(String.valueOf(CacheStatus.READY));
 		when(jedisClusterMock.set(CacheKey.DISTRICT_CACHE.name(), CacheStatus.READY.name()))
@@ -399,7 +390,7 @@ public class InstituteDistrictServiceTest {
 		schoolDetail.setSchoolId("ID");
 		schoolDetail.setDistrictId("DistID");
 		schoolDetail.setSchoolNumber("12345");
-		schoolDetail.setSchoolCategoryCode("SCC");
+		schoolDetail.setSchoolCategoryCode(schoolCategoryCode);
 		schoolDetail.setEmail("abc@xyz.ca");
 		schoolDetails.add(schoolDetail);
 
@@ -407,7 +398,7 @@ public class InstituteDistrictServiceTest {
 		schoolDetail.setSchoolId("ID");
 		schoolDetail.setDistrictId("DistID");
 		schoolDetail.setSchoolNumber("12345");
-		schoolDetail.setSchoolCategoryCode("SCC");
+		schoolDetail.setSchoolCategoryCode(schoolCategoryCode);
 		schoolDetail.setEmail("abc@xyz.ca");
 		schoolDetails.add(schoolDetail);
 
@@ -416,7 +407,7 @@ public class InstituteDistrictServiceTest {
 		schoolDetailEntity.setSchoolId("ID");
 		schoolDetailEntity.setDistrictId("DistID");
 		schoolDetailEntity.setSchoolNumber("12345");
-		schoolDetailEntity.setSchoolCategoryCode("SCC");
+		schoolDetailEntity.setSchoolCategoryCode(schoolCategoryCode);
 		schoolDetailEntity.setEmail("abc@xyz.ca");
 		schoolDetailEntities.add(schoolDetailEntity);
 
@@ -424,7 +415,7 @@ public class InstituteDistrictServiceTest {
 		schoolDetailEntity.setSchoolId("ID");
 		schoolDetailEntity.setDistrictId("DistID");
 		schoolDetailEntity.setSchoolNumber("12345");
-		schoolDetailEntity.setSchoolCategoryCode("SCC");
+		schoolDetailEntity.setSchoolCategoryCode(schoolCategoryCode);
 		schoolDetailEntity.setEmail("abc@xyz.ca");
 		schoolDetailEntities.add(schoolDetailEntity);
 
@@ -433,7 +424,9 @@ public class InstituteDistrictServiceTest {
 				.thenReturn(schoolDetailEntities);
 		when(this.schoolDetailTransformer.transformToDTO(schoolDetailEntities))
 				.thenReturn(schoolDetails);
-		when(this.districtService.getDistrictByIdFromRedisCache("ID"))
+		when(this.districtRedisRepository.findById("DistID"))
+				.thenReturn(Optional.of(districtEntity));
+		when(this.districtService.getDistrictByIdFromRedisCache("DistID"))
 				.thenReturn(district);
 		when(this.districtTransformerMock.transformToDTO(districtEntities))
 				.thenReturn(districts);

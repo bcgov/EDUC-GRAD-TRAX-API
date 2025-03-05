@@ -8,13 +8,14 @@ import ca.bc.gov.educ.api.trax.repository.DistrictRepository;
 import ca.bc.gov.educ.api.trax.repository.SchoolRepository;
 import ca.bc.gov.educ.api.trax.repository.TraxSchoolSearchCriteria;
 import ca.bc.gov.educ.api.trax.repository.TraxSchoolSearchSpecification;
+import ca.bc.gov.educ.api.trax.service.institute.CommonService;
 import ca.bc.gov.educ.api.trax.util.CommonSchoolCache;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,22 +23,24 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class SchoolService {
 
     private SchoolRepository schoolRepository;
     private SchoolTransformer schoolTransformer;
     private DistrictRepository districtRepository;
     private DistrictTransformer districtTransformer;
-	private CodeService codeService;
+	private CommonService commonService;
 	private CommonSchoolCache commonSchoolCache;
 
 	@Autowired
-	public SchoolService(SchoolRepository schoolRepository, SchoolTransformer schoolTransformer, DistrictRepository districtRepository, DistrictTransformer districtTransformer, CodeService codeService, CommonSchoolCache commonSchoolCache) {
+	public SchoolService(SchoolRepository schoolRepository, SchoolTransformer schoolTransformer, DistrictRepository districtRepository, DistrictTransformer districtTransformer,
+						 CommonSchoolCache commonSchoolCache, CommonService commonService) {
 		this.schoolRepository = schoolRepository;
 		this.schoolTransformer = schoolTransformer;
 		this.districtRepository = districtRepository;
 		this.districtTransformer = districtTransformer;
-		this.codeService = codeService;
+		this.commonService = commonService;
 		this.commonSchoolCache = commonSchoolCache;
 	}
 
@@ -54,24 +57,16 @@ public class SchoolService {
     		if (dist != null) {
 				sL.setDistrictName(dist.getDistrictName());
 			}
-			if(StringUtils.isNotBlank(sL.getCountryCode())) {
-				GradCountry country = codeService.getSpecificCountryCode(sL.getCountryCode());
-				if(country != null) {
-					sL.setCountryName(country.getCountryName());
-				}
-			}
-			if(StringUtils.isNotBlank(sL.getProvCode())) {
-				GradProvince province = codeService.getSpecificProvinceCode(sL.getProvCode());
-				if(province != null) {
-					sL.setProvinceName(province.getProvName());
-				}
+			sL.setSchoolId(commonService.getSchoolIdStrFromRedisCache(sL.getMinCode())); // Dev
+			if (sL.getSchoolId() == null) {
+				log.debug("Mincode [{}] failed to get School from RedisCache!", sL.getMinCode());
 			}
     	});
         return schoolList;
     }
 
 	@Transactional(readOnly = true)
-	public School getSchoolDetails(String minCode, String accessToken) {
+	public School getSchoolDetails(String minCode) {
 		Optional<SchoolEntity> entOptional = schoolRepository.findById(minCode);
 		if(entOptional.isPresent()) {
 			School school = schoolTransformer.transformToDTO(entOptional.get());
@@ -152,8 +147,9 @@ public class SchoolService {
 	private School adaptSchool(CommonSchool commonSchool) {
 		School school = new School();
 		school.setMinCode(commonSchool.getDistNo()+commonSchool.getSchlNo());
+		school.setSchoolId(commonService.getSchoolIdStrFromRedisCache(school.getMinCode()));
 		school.setSchoolName(commonSchool.getSchoolName());
-		school.setSchoolCategory(commonSchool.getSchoolCategoryCode());
+		school.setSchoolCategoryCode(commonSchool.getSchoolCategoryCode());
 		return school;
 	}
 
@@ -170,20 +166,9 @@ public class SchoolService {
 			return;
 		}
     	if(school != null) {
-    		school.setSchoolCategory(commonSchool.getSchoolCategoryCode());
-
-    		if(StringUtils.isNotBlank(school.getCountryCode())) {
-				GradCountry country = codeService.getSpecificCountryCode(school.getCountryCode());
-				if(country != null) {
-					school.setCountryName(country.getCountryName());
-				}
-			}
-			if(StringUtils.isNotBlank(school.getProvCode())) {
-				GradProvince province = codeService.getSpecificProvinceCode(school.getProvCode());
-				if(province != null) {
-					school.setProvinceName(province.getProvName());
-				}
-			}
+    		school.setSchoolCategoryCode(commonSchool.getSchoolCategoryCode());
+			school.setSchoolId(commonService.getSchoolIdStrFromRedisCache(school.getMinCode()));
 		}
 	}
+
 }

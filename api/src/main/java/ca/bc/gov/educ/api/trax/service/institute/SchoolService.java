@@ -12,18 +12,21 @@ import ca.bc.gov.educ.api.trax.repository.redis.SchoolDetailRedisRepository;
 import ca.bc.gov.educ.api.trax.repository.redis.SchoolRedisRepository;
 import ca.bc.gov.educ.api.trax.service.RESTService;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
+import com.google.common.base.Strings;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
-@Service("InstituteSchoolService")
+@RequiredArgsConstructor
+@Service("instituteSchoolService")
 public class SchoolService {
 
 	@Autowired
@@ -55,7 +58,7 @@ public class SchoolService {
 		} catch (Exception e) {
 			log.error(String.format("Error getting data from Institute api: %s", e.getMessage()));
 		}
-		return null;
+		return Collections.emptyList();
 	}
 
 	public void loadSchoolsIntoRedisCache(List<ca.bc.gov.educ.api.trax.model.dto.institute.School> schools) {
@@ -69,14 +72,14 @@ public class SchoolService {
 		return  schoolTransformer.transformToDTO(schoolRedisRepository.findAll());
 	}
 
-	public School getSchoolByMincodeFromRedisCache(String mincode) {
-		log.debug("Get School by Mincode from Redis Cache");
-		return schoolTransformer.transformToDTO(schoolRedisRepository.findByMincode(mincode));
+	public School getSchoolByMinCodeFromRedisCache(String minCode) {
+		log.debug("Get School by Mincode from Redis Cache: {}", minCode);
+		return schoolRedisRepository.findByMincode(minCode).map(schoolTransformer::transformToDTO).orElse(null);
 	}
 
 	public boolean checkIfSchoolExists(String minCode) {
-		SchoolEntity schoolEntity = schoolRedisRepository.findByMincode(minCode);
-		return schoolEntity != null;
+		Optional<SchoolEntity> schoolOptional = schoolRedisRepository.findByMincode(minCode);
+		return schoolOptional.isPresent();
 	}
 
 	public void initializeSchoolCache(boolean force) {
@@ -120,17 +123,23 @@ public class SchoolService {
 
 	public SchoolDetail getSchoolDetailByMincodeFromRedisCache(String mincode) {
 		log.debug("**** Getting school Details By Mincode from Redis Cache.");
-		return schoolDetailTransformer.transformToDTO(schoolDetailRedisRepository.findByMincode(mincode));
+		return schoolDetailRedisRepository.findByMincode(mincode).map(schoolDetailTransformer::transformToDTO).orElse(null);
 	}
 
-	public void initializeSchoolDetailCache(boolean force) {
-		serviceHelper.initializeCache(force, CacheKey.SCHOOL_DETAIL_CACHE, this);
+	public SchoolDetail getSchoolDetailBySchoolIdFromRedisCache(UUID schoolId) {
+		log.debug("**** Getting school Details By SchoolId from Redis Cache.");
+		return schoolDetailRedisRepository.findById(String.valueOf(schoolId)).map(schoolDetailTransformer::transformToDTO).orElse(null);
 	}
 
 	public List<SchoolDetail> getSchoolDetailsBySchoolCategoryCode(String schoolCategoryCode) {
 
 		return schoolDetailTransformer.transformToDTO(
 				schoolDetailRedisRepository.findBySchoolCategoryCode(schoolCategoryCode));
+	}
+
+	public List<SchoolDetail> getSchoolDetailsByDistrictFromRedisCache(String districtId) {
+		return schoolDetailTransformer.transformToDTO(
+				schoolDetailRedisRepository.findByDistrictId(districtId));
 	}
 
 	/**
@@ -165,5 +174,62 @@ public class SchoolService {
 		for (String schoolId : schoolIds) {
 			updateSchoolCache(schoolId);
 		}
+	}
+
+	public Optional<School> getSchoolBySchoolId(UUID schoolId) {
+		return schoolRedisRepository.findById(String.valueOf(schoolId)).map(schoolTransformer::transformToDTO);
+	}
+
+	/**
+	 * Get a list of schools that match the given params with wildcards
+	 * @param districtId
+	 * @param mincode
+	 * @param displayName
+	 * @param distNo
+	 * @return
+	 */
+	@Transactional(readOnly = true)
+	public List<School> getSchoolsByParams(String districtId, String mincode, String displayName, String distNo, List<String> schoolCategoryCodes) {
+
+		SchoolSearchCriteria criteria = SchoolSearchCriteria.builder()
+				.districtId(transformToWildcard(districtId))
+				.mincode(transformToWildcard(mincode))
+				.displayName(transformToWildcard(displayName))
+				.distNo(transformToWildcard(distNo))
+				.schoolCategoryCodes(schoolCategoryCodes)
+				.build();
+
+		log.debug(criteria.toString());
+		List<SchoolEntity> schools = filterByCriteria(criteria, schoolRedisRepository.findAll());
+		return schoolTransformer.transformToDTO(schools);
+	}
+
+	/**
+	 * Filter a list of SchoolEntities by given criteria
+	 * @param criteria
+	 * @param schoolEntities
+	 * @return
+	 */
+	private List<SchoolEntity> filterByCriteria(SchoolSearchCriteria criteria, Iterable<SchoolEntity> schoolEntities) {
+		List<SchoolEntity> schools = new ArrayList<>();
+		for (SchoolEntity school : schoolEntities) {
+			if (school.getDistrictId().matches(criteria.getDistrictId())
+					&& school.getMincode().matches(criteria.getMincode())
+					&& school.getDisplayName().matches(criteria.getDisplayName())
+					&& school.getMincode().substring(0, 3).matches(criteria.getDistNo())
+					&& (criteria.getSchoolCategoryCodes() == null || criteria.getSchoolCategoryCodes().isEmpty() || criteria.getSchoolCategoryCodes().contains(school.getSchoolCategoryCode()))
+			)
+				schools.add(school);
+		}
+		return schools;
+	}
+
+	/**
+	 * Transform '*' wildcard into Regex format
+	 * @param value
+	 * @return
+	 */
+	private String transformToWildcard(String value) {
+		return Strings.isNullOrEmpty(value) ? "(.*)" : "*".concat(value).concat("*").replaceAll("\\*", "(.*)");
 	}
 }

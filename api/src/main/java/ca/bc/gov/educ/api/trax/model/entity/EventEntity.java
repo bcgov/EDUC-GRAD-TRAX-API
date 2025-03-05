@@ -20,7 +20,9 @@ import java.util.UUID;
 @Builder
 @Entity
 @Table(name = "REPLICATION_EVENT")
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper = false)
 @DynamicUpdate
 public class EventEntity {
   /**

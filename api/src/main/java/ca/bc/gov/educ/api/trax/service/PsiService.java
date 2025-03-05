@@ -1,8 +1,6 @@
 package ca.bc.gov.educ.api.trax.service;
 
 
-import ca.bc.gov.educ.api.trax.model.dto.GradCountry;
-import ca.bc.gov.educ.api.trax.model.dto.GradProvince;
 import ca.bc.gov.educ.api.trax.model.dto.Psi;
 import ca.bc.gov.educ.api.trax.model.dto.StudentPsi;
 import ca.bc.gov.educ.api.trax.model.entity.PsiEntity;
@@ -35,8 +33,6 @@ public class PsiService {
     @Autowired
     private StudentPsiRepository studentPsiRepository;
     
-    @Autowired
-    CodeService codeService;
 
     @SuppressWarnings("unused")
 	private static Logger logger = LoggerFactory.getLogger(PsiService.class);
@@ -52,18 +48,6 @@ public class PsiService {
 		Optional<PsiEntity> entOptional = psiRepository.findById(psiCode);
 		if(entOptional.isPresent()) {
             Psi psi = psiTransformer.transformToDTO(entOptional.get());
-			if(StringUtils.isNotBlank(psi.getCountryCode())) {
-			    GradCountry country = codeService.getSpecificCountryCode(psi.getCountryCode());
-		        if(country != null) {
-		        	psi.setCountryName(country.getCountryName());
-				}
-			}
-			if(StringUtils.isNotBlank(psi.getProvinceCode())) {
-                GradProvince province = codeService.getSpecificProvinceCode(psi.getProvinceCode());
-		        if(province != null) {
-		        	psi.setProvinceName(province.getProvName());
-				}
-			}
             return psi;
 		}
 		return null;

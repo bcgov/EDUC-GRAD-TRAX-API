@@ -47,26 +47,25 @@ public class EducGradTraxApiConstants {
     public static final String GRAD_TSW_URL_MAPPING_V2 = GRAD_TRAX_API_ROOT_MAPPING_V2 + "/tsw";
     public static final String GRAD_EDW_URL_MAPPING_V1 = GRAD_TRAX_API_ROOT_MAPPING_V1 + "/edw";
     public static final String GRAD_EDW_URL_MAPPING_V2 = GRAD_TRAX_API_ROOT_MAPPING_V2 + "/edw";
-
+    public static final String GRAD_SCHOOL_CLOB_URL_MAPPING_V2 = GRAD_TRAX_API_ROOT_MAPPING_V2  + "/school-clob";
+    public static final String GRAD_SCHOOLS_BY_DISTRICT_URL_MAPPING_V2 = GRAD_TRAX_API_ROOT_MAPPING_V2  + "/schools-by-district";
 
     // Service Methods Mappings
-    public static final String GET_ALL_COUNTRY_MAPPING = "/country";
-    public static final String GET_ALL_COUNTRY_BY_CODE_MAPPING = "/country/{countryCode}";
-
-    public static final String GET_ALL_PROVINCE_MAPPING = "/province";
-    public static final String GET_ALL_PROVINCE_BY_CODE_MAPPING = "/province/{provinceCode}";
 
     public static final String CHECK_SCHOOL_BY_CODE_MAPPING = "/check/{minCode}";
     public static final String GET_SCHOOL_BY_CODE_MAPPING = "/{minCode}";
+    public static final String GET_SCHOOL_BY_SCHOOL_ID = "/{schoolId}";
 
     public static final String GET_COMMON_SCHOOL_BY_CODE_MAPPING = GET_COMMON_SCHOOLS + GET_SCHOOL_BY_CODE_MAPPING;
     public static final String GET_SCHOOL_SEARCH_MAPPING = "/search";
+    public static final String GET_SCHOOL_DETAIL_SEARCH_MAPPING = "/search";
 
     public static final String GET_PSI_BY_CODE_MAPPING = "/{psiCode}";
     public static final String GET_PSI_SEARCH_MAPPING="/search";
 
     public static final String GET_STUDENT_PSI_BY_CODE_MAPPING = "/student";
 
+    public static final String GET_DISTRICT_BY_ID_MAPPING = "/{districtId}";
     public static final String GET_DISTRICT_BY_DISTNO_MAPPING = "/{distNo}";
     public static final String GET_DISTRICTS_BY_SCHOOL_CATEGORY_MAPPING = "/schoolCategories";
     public static final String GET_SCHOOLS_BY_SCHOOL_CATEGORY_MAPPING = "/schoolCategories";
@@ -86,6 +85,13 @@ public class EducGradTraxApiConstants {
     public static final String GET_COURSE_REQUIREMENT_LIST_MAPPING = "/course-requirements";
     public static final String POST_SAVE_TRAX_STUDENT_NO_MAPPING = "/trax-student-no";
     public static final String DELETE_TRAX_STUDENT_NO_MAPPING = "/trax-student-no/{pen}";
+
+    //cache endpoints
+    public static final String PUT_SCHOOL_CATEGORY_CODES_MAPPING = "/cache/school-category-codes";
+    public static final String PUT_SCHOOL_FUNDING_GROUP_CODES_MAPPING = "/cache/school-funding-group-codes";
+    public static final String PUT_DISTRICTS_MAPPING = "/cache/districts";
+    public static final String PUT_SCHOOLS_MAPPING = "/cache/schools";
+    public static final String PUT_SCHOOL_DETAILS_MAPPING = "/cache/school-details";
 
     // Event urls
     public static final String EVENT_HISTORY_MAPPING_V1 = GRAD_TRAX_API_ROOT_MAPPING_V1 + "/event/history";

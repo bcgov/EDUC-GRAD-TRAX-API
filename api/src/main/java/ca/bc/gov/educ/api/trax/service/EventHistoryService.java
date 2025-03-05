@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.trax.service;
 
+import ca.bc.gov.educ.api.trax.constant.EventType;
 import ca.bc.gov.educ.api.trax.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.trax.exception.InvalidParameterException;
 import ca.bc.gov.educ.api.trax.exception.ServiceException;
@@ -32,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -87,15 +89,16 @@ public class EventHistoryService {
         Specification<EventHistoryEntity> eventHistoryEntitySpecification = null;
         try {
             RequestUtil.getSortCriteria(sortCriteriaJson, objectMapper, sorts);
+            int i = 0;
             if (StringUtils.isNotBlank(searchCriteriaListJson)) {
                 List<Search> searches = objectMapper.readValue(searchCriteriaListJson, new TypeReference<>() {
                 });
-                int i = 0;
                 for (var search : searches) {
                     eventHistoryEntitySpecification = getSpecifications(eventHistoryEntitySpecification, i, search);
                     i++;
                 }
             }
+            eventHistoryEntitySpecification = getSpecifications(eventHistoryEntitySpecification, i, getDefaultSearchCriteria());
         } catch (JsonProcessingException e) {
             throw new TraxAPIRuntimeException(e.getMessage());
         }
@@ -121,6 +124,17 @@ public class EventHistoryService {
             }
         }
         return eventHistoryEntitySpecification;
+    }
+
+    private Search getDefaultSearchCriteria() {
+        List<String> ignorableEvents = List.of(EventType.CREATE_SCHOOL_CONTACT.name(), EventType.UPDATE_SCHOOL_CONTACT.name(), EventType.DELETE_SCHOOL_CONTACT.name(), EventType.CREATE_DISTRICT_CONTACT.name(), EventType.UPDATE_DISTRICT_CONTACT.name(), EventType.DELETE_DISTRICT_CONTACT.name());
+        SearchCriteria searchCriteria = new SearchCriteria();
+        searchCriteria.setCondition(Condition.AND);
+        searchCriteria.setValueType(ValueType.STRING);
+        searchCriteria.setOperation(FilterOperation.NOT_IN);
+        searchCriteria.setValue(String.join(",", ignorableEvents));
+        searchCriteria.setKey("event.eventType");
+        return Search.builder().searchCriteriaList(new ArrayList<>(List.of(searchCriteria))).condition(Condition.AND).build();
     }
 
     private Specification<EventHistoryEntity> getSpecificationPerGroup(Specification<EventHistoryEntity> eventHistoryEntitySpecification, int i, SearchCriteria criteria, Specification<EventHistoryEntity> typeSpecification) {
@@ -162,7 +176,6 @@ public class EventHistoryService {
         }
         return schoolEntitySpecification;
     }
-
 
     @Transactional(propagation = Propagation.SUPPORTS)
     public CompletableFuture<Page<EventHistoryEntity>> findAll(Specification<EventHistoryEntity> eventHistorySpecs, final Integer pageNumber, final Integer pageSize, final List<Sort.Order> sorts) {

@@ -36,9 +36,7 @@ public class SchoolDetailEntity {
     private String facilityTypeCode;
     private String openedDate;
     private String closedDate;
-    @Indexed
     private boolean canIssueTranscripts;
-    @Indexed
     private boolean canIssueCertificates;
     private String createUser;
     private String updateUser;

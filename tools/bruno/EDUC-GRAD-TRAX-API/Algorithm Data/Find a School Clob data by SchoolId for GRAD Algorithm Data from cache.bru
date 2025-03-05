@@ -1,0 +1,15 @@
+meta {
+  name: Find a School Clob data by SchoolId for GRAD Algorithm Data from cache
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/v2/trax/school-clob/:schoolId
+  body: none
+  auth: none
+}
+
+params:path {
+  schoolId: 
+}
