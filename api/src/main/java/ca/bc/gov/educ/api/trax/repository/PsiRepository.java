@@ -11,8 +11,8 @@ import java.util.List;
 @Repository
 public interface PsiRepository extends JpaRepository<PsiEntity, String>, JpaSpecificationExecutor<PsiEntity> {
 
-    @Query(value="SELECT si.* FROM TAB_POSTSEC si where "
-			+ "(:psiName is null or si.PSI_NAME like %:psiName%) and ROWNUM <= 50",nativeQuery = true)	
+    @Query(value="SELECT si.* FROM ISD_PSI_REGISTRY si where "
+			+ "(:psiName is null or si.PSI_NAME like %:psiName%) and ROWNUM <= 50",nativeQuery = true)
 	List<PsiEntity> searchForPSI(String psiName);
 
 }

@@ -11,7 +11,7 @@ import jakarta.persistence.Table;
 @Data
 @Immutable
 @Entity
-@Table(name = "TAB_POSTSEC")
+@Table(name = "ISD_PSI_REGISTRY")
 public class PsiEntity {
    
 	@Id
@@ -67,5 +67,5 @@ public class PsiEntity {
     private String psiUrl; 
     
     @Column(name = "PSI_GROUPING", nullable = true)
-    private String psiGrouping; 
+    private String psiGrouping;
 }
