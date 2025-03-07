@@ -49,7 +49,7 @@ public class RESTService {
             obj = webClient
                     .get()
                     .uri(url)
-                    .headers(h -> { h.setBearerAuth(accessToken); h.set(EducGradTraxApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()); })
+                    .headers(h -> h.setBearerAuth(accessToken))
                     .retrieve()
                     // if 5xx errors, throw Service error
                     .onStatus(HttpStatusCode::is5xxServerError,
@@ -78,7 +78,6 @@ public class RESTService {
             obj = webClient
                     .get()
                     .uri(url)
-                    .headers(h -> { h.set(EducGradTraxApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()); })
                     .retrieve()
                     // if 5xx errors, throw Service error
                     .onStatus(HttpStatusCode::is5xxServerError,
@@ -116,7 +115,7 @@ public class RESTService {
         try {
             obj = webClient.post()
                     .uri(url)
-                    .headers(h -> { h.setBearerAuth(accessToken); h.set(EducGradTraxApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()); })
+                    .headers(h -> h.setBearerAuth(accessToken))
                     .body(BodyInserters.fromValue(body))
                     .retrieve()
                     .onStatus(HttpStatusCode::is5xxServerError,
@@ -141,7 +140,6 @@ public class RESTService {
         try {
             obj = webClient.post()
                     .uri(url)
-                    .headers(h -> { h.set(EducGradTraxApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()); })
                     .body(BodyInserters.fromValue(body))
                     .retrieve()
                     .onStatus(HttpStatusCode::is5xxServerError,
