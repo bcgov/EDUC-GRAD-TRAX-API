@@ -2,10 +2,14 @@ package ca.bc.gov.educ.api.trax.service.institute;
 
 import ca.bc.gov.educ.api.trax.constant.CacheKey;
 import ca.bc.gov.educ.api.trax.constant.CacheStatus;
+import ca.bc.gov.educ.api.trax.model.dto.institute.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import redis.clients.jedis.JedisCluster;
+
+import java.util.List;
 
 @Slf4j
 @Component
@@ -33,41 +37,39 @@ public class ServiceHelper<T> {
     }
 
     private void loadCache(CacheKey cacheKey, T service) {
-        jedisCluster.set(cacheKey.name(), CacheStatus.LOADING.name());
         loadDataIntoRedisCache(cacheKey, service);
-        jedisCluster.set(cacheKey.name(), CacheStatus.READY.name());
-        log.info(String.format("Success! - %s is now READY", cacheKey));
     }
 
     private void loadDataIntoRedisCache(CacheKey cacheKey, T service) {
         try {
             switch (cacheKey) {
                 case SCHOOL_CATEGORY_CODE_CACHE -> {
-                    ((CodeService)service).loadSchoolCategoryCodesIntoRedisCache(
-                            ((CodeService)service).getSchoolCategoryCodesFromInstituteApi()
-                    );
-                    break;
+                    List<SchoolCategoryCode> schoolCategoryCodes = ((CodeService)service).getSchoolCategoryCodesFromInstituteApi();
+                    if(!CollectionUtils.isEmpty(schoolCategoryCodes)) {
+                        ((CodeService)service).loadSchoolCategoryCodesIntoRedisCache(schoolCategoryCodes);
+                    }
                 }
                 case SCHOOL_FUNDING_GROUP_CODE_CACHE -> {
-                    ((CodeService)service).loadSchoolFundingGroupCodesIntoRedisCache(
-                            ((CodeService)service).getSchoolFundingGroupCodesFromInstituteApi()
-                    );
-                    break;
+                    List<SchoolFundingGroupCode> schoolFundingGroupCodes = ((CodeService)service).getSchoolFundingGroupCodesFromInstituteApi();
+                    if(!CollectionUtils.isEmpty(schoolFundingGroupCodes)) {
+                        ((CodeService)service).loadSchoolFundingGroupCodesIntoRedisCache(schoolFundingGroupCodes);
+                    }
                 }
                 case DISTRICT_CACHE -> {
-                    ((DistrictService)service).loadDistrictsIntoRedisCache(
-                            ((DistrictService)service).getDistrictsFromInstituteApi()
-                    );
-                    break;
+                    List<District> districts = ((DistrictService)service).getDistrictsFromInstituteApi();
+                    if(!CollectionUtils.isEmpty(districts)) {
+                        ((DistrictService) service).loadDistrictsIntoRedisCache(districts);
+                    }
                 }
                 case SCHOOL_CACHE -> {
-                    ((SchoolService)service).loadSchoolsIntoRedisCache(
-                            ((SchoolService)service).getSchoolsFromInstituteApi()
-                    );
-                    ((SchoolService)service).loadSchoolDetailsIntoRedisCache(
-                            ((SchoolService)service).getSchoolDetailsFromInstituteApi()
-                    );
-                    break;
+                    List<School> schools = ((SchoolService)service).getSchoolsFromInstituteApi();
+                    if(!CollectionUtils.isEmpty(schools)) {
+                        ((SchoolService) service).loadSchoolsIntoRedisCache(schools);
+                    }
+                    List<SchoolDetail> schoolDetails = ((SchoolService)service).getSchoolDetailsFromInstituteApi();
+                    if(!CollectionUtils.isEmpty(schoolDetails)) {
+                        ((SchoolService) service).loadSchoolDetailsIntoRedisCache(schoolDetails);
+                    }
                 }
                 default -> {
                     log.info(String.format("Invalid Cache Key %s", cacheKey));
