@@ -34,6 +34,10 @@ public final class LogHelper {
       if (correlationID != null) {
         httpMap.put("correlation_id", correlationID);
       }
+      val requestSource = request.getHeader(EducGradTraxApiConstants.REQUEST_SOURCE);
+      if (requestSource != null) {
+        httpMap.put("request_source", requestSource);
+      }
       httpMap.put("server_http_request_url", String.valueOf(request.getRequestURL()));
       httpMap.put("server_http_request_processing_time_ms", totalTime);
       httpMap.put("server_http_request_payload", String.valueOf(request.getAttribute("payload")));

@@ -6,6 +6,8 @@ import ca.bc.gov.educ.api.trax.model.dto.School;
 import ca.bc.gov.educ.api.trax.model.entity.DistrictEntity;
 import ca.bc.gov.educ.api.trax.model.entity.PsiEntity;
 import ca.bc.gov.educ.api.trax.model.entity.SchoolEntity;
+import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
+import ca.bc.gov.educ.api.trax.util.ThreadLocalStateUtil;
 import net.javacrumbs.shedlock.core.LockProvider;
 import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider;
 import org.modelmapper.ModelMapper;
@@ -22,8 +24,11 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.ClientRequest;
+import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 
 @Configuration
@@ -55,6 +60,7 @@ public class GradTraxConfig {
 		ServletOAuth2AuthorizedClientExchangeFilterFunction filter = new ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager);
 		filter.setDefaultClientRegistrationId("traxclient");
 		return WebClient.builder()
+				.filter(setRequestHeaders())
 				.exchangeStrategies(ExchangeStrategies
 						.builder()
 						.codecs(codecs -> codecs
@@ -105,12 +111,24 @@ public class GradTraxConfig {
 		Integer CODEC_50_MB_SIZE = 50 * 1024 * 1024;
 		HttpClient client = HttpClient.create();
 		client.warmup().block();
-		return WebClient.builder().codecs(clientCodecConfigurer -> {
+		return WebClient.builder()
+				.filter(setRequestHeaders())
+				.codecs(clientCodecConfigurer -> {
 			var codec = new Jackson2JsonDecoder();
 			codec.setMaxInMemorySize(CODEC_50_MB_SIZE);
 			clientCodecConfigurer.customCodecs().register(codec);
 			clientCodecConfigurer.customCodecs().register(new Jackson2JsonEncoder());
 		}).build();
+	}
+	private ExchangeFilterFunction setRequestHeaders() {
+		return (clientRequest, next) -> {
+			ClientRequest modifiedRequest = ClientRequest.from(clientRequest)
+					.header(EducGradTraxApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID())
+					.header(EducGradTraxApiConstants.USER_NAME, ThreadLocalStateUtil.getCurrentUser())
+					.header(EducGradTraxApiConstants.REQUEST_SOURCE, EducGradTraxApiConstants.API_NAME)
+					.build();
+			return next.exchange(modifiedRequest);
+		};
 	}
 
 	/**
