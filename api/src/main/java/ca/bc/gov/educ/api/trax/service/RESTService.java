@@ -2,8 +2,6 @@ package ca.bc.gov.educ.api.trax.service;
 
 
 import ca.bc.gov.educ.api.trax.exception.ServiceException;
-import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
-import ca.bc.gov.educ.api.trax.util.ThreadLocalStateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
