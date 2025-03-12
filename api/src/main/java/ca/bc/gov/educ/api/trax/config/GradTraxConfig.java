@@ -7,6 +7,7 @@ import ca.bc.gov.educ.api.trax.model.entity.DistrictEntity;
 import ca.bc.gov.educ.api.trax.model.entity.PsiEntity;
 import ca.bc.gov.educ.api.trax.model.entity.SchoolEntity;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
+import ca.bc.gov.educ.api.trax.util.LogHelper;
 import ca.bc.gov.educ.api.trax.util.ThreadLocalStateUtil;
 import net.javacrumbs.shedlock.core.LockProvider;
 import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider;
@@ -34,6 +35,9 @@ import reactor.netty.http.client.HttpClient;
 @Configuration
 @Profile("!test")
 public class GradTraxConfig {
+
+	LogHelper logHelper;
+	EducGradTraxApiConstants constants;
 
 	@Bean
 	public ModelMapper modelMapper() {
@@ -68,6 +72,7 @@ public class GradTraxConfig {
 								.maxInMemorySize(50 * 1024 * 1024))
 						.build())
 				.apply(filter.oauth2Configuration())
+				.filter(this.log())
 				.build();
 	}
 
@@ -117,8 +122,9 @@ public class GradTraxConfig {
 			var codec = new Jackson2JsonDecoder();
 			codec.setMaxInMemorySize(CODEC_50_MB_SIZE);
 			clientCodecConfigurer.customCodecs().register(codec);
-			clientCodecConfigurer.customCodecs().register(new Jackson2JsonEncoder());
-		}).build();
+			clientCodecConfigurer.customCodecs().register(new Jackson2JsonEncoder());})
+				.filter(this.log())
+				.build();
 	}
 	private ExchangeFilterFunction setRequestHeaders() {
 		return (clientRequest, next) -> {
@@ -129,6 +135,21 @@ public class GradTraxConfig {
 					.build();
 			return next.exchange(modifiedRequest);
 		};
+	}
+
+	private ExchangeFilterFunction log() {
+		return (clientRequest, next) -> next
+				.exchange(clientRequest)
+				.doOnNext((clientResponse -> logHelper.logClientHttpReqResponseDetails(
+						clientRequest.method(),
+						clientRequest.url().toString(),
+						clientResponse.statusCode().value(),
+						//GRAD2-1929 Refactoring/Linting replaced rawStatusCode() with statusCode() as it was deprecated.
+						// clientResponse.rawStatusCode(),
+						clientRequest.headers().get(EducGradTraxApiConstants.CORRELATION_ID),
+						clientRequest.headers().get(EducGradTraxApiConstants.REQUEST_SOURCE),
+						constants.isSplunkLogHelperEnabled())
+				));
 	}
 
 	/**
