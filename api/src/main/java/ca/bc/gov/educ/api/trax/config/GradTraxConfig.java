@@ -89,6 +89,7 @@ public class GradTraxConfig {
 								.maxInMemorySize(50 * 1024 * 1024))
 						.build())
 				.apply(filter.oauth2Configuration())
+				.filter(this.log())
 				.build();
 	}
 
@@ -144,8 +145,6 @@ public class GradTraxConfig {
 						clientRequest.method(),
 						clientRequest.url().toString(),
 						clientResponse.statusCode().value(),
-						//GRAD2-1929 Refactoring/Linting replaced rawStatusCode() with statusCode() as it was deprecated.
-						// clientResponse.rawStatusCode(),
 						clientRequest.headers().get(EducGradTraxApiConstants.CORRELATION_ID),
 						clientRequest.headers().get(EducGradTraxApiConstants.REQUEST_SOURCE),
 						constants.isSplunkLogHelperEnabled())
