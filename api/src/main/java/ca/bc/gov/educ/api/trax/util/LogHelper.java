@@ -9,12 +9,15 @@ import org.springframework.lang.NonNull;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.stereotype.Component;
+
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Slf4j
+@Component
 public final class LogHelper {
   private static final ObjectMapper mapper = new ObjectMapper();
   private static final String EXCEPTION = "Exception ";

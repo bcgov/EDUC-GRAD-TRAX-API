@@ -29,7 +29,6 @@ import org.springframework.web.reactive.function.client.ClientRequest;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 
 @Configuration
@@ -38,6 +37,12 @@ public class GradTraxConfig {
 
 	LogHelper logHelper;
 	EducGradTraxApiConstants constants;
+
+	@Autowired
+	public GradTraxConfig(LogHelper logHelper, EducGradTraxApiConstants constants) {
+		this.logHelper = logHelper;
+		this.constants = constants;
+	}
 
 	@Bean
 	public ModelMapper modelMapper() {
