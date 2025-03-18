@@ -23,27 +23,7 @@ public class SchoolDetailTransformer {
     }
 
     public SchoolEntity transformToSchoolEntity(final SchoolDetail schoolDetail) {
-        return SchoolEntity.builder()
-                .schoolId(schoolDetail.getSchoolId())
-                .districtId(schoolDetail.getDistrictId())
-                .mincode(schoolDetail.getMincode())
-                .independentAuthorityId(schoolDetail.getIndependentAuthorityId())
-                .schoolNumber(schoolDetail.getSchoolNumber())
-                .faxNumber(schoolDetail.getFaxNumber())
-                .phoneNumber(schoolDetail.getPhoneNumber())
-                .email(schoolDetail.getEmail())
-                .website(schoolDetail.getWebsite())
-                .displayName(schoolDetail.getDisplayName())
-                .displayNameNoSpecialChars(schoolDetail.getDisplayNameNoSpecialChars())
-                .schoolReportingRequirementCode(schoolDetail.getSchoolReportingRequirementCode())
-                .schoolOrganizationCode(schoolDetail.getSchoolOrganizationCode())
-                .schoolCategoryCode(schoolDetail.getSchoolCategoryCode())
-                .facilityTypeCode(schoolDetail.getFacilityTypeCode())
-                .openedDate(schoolDetail.getOpenedDate())
-                .closedDate(schoolDetail.getClosedDate())
-                .canIssueTranscripts(schoolDetail.isCanIssueTranscripts())
-                .canIssueCertificates(schoolDetail.isCanIssueCertificates())
-                .build();
+        return modelMapper.map(schoolDetail, SchoolEntity.class);
     }
 
     public SchoolDetail transformToDTO (SchoolDetailEntity schoolDetailEntity) {
