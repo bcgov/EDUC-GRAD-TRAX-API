@@ -17,14 +17,16 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.http.codec.json.Jackson2JsonDecoder;
 import org.springframework.http.codec.json.Jackson2JsonEncoder;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.security.oauth2.client.*;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction;
+import org.springframework.security.task.DelegatingSecurityContextAsyncTaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.ClientRequest;
@@ -177,10 +179,13 @@ public class GradTraxConfig {
 	 * @return the thread pool task scheduler
 	 */
 	@Bean(name = "taskExecutor")
-	public ThreadPoolTaskScheduler threadPoolTaskScheduler() {
-		final ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
-		threadPoolTaskScheduler.setPoolSize(5);
-		return threadPoolTaskScheduler;
+	public TaskExecutor threadPoolTaskScheduler() {
+		ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
+		threadPoolTaskExecutor.setThreadNamePrefix("async-");
+		threadPoolTaskExecutor.setCorePoolSize(2);
+		threadPoolTaskExecutor.setMaxPoolSize(5);
+		threadPoolTaskExecutor.initialize();
+		return new DelegatingSecurityContextAsyncTaskExecutor(threadPoolTaskExecutor);
 	}
 
 }
