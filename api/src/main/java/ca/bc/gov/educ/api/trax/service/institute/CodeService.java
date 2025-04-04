@@ -14,6 +14,7 @@ import ca.bc.gov.educ.api.trax.repository.redis.SchoolFundingGroupCodeRedisRepos
 import ca.bc.gov.educ.api.trax.service.RESTService;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -77,6 +78,7 @@ public class CodeService {
 	}
 
 	public SchoolCategoryCode getSchoolCategoryCodeFromRedisCache(String schoolCategoryCode) {
+		if(StringUtils.isBlank(schoolCategoryCode)) { return null;}
 		log.debug("**** Getting school category codes from Redis Cache for : {}.", schoolCategoryCode);
 		return schoolCategoryCodeRedisRepository.findById(schoolCategoryCode)
 				.map(schoolCategoryCodeTransformer::transformToDTO)
@@ -146,7 +148,9 @@ public class CodeService {
 	 * @param schoolCategoryCode the school detail object
 	 */
 	public void updateSchoolCategoryCode(SchoolCategoryCode schoolCategoryCode) throws ServiceException {
-		schoolCategoryCodeRedisRepository.save(schoolCategoryCodeTransformer.transformToEntity(schoolCategoryCode));
+		if (schoolCategoryCode != null) {
+			schoolCategoryCodeRedisRepository.save(schoolCategoryCodeTransformer.transformToEntity(schoolCategoryCode));
+		}
 	}
 
 }

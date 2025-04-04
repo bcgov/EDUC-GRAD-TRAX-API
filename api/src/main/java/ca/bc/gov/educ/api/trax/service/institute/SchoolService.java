@@ -13,28 +13,21 @@ import ca.bc.gov.educ.api.trax.repository.redis.SchoolRedisRepository;
 import ca.bc.gov.educ.api.trax.service.RESTService;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.model.dto.institute.PaginatedResponse;
-import ca.bc.gov.educ.api.trax.util.JsonUtil;
-import ca.bc.gov.educ.api.trax.util.ThreadLocalStateUtil;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-import org.springframework.web.util.UriBuilder;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -70,13 +63,16 @@ public class SchoolService {
 	}
 
 	public School getSchoolByMinCodeFromRedisCache(String minCode) {
+		if (StringUtils.isBlank(minCode)) { return null; }
 		log.debug("Get School by minCode from Redis Cache: {}", minCode);
 		return schoolRedisRepository.findByMincode(minCode)
 				.map(schoolTransformer::transformToDTO)
 				.orElseGet(() -> {
 				 log.debug("School not found in cache, fetched from API.");
 				 School school = getSchoolByMinCodeFromInstituteApi(minCode);
-				 updateSchoolCache(school.getSchoolId());
+				 if(school != null) {
+					 updateSchoolCache(school.getSchoolId());
+				 }
 				 return school;
 		});
 	}
@@ -117,7 +113,10 @@ public class SchoolService {
 	}
 
 	public School getSchoolByMinCodeFromInstituteApi(String minCode) {
+		if(StringUtils.isNotBlank(minCode)) {
 			return getSchoolsFromInstituteApi().stream().filter(school -> school.getMincode().equals(minCode)).findFirst().orElse(null);
+		}
+		return null;
 	}
 
 	/**
@@ -129,7 +128,8 @@ public class SchoolService {
 	}
 
 	public SchoolDetail getSchoolDetailByIdFromInstituteApi(String schoolId) {
-        try {
+		if (StringUtils.isBlank(schoolId)) { return null; }
+		try {
 			log.debug("****Before Calling Institute API for schoolId: {}", schoolId);
 			SchoolDetailEntity sde = this.restService.get(String.format(constants.getSchoolDetailsByIdFromInstituteApiUrl(), schoolId),
 					SchoolDetailEntity.class, webClient);
@@ -200,6 +200,7 @@ public class SchoolService {
 	}
 
 	public SchoolDetail getSchoolDetailByMincodeFromRedisCache(String minCode) {
+		if (StringUtils.isBlank(minCode)) { return null; }
 		log.debug("**** Getting school Details By Mincode from Redis Cache.");
 		return schoolDetailRedisRepository.findByMincode(minCode)
 				.map(schoolDetailTransformer::transformToDTO)
@@ -214,6 +215,7 @@ public class SchoolService {
 	}
 
 	public SchoolDetail getSchoolDetailBySchoolIdFromRedisCache(UUID schoolId) {
+		if (schoolId == null) { return null; }
 		log.debug("**** Getting school Details By SchoolId from Redis Cache.");
 		return schoolDetailRedisRepository.findById(String.valueOf(schoolId))
 				.map(schoolDetailTransformer::transformToDTO)
@@ -226,6 +228,7 @@ public class SchoolService {
 	}
 
 	public List<SchoolDetail> getSchoolDetailsBySchoolCategoryCode(String schoolCategoryCode) {
+		if (StringUtils.isBlank(schoolCategoryCode)) { return Collections.emptyList(); }
 		List<SchoolDetail> schoolDetails = schoolDetailTransformer.transformToDTO(schoolDetailRedisRepository.findBySchoolCategoryCode(schoolCategoryCode));
 		if(CollectionUtils.isEmpty(schoolDetails)) {
 			log.debug("School detail not found in cache for schoolCategoryCode: {}, fetched from API.", schoolCategoryCode);
@@ -235,6 +238,7 @@ public class SchoolService {
 	}
 
 	public List<SchoolDetail> getSchoolDetailsByDistrictFromRedisCache(String districtId) {
+		if (StringUtils.isBlank(districtId)) { return Collections.emptyList(); }
 		List<SchoolDetail> schoolDetails = schoolDetailTransformer.transformToDTO(schoolDetailRedisRepository.findByDistrictId(districtId));
 		if(CollectionUtils.isEmpty(schoolDetails)) {
 			log.debug("School detail not found in cache for districtId: {}, fetched from API.", districtId);
@@ -249,6 +253,7 @@ public class SchoolService {
 	 * @param schoolId the school id guid
 	 */
 	public void updateSchoolCache(String schoolId) throws ServiceException {
+		if (StringUtils.isBlank(schoolId)) { return; }
 		// get details from institute
 		log.debug("Updating school {} in cache.",  schoolId);
 		SchoolDetail schoolDetail = this.restService.get(String.format(constants.getSchoolDetailsByIdFromInstituteApiUrl(), schoolId),
@@ -262,8 +267,10 @@ public class SchoolService {
 	 * @param schoolDetail the school detail object
 	 */
 	public void updateSchoolCache(SchoolDetail schoolDetail) throws ServiceException {
-		schoolDetailRedisRepository.save(schoolDetailTransformer.transformToEntity(schoolDetail));
-		schoolRedisRepository.save(schoolDetailTransformer.transformToSchoolEntity(schoolDetail));
+		if(schoolDetail != null) {
+			schoolDetailRedisRepository.save(schoolDetailTransformer.transformToEntity(schoolDetail));
+			schoolRedisRepository.save(schoolDetailTransformer.transformToSchoolEntity(schoolDetail));
+		}
 	}
 
 	/**
@@ -278,6 +285,7 @@ public class SchoolService {
 	}
 
 	public Optional<School> getSchoolBySchoolId(UUID schoolId) {
+		if (schoolId == null) { return Optional.empty(); }
 		log.debug("**** Getting school By SchoolId from Redis Cache.");
 		return schoolRedisRepository.findById(String.valueOf(schoolId))
 				.map(schoolTransformer::transformToDTO)

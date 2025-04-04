@@ -10,6 +10,7 @@ import ca.bc.gov.educ.api.trax.repository.redis.DistrictRedisRepository;
 import ca.bc.gov.educ.api.trax.service.RESTService;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -54,7 +55,9 @@ public class DistrictService {
             District dist;
             for (District d : dList) {
                 dist = getDistrictByIdFromInstituteApi(d.getDistrictId());
-                districts.add(dist);
+                if(dist != null) {
+                    districts.add(dist);
+                }
             }
             return districts;
         } catch (WebClientResponseException e) {
@@ -66,6 +69,7 @@ public class DistrictService {
     }
 
     public District getDistrictByIdFromInstituteApi(String districtId) {
+        if(StringUtils.isBlank(districtId)) { return null;}
         try {
             return this.restService.get(String.format(constants.getGetDistrictFromInstituteApiUrl(), districtId),
                     District.class, webClient);
@@ -103,6 +107,7 @@ public class DistrictService {
     }
 
     public District getDistrictByDistNoFromRedisCache(String districtNumber) {
+        if(StringUtils.isBlank(districtNumber)) { return null;}
         log.debug("**** Getting district by district no. from Redis Cache.");
         return districtRedisRepository.findByDistrictNumber(districtNumber)
                 .map(districtTransformer::transformToDTO)
@@ -117,6 +122,7 @@ public class DistrictService {
     }
 
     public District getDistrictByIdFromRedisCache(String districtId) {
+        if(StringUtils.isBlank(districtId)) { return null;}
         log.debug("**** Getting district by ID from Redis Cache.");
         return districtRedisRepository.findById(districtId)
                 .map(districtTransformer::transformToDTO)
@@ -131,6 +137,7 @@ public class DistrictService {
     }
 
     public List<District> getDistrictsBySchoolCategoryCode(String schoolCategoryCode) {
+        if(StringUtils.isBlank(schoolCategoryCode)) { return Collections.emptyList();}
         List<SchoolDetail> schoolDetails;
 
         if (schoolCategoryCode.isBlank() || schoolCategoryCode.isEmpty())
@@ -157,8 +164,10 @@ public class DistrictService {
      * @param districtId the district id guid
      */
     public void updateDistrictCache(String districtId) throws ServiceException {
-        District district = getDistrictByIdFromInstituteApi(districtId);
-        updateDistrictCache(district);
+        if(StringUtils.isNotBlank(districtId)) {
+            District district = getDistrictByIdFromInstituteApi(districtId);
+            updateDistrictCache(district);
+        }
     }
 
     /**
