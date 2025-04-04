@@ -78,7 +78,7 @@ public class CodeService {
 	}
 
 	public SchoolCategoryCode getSchoolCategoryCodeFromRedisCache(String schoolCategoryCode) {
-		if(StringUtils.isBlank(schoolCategoryCode)) { return null;}
+		if(StringUtils.isBlank(schoolCategoryCode)) { log.info("getSchoolCategoryCodeFromRedisCache: schoolCategoryCode is null.");  return null;}
 		log.debug("**** Getting school category codes from Redis Cache for : {}.", schoolCategoryCode);
 		return schoolCategoryCodeRedisRepository.findById(schoolCategoryCode)
 				.map(schoolCategoryCodeTransformer::transformToDTO)

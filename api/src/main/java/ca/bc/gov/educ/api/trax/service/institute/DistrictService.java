@@ -69,7 +69,7 @@ public class DistrictService {
     }
 
     public District getDistrictByIdFromInstituteApi(String districtId) {
-        if(StringUtils.isBlank(districtId)) { return null;}
+        if(StringUtils.isBlank(districtId)) { log.info("getDistrictByIdFromInstituteApi: districtId is null."); return null;}
         try {
             return this.restService.get(String.format(constants.getGetDistrictFromInstituteApiUrl(), districtId),
                     District.class, webClient);
@@ -107,7 +107,7 @@ public class DistrictService {
     }
 
     public District getDistrictByDistNoFromRedisCache(String districtNumber) {
-        if(StringUtils.isBlank(districtNumber)) { return null;}
+        if(StringUtils.isBlank(districtNumber)) { log.info("getDistrictByDistNoFromRedisCache: districtNumber is null."); return null;}
         log.debug("**** Getting district by district no. from Redis Cache.");
         return districtRedisRepository.findByDistrictNumber(districtNumber)
                 .map(districtTransformer::transformToDTO)
@@ -122,7 +122,7 @@ public class DistrictService {
     }
 
     public District getDistrictByIdFromRedisCache(String districtId) {
-        if(StringUtils.isBlank(districtId)) { return null;}
+        if(StringUtils.isBlank(districtId)) { log.info("getDistrictByIdFromRedisCache: districtId is null."); return null;}
         log.debug("**** Getting district by ID from Redis Cache.");
         return districtRedisRepository.findById(districtId)
                 .map(districtTransformer::transformToDTO)
@@ -137,7 +137,7 @@ public class DistrictService {
     }
 
     public List<District> getDistrictsBySchoolCategoryCode(String schoolCategoryCode) {
-        if(StringUtils.isBlank(schoolCategoryCode)) { return Collections.emptyList();}
+        if(StringUtils.isBlank(schoolCategoryCode)) { log.info("getDistrictsBySchoolCategoryCode: schoolCategoryCode is null."); return Collections.emptyList();}
         List<SchoolDetail> schoolDetails;
 
         if (schoolCategoryCode.isBlank() || schoolCategoryCode.isEmpty())

@@ -63,7 +63,7 @@ public class SchoolService {
 	}
 
 	public School getSchoolByMinCodeFromRedisCache(String minCode) {
-		if (StringUtils.isBlank(minCode)) { return null; }
+		if (StringUtils.isBlank(minCode)) { log.info("getSchoolByMinCodeFromRedisCache: minCode is null."); return null; }
 		log.debug("Get School by minCode from Redis Cache: {}", minCode);
 		return schoolRedisRepository.findByMincode(minCode)
 				.map(schoolTransformer::transformToDTO)
@@ -115,6 +115,8 @@ public class SchoolService {
 	public School getSchoolByMinCodeFromInstituteApi(String minCode) {
 		if(StringUtils.isNotBlank(minCode)) {
 			return getSchoolsFromInstituteApi().stream().filter(school -> school.getMincode().equals(minCode)).findFirst().orElse(null);
+		} else {
+			log.warn("getSchoolByMinCodeFromInstituteApi: minCode is null.");
 		}
 		return null;
 	}
@@ -128,7 +130,7 @@ public class SchoolService {
 	}
 
 	public SchoolDetail getSchoolDetailByIdFromInstituteApi(String schoolId) {
-		if (StringUtils.isBlank(schoolId)) { return null; }
+		if (StringUtils.isBlank(schoolId)) { log.info("getSchoolDetailByIdFromInstituteApi: schoolId is null."); return null; }
 		try {
 			log.debug("****Before Calling Institute API for schoolId: {}", schoolId);
 			SchoolDetailEntity sde = this.restService.get(String.format(constants.getSchoolDetailsByIdFromInstituteApiUrl(), schoolId),
@@ -200,7 +202,7 @@ public class SchoolService {
 	}
 
 	public SchoolDetail getSchoolDetailByMincodeFromRedisCache(String minCode) {
-		if (StringUtils.isBlank(minCode)) { return null; }
+		if (StringUtils.isBlank(minCode)) { log.info("getSchoolDetailByMincodeFromRedisCache: minCode is null."); return null; }
 		log.debug("**** Getting school Details By Mincode from Redis Cache.");
 		return schoolDetailRedisRepository.findByMincode(minCode)
 				.map(schoolDetailTransformer::transformToDTO)
@@ -215,7 +217,7 @@ public class SchoolService {
 	}
 
 	public SchoolDetail getSchoolDetailBySchoolIdFromRedisCache(UUID schoolId) {
-		if (schoolId == null) { return null; }
+		if (schoolId == null) { log.info("getSchoolDetailBySchoolIdFromRedisCache: schoolId is null.");  return null; }
 		log.debug("**** Getting school Details By SchoolId from Redis Cache.");
 		return schoolDetailRedisRepository.findById(String.valueOf(schoolId))
 				.map(schoolDetailTransformer::transformToDTO)
@@ -228,7 +230,7 @@ public class SchoolService {
 	}
 
 	public List<SchoolDetail> getSchoolDetailsBySchoolCategoryCode(String schoolCategoryCode) {
-		if (StringUtils.isBlank(schoolCategoryCode)) { return Collections.emptyList(); }
+		if (StringUtils.isBlank(schoolCategoryCode)) { log.info("getSchoolDetailsBySchoolCategoryCode: schoolCategoryCode is null."); return Collections.emptyList(); }
 		List<SchoolDetail> schoolDetails = schoolDetailTransformer.transformToDTO(schoolDetailRedisRepository.findBySchoolCategoryCode(schoolCategoryCode));
 		if(CollectionUtils.isEmpty(schoolDetails)) {
 			log.debug("School detail not found in cache for schoolCategoryCode: {}, fetched from API.", schoolCategoryCode);
@@ -238,7 +240,7 @@ public class SchoolService {
 	}
 
 	public List<SchoolDetail> getSchoolDetailsByDistrictFromRedisCache(String districtId) {
-		if (StringUtils.isBlank(districtId)) { return Collections.emptyList(); }
+		if (StringUtils.isBlank(districtId)) { log.info("getSchoolDetailsByDistrictFromRedisCache: districtId is null."); return Collections.emptyList(); }
 		List<SchoolDetail> schoolDetails = schoolDetailTransformer.transformToDTO(schoolDetailRedisRepository.findByDistrictId(districtId));
 		if(CollectionUtils.isEmpty(schoolDetails)) {
 			log.debug("School detail not found in cache for districtId: {}, fetched from API.", districtId);
@@ -253,7 +255,7 @@ public class SchoolService {
 	 * @param schoolId the school id guid
 	 */
 	public void updateSchoolCache(String schoolId) throws ServiceException {
-		if (StringUtils.isBlank(schoolId)) { return; }
+		if (StringUtils.isBlank(schoolId)) { log.info("updateSchoolCache: schoolId is null."); return; }
 		// get details from institute
 		log.debug("Updating school {} in cache.",  schoolId);
 		SchoolDetail schoolDetail = this.restService.get(String.format(constants.getSchoolDetailsByIdFromInstituteApiUrl(), schoolId),
@@ -285,7 +287,7 @@ public class SchoolService {
 	}
 
 	public Optional<School> getSchoolBySchoolId(UUID schoolId) {
-		if (schoolId == null) { return Optional.empty(); }
+		if (schoolId == null) { log.info("getSchoolBySchoolId: schoolId is null."); return Optional.empty(); }
 		log.debug("**** Getting school By SchoolId from Redis Cache.");
 		return schoolRedisRepository.findById(String.valueOf(schoolId))
 				.map(schoolTransformer::transformToDTO)
