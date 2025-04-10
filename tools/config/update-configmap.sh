@@ -76,11 +76,8 @@ oc create -n "$GRAD_NAMESPACE"-"$envValue" configmap "$APP_NAME"-config-map \
   --from-literal=MAX_RETRY_ATTEMPTS="3" \
   --from-literal=SCHOOL_CACHE_EXPIRY_IN_MINS="240" \
   --from-literal=STUDENT_ADMIN_URL_ROOT="$STUDENT_ADMIN_URL_ROOT" \
-  --from-literal=CONNECTION_TIMEOUT='30000' \
   --from-literal=MAXIMUM_POOL_SIZE='15' \
-  --from-literal=MIN_IDLE='15' \
-  --from-literal=IDLE_TIMEOUT='600000' \
-  --from-literal=MAX_LIFETIME='1500000' \
+  --from-literal=MAX_LIFETIME='300000' \
   --from-literal=ENABLE_COMPRESSION="true" \
   --dry-run=client -o yaml | oc apply -f -
 
