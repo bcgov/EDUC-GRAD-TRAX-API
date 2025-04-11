@@ -1,7 +1,9 @@
 package ca.bc.gov.educ.api.trax.service.institute;
 
 import ca.bc.gov.educ.api.trax.constant.CacheKey;
+import ca.bc.gov.educ.api.trax.exception.ServiceException;
 import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolCategoryCode;
+import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolDetail;
 import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolFundingGroupCode;
 import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolCategoryCodeEntity;
 import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolFundingGroupCodeEntity;
@@ -12,12 +14,15 @@ import ca.bc.gov.educ.api.trax.repository.redis.SchoolFundingGroupCodeRedisRepos
 import ca.bc.gov.educ.api.trax.service.RESTService;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
+import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -41,10 +46,12 @@ public class CodeService {
 	ServiceHelper<CodeService> serviceHelper;
 	@Autowired
 	RESTService restService;
+	@Autowired
+	CacheService cacheService;
 
 	public List<SchoolCategoryCode> getSchoolCategoryCodesFromInstituteApi() {
 		try {
-			log.debug("****Before Calling Institute API");
+			log.debug("****Before Calling Institute API for SchoolCategoryCode");
 			List<SchoolCategoryCodeEntity> response = this.restService.get(constants.getAllSchoolCategoryCodesFromInstituteApiUrl(),
 					List.class, webClient);
 			return schoolCategoryCodeTransformer.transformToDTO(response);
@@ -53,23 +60,45 @@ public class CodeService {
 		} catch (Exception e) {
 			log.error(String.format("Error while calling school-api: %s", e.getMessage()));
 		}
-		return null;
+		return Collections.emptyList();
+	}
+
+	public List<SchoolCategoryCode> loadSchoolCategoryCodesFromInstituteApiIntoRedisCacheAsync() {
+		List<SchoolCategoryCode> schoolCategoryCodes = getSchoolCategoryCodesFromInstituteApi();
+		if(!CollectionUtils.isEmpty(schoolCategoryCodes)) {
+			cacheService.loadSchoolCategoryCodesIntoRedisCacheAsync(schoolCategoryCodeTransformer.transformToEntity(schoolCategoryCodes));
+		}
+		return schoolCategoryCodes;
 	}
 
 	public void loadSchoolCategoryCodesIntoRedisCache(List<SchoolCategoryCode> schoolCategoryCodes) {
-		schoolCategoryCodeRedisRepository
-				.saveAll(schoolCategoryCodeTransformer.transformToEntity(schoolCategoryCodes));
-		log.info(String.format("%s School Category Codes Loaded into cache.", schoolCategoryCodes.size()));
+		if(!CollectionUtils.isEmpty(schoolCategoryCodes)) {
+			cacheService.loadSchoolCategoryCodesIntoRedisCache(schoolCategoryCodeTransformer.transformToEntity(schoolCategoryCodes));
+		}
 	}
 
 	public SchoolCategoryCode getSchoolCategoryCodeFromRedisCache(String schoolCategoryCode) {
-		log.debug("**** Getting school category codes from Redis Cache.");
-		return  schoolCategoryCodeTransformer.transformToDTO(schoolCategoryCodeRedisRepository.findById(schoolCategoryCode));
+		if(StringUtils.isBlank(schoolCategoryCode)) { log.info("getSchoolCategoryCodeFromRedisCache: schoolCategoryCode is null.");  return null;}
+		log.debug("**** Getting school category codes from Redis Cache for : {}.", schoolCategoryCode);
+		return schoolCategoryCodeRedisRepository.findById(schoolCategoryCode)
+				.map(schoolCategoryCodeTransformer::transformToDTO)
+				.orElseGet(() -> {
+					SchoolCategoryCode schoolCategory = getSchoolCategoryCodesFromInstituteApi().stream()
+							.filter(schoolCategoryCode1 -> schoolCategoryCode1.getSchoolCategoryCode().equals(schoolCategoryCode))
+							.findFirst()
+							.orElse(null);
+					if(schoolCategory != null) {
+						updateSchoolCategoryCode(schoolCategory);
+					}
+					return schoolCategory;
+
+				});
 	}
 
 	public List<SchoolCategoryCode> getSchoolCategoryCodesFromRedisCache() {
 		log.debug("**** Getting school category codes from Redis Cache.");
-		return  schoolCategoryCodeTransformer.transformToDTO(schoolCategoryCodeRedisRepository.findAll());
+		List<SchoolCategoryCode> schoolCategoryCodes =  schoolCategoryCodeTransformer.transformToDTO(schoolCategoryCodeRedisRepository.findAll());
+		return CollectionUtils.isEmpty(schoolCategoryCodes) ? loadSchoolCategoryCodesFromInstituteApiIntoRedisCacheAsync() : schoolCategoryCodes;
 	}
 
 	public void initializeSchoolCategoryCodeCache(boolean force) {
@@ -78,7 +107,7 @@ public class CodeService {
 
 	public List<SchoolFundingGroupCode> getSchoolFundingGroupCodesFromInstituteApi() {
 		try {
-			log.debug("****Before Calling Institute API");
+			log.debug("****Before Calling Institute API for SchoolFundingGroupCode");
 			List<SchoolFundingGroupCodeEntity> response = this.restService.get(constants.getAllSchoolFundingGroupCodesFromInstituteApiUrl(),
 					List.class, webClient);
 			return schoolFundingGroupCodeTransformer.transformToDTO(response);
@@ -87,21 +116,41 @@ public class CodeService {
 		} catch (Exception e) {
 			log.error(String.format("Error while calling school-api: %s", e.getMessage()));
 		}
-		return null;
+		return Collections.emptyList();
+	}
+
+	public List<SchoolFundingGroupCode> loadSchoolFundingGroupCodesFromInstituteApiIntoRedisCacheAsync() {
+		List<SchoolFundingGroupCode> schoolFundingGroupCodes = getSchoolFundingGroupCodesFromInstituteApi();
+		if(!CollectionUtils.isEmpty(schoolFundingGroupCodes)) {
+			cacheService.loadSchoolFundingGroupCodesIntoRedisCacheAsync(schoolFundingGroupCodeTransformer.transformToEntity(schoolFundingGroupCodes));
+		}
+		return schoolFundingGroupCodes;
 	}
 
 	public void loadSchoolFundingGroupCodesIntoRedisCache(List<SchoolFundingGroupCode> schoolFundingGroupCodes) {
-		schoolFundingGroupCodeRedisRepository
-				.saveAll(schoolFundingGroupCodeTransformer.transformToEntity(schoolFundingGroupCodes));
-		log.info(String.format("%s School Funding Group Codes Loaded into cache.", schoolFundingGroupCodes.size()));
+		if(!CollectionUtils.isEmpty(schoolFundingGroupCodes)) {
+			cacheService.loadSchoolFundingGroupCodesIntoRedisCache(schoolFundingGroupCodeTransformer.transformToEntity(schoolFundingGroupCodes));
+		}
 	}
 
 	public List<SchoolFundingGroupCode> getSchoolFundingGroupCodesFromRedisCache() {
 		log.debug("**** Getting school funding group codes from Redis Cache.");
-		return  schoolFundingGroupCodeTransformer.transformToDTO(schoolFundingGroupCodeRedisRepository.findAll());
+		List<SchoolFundingGroupCode> schoolFundingGroupCodes =   schoolFundingGroupCodeTransformer.transformToDTO(schoolFundingGroupCodeRedisRepository.findAll());
+		return CollectionUtils.isEmpty(schoolFundingGroupCodes) ? loadSchoolFundingGroupCodesFromInstituteApiIntoRedisCacheAsync() : schoolFundingGroupCodes;
 	}
 
 	public void initializeSchoolFundingGroupCodeCache(boolean force) {
 		serviceHelper.initializeCache(force, CacheKey.SCHOOL_FUNDING_GROUP_CODE_CACHE, this);
 	}
+	
+	/**
+	 * Updates the school category code in the cache
+	 * @param schoolCategoryCode the school detail object
+	 */
+	public void updateSchoolCategoryCode(SchoolCategoryCode schoolCategoryCode) throws ServiceException {
+		if (schoolCategoryCode != null) {
+			schoolCategoryCodeRedisRepository.save(schoolCategoryCodeTransformer.transformToEntity(schoolCategoryCode));
+		}
+	}
+
 }

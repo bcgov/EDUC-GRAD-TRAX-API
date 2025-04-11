@@ -8,7 +8,6 @@ import org.springframework.data.redis.core.index.Indexed;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @RedisHash("School")
 public class SchoolEntity {
 

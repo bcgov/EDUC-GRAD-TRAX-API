@@ -21,6 +21,8 @@ public class EducGradTraxApiConstants {
 
     public static final String INSTITUTE_STREAM_NAME="INSTITUTE_EVENTS";
     public static final String CORRELATION_ID = "correlationID";
+    public static final String USER_NAME = "User-Name";
+    public static final String REQUEST_SOURCE = "Request-Source";
 
     //API end-point Mapping constants
     public static final String API_VERSION_V1 = "/api/v1";
@@ -170,11 +172,15 @@ public class EducGradTraxApiConstants {
     @Value("${endpoint.institute-api.get-all-schools.url}")
     private String allSchoolsFromInstituteApiUrl;
 
+    @Value("${endpoint.institute-api.get-schools-paginated.url}")
+    private String schoolsPaginatedFromInstituteApiUrl;
+
     @Value("${endpoint.institute-api.get-school-details-by-id.url}")
     private String schoolDetailsByIdFromInstituteApiUrl;
 
     @Value("${endpoint.institute-api.get-all-districts.url}")
     private String allDistrictsFromInstituteApiUrl;
+
     @Value("${endpoint.institute-api.get-district.url}")
     private String getDistrictFromInstituteApiUrl;
 

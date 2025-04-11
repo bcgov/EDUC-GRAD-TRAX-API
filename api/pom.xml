@@ -6,7 +6,7 @@
 
     <groupId>ca.bc.gov.educ</groupId>
     <artifactId>educ-grad-trax-api</artifactId>
-    <version>1.8.62</version>
+    <version>1.8.63</version>
     <name>educ-grad-trax-api</name>
     <description>Ministry of Education GRAD TRAX API</description>
 
@@ -35,6 +35,9 @@
             src/main/java/ca/bc/gov/educ/api/trax/repository/**,
             src/main/java/ca/bc/gov/educ/api/trax/filter/**
         </sonar.junit.exclusions>
+        <sonar.coverage.exclusions>
+            src/main/java/ca/bc/gov/educ/api/trax/controller/APIMetadataController.java
+        </sonar.coverage.exclusions>
         <java.version>18</java.version>
         <maven.compiler.version>3.10.1</maven.compiler.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
