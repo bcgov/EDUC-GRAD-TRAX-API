@@ -11,6 +11,7 @@ import ca.bc.gov.educ.api.trax.util.EducGradTraxApiUtils;
 import ca.bc.gov.educ.api.trax.util.ReplicationUtils;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.PersistenceException;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.commons.lang3.StringUtils;
@@ -60,7 +61,6 @@ public abstract class EventCommonService<T> extends EventBaseService<T> {
         final EntityTransaction tx = em.getTransaction();
         try {
             process(existingStudent, gradStatusUpdate, em, tx, constants.isTraxUpdateEnabled());
-
             var existingEvent = this.eventRepository.findByEventId(eventEntity.getEventId());
             existingEvent.ifPresent(eventRecord -> {
                 eventRecord.setEventStatus(PROCESSED.toString());
@@ -69,7 +69,13 @@ public abstract class EventCommonService<T> extends EventBaseService<T> {
             });
         } catch (Exception e) {
             log.error("Error occurred saving entity {}", e.getMessage());
-            tx.rollback();
+            if (tx.isActive()) {
+                try {
+                    tx.rollback();
+                } catch (final IllegalStateException | PersistenceException ex) {
+                    log.error("IllegalStateException | PersistenceException", ex);
+                }
+            }
         } finally {
             if (em.isOpen()) {
                 em.close();
