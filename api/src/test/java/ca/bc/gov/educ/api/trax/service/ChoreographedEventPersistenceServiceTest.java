@@ -30,7 +30,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static ca.bc.gov.educ.api.trax.constant.EventStatus.DB_COMMITTED;
-import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -74,8 +75,8 @@ public class ChoreographedEventPersistenceServiceTest {
         }
     }
 
-    @Test(expected = BusinessException.class)
-    public void testPersistEventToDB_givenTheExistingEvent() throws BusinessException {
+    @Test
+    public void testPersistEventToDB_checkExistingEvent() {
         UUID eventId = UUID.randomUUID();
 
         ChoreographedEvent choreographedEvent = new ChoreographedEvent();
@@ -92,9 +93,8 @@ public class ChoreographedEventPersistenceServiceTest {
 
         Mockito.when(eventRepository.findByEventId(eventId)).thenReturn(Optional.of(eventEntity));
 
-        choreographedEventPersistenceService.persistEventToDB(choreographedEvent);
-
-        assertThatNoException();
+        Optional<EventEntity> result = choreographedEventPersistenceService.eventExistsInDB(choreographedEvent);
+        assertEquals(true, result.isPresent());
     }
 
     @Test

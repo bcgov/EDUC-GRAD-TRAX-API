@@ -8,7 +8,6 @@ import ca.bc.gov.educ.api.trax.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.trax.model.dto.ChoreographedEvent;
 import ca.bc.gov.educ.api.trax.model.entity.EventEntity;
 import io.nats.client.Message;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,6 +23,7 @@ import redis.clients.jedis.JedisCluster;
 
 
 import java.io.IOException;
+import java.util.Optional;
 
 import static ca.bc.gov.educ.api.trax.constant.Topics.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -60,8 +60,7 @@ class EventHandlerDelegatorServiceTest {
     private EventEntity eventEntity;
     private ChoreographedEvent choreographedEvent;
 
-    @BeforeEach
-    public void setUp() throws Exception {
+    private void setUpDefaultEvent() {
         choreographedEvent = new ChoreographedEvent();
         eventEntity = new EventEntity();
         eventEntity.setEventType("UPDATE_SCHOOL");
@@ -71,18 +70,21 @@ class EventHandlerDelegatorServiceTest {
 
     @Test
     void whenHandleChoreographyEvent_thenVerified() throws IOException {
+        setUpDefaultEvent();
         this.eventHandlerDelegatorService.handleChoreographyEvent(this.choreographedEvent, this.message);
         verify(eventHandlerDelegatorService, times(1)).handleChoreographyEvent(this.choreographedEvent, this.message);
     }
 
     @Test
     void testSetActivityCode_givenINSTITUTE_EVENT_shouldSetINSTITUTE_EVENTActivityCode() throws IOException {
+        setUpDefaultEvent();
         this.eventHandlerDelegatorService.handleChoreographyEvent(this.choreographedEvent, this.message);
         assertTrue(choreographedEvent.getActivityCode().equalsIgnoreCase(EventActivityCode.INSTITUTE_EVENT.toString()));
     }
 
     @Test
     void testSetActivityCode_givenPEN_EVENT_shouldSetPEN_EVENTActivityCode() throws IOException {
+        setUpDefaultEvent();
         when(message.getSubject()).thenReturn(PEN_EVENTS_TOPIC.toString());
         this.eventHandlerDelegatorService.handleChoreographyEvent(this.choreographedEvent, this.message);
         assertTrue(choreographedEvent.getActivityCode().equalsIgnoreCase(EventActivityCode.PEN_EVENT.toString()));
@@ -90,6 +92,7 @@ class EventHandlerDelegatorServiceTest {
 
     @Test
     void testSetActivityCode_givenCOREG_EVENT_shouldSetCOREG_EVENTActivityCode() throws IOException {
+        setUpDefaultEvent();
         when(message.getSubject()).thenReturn(COREG_EVENTS_TOPIC.toString());
         this.eventHandlerDelegatorService.handleChoreographyEvent(this.choreographedEvent, this.message);
         assertTrue(choreographedEvent.getActivityCode().equalsIgnoreCase(EventActivityCode.COREG_EVENT.toString()));
@@ -97,11 +100,33 @@ class EventHandlerDelegatorServiceTest {
 
     @Test
     void testSetActivityCode_givenInvalidCode_shouldLogError(CapturedOutput capturedOutput) throws IOException {
+        setUpDefaultEvent();
         final String topic = "SILLY_EVENTS_TOPIC";
         final String errorMessage = String.format("%s is not a valid topic", topic);
         when(message.getSubject()).thenReturn(topic);
         this.eventHandlerDelegatorService.handleChoreographyEvent(this.choreographedEvent, this.message);
         assertTrue(capturedOutput.getAll().contains(errorMessage));
+    }
+
+    @Test
+    void testSetActivityCode_givenTRAX_UPDATE_EVENT() throws IOException {
+        choreographedEvent = new ChoreographedEvent();
+        eventEntity = new EventEntity();
+        eventEntity.setEventType("UPDATE_SCHOOL");
+        when(message.getSubject()).thenReturn(TRAX_UPDATE_EVENT_TOPIC.toString());
+        this.eventHandlerDelegatorService.handleChoreographyEvent(this.choreographedEvent, this.message);
+        verify(eventHandlerDelegatorService, times(1)).handleChoreographyEvent(this.choreographedEvent, this.message);
+    }
+
+    @Test
+    void testSetActivityCode_givenCOREG_EVENTS_TOPIC_duplicateEvent() throws IOException {
+        choreographedEvent = new ChoreographedEvent();
+        eventEntity = new EventEntity();
+        eventEntity.setEventType("UPDATE_SCHOOL");
+        when(message.getSubject()).thenReturn(COREG_EVENTS_TOPIC.toString());
+        when(choreographedEventPersistenceService.eventExistsInDB(any())).thenReturn(Optional.of(eventEntity));
+        this.eventHandlerDelegatorService.handleChoreographyEvent(this.choreographedEvent, this.message);
+        verify(eventHandlerDelegatorService, times(1)).handleChoreographyEvent(this.choreographedEvent, this.message);
     }
 
 

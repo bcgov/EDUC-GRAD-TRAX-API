@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static ca.bc.gov.educ.api.trax.constant.EventStatus.MESSAGE_PUBLISHED;
 import static ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants.DEFAULT_CREATED_BY;
@@ -35,25 +36,25 @@ public class ChoreographedEventPersistenceService {
     this.traxUpdatedPubEventRepository = traxUpdatedPubEventRepository;
   }
 
+  public Optional<EventEntity> eventExistsInDB(final ChoreographedEvent choreographedEvent) {
+    return eventRepository.findByEventId(choreographedEvent.getEventID());
+  }
+
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public EventEntity persistEventToDB(final ChoreographedEvent choreographedEvent) throws BusinessException {
-    var eventOptional = eventRepository.findByEventId(choreographedEvent.getEventID());
-    if (eventOptional.isPresent()) {
-      throw new BusinessException(BusinessError.EVENT_ALREADY_PERSISTED, choreographedEvent.getEventID().toString());
-    }
+  public EventEntity persistEventToDB(final ChoreographedEvent choreographedEvent) {
     final EventEntity eventEntity = EventEntity.builder()
-        .eventType(choreographedEvent.getEventType().toString())
-        .eventId(choreographedEvent.getEventID())
-        .eventOutcome(choreographedEvent.getEventOutcome().toString())
-        .activityCode(choreographedEvent.getActivityCode())
-        .eventPayload(choreographedEvent.getEventPayload())
-        .eventStatus(DB_COMMITTED.toString())
-        .createUser(StringUtils.isBlank(choreographedEvent.getCreateUser()) ? DEFAULT_CREATED_BY : choreographedEvent.getCreateUser())
-        .updateUser(StringUtils.isBlank(choreographedEvent.getUpdateUser()) ? DEFAULT_UPDATED_BY : choreographedEvent.getUpdateUser())
-        .createDate(LocalDateTime.now())
-        .updateDate(LocalDateTime.now())
-        .build();
-    return this.eventRepository.save(eventEntity);
+              .eventType(choreographedEvent.getEventType().toString())
+              .eventId(choreographedEvent.getEventID())
+              .eventOutcome(choreographedEvent.getEventOutcome().toString())
+              .activityCode(choreographedEvent.getActivityCode())
+              .eventPayload(choreographedEvent.getEventPayload())
+              .eventStatus(DB_COMMITTED.toString())
+              .createUser(StringUtils.isBlank(choreographedEvent.getCreateUser()) ? DEFAULT_CREATED_BY : choreographedEvent.getCreateUser())
+              .updateUser(StringUtils.isBlank(choreographedEvent.getUpdateUser()) ? DEFAULT_UPDATED_BY : choreographedEvent.getUpdateUser())
+              .createDate(LocalDateTime.now())
+              .updateDate(LocalDateTime.now())
+              .build();
+      return this.eventRepository.save(eventEntity);
   }
 
   /**

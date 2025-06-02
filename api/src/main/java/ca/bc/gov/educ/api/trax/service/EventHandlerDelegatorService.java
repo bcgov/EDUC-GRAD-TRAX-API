@@ -46,20 +46,22 @@ public class EventHandlerDelegatorService {
         // some messages come in already with an activity code, some do not.
         // set the activity code early in the process
         setActivityCode(choreographedEvent, message);
-        try {
-            if (message.getSubject().equalsIgnoreCase(TRAX_UPDATE_EVENT_TOPIC.toString())) {
-                this.choreographedEventPersistenceService.updateEventStatus(choreographedEvent);
-                message.ack();
-                log.debug("acknowledged to Jet Stream for TRAX UPDATE EVENT sent...");
-            } else {
+        if (message.getSubject().equalsIgnoreCase(TRAX_UPDATE_EVENT_TOPIC.toString())) {
+            this.choreographedEventPersistenceService.updateEventStatus(choreographedEvent);
+            message.ack();
+            log.debug("acknowledged to Jet Stream for TRAX UPDATE EVENT sent...");
+        } else {
+            if(!this.choreographedEventPersistenceService.eventExistsInDB(choreographedEvent).isPresent()) {
                 final var persistedEvent = this.choreographedEventPersistenceService.persistEventToDB(choreographedEvent);
-                message.ack(); // acknowledge to Jet Stream that api got the message and it is now in DB.
-                log.debug("acknowledged to Jet Stream for EVENT received: {}", persistedEvent.getEventType());
-                this.choreographer.handleEvent(persistedEvent);
+                if(persistedEvent != null) {
+                    message.ack(); // acknowledge to Jet Stream that api got the message and it is now in DB.
+                    log.debug("acknowledged to Jet Stream for EVENT received: {}", persistedEvent.getEventType());
+                    this.choreographer.handleEvent(persistedEvent);
+                }
+            } else {
+                message.ack(); // acknowledge to Jet Stream that api got the message and it is already in DB.
+                log.debug("Event with ID {} already exists in the database. No further action taken.", choreographedEvent.getEventID());
             }
-        } catch (final BusinessException businessException) {
-            message.ack(); // acknowledge to Jet Stream that api got the message already...
-            log.error("acknowledged to Jet Stream for exception...");
         }
     }
 
