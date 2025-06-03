@@ -38,19 +38,19 @@ spring:
           jwk-set-uri: ${TOKEN_ISSUER_URL}/protocol/openid-connect/certs
       client:
         registration:
-          trax-api-client:
-            client-id: ${GRAD_TRAX_API_CLIENT_NAME}
-            client-secret: ${GRAD_TRAX_API_CLIENT_SECRET}
+          traxclient:
+            client-id: ${TRAX_CLIENT_NAME}
+            client-secret: ${TRAX_CLIENT_SECRET}
             authorization-grant-type: client_credentials
-          grad-institute-api-client:
-            client-id: ${GRAD_INSTITUTE_API_CLIENT_NAME}
-            client-secret: ${GRAD_INSTITUTE_API_CLIENT_SECRET}
+          institute-web-client:
+            client-id: ${EDX_GRAD_CLIENT_NAME}
+            client-secret: ${EDX_GRAD_CLIENT_SECRET}
             authorization-grant-type: client_credentials
         provider:
-          trax-api-client:
+          traxclient:
             issuer-uri: ${TOKEN_ISSUER_URL}
             token-uri: ${TOKEN_ISSUER_URL}/protocol/openid-connect/token
-          grad-institute-api-client:
+          institute-web-client:
             issuer-uri: ${TOKEN_ISSUER_URL}
             token-uri: ${TOKEN_ISSUER_URL}/protocol/openid-connect/token
 
@@ -120,11 +120,11 @@ resilience4j.retry:
         - java.lang.NullPointerException
 
 authorization:
-  user: ${GRAD_TRAX_API_CLIENT_NAME}
-  password: ${GRAD_TRAX_API_CLIENT_SECRET}
+  user: ${GRAD_CLIENT_NAME}
+  password: ${GRAD_CLIENT_SECRET}
   institute-api:
-    client-id: ${GRAD_INSTITUTE_API_CLIENT_NAME}
-    client-secret: ${GRAD_INSTITUTE_API_CLIENT_SECRET}
+    client-id: ${EDX_GRAD_CLIENT_NAME}
+    client-secret: ${EDX_GRAD_CLIENT_SECRET}
 
 #NATS
 nats:

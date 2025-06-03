@@ -6,6 +6,7 @@ import ca.bc.gov.educ.api.trax.messaging.NatsConnection;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.trax.model.dto.ResponseObj;
+import ca.bc.gov.educ.api.trax.model.dto.institute.School;
 import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolCategoryCode;
 import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolFundingGroupCode;
 import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolCategoryCodeEntity;
@@ -17,6 +18,7 @@ import ca.bc.gov.educ.api.trax.repository.redis.SchoolFundingGroupCodeRedisRepos
 import ca.bc.gov.educ.api.trax.service.RESTService;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.RestUtils;
+import org.checkerframework.checker.nullness.Opt;
 import org.junit.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
@@ -46,6 +48,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -75,7 +78,7 @@ public class InstituteCodeServiceTest {
 	@Qualifier("default")
 	WebClient webClientMock;
 	@MockBean
-	@Qualifier("gradInstituteApiClient")
+	@Qualifier("instituteWebClient")
 	private WebClient instWebClient;
 	@Mock
 	private WebClient.RequestHeadersSpec requestHeadersSpecMock;

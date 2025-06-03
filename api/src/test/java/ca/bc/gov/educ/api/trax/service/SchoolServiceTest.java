@@ -375,7 +375,7 @@ class SchoolServiceTest {
 
         mockCommonSchool("02121000", "THE GATEWAY COMMUNITY LEARNING CENTRE");
 
-        var result = schoolService.getSchoolsByParams(null, searchCriteria.getMinCode(), null);
+        var result = schoolService.getSchoolsByParams(null, searchCriteria.getMinCode(), null, "accessToken");
         assertThat(result).isNotNull();
 
     }
@@ -419,12 +419,19 @@ class SchoolServiceTest {
         province.setProvCode("BC");
         province.setProvName("British Columbia");
 
+        TraxSchoolSearchCriteria searchCriteria = TraxSchoolSearchCriteria.builder()
+                .district(null)
+                .schoolName(null)
+                .minCode(school.getMinCode())
+                .build();
+        Specification<SchoolEntity> spec = new TraxSchoolSearchSpecification(searchCriteria);
+
         Mockito.when(schoolRepository.findAll(Mockito.any(Specification.class))).thenReturn(List.of(school));
         Mockito.when(districtRepository.findById("021")).thenReturn(Optional.of(district));
 
         mockCommonSchool("02121000", "THE GATEWAY COMMUNITY LEARNING CENTRE");
 
-        var result = schoolService.getSchoolsByParams("TH*", null, "02*");
+        var result = schoolService.getSchoolsByParams("TH*", null, "02*", "accessToken");
         assertThat(result).isNotNull();
 
     }

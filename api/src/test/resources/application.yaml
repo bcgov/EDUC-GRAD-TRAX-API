@@ -37,19 +37,18 @@ spring:
           jwk-set-uri: https://soam-dev.apps.silver.devops.gov.bc.ca/auth/realms/master/protocol/openid-connect/certs
       client:
         registration:
-          trax-api-client:
-            client-id: ${GRAD_TRAX_API_CLIENT_NAME}
-            client-secret: ${GRAD_TRAX_API_CLIENT_SECRET}
+          traxclient:
+            client-id: trax-client-name
+            client-secret: trax-client-secret
             authorization-grant-type: client_credentials
-          grad-institute-api-client:
-            client-id: ${GRAD_INSTITUTE_API_CLIENT_NAME}
-            client-secret: ${GRAD_INSTITUTE_API_CLIENT_SECRET}
-            authorization-grant-type: client_credentials
+          institute-web-client:
+            client-id: edx-client-name
+            client-secret: edx-client-secret
         provider:
-          trax-api-client:
+          traxclient:
             issuer-uri: https://soam-dev.apps.silver.devops.gov.bc.ca/auth/realms/master
             token-uri: https://soam-dev.apps.silver.devops.gov.bc.ca/auth/realms/master/protocol/openid-connect/token
-          grad-institute-api-client:
+          institute-web-client:
             issuer-uri: https://soam-dev.apps.silver.devops.gov.bc.ca/auth/realms/master
             token-uri: https://soam-dev.apps.silver.devops.gov.bc.ca/auth/realms/master/protocol/openid-connect/token
   sql:
@@ -82,7 +81,7 @@ authorization:
   user: batch-api
   password: abc
   institute-api:
-    client-id: grad-edx-client-name
+    client-id: edx-grad-client-name
     client-secret: xyz
 
 #NATS

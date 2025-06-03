@@ -60,7 +60,7 @@ public class RESTServicePostTest {
     WebClient webClient;
 
     @MockBean
-    @Qualifier("gradInstituteApiClient")
+    @Qualifier("instituteWebClient")
     private WebClient instWebClient;
 
     private RESTService restService;

@@ -26,7 +26,7 @@ public class CommonSchoolCache {
     private EducGradTraxApiConstants constants;
 
     @Autowired
-    public CommonSchoolCache(@Qualifier("traxApiClient") WebClient webClient, EducGradTraxApiConstants constants) {
+    public CommonSchoolCache(@Qualifier("traxClient") WebClient webClient, EducGradTraxApiConstants constants) {
         this.webClient = webClient;
         this.constants = constants;
     }
@@ -74,7 +74,9 @@ public class CommonSchoolCache {
         List<CommonSchool> commonSchools = new ArrayList<>();
         try {
             commonSchools = webClient.get().uri(constants.getAllSchoolSchoolApiUrl())
-                    .headers(h -> h.set(EducGradTraxApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()))
+                    .headers(h -> {
+                        h.set(EducGradTraxApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                    })
                     .retrieve().bodyToMono(new ParameterizedTypeReference<List<CommonSchool>>() {
                     }).block();
         } catch (Exception e) {

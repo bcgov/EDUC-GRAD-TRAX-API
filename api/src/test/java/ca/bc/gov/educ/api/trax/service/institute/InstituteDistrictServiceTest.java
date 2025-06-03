@@ -17,9 +17,9 @@ import ca.bc.gov.educ.api.trax.model.transformer.institute.SchoolDetailTransform
 import ca.bc.gov.educ.api.trax.repository.redis.DistrictRedisRepository;
 import ca.bc.gov.educ.api.trax.repository.redis.SchoolDetailRedisRepository;
 import ca.bc.gov.educ.api.trax.service.RESTService;
+import ca.bc.gov.educ.api.trax.support.TestUtils;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.RestUtils;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
@@ -85,7 +85,7 @@ public class InstituteDistrictServiceTest {
 	@Qualifier("default")
 	WebClient webClientMock;
 	@MockBean
-	@Qualifier("gradInstituteApiClient")
+	@Qualifier("instituteWebClient")
 	private WebClient instWebClient;
 
 
@@ -513,7 +513,7 @@ public class InstituteDistrictServiceTest {
 				.thenReturn(district);
 		List<District> result = districtService.getDistrictsBySchoolCategoryCode(schoolCategoryCode);
 		assertNotNull(result);
-        Assert.assertEquals(1, result.size());
+		assertTrue(result.size() == 1);
 	}
 
 	@Test
@@ -553,4 +553,8 @@ public class InstituteDistrictServiceTest {
 		assertTrue(this.districtRedisRepository.findById(districtEntity.getDistrictId()).isPresent());
 	}
 
+	private DistrictEntity createDistrictEntity() {
+		District d = TestUtils.createDistrict();
+        return districtTransformer.transformToEntity(d);
+	}
 }

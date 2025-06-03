@@ -3,7 +3,6 @@ package ca.bc.gov.educ.api.trax.service.institute;
 import ca.bc.gov.educ.api.trax.constant.CacheKey;
 import ca.bc.gov.educ.api.trax.exception.ServiceException;
 import ca.bc.gov.educ.api.trax.model.dto.institute.District;
-import ca.bc.gov.educ.api.trax.model.dto.institute.School;
 import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolDetail;
 import ca.bc.gov.educ.api.trax.model.entity.institute.DistrictEntity;
 import ca.bc.gov.educ.api.trax.model.transformer.institute.DistrictTransformer;
@@ -28,29 +27,23 @@ import java.util.stream.Collectors;
 @Service("instituteDistrictService")
 public class DistrictService {
 
-    private final EducGradTraxApiConstants constants;
-    private final WebClient webClient;
-    DistrictRedisRepository districtRedisRepository;
-    DistrictTransformer districtTransformer;
-    ServiceHelper<DistrictService> serviceHelper;
-    SchoolService schoolService;
-    RESTService restService;
-    CacheService cacheService;
-
     @Autowired
-    public DistrictService(EducGradTraxApiConstants constants, @Qualifier("gradInstituteApiClient") WebClient webClient,
-                           DistrictRedisRepository districtRedisRepository, DistrictTransformer districtTransformer,
-                           ServiceHelper<DistrictService> serviceHelper, SchoolService schoolService,
-                           RESTService restService, CacheService cacheService) {
-        this.constants = constants;
-        this.webClient = webClient;
-        this.districtRedisRepository = districtRedisRepository;
-        this.districtTransformer = districtTransformer;
-        this.serviceHelper = serviceHelper;
-        this.schoolService = schoolService;
-        this.restService = restService;
-        this.cacheService = cacheService;
-    }
+    private EducGradTraxApiConstants constants;
+    @Autowired
+    @Qualifier("instituteWebClient")
+    private WebClient webClient;
+    @Autowired
+    DistrictRedisRepository districtRedisRepository;
+    @Autowired
+    DistrictTransformer districtTransformer;
+    @Autowired
+    ServiceHelper<DistrictService> serviceHelper;
+    @Autowired
+    SchoolService schoolService;
+    @Autowired
+    RESTService restService;
+    @Autowired
+    CacheService cacheService;
 
     public List<District> getDistrictsFromInstituteApi() {
         try {
@@ -155,9 +148,9 @@ public class DistrictService {
         List<District> districts = new ArrayList<>();
         if(!CollectionUtils.isEmpty(schoolDetails)) {
             List<String> districtIds = schoolDetails.stream()
-                    .map(School::getDistrictId)
+                    .map(schoolDetail -> schoolDetail.getDistrictId())
                     .distinct()
-                    .toList();
+                    .collect(Collectors.toList());
             for (String districtId : districtIds) {
                 districts.add(getDistrictByIdFromRedisCache(districtId));
             }
