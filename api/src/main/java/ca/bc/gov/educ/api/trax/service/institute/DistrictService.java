@@ -3,7 +3,6 @@ package ca.bc.gov.educ.api.trax.service.institute;
 import ca.bc.gov.educ.api.trax.constant.CacheKey;
 import ca.bc.gov.educ.api.trax.exception.ServiceException;
 import ca.bc.gov.educ.api.trax.model.dto.institute.District;
-import ca.bc.gov.educ.api.trax.model.dto.institute.School;
 import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolDetail;
 import ca.bc.gov.educ.api.trax.model.entity.institute.DistrictEntity;
 import ca.bc.gov.educ.api.trax.model.transformer.institute.DistrictTransformer;
@@ -155,7 +154,7 @@ public class DistrictService {
         List<District> districts = new ArrayList<>();
         if(!CollectionUtils.isEmpty(schoolDetails)) {
             List<String> districtIds = schoolDetails.stream()
-                    .map(School::getDistrictId)
+                    .map(schoolDetail -> schoolDetail.getDistrictId())
                     .distinct()
                     .toList();
             for (String districtId : districtIds) {
