@@ -28,14 +28,14 @@ public class MockConfiguration {
   }
 
   @Bean
-  @Qualifier("instituteWebClient")
+  @Qualifier("gradInstituteApiClient")
   @Primary
   public WebClient webClient() {
     return Mockito.mock(WebClient.class);
   }
 
   @Bean
-  @Qualifier("traxClient")
+  @Qualifier("traxApiClient")
   public WebClient traxClient() {
     return Mockito.mock(WebClient.class);
   }
