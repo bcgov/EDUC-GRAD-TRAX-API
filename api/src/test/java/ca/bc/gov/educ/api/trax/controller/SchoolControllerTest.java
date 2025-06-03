@@ -17,16 +17,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 @ExtendWith(MockitoExtension.class)
@@ -92,9 +88,9 @@ public class SchoolControllerTest {
         final School school = new School();
         school.setMinCode("1234567");
         school.setSchoolName("Test School");
-        Mockito.when(schoolService.getSchoolsByParams("1234567", "123", null, "accessToken")).thenReturn(Arrays.asList(school));
-        schoolController.getSchoolsByParams("1234567", "123", null,"accessToken");
-        Mockito.verify(schoolService).getSchoolsByParams("1234567", "123", null, "accessToken");
+        Mockito.when(schoolService.getSchoolsByParams("1234567", "123", null)).thenReturn(Arrays.asList(school));
+        schoolController.getSchoolsByParams("1234567", "123", null);
+        Mockito.verify(schoolService).getSchoolsByParams("1234567", "123", null);
     }
 
     @Test
@@ -148,20 +144,6 @@ public class SchoolControllerTest {
         Mockito.when(schoolService.getCommonSchool("1234567")).thenReturn(school);
         schoolController.getCommonSchool("1234567");
         Mockito.verify(schoolService).getCommonSchool("1234567");
-    }
-
-    private void mockCommonSchool(String minCode, String schoolName) {
-        CommonSchool commonSchool = new CommonSchool();
-        commonSchool.setSchlNo(minCode);
-        commonSchool.setSchoolName(schoolName);
-        commonSchool.setSchoolCategoryCode("02");
-
-        when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-        when(this.requestHeadersUriMock.uri(String.format(constants.getSchoolByMincodeSchoolApiUrl(), minCode))).thenReturn(this.requestHeadersMock);
-        when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
-        when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-        when(this.responseMock.bodyToMono(CommonSchool.class)).thenReturn(Mono.just(commonSchool));
-
     }
 
     @Test

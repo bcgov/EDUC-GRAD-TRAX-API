@@ -34,27 +34,33 @@ import java.util.*;
 @Service("instituteSchoolService")
 public class SchoolService {
 
-	@Autowired
 	private EducGradTraxApiConstants constants;
-	@Autowired
-	@Qualifier("instituteWebClient")
 	private WebClient webClient;
-	@Autowired
 	SchoolRedisRepository schoolRedisRepository;
-	@Autowired
 	SchoolDetailRedisRepository schoolDetailRedisRepository;
-	@Autowired
 	SchoolTransformer schoolTransformer;
-	@Autowired
 	SchoolDetailTransformer schoolDetailTransformer;
-	@Autowired
 	ServiceHelper<SchoolService> serviceHelper;
-	@Autowired
 	RESTService restService;
-	@Autowired
 	CacheService cacheService;
 
 	ObjectMapper mapper =  new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+	@Autowired
+	public SchoolService(EducGradTraxApiConstants constants, @Qualifier("gradInstituteApiClient") WebClient webClient,
+						 SchoolRedisRepository schoolRedisRepository, SchoolDetailRedisRepository schoolDetailRedisRepository,
+						 SchoolTransformer schoolTransformer, SchoolDetailTransformer schoolDetailTransformer,
+						 ServiceHelper<SchoolService> serviceHelper, RESTService restService, CacheService cacheService) {
+		this.constants = constants;
+		this.webClient = webClient;
+		this.schoolRedisRepository = schoolRedisRepository;
+		this.schoolDetailRedisRepository = schoolDetailRedisRepository;
+		this.schoolTransformer = schoolTransformer;
+		this.schoolDetailTransformer = schoolDetailTransformer;
+		this.serviceHelper = serviceHelper;
+		this.restService = restService;
+		this.cacheService = cacheService;
+	}
 
 	public List<School> getSchoolsFromRedisCache() {
 		log.debug("**** Getting schools from Redis Cache.");

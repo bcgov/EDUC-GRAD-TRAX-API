@@ -82,7 +82,7 @@ public class SchoolService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<School> getSchoolsByParams(String schoolName, String minCode, String district, String accessToken) {
+	public List<School> getSchoolsByParams(String schoolName, String minCode, String district) {
 		String sName = !StringUtils.isBlank(schoolName) ? StringUtils.strip(schoolName,"*"):null;
 		String sCode = !StringUtils.isBlank(minCode) ? StringUtils.strip(minCode,"*"):null;
 		String sDist = !StringUtils.isBlank(district) ? StringUtils.strip(district,"*"):null;

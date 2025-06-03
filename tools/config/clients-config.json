@@ -1,0 +1,44 @@
+[
+  {
+    "clientId": "grad-trax-api-client",
+    "scopes": ["READ_EVENT_HISTORY",
+      "WRITE_EVENT_HISTORY",
+      "READ_GRAD_PSI_DATA",
+      "READ_GRAD_SCHOOL_DATA",
+      "READ_GRAD_TRAX_COURSE_DATA",
+      "READ_GRAD_TRAX_STUDENT_DATA",
+      "UPDATE_GRAD_TRAX_CACHE",
+      "UPDATE_GRAD_TRAX_STUDENT_DATA",
+      "READ_SCHOOL",
+      "READ_STUDENT"],
+    "settings": {
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false
+    }
+  },
+  {
+    "clientId": "grad-edx-api-client",
+    "scopes": [
+      "READ_SCHOOL",
+      "READ_SCHOOL_CONTACT",
+      "READ_SCHOOL_NOTE",
+      "READ_SCHOOL_HISTORY",
+      "READ_DISTRICT",
+      "READ_DISTRICT_NOTE",
+      "READ_DISTRICT_CONTACT",
+      "READ_INSTITUTE_CODES",
+      "READ_COLLECTION_CODES"],
+    "settings": {
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false
+    }
+  }
+]

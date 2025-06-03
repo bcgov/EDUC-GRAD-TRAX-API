@@ -58,7 +58,7 @@ public class RESTServiceGetTest {
     @Qualifier("default")
     WebClient webClient;
     @MockBean
-    @Qualifier("instituteWebClient")
+    @Qualifier("gradInstituteApiClient")
     private WebClient instWebClient;
 
     @MockBean
@@ -144,7 +144,6 @@ public class RESTServiceGetTest {
         when(requestBodyUriMock.uri(TEST_URL_503)).thenReturn(requestBodyMock);
         when(requestBodyMock.retrieve()).thenReturn(responseMock);
 
-        Throwable cause = new RuntimeException("Simulated cause");
         when(responseMock.bodyToMono(String.class)).thenReturn(Mono.error(new ConnectTimeoutException("Connection closed")));
         restService.get(TEST_URL_503, String.class, this.webClient);
     }

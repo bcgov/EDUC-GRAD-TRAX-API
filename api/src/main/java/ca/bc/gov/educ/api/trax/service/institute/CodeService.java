@@ -3,7 +3,6 @@ package ca.bc.gov.educ.api.trax.service.institute;
 import ca.bc.gov.educ.api.trax.constant.CacheKey;
 import ca.bc.gov.educ.api.trax.exception.ServiceException;
 import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolCategoryCode;
-import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolDetail;
 import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolFundingGroupCode;
 import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolCategoryCodeEntity;
 import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolFundingGroupCodeEntity;
@@ -29,25 +28,35 @@ import java.util.List;
 @Service("instituteCodeService")
 public class CodeService {
 
-	@Autowired
-	private EducGradTraxApiConstants constants;
-	@Autowired
-	@Qualifier("instituteWebClient")
-	private WebClient webClient;
-	@Autowired
+	private final EducGradTraxApiConstants constants;
+	private final WebClient webClient;
 	SchoolCategoryCodeRedisRepository schoolCategoryCodeRedisRepository;
-	@Autowired
 	SchoolFundingGroupCodeRedisRepository schoolFundingGroupCodeRedisRepository;
-	@Autowired
 	SchoolCategoryCodeTransformer schoolCategoryCodeTransformer;
-	@Autowired
 	SchoolFundingGroupCodeTransformer schoolFundingGroupCodeTransformer;
-	@Autowired
 	ServiceHelper<CodeService> serviceHelper;
-	@Autowired
 	RESTService restService;
-	@Autowired
 	CacheService cacheService;
+
+	@Autowired
+	public CodeService(EducGradTraxApiConstants constants, @Qualifier("gradInstituteApiClient") WebClient webClient,
+					   SchoolCategoryCodeRedisRepository schoolCategoryCodeRedisRepository,
+					   SchoolFundingGroupCodeRedisRepository schoolFundingGroupCodeRedisRepository,
+					   SchoolCategoryCodeTransformer schoolCategoryCodeTransformer,
+					   SchoolFundingGroupCodeTransformer schoolFundingGroupCodeTransformer,
+					   ServiceHelper<CodeService> serviceHelper,
+					   RESTService restService,
+					   CacheService cacheService) {
+		this.constants = constants;
+		this.webClient = webClient;
+		this.schoolCategoryCodeRedisRepository = schoolCategoryCodeRedisRepository;
+		this.schoolFundingGroupCodeRedisRepository = schoolFundingGroupCodeRedisRepository;
+		this.schoolCategoryCodeTransformer = schoolCategoryCodeTransformer;
+		this.schoolFundingGroupCodeTransformer = schoolFundingGroupCodeTransformer;
+		this.serviceHelper = serviceHelper;
+		this.restService = restService;
+		this.cacheService = cacheService;
+	}
 
 	public List<SchoolCategoryCode> getSchoolCategoryCodesFromInstituteApi() {
 		try {
