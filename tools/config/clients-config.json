@@ -21,7 +21,7 @@
     }
   },
   {
-    "clientId": "grad-edx-api-client",
+    "clientId": "grad-institute-api-client",
     "scopes": [
       "READ_SCHOOL",
       "READ_SCHOOL_CONTACT",
