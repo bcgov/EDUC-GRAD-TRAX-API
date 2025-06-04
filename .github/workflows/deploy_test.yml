@@ -93,7 +93,7 @@ jobs:
           -p MAX_MEM=${{ env.MAX_MEM }} | oc apply -f -
           
           # UPDATE Configmaps
-          curl -s https://raw.githubusercontent.com/bcgov/${{ env.REPO_NAME }}/${{ env.BRANCH }}/tools/config/update-configmap.sh \
+          curl -s https://raw.githubusercontent.com/bcgov/${{ env.REPO_NAME }}/${{ steps.get-latest-tag.outputs.tag }}/tools/config/update-configmap.sh \
           | bash /dev/stdin \
           test \
           ${{ env.REPO_NAME }} \
