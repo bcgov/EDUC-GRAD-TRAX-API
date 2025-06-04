@@ -29,9 +29,6 @@ import java.util.List;
 		security = {@SecurityRequirement(name = "OAUTH2", scopes = {"READ_GRAD_SCHOOL_DATA"})})
 public class SchoolController {
 
-    private static final String BEARER = "Bearer ";
-
-
     SchoolService schoolService;
     GradValidation validation;
 	ResponseHelper response;
@@ -98,9 +95,8 @@ public class SchoolController {
     public ResponseEntity<List<School>> getSchoolsByParams(
     		@RequestParam(value = "schoolName", required = false) String schoolName,
     		@RequestParam(value = "mincode", required = false) String mincode,
-            @RequestParam(value = "district", required = false) String district,
-            @RequestHeader(name="Authorization") String accessToken) {
-		return response.GET(schoolService.getSchoolsByParams(schoolName, mincode, district, accessToken.replace(BEARER, "")));
+            @RequestParam(value = "district", required = false) String district) {
+		return response.GET(schoolService.getSchoolsByParams(schoolName, mincode, district));
     }
 
     @GetMapping(EducGradTraxApiConstants.GRAD_SCHOOL_URL_MAPPING_V1 + EducGradTraxApiConstants.CHECK_SCHOOL_BY_CODE_MAPPING)

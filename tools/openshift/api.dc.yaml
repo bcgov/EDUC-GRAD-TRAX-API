@@ -65,11 +65,9 @@ objects:
                 - secretRef:
                     name: api-grad-trax-db-secret
                 - secretRef:
-                    name: grad-client-secret
+                    name: grad-trax-api-client-secret
                 - secretRef:
-                    name: trax-client-secret
-                - secretRef:
-                    name: edx-grad-client-secret
+                    name: grad-institute-api-client-secret
                 - secretRef:
                     name: redis-cache-secret
               resources:

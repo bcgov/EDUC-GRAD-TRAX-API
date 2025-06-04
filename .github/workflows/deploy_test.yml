@@ -9,6 +9,9 @@ env:
   OPENSHIFT_NAMESPACE: ${{ vars.GRAD_NAMESPACE }}-test
   COMMON_NAMESPACE: ${{ vars.COMMON_NAMESPACE }}
   BUSINESS_NAMESPACE: ${{ vars.GRAD_BUSINESS_NAMESPACE }}
+  KEYCLOAK_URL: ${{ secrets.KEYCLOAK_URL }}
+  KEYCLOAK_REALM: ${{ secrets.KEYCLOAK_REALM }}
+  TARGET_ENV: test
 
   SPRING_BOOT_IMAGE_NAME: educ-grad-trax-api
 
@@ -48,6 +51,20 @@ jobs:
         with:
           oc: 4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install axios
+
+      - name: Create/Update clients
+        run: node ./tools/config/clients-and-scopes.js
+
+      - name: Create/Update secrets
+        run: node ./tools/openshift/fetch-and-create-secrets.js
+
         # https://github.com/redhat-actions/oc-login#readme
       - name: Deploy
         run: |
@@ -76,7 +93,7 @@ jobs:
           -p MAX_MEM=${{ env.MAX_MEM }} | oc apply -f -
           
           # UPDATE Configmaps
-          curl -s https://raw.githubusercontent.com/bcgov/${{ env.REPO_NAME }}/${{ env.BRANCH }}/tools/config/update-configmap.sh \
+          curl -s https://raw.githubusercontent.com/bcgov/${{ env.REPO_NAME }}/${{ steps.get-latest-tag.outputs.tag }}/tools/config/update-configmap.sh \
           | bash /dev/stdin \
           test \
           ${{ env.REPO_NAME }} \

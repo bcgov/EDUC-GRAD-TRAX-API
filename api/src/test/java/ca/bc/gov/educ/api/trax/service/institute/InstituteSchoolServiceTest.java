@@ -63,7 +63,7 @@ class InstituteSchoolServiceTest {
 	@Qualifier("default")
 	WebClient webClientMock;
 	@MockBean
-	@Qualifier("instituteWebClient")
+	@Qualifier("gradInstituteApiClient")
 	private WebClient instWebClient;
 	@Mock
 	private WebClient.RequestHeadersSpec requestHeadersSpecMock;
