@@ -518,24 +518,6 @@ public class InstituteCodeServiceTest {
 	@Test
 	public void whenInitializeSchoolFundingGroupCodeCache_WithReadyAndTrue_ThenForceLoad() {
 
-		SchoolFundingGroupCode sfgc = new SchoolFundingGroupCode();
-		List<SchoolFundingGroupCode> sfgcs = new ArrayList<SchoolFundingGroupCode>();
-		sfgc.setSchoolFundingGroupCode("SCC1");
-		sfgc.setLabel("SCC1-label");
-		sfgc.setDescription("Desc");
-		sfgc.setDisplayOrder("10");
-		sfgc.setEffectiveDate("01-01-2024");
-		sfgc.setExpiryDate("01-01-2024");
-		sfgcs.add(sfgc);
-		sfgc = new SchoolFundingGroupCode();
-		sfgc.setSchoolFundingGroupCode("SCC2");
-		sfgc.setLabel("SCC2-label");
-		sfgc.setDescription("Desc");
-		sfgc.setDisplayOrder("20");
-		sfgc.setEffectiveDate("01-01-2024");
-		sfgc.setExpiryDate("01-01-2024");
-		sfgcs.add(sfgc);
-
 		when(redisConfig.getStringRedisTemplate().opsForValue().get(CacheKey.SCHOOL_FUNDING_GROUP_CODE_CACHE.name()))
 				.thenReturn(String.valueOf(CacheStatus.READY));
 		assertDoesNotThrow(() -> codeService.initializeSchoolFundingGroupCodeCache(true));

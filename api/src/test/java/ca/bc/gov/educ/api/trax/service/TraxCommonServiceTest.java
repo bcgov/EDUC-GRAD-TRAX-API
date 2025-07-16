@@ -120,8 +120,6 @@ public class TraxCommonServiceTest {
         Object[] cols = new Object[] {
                 "1950", Integer.valueOf(0), Integer.valueOf(0), null
         };
-        List<Object[]> list = new ArrayList<>();
-        list.add(cols);
 
         when(this.traxStudentRepository.loadTraxStudent(pen)).thenReturn(results);
         when(this.commonService.getSchoolIdFromRedisCache("12345678")).thenReturn(UUID.randomUUID());
