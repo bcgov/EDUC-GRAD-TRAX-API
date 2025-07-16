@@ -92,7 +92,7 @@ public class ChoreographedEventPersistenceServiceTest {
     }
 
     @Test
-    public void testPersistEventToDB_givenTheNewEvent() throws BusinessException {
+    public void testPersistEventToDB_givenTheNewEvent()  {
         UUID eventId = UUID.randomUUID();
 
         ChoreographedEvent choreographedEvent = new ChoreographedEvent();
