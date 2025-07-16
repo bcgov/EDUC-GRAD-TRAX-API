@@ -1,7 +1,6 @@
 package ca.bc.gov.educ.api.trax.service.institute;
 
 import ca.bc.gov.educ.api.trax.constant.CacheKey;
-import ca.bc.gov.educ.api.trax.mapper.GradSchoolMapper;
 import ca.bc.gov.educ.api.trax.model.dto.GradSchool;
 import ca.bc.gov.educ.api.trax.model.dto.ResponseObj;
 import ca.bc.gov.educ.api.trax.model.dto.institute.PaginatedResponse;
@@ -104,8 +103,6 @@ class InstituteSchoolServiceTest {
 	@MockBean
 	private JsonTransformer jsonTransformer;
 
-	private GradSchoolMapper gradSchoolMapper = GradSchoolMapper.mapper;
-
 	@TestConfiguration
 	static class TestConfigInstitute {
 		@Bean
@@ -121,17 +118,6 @@ class InstituteSchoolServiceTest {
 
 	@Test
 	void whenGetSchoolsFromInstituteApi_returnsListOfSchools() {
-		List<SchoolEntity> schoolEntities = new ArrayList<>();
-		SchoolEntity schoolEntity = new SchoolEntity();
-
-		schoolEntity.setSchoolId("ID");
-		schoolEntity.setDistrictId("DistID");
-		schoolEntity.setSchoolNumber("12345");
-		schoolEntity.setSchoolCategoryCode("SCC");
-		schoolEntity.setEmail("abc@xyz.ca");
-		schoolEntity.setDisplayName("Tk̓emlúps te Secwépemc");
-		schoolEntity.setDisplayNameNoSpecialChars("Tkkemlups te Secwepemc");
-		schoolEntities.add(schoolEntity);
 
 		List<School> schools = new ArrayList<>();
 		School school = new School();

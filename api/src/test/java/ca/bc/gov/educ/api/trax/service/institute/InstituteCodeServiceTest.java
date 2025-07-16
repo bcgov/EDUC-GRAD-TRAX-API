@@ -185,17 +185,10 @@ public class InstituteCodeServiceTest {
 	@Test
 	public void whenGetSchoolCategoryCodeFromRedisCache_returnSchoolCategoryCode() {
 		SchoolCategoryCodeEntity scce = new SchoolCategoryCodeEntity();
-		List<SchoolCategoryCodeEntity> scces = new ArrayList<SchoolCategoryCodeEntity>();
 		scce.setSchoolCategoryCode("SCC1");
 		scce.setLabel("SCC1-label");
-		scces.add(scce);
-		scce = new SchoolCategoryCodeEntity();
-		scce.setSchoolCategoryCode("SCC2");
-		scce.setLabel("SCC2-label");
-		scces.add(scce);
 
 		SchoolCategoryCode scc = new SchoolCategoryCode();
-		List<SchoolCategoryCode> sccs = new ArrayList<SchoolCategoryCode>();
 		scc.setSchoolCategoryCode("SCC1");
 		scc.setLabel("SCC1-label");
 		scc.setDescription("Desc");
@@ -203,16 +196,6 @@ public class InstituteCodeServiceTest {
 		scc.setDisplayOrder("10");
 		scc.setEffectiveDate("01-01-2024");
 		scc.setExpiryDate("01-01-2024");
-		sccs.add(scc);
-		scc = new SchoolCategoryCode();
-		scc.setSchoolCategoryCode("SCC2");
-		scc.setLabel("SCC2-label");
-		scc.setDescription("Desc");
-		scc.setLegacyCode("SCC2-legacy");
-		scc.setDisplayOrder("20");
-		scc.setEffectiveDate("01-01-2024");
-		scc.setExpiryDate("01-01-2024");
-		sccs.add(scc);
 
 		when(this.schoolCategoryCodeRedisRepository.findById("SCC1"))
 				.thenReturn(Optional.of(scce));
