@@ -143,18 +143,6 @@ public class EducGradTraxApiConstants {
     @Value("${nats.connectionName}")
     private String connectionName;
 
-    @Value("${redis.url}")
-    private String redisUrl;
-
-    @Value("${redis.port}")
-    private String redisPort;
-
-    @Value("${redis.user}")
-    private String redisUser;
-
-    @Value("${redis.secret}")
-    private String redisSecret;
-
     // Incremental Trax Update
     @Value("${trax.update.enabled}")
     private boolean traxUpdateEnabled;
@@ -198,6 +186,9 @@ public class EducGradTraxApiConstants {
 
     @Value("${endpoint.student-admin.authority-details.url}")
     private String studentAdminAuthorityDetailsUrl;
+
+    @Value("${endpoint.grad-school-api.get-grad-details.url}")
+    private String schoolGradDetailsFromGradSchoolApiUrl;
 
     // Scheduler: ongoing updates from TRAX to GRAD
     @Value("${cron.scheduled.process.events.trax-to-grad.run}")

@@ -1,38 +1,19 @@
 package ca.bc.gov.educ.api.trax.service.institute;
 
-import ca.bc.gov.educ.api.trax.constant.CacheKey;
-import ca.bc.gov.educ.api.trax.model.dto.ResponseObj;
-import ca.bc.gov.educ.api.trax.model.dto.institute.PaginatedResponse;
-import ca.bc.gov.educ.api.trax.model.dto.institute.School;
-import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolDetail;
 import ca.bc.gov.educ.api.trax.model.entity.institute.*;
-import ca.bc.gov.educ.api.trax.model.transformer.institute.SchoolDetailTransformer;
-import ca.bc.gov.educ.api.trax.model.transformer.institute.SchoolTransformer;
 import ca.bc.gov.educ.api.trax.repository.redis.*;
-import ca.bc.gov.educ.api.trax.service.RESTService;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
-import ca.bc.gov.educ.api.trax.util.RestUtils;
-import org.h2.util.Cache;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
-import redis.clients.jedis.JedisCluster;
 
 import java.util.*;
 
@@ -61,10 +42,7 @@ class CacheServiceTest {
     private SchoolCategoryCodeRedisRepository schoolCategoryCodeRedisRepository;
     @MockBean
     private SchoolFundingGroupCodeRedisRepository schoolFundingGroupCodeRedisRepository;
-    @MockBean
-    private JedisConnectionFactory jedisConnectionFactoryMock;
-    @MockBean
-    private JedisCluster jedisClusterMock;
+
 
     @TestConfiguration
     static class TestConfigInstitute {

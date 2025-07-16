@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.trax.service.institute;
 
+import ca.bc.gov.educ.api.trax.config.RedisConfig;
 import ca.bc.gov.educ.api.trax.constant.CacheKey;
 import ca.bc.gov.educ.api.trax.constant.CacheStatus;
 import ca.bc.gov.educ.api.trax.messaging.NatsConnection;
@@ -17,6 +18,7 @@ import ca.bc.gov.educ.api.trax.repository.redis.SchoolFundingGroupCodeRedisRepos
 import ca.bc.gov.educ.api.trax.service.RESTService;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.RestUtils;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
@@ -29,7 +31,8 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
@@ -37,7 +40,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-import redis.clients.jedis.JedisCluster;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,7 +55,7 @@ import static org.wildfly.common.Assert.assertNotNull;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@ActiveProfiles("test")
+@ActiveProfiles({"test", "redisTest"})
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings({"unchecked","rawtypes"})
 public class InstituteCodeServiceTest {
@@ -66,10 +68,6 @@ public class InstituteCodeServiceTest {
 	private SchoolCategoryCodeRedisRepository schoolCategoryCodeRedisRepository;
 	@MockBean
 	private SchoolFundingGroupCodeRedisRepository schoolFundingGroupCodeRedisRepository;
-	@MockBean
-	private JedisConnectionFactory jedisConnectionFactoryMock;
-	@MockBean
-	private JedisCluster jedisClusterMock;
 
 	@MockBean
 	@Qualifier("default")
@@ -111,6 +109,12 @@ public class InstituteCodeServiceTest {
 	@MockBean
 	private Subscriber subscriber;
 
+	@MockBean
+	private RedisConfig redisConfig;
+
+	@Mock
+	private StringRedisTemplate stringRedisTemplate;
+
 	@TestConfiguration
 	static class TestConfigInstitute {
 		@Bean
@@ -122,6 +126,20 @@ public class InstituteCodeServiceTest {
 				}
 			};
 		}
+	}
+
+	@Before
+	public void setUp() {
+		StringRedisTemplate redisTemplate = mock(StringRedisTemplate.class);
+		ValueOperations<String, String> valueOps = mock(ValueOperations.class);
+		when(redisConfig.getStringRedisTemplate()).thenReturn(redisTemplate);
+		when(redisTemplate.opsForValue()).thenReturn(valueOps);
+	}
+
+	@Test
+	public void testTemplateIsInitialized() {
+		assertNotNull(redisConfig);
+		assertNotNull(redisConfig.getStringRedisTemplate());
 	}
 
 	@Test
@@ -337,20 +355,15 @@ public class InstituteCodeServiceTest {
 
 	@Test
 	public void whenInitializeSchoolCategoryCodeCache_WithLoadingAndFalse_DoNotForceLoad() {
-		when(jedisClusterMock.get(CacheKey.SCHOOL_CATEGORY_CODE_CACHE.name()))
-				.thenReturn(String.valueOf(CacheStatus.LOADING));
-		when(jedisClusterMock.set(CacheKey.SCHOOL_CATEGORY_CODE_CACHE.name(), CacheStatus.LOADING.name()))
-				.thenReturn(anyString());
-		codeService.initializeSchoolCategoryCodeCache(false);
+		when(redisConfig.getStringRedisTemplate().opsForValue().get(CacheKey.SCHOOL_CATEGORY_CODE_CACHE.name())).thenReturn(CacheStatus.LOADING.name());
+		assertDoesNotThrow(() -> codeService.initializeSchoolCategoryCodeCache(false));
 	}
 
 	@Test
 	public void whenInitializeSchoolCategoryCodeCache_WithReadyAndFalse_DoNotForceLoad() {
-		when(jedisClusterMock.get(CacheKey.SCHOOL_CATEGORY_CODE_CACHE.name()))
+		when(redisConfig.getStringRedisTemplate().opsForValue().get(CacheKey.SCHOOL_CATEGORY_CODE_CACHE.name()))
 				.thenReturn(String.valueOf(CacheStatus.READY));
-		when(jedisClusterMock.set(CacheKey.SCHOOL_CATEGORY_CODE_CACHE.name(), CacheStatus.READY.name()))
-				.thenReturn(anyString());
-		codeService.initializeSchoolCategoryCodeCache(false);
+		assertDoesNotThrow(() -> codeService.initializeSchoolCategoryCodeCache(false));
 	}
 
 	@Test
@@ -409,7 +422,7 @@ public class InstituteCodeServiceTest {
 		when(this.responseObjectMock.getAccess_token())
 				.thenReturn("accessToken");
 
-		when(jedisClusterMock.get(CacheKey.SCHOOL_CATEGORY_CODE_CACHE.name()))
+		when(redisConfig.getStringRedisTemplate().opsForValue().get(CacheKey.SCHOOL_CATEGORY_CODE_CACHE.name()))
 				.thenReturn(String.valueOf(CacheStatus.LOADING));
 
 		CodeService codeServicemock = mock(CodeService.class);
@@ -421,11 +434,9 @@ public class InstituteCodeServiceTest {
 
 	@Test
 	public void whenInitializeSchoolCategoryCodeCache_WithReadyAndTrue_ThenForceLoad() {
-		when(jedisClusterMock.get(CacheKey.SCHOOL_CATEGORY_CODE_CACHE.name()))
+		when(redisConfig.getStringRedisTemplate().opsForValue().get(CacheKey.SCHOOL_CATEGORY_CODE_CACHE.name()))
 				.thenReturn(String.valueOf(CacheStatus.READY));
-		when(jedisClusterMock.set(CacheKey.SCHOOL_CATEGORY_CODE_CACHE.name(), CacheStatus.READY.name()))
-				.thenReturn(anyString());
-		codeService.initializeSchoolCategoryCodeCache(true);
+		assertDoesNotThrow(() -> codeService.initializeSchoolCategoryCodeCache(true));
 	}
 
 	@Test
@@ -444,20 +455,16 @@ public class InstituteCodeServiceTest {
 
 	@Test
 	public void whenInitializeSchoolFundingGroupCodeCache_WithLoadingAndFalse_DoNotForceLoad() {
-		when(jedisClusterMock.get(CacheKey.SCHOOL_FUNDING_GROUP_CODE_CACHE.name()))
+		when(redisConfig.getStringRedisTemplate().opsForValue().get(CacheKey.SCHOOL_FUNDING_GROUP_CODE_CACHE.name()))
 				.thenReturn(String.valueOf(CacheStatus.LOADING));
-		when(jedisClusterMock.set(CacheKey.SCHOOL_FUNDING_GROUP_CODE_CACHE.name(), CacheStatus.LOADING.name()))
-				.thenReturn(anyString());
-		codeService.initializeSchoolFundingGroupCodeCache(false);
+		assertDoesNotThrow(() -> codeService.initializeSchoolFundingGroupCodeCache(false));
 	}
 
 	@Test
 	public void whenInitializeSchoolFundingGroupCodeCache_WithReadyAndFalse_DoNotForceLoad() {
-		when(jedisClusterMock.get(CacheKey.SCHOOL_FUNDING_GROUP_CODE_CACHE.name()))
+		when(redisConfig.getStringRedisTemplate().opsForValue().get(CacheKey.SCHOOL_FUNDING_GROUP_CODE_CACHE.name()))
 				.thenReturn(String.valueOf(CacheStatus.READY));
-		when(jedisClusterMock.set(CacheKey.SCHOOL_FUNDING_GROUP_CODE_CACHE.name(), CacheStatus.READY.name()))
-				.thenReturn(anyString());
-		codeService.initializeSchoolFundingGroupCodeCache(false);
+		assertDoesNotThrow(() -> codeService.initializeSchoolFundingGroupCodeCache(false));
 	}
 
 	@Test
@@ -514,7 +521,7 @@ public class InstituteCodeServiceTest {
 		when(this.responseObjectMock.getAccess_token())
 				.thenReturn("accessToken");
 
-		when(jedisClusterMock.get(CacheKey.SCHOOL_CATEGORY_CODE_CACHE.name()))
+		when(redisConfig.getStringRedisTemplate().opsForValue().get(CacheKey.SCHOOL_CATEGORY_CODE_CACHE.name()))
 				.thenReturn(String.valueOf(CacheStatus.LOADING));
 
 		CodeService codeServicemock = mock(CodeService.class);
@@ -546,10 +553,8 @@ public class InstituteCodeServiceTest {
 		sfgc.setExpiryDate("01-01-2024");
 		sfgcs.add(sfgc);
 
-		when(jedisClusterMock.get(CacheKey.SCHOOL_FUNDING_GROUP_CODE_CACHE.name()))
+		when(redisConfig.getStringRedisTemplate().opsForValue().get(CacheKey.SCHOOL_FUNDING_GROUP_CODE_CACHE.name()))
 				.thenReturn(String.valueOf(CacheStatus.READY));
-		when(jedisClusterMock.set(CacheKey.SCHOOL_FUNDING_GROUP_CODE_CACHE.name(), CacheStatus.READY.name()))
-				.thenReturn(anyString());
-		codeService.initializeSchoolFundingGroupCodeCache(true);
+		assertDoesNotThrow(() -> codeService.initializeSchoolFundingGroupCodeCache(true));
 	}
 }

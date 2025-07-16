@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.trax.service.institute;
 
+import ca.bc.gov.educ.api.trax.config.RedisConfig;
 import ca.bc.gov.educ.api.trax.constant.CacheKey;
 import ca.bc.gov.educ.api.trax.constant.CacheStatus;
 import ca.bc.gov.educ.api.trax.messaging.NatsConnection;
@@ -20,12 +21,12 @@ import ca.bc.gov.educ.api.trax.service.RESTService;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.RestUtils;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.exceptions.base.MockitoException;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -34,7 +35,8 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
@@ -42,7 +44,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-import redis.clients.jedis.JedisCluster;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -77,9 +78,10 @@ public class InstituteDistrictServiceTest {
 	@MockBean
 	private SchoolDetailRedisRepository schoolDetailRedisRepository;
 	@MockBean
-	private JedisConnectionFactory jedisConnectionFactoryMock;
-	@MockBean
-	private JedisCluster jedisClusterMock;
+	private RedisConfig redisConfig;
+	@Mock
+	private StringRedisTemplate stringRedisTemplate;
+
 
 	@MockBean
 	@Qualifier("default")
@@ -136,6 +138,14 @@ public class InstituteDistrictServiceTest {
 				}
 			};
 		}
+	}
+
+	@Before
+	public void setUp() {
+		StringRedisTemplate redisTemplate = mock(StringRedisTemplate.class);
+		ValueOperations<String, String> valueOps = mock(ValueOperations.class);
+		when(redisConfig.getStringRedisTemplate()).thenReturn(redisTemplate);
+		when(redisTemplate.opsForValue()).thenReturn(valueOps);
 	}
 
 	@Test
@@ -223,18 +233,16 @@ public class InstituteDistrictServiceTest {
 
 	@Test
 	public void whenInitializeDistrictCache_WithLoadingAndFalse_DoNotForceLoad() {
-		when(jedisClusterMock.get(CacheKey.DISTRICT_CACHE.name()))
+		when(redisConfig.getStringRedisTemplate().opsForValue().get(CacheKey.DISTRICT_CACHE.name()))
 				.thenReturn(String.valueOf(CacheStatus.LOADING));
-		doThrow(new MockitoException("")).when(jedisClusterMock).set(CacheKey.DISTRICT_CACHE.name(), CacheStatus.LOADING.name());
-		districtService.initializeDistrictCache(false);
+		assertDoesNotThrow(() -> districtService.initializeDistrictCache(false));
 	}
 
 	@Test
 	public void whenInitializeDistrictCache_WithReadyAndFalse_DoNotForceLoad() {
-		when(jedisClusterMock.get(CacheKey.DISTRICT_CACHE.name()))
+		when(redisConfig.getStringRedisTemplate().opsForValue().get(CacheKey.DISTRICT_CACHE.name()))
 				.thenReturn(String.valueOf(CacheStatus.READY));
-		doThrow(new MockitoException("")).when(jedisClusterMock).set(CacheKey.DISTRICT_CACHE.name(), CacheStatus.READY.name());
-		districtService.initializeDistrictCache(false);
+		assertDoesNotThrow(() -> districtService.initializeDistrictCache(false));
 	}
 
 	@Test
@@ -281,7 +289,7 @@ public class InstituteDistrictServiceTest {
 		when(this.responseObjectMock.getAccess_token())
 				.thenReturn("accessToken");
 
-		when(jedisClusterMock.get(CacheKey.DISTRICT_CACHE.name()))
+		when(redisConfig.getStringRedisTemplate().opsForValue().get(CacheKey.DISTRICT_CACHE.name()))
 				.thenReturn(String.valueOf(CacheStatus.LOADING));
 
 
@@ -411,10 +419,8 @@ public class InstituteDistrictServiceTest {
 
 	@Test
 	public void whenInitializeDistrictCache_WithReadyAndTrue_ThenForceLoad() {
-		when(jedisClusterMock.get(CacheKey.DISTRICT_CACHE.name()))
+		when(redisConfig.getStringRedisTemplate().opsForValue().get(CacheKey.DISTRICT_CACHE.name()))
 				.thenReturn(String.valueOf(CacheStatus.READY));
-		when(jedisClusterMock.set(CacheKey.DISTRICT_CACHE.name(), CacheStatus.READY.name()))
-				.thenReturn("OK");
 		districtService.initializeDistrictCache(true);
 		verify(serviceHelper).initializeCache(true, CacheKey.DISTRICT_CACHE, districtService);
 	}
