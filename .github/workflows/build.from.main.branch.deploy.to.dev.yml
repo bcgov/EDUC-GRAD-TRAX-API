@@ -144,7 +144,8 @@ jobs:
           ${{ secrets.STUDENT_ADMIN_URL_ROOT }} \
           ${{ secrets.REDIS_URL }} \
           ${{ secrets.REDIS_PORT }} \
-          ${{ secrets.REDIS_USER }}
+          ${{ secrets.REDIS_USER }} \
+          ${{ secrets.GRAD_SCHOOL_NAMESPACE }}
           
           # OVERRIDE Configmaps
           curl -s https://raw.githubusercontent.com/bcgov/${{ env.REPO_NAME }}/${{ env.BRANCH }}/tools/config/override-configmap-dev.sh \

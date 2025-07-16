@@ -9,6 +9,7 @@ BUSINESS_NAMESPACE=$5
 SPLUNK_TOKEN=$6
 APP_LOG_LEVEL=$7
 STUDENT_ADMIN_URL_ROOT=$8
+GRAD_SCHOOL_NAMESPACE=$12
 
 SPLUNK_URL="gww.splunk.educ.gov.bc.ca"
 FLB_CONFIG="[SERVICE]
@@ -73,6 +74,7 @@ oc create -n "$GRAD_NAMESPACE"-"$envValue" configmap "$APP_NAME"-config-map \
   --from-literal=ENABLE_TRAX_UPDATE="true" \
   --from-literal=KEYCLOAK_TOKEN_URL="https://soam-$envValue.apps.silver.devops.gov.bc.ca/" \
   --from-literal=INSTITUTE_API_URL_ROOT="http://institute-api-master.$COMMON_NAMESPACE-$envValue.svc.cluster.local:8080/" \
+  --from-literal=GRAD_SCHOOL_API_URL_ROOT="http://grad-school-api-master.$GRAD_SCHOOL_NAMESPACE-$envValue.svc.cluster.local:8080/" \
   --from-literal=MAX_RETRY_ATTEMPTS="3" \
   --from-literal=SCHOOL_CACHE_EXPIRY_IN_MINS="240" \
   --from-literal=STUDENT_ADMIN_URL_ROOT="$STUDENT_ADMIN_URL_ROOT" \
