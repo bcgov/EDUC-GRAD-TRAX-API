@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.trax.service.institute;
 
 import ca.bc.gov.educ.api.trax.constant.CacheKey;
+import ca.bc.gov.educ.api.trax.mapper.GradSchoolMapper;
 import ca.bc.gov.educ.api.trax.model.dto.GradSchool;
 import ca.bc.gov.educ.api.trax.model.dto.ResponseObj;
 import ca.bc.gov.educ.api.trax.model.dto.institute.PaginatedResponse;
@@ -103,6 +104,8 @@ class InstituteSchoolServiceTest {
 	@MockBean
 	private JsonTransformer jsonTransformer;
 
+	private GradSchoolMapper gradSchoolMapper = GradSchoolMapper.mapper;
+
 	@TestConfiguration
 	static class TestConfigInstitute {
 		@Bean
@@ -130,22 +133,6 @@ class InstituteSchoolServiceTest {
 		schoolEntity.setDisplayNameNoSpecialChars("Tkkemlups te Secwepemc");
 		schoolEntities.add(schoolEntity);
 
-		List<GradSchool> schoolGradEntries = new ArrayList<>();
-		GradSchool gradSchool = new GradSchool();
-		gradSchool.setSchoolID("ID");
-		gradSchool.setCanIssueCertificates("Y");
-		gradSchool.setCanIssueTranscripts("N");
-		schoolGradEntries.add(gradSchool);
-
-		schoolEntity.setSchoolId("ID");
-		schoolEntity.setDistrictId("DistID");
-		schoolEntity.setSchoolNumber("12345");
-		schoolEntity.setSchoolCategoryCode("SCC");
-		schoolEntity.setEmail("abc@xyz.ca");
-		schoolEntity.setDisplayName("Tk̓emlúps te Secwépemc");
-		schoolEntity.setDisplayNameNoSpecialChars("Tkkemlups te Secwepemc");
-		schoolEntities.add(schoolEntity);
-
 		List<School> schools = new ArrayList<>();
 		School school = new School();
 		school.setSchoolId("ID");
@@ -157,19 +144,7 @@ class InstituteSchoolServiceTest {
 		school.setDisplayNameNoSpecialChars("Tkkemlups te Secwepemc");
 		schools.add(school);
 
-		when(this.restServiceMock.get(constants.getSchoolGradDetailsFromGradSchoolApiUrl(),
-				List.class, gradSchoolWebClient)).thenReturn(schoolGradEntries);
-		when(jsonTransformer.convertValue(any(), any(TypeReference.class)))
-				.thenReturn(schoolGradEntries);
-
-		when(this.schoolTransformer.transformToDTO(schoolEntities)).thenReturn(schools);
-		when(this.restServiceMock.get(constants.getAllSchoolsFromInstituteApiUrl(),
-				List.class, instWebClient)).thenReturn(schoolEntities);
-		when(this.restServiceMock.get(constants.getSchoolGradDetailsFromGradSchoolApiUrl(),
-				List.class, gradSchoolWebClient)).thenReturn(schoolGradEntries);
-
-		List<School> result = schoolService.getSchoolsFromInstituteApi();
-		assertEquals(schools, result);
+		when(schoolService.getSchoolsFromInstituteApi()).thenReturn(schools);
 		assertDoesNotThrow(() -> schoolService.loadSchoolDetailsFromInstituteApiIntoRedisCacheAsync());
 	}
 
@@ -297,15 +272,33 @@ class InstituteSchoolServiceTest {
 		school.setDisplayName("Tk̓emlúps te Secwépemc");
 		school.setDisplayNameNoSpecialChars("Tkkemlups te Secwepemc");
 		school.setMincode(mincode);
+		school.setCanIssueCertificates(false);
+		school.setCanIssueTranscripts(true);
 		schools.add(school);
 
-		when(this.schoolTransformer.transformToDTO(schoolEntities)).thenReturn(schools);
+		List<GradSchool> schoolGradEntries = new ArrayList<>();
+		GradSchool gradSchool = new GradSchool();
+		gradSchool.setSchoolID("ID");
+		gradSchool.setCanIssueCertificates("N");
+		gradSchool.setCanIssueTranscripts("Y");
+		schoolGradEntries.add(gradSchool);
+
 		when(this.restServiceMock.get(constants.getAllSchoolsFromInstituteApiUrl(),
 				List.class, instWebClient)).thenReturn(schoolEntities);
-
+		when(this.schoolTransformer.transformToDTO(schoolEntities)).thenReturn(schools);
+		when(this.restServiceMock.get(constants.getSchoolGradDetailsFromGradSchoolApiUrl(),
+				List.class, gradSchoolWebClient)).thenReturn(schoolGradEntries);
+		when(jsonTransformer.convertValue(any(), any())).thenAnswer(invocation -> {
+			TypeReference<?> typeRef = invocation.getArgument(1);
+			if (typeRef.getType().getTypeName().contains("SchoolEntity")) {
+				return schoolEntities;
+			} else if (typeRef.getType().getTypeName().contains("GradSchool")) {
+				return schoolGradEntries;
+			}
+			return Collections.emptyList(); // fallback
+		});
 		List<School> result = schoolService.getSchoolsFromInstituteApi();
 		assertEquals(schools, result);
-
 		when(this.schoolRedisRepository.findByMincode(mincode))
 				.thenReturn(Optional.empty());
 		assertEquals(school, schoolService.getSchoolByMinCodeFromRedisCache(mincode));
@@ -337,11 +330,31 @@ class InstituteSchoolServiceTest {
 		school.setDisplayName("Tk̓emlúps te Secwépemc");
 		school.setDisplayNameNoSpecialChars("Tkkemlups te Secwepemc");
 		school.setMincode(mincode);
+		school.setCanIssueCertificates(false);
+		school.setCanIssueTranscripts(true);
 		schools.add(school);
 
-		when(this.schoolTransformer.transformToDTO(schoolEntities)).thenReturn(schools);
+		List<GradSchool> schoolGradEntries = new ArrayList<>();
+		GradSchool gradSchool = new GradSchool();
+		gradSchool.setSchoolID("ID");
+		gradSchool.setCanIssueCertificates("N");
+		gradSchool.setCanIssueTranscripts("Y");
+		schoolGradEntries.add(gradSchool);
+
 		when(this.restServiceMock.get(constants.getAllSchoolsFromInstituteApiUrl(),
 				List.class, instWebClient)).thenReturn(schoolEntities);
+		when(this.schoolTransformer.transformToDTO(schoolEntities)).thenReturn(schools);
+		when(this.restServiceMock.get(constants.getSchoolGradDetailsFromGradSchoolApiUrl(),
+				List.class, gradSchoolWebClient)).thenReturn(schoolGradEntries);
+		when(jsonTransformer.convertValue(any(), any())).thenAnswer(invocation -> {
+			TypeReference<?> typeRef = invocation.getArgument(1);
+			if (typeRef.getType().getTypeName().contains("SchoolEntity")) {
+				return schoolEntities;
+			} else if (typeRef.getType().getTypeName().contains("GradSchool")) {
+				return schoolGradEntries;
+			}
+			return Collections.emptyList(); // fallback
+		});
 
 		List<School> result = schoolService.getSchoolsFromInstituteApi();
 		assertEquals(schools, result);

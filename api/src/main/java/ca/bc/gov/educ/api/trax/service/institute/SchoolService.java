@@ -124,6 +124,9 @@ public class SchoolService {
 					List.class, webClient);
 			List<SchoolEntity> schoolEntities= response != null ? jsonTransformer.convertValue(response, new TypeReference<List<SchoolEntity>>() {}) : Collections.emptyList();
 			List<GradSchool> gradSchools = getSchoolGradDetailsFromSchoolApi();
+			if(CollectionUtils.isEmpty(gradSchools)) {
+				throw new ServiceException("Unable to fetch grad schools from Grad School API.");
+			}
 			Map<String, GradSchool> gradSchoolResponse = gradSchools.stream()
 					.collect(Collectors.toMap(GradSchool::getSchoolID, Function.identity(), (existing, replacement) -> replacement));
 			return gradSchoolMapper.toSchools(schoolEntities, gradSchoolResponse);
