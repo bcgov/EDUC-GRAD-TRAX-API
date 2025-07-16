@@ -2,7 +2,6 @@ package ca.bc.gov.educ.api.trax.service;
 
 import ca.bc.gov.educ.api.trax.constant.EventOutcome;
 import ca.bc.gov.educ.api.trax.constant.EventType;
-import ca.bc.gov.educ.api.trax.exception.BusinessException;
 import ca.bc.gov.educ.api.trax.messaging.NatsConnection;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Subscriber;

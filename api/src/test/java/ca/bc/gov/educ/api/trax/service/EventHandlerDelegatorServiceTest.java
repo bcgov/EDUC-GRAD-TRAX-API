@@ -9,7 +9,7 @@ import ca.bc.gov.educ.api.trax.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.trax.model.dto.ChoreographedEvent;
 import ca.bc.gov.educ.api.trax.model.entity.EventEntity;
 import io.nats.client.Message;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -75,8 +75,8 @@ class EventHandlerDelegatorServiceTest {
         when(choreographedEventPersistenceService.persistEventToDB(any())).thenReturn(eventEntity);
     }
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         StringRedisTemplate redisTemplate = mock(StringRedisTemplate.class);
         ValueOperations<String, String> valueOps = mock(ValueOperations.class);
         when(redisConfig.getStringRedisTemplate()).thenReturn(redisTemplate);
