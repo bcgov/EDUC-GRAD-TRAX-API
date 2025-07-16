@@ -23,7 +23,7 @@ import static org.junit.Assert.assertNotNull;
 @SpringBootTest(classes = { EducGradTraxApiApplication.class })
 @ActiveProfiles("test")
 @ExtendWith(OutputCaptureExtension.class)
-public class GradSchoolMapperTest {
+class GradSchoolMapperTest {
 
     private static final GradSchoolMapper gradSchoolMapper = GradSchoolMapper.mapper;
 
