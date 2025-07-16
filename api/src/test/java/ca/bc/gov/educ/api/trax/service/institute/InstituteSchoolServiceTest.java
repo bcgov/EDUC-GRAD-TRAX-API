@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.trax.service.institute;
 
 import ca.bc.gov.educ.api.trax.constant.CacheKey;
+import ca.bc.gov.educ.api.trax.model.dto.GradSchool;
 import ca.bc.gov.educ.api.trax.model.dto.ResponseObj;
 import ca.bc.gov.educ.api.trax.model.dto.institute.PaginatedResponse;
 import ca.bc.gov.educ.api.trax.model.dto.institute.School;
@@ -12,7 +13,9 @@ import ca.bc.gov.educ.api.trax.repository.redis.SchoolDetailRedisRepository;
 import ca.bc.gov.educ.api.trax.repository.redis.SchoolRedisRepository;
 import ca.bc.gov.educ.api.trax.service.RESTService;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
+import ca.bc.gov.educ.api.trax.util.JsonTransformer;
 import ca.bc.gov.educ.api.trax.util.RestUtils;
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -59,6 +62,9 @@ class InstituteSchoolServiceTest {
 	@MockBean
 	@Qualifier("gradInstituteApiClient")
 	private WebClient instWebClient;
+	@MockBean
+	@Qualifier("gradSchoolApiClient")
+	private WebClient gradSchoolWebClient;
 	@Mock
 	private WebClient.RequestHeadersSpec requestHeadersSpecMock;
 	@Mock
@@ -94,6 +100,8 @@ class InstituteSchoolServiceTest {
 	private SchoolDetailTransformer schoolDetailTransformerMock;
 	@Autowired
 	private SchoolDetailTransformer schoolDetailTransformer;
+	@MockBean
+	private JsonTransformer jsonTransformer;
 
 	@TestConfiguration
 	static class TestConfigInstitute {
@@ -122,6 +130,22 @@ class InstituteSchoolServiceTest {
 		schoolEntity.setDisplayNameNoSpecialChars("Tkkemlups te Secwepemc");
 		schoolEntities.add(schoolEntity);
 
+		List<GradSchool> schoolGradEntries = new ArrayList<>();
+		GradSchool gradSchool = new GradSchool();
+		gradSchool.setSchoolID("ID");
+		gradSchool.setCanIssueCertificates("Y");
+		gradSchool.setCanIssueTranscripts("N");
+		schoolGradEntries.add(gradSchool);
+
+		schoolEntity.setSchoolId("ID");
+		schoolEntity.setDistrictId("DistID");
+		schoolEntity.setSchoolNumber("12345");
+		schoolEntity.setSchoolCategoryCode("SCC");
+		schoolEntity.setEmail("abc@xyz.ca");
+		schoolEntity.setDisplayName("Tk̓emlúps te Secwépemc");
+		schoolEntity.setDisplayNameNoSpecialChars("Tkkemlups te Secwepemc");
+		schoolEntities.add(schoolEntity);
+
 		List<School> schools = new ArrayList<>();
 		School school = new School();
 		school.setSchoolId("ID");
@@ -133,13 +157,36 @@ class InstituteSchoolServiceTest {
 		school.setDisplayNameNoSpecialChars("Tkkemlups te Secwepemc");
 		schools.add(school);
 
+		when(this.restServiceMock.get(constants.getSchoolGradDetailsFromGradSchoolApiUrl(),
+				List.class, gradSchoolWebClient)).thenReturn(schoolGradEntries);
+		when(jsonTransformer.convertValue(any(), any(TypeReference.class)))
+				.thenReturn(schoolGradEntries);
+
 		when(this.schoolTransformer.transformToDTO(schoolEntities)).thenReturn(schools);
 		when(this.restServiceMock.get(constants.getAllSchoolsFromInstituteApiUrl(),
 				List.class, instWebClient)).thenReturn(schoolEntities);
+		when(this.restServiceMock.get(constants.getSchoolGradDetailsFromGradSchoolApiUrl(),
+				List.class, gradSchoolWebClient)).thenReturn(schoolGradEntries);
 
 		List<School> result = schoolService.getSchoolsFromInstituteApi();
 		assertEquals(schools, result);
 		assertDoesNotThrow(() -> schoolService.loadSchoolDetailsFromInstituteApiIntoRedisCacheAsync());
+	}
+
+	@Test
+	void whenGetSchoolsFromSchoolApi_returnsListOfSchools() {
+		List<GradSchool> schoolGradEntries = new ArrayList<>();
+		GradSchool gradSchool = new GradSchool();
+		gradSchool.setSchoolID("ID");
+		gradSchool.setCanIssueCertificates("Y");
+		gradSchool.setCanIssueTranscripts("N");
+		schoolGradEntries.add(gradSchool);
+		when(this.restServiceMock.get(constants.getSchoolGradDetailsFromGradSchoolApiUrl(),
+				List.class, gradSchoolWebClient)).thenReturn(schoolGradEntries);
+		when(jsonTransformer.convertValue(any(), any(TypeReference.class)))
+				.thenReturn(schoolGradEntries);
+		List<GradSchool> result = schoolService.getSchoolGradDetailsFromSchoolApi();
+		assertEquals(schoolGradEntries, result);
 	}
 
 	@Test
