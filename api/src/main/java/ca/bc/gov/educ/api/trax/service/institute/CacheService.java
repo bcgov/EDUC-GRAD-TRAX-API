@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.trax.service.institute;
 
+import ca.bc.gov.educ.api.trax.config.RedisConfig;
 import ca.bc.gov.educ.api.trax.constant.CacheKey;
 import ca.bc.gov.educ.api.trax.constant.CacheStatus;
 import ca.bc.gov.educ.api.trax.model.entity.institute.*;
@@ -10,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import redis.clients.jedis.JedisCluster;
 
 import java.util.List;
 
@@ -29,7 +29,7 @@ public class CacheService {
 
     SchoolFundingGroupCodeRedisRepository schoolFundingGroupCodeRedisRepository;
 
-    JedisCluster jedisCluster;
+    RedisConfig redisConfig;
 
     @Async("taskExecutor")
     public void loadSchoolsIntoRedisCacheAsync(List<SchoolEntity> schools) {
@@ -126,16 +126,16 @@ public class CacheService {
     }
 
     private boolean isCacheLoading(CacheKey cacheKey) {
-        String cacheStatus = jedisCluster.get(cacheKey.name());
+        String cacheStatus = redisConfig.getStringRedisTemplate().opsForValue().get(cacheKey.name());
         return CacheStatus.LOADING.name().equals(cacheStatus);
     }
 
     private void setCacheStateLoading(CacheKey cacheKey) {
-        jedisCluster.set(cacheKey.name(), CacheStatus.LOADING.name());
+        redisConfig.getStringRedisTemplate().opsForValue().set(cacheKey.name(), CacheStatus.LOADING.name());
     }
 
     private void setCacheReadiness(CacheKey cacheKey) {
-        jedisCluster.set(cacheKey.name(), CacheStatus.READY.name());
+        redisConfig.getStringRedisTemplate().opsForValue().set(cacheKey.name(), CacheStatus.READY.name());
         log.info(String.format("Success! - %s is now READY", cacheKey));
     }
 

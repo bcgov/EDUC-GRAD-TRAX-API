@@ -11,10 +11,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-import redis.clients.jedis.JedisCluster;
 
 import java.util.List;
 import java.util.Optional;
@@ -39,10 +37,6 @@ public class CommonServiceTest {
     @MockBean
     private SchoolService schoolService;
 
-    @MockBean
-    private JedisConnectionFactory jedisConnectionFactoryMock;
-    @MockBean
-    private JedisCluster jedisClusterMock;
     // NATS
     @MockBean
     private NatsConnection natsConnection;

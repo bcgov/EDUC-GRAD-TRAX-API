@@ -6,11 +6,9 @@ import ca.bc.gov.educ.api.trax.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.trax.model.entity.EventEntity;
 import ca.bc.gov.educ.api.trax.model.entity.EventHistoryEntity;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
-import redis.clients.jedis.JedisCluster;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -31,10 +29,7 @@ public abstract class BaseEventHistoryTest {
     private OAuth2AuthorizedClientRepository oAuth2AuthorizedClientRepository;
     @MockBean
     private OAuth2AuthorizedClientService oAuth2AuthorizedClientService;
-    @MockBean
-    private JedisConnectionFactory jedisConnectionFactoryMock;
-    @MockBean
-    private JedisCluster jedisClusterMock;
+
 
     protected EventEntity createEventData() {
         return EventEntity.builder()

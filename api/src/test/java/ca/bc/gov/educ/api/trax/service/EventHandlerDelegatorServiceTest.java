@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.trax.service;
 
 import ca.bc.gov.educ.api.trax.choreographer.ChoreographEventHandler;
+import ca.bc.gov.educ.api.trax.config.RedisConfig;
 import ca.bc.gov.educ.api.trax.constant.EventActivityCode;
 import ca.bc.gov.educ.api.trax.messaging.NatsConnection;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Publisher;
@@ -8,18 +9,21 @@ import ca.bc.gov.educ.api.trax.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.trax.model.dto.ChoreographedEvent;
 import ca.bc.gov.educ.api.trax.model.entity.EventEntity;
 import io.nats.client.Message;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
-import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
-import redis.clients.jedis.JedisCluster;
+import org.springframework.test.context.ActiveProfiles;
 
 
 import java.io.IOException;
@@ -31,6 +35,7 @@ import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @ExtendWith(OutputCaptureExtension.class)
+@ActiveProfiles({"test", "redisTest"})
 class EventHandlerDelegatorServiceTest {
 
     @SpyBean
@@ -41,10 +46,6 @@ class EventHandlerDelegatorServiceTest {
     private ChoreographEventHandler choreographer;
     @MockBean
     private Message message;
-    @MockBean
-    private JedisConnectionFactory jedisConnectionFactoryMock;
-    @MockBean
-    private JedisCluster jedisClusterMock;
     @MockBean
     public Publisher publisher;
     @MockBean
@@ -60,12 +61,26 @@ class EventHandlerDelegatorServiceTest {
     private EventEntity eventEntity;
     private ChoreographedEvent choreographedEvent;
 
+    @MockBean
+    private RedisConfig redisConfig;
+
+    @Mock
+    private StringRedisTemplate stringRedisTemplate;
+
     private void setUpDefaultEvent() {
         choreographedEvent = new ChoreographedEvent();
         eventEntity = new EventEntity();
         eventEntity.setEventType("UPDATE_SCHOOL");
         when(message.getSubject()).thenReturn(INSTITUTE_EVENTS_TOPIC.toString());
         when(choreographedEventPersistenceService.persistEventToDB(any())).thenReturn(eventEntity);
+    }
+
+    @BeforeEach
+    void setUp() {
+        StringRedisTemplate redisTemplate = mock(StringRedisTemplate.class);
+        ValueOperations<String, String> valueOps = mock(ValueOperations.class);
+        when(redisConfig.getStringRedisTemplate()).thenReturn(redisTemplate);
+        when(redisTemplate.opsForValue()).thenReturn(valueOps);
     }
 
     @Test

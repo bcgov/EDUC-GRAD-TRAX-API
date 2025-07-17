@@ -41,6 +41,12 @@ public class MockConfiguration {
   }
 
   @Bean
+  @Qualifier("gradSchoolApiClient")
+  public WebClient gradSchoolApiClient() {
+    return Mockito.mock(WebClient.class);
+  }
+
+  @Bean
   @Primary
   public NatsConnection natsConnection() {
     return Mockito.mock(NatsConnection.class);
@@ -69,4 +75,5 @@ public class MockConfiguration {
   public ModelMapper modelMapper() {
     return new ModelMapper();
   }
+
 }
