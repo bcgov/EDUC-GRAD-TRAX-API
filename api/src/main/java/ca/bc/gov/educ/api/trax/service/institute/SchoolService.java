@@ -187,7 +187,7 @@ public class SchoolService {
 	private PaginatedResponse<SchoolDetail> getSchoolDetailsPaginatedFromInstituteApi(int pageNumber) {
 		int pageSize = 1000;
 		try {
-			return this.restService.get(String.format(constants.getSchoolsPaginatedFromInstituteApiUrl()+"?pageNumber=%d&pageSize=%d", pageNumber, pageSize),
+			return this.restService.get(String.format("%s?pageNumber=%d&pageSize=%d", constants.getSchoolsPaginatedFromInstituteApiUrl(), pageNumber, pageSize),
 					PaginatedResponse.class, webClient);
 		} catch (WebClientResponseException e) {
 			log.warn(String.format("Error getting School Details from Institute API: %s", e.getMessage()));
@@ -200,7 +200,7 @@ public class SchoolService {
 
 	// Recursive method to fetch school details page by page
 	public List<SchoolDetail> getSchoolDetailsPaginatedFromInstituteApi(int pageNumber, List<SchoolDetail> schoolDetails) {
-		PaginatedResponse response =  getSchoolDetailsPaginatedFromInstituteApi(pageNumber);
+		PaginatedResponse<SchoolDetail> response =  getSchoolDetailsPaginatedFromInstituteApi(pageNumber);
 		if (response == null) {
 			return schoolDetails;
 		}
