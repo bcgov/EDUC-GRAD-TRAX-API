@@ -10,6 +10,7 @@ env:
   COMMON_NAMESPACE: ${{ vars.COMMON_NAMESPACE }}
   GRAD_NAMESPACE: ${{ vars.GRAD_NAMESPACE }}
   BUSINESS_NAMESPACE: ${{ vars.GRAD_BUSINESS_NAMESPACE }}
+  GRAD_SCHOOL_NAMESPACE: ${{ vars.GRAD_SCHOOL_NAMESPACE }}
   KEYCLOAK_URL: ${{ secrets.KEYCLOAK_URL }}
   KEYCLOAK_REALM: ${{ secrets.KEYCLOAK_REALM }}
   TARGET_ENV: dev
@@ -153,7 +154,7 @@ jobs:
           ${{ secrets.REDIS_URL }} \
           ${{ secrets.REDIS_PORT }} \
           ${{ secrets.REDIS_USER }} \
-          ${{ secrets.GRAD_SCHOOL_NAMESPACE }}
+          ${{ env.GRAD_SCHOOL_NAMESPACE }}
           
           # OVERRIDE Configmaps
           curl -s https://raw.githubusercontent.com/bcgov/${{ env.REPO_NAME }}/${{ env.BRANCH }}/tools/config/override-configmap-dev.sh \

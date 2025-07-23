@@ -6,6 +6,7 @@ env:
   COMMON_NAMESPACE: ${{ vars.COMMON_NAMESPACE }}
   GRAD_NAMESPACE: ${{ vars.GRAD_NAMESPACE }}
   BUSINESS_NAMESPACE: ${{ vars.GRAD_BUSINESS_NAMESPACE }}
+  GRAD_SCHOOL_NAMESPACE: ${{ vars.GRAD_SCHOOL_NAMESPACE }}
   IMAGE_REGISTRY: ghcr.io/${{ github.repository_owner }}
   IMAGE_REGISTRY_USER: ${{ github.actor }}
   IMAGE_REGISTRY_PASSWORD: ${{ github.token }}
@@ -142,7 +143,7 @@ jobs:
           ${{ secrets.REDIS_URL }} \
           ${{ secrets.REDIS_PORT }} \
           ${{ secrets.REDIS_USER }} \
-          ${{ secrets.GRAD_SCHOOL_NAMESPACE }}
+          ${{ env.GRAD_SCHOOL_NAMESPACE }}
           
           # OVERRIDE Configmaps
           curl -s https://raw.githubusercontent.com/bcgov/${{ env.REPO_NAME }}/${{ github.ref }}/tools/config/override-configmap-dev.sh \
