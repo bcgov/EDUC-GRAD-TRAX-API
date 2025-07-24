@@ -45,11 +45,18 @@ spring:
             client-id: ${GRAD_INSTITUTE_API_CLIENT_NAME}
             client-secret: ${GRAD_INSTITUTE_API_CLIENT_SECRET}
             authorization-grant-type: client_credentials
+          grad-school-api-client:
+            client-id: ${GRAD_SCHOOL_API_CLIENT_NAME}
+            client-secret: ${GRAD_SCHOOL_API_CLIENT_SECRET}
+            authorization-grant-type: client_credentials
         provider:
           trax-api-client:
             issuer-uri: https://soam-dev.apps.silver.devops.gov.bc.ca/auth/realms/master
             token-uri: https://soam-dev.apps.silver.devops.gov.bc.ca/auth/realms/master/protocol/openid-connect/token
           grad-institute-api-client:
+            issuer-uri: https://soam-dev.apps.silver.devops.gov.bc.ca/auth/realms/master
+            token-uri: https://soam-dev.apps.silver.devops.gov.bc.ca/auth/realms/master/protocol/openid-connect/token
+          grad-school-api-client:
             issuer-uri: https://soam-dev.apps.silver.devops.gov.bc.ca/auth/realms/master
             token-uri: https://soam-dev.apps.silver.devops.gov.bc.ca/auth/realms/master/protocol/openid-connect/token
   sql:
@@ -164,7 +171,9 @@ endpoint:
       url: https://student-admin-8878b4-dev.apps.silver.devops.gov.bc.ca/district/%s
     authority-details:
       url: https://student-admin-8878b4-dev.apps.silver.devops.gov.bc.ca/authority/%s
-
+  grad-school-api:
+    get-grad-details:
+      url: https://grad-school-api-e14b44-dev.apps.silver.devops.gov.bc.ca/api/v1/grad-school
 # other properties
 props:
   school-cache-expiry-in-mins: 10

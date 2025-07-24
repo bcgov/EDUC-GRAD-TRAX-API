@@ -6,6 +6,7 @@ env:
   COMMON_NAMESPACE: ${{ vars.COMMON_NAMESPACE }}
   GRAD_NAMESPACE: ${{ vars.GRAD_NAMESPACE }}
   BUSINESS_NAMESPACE: ${{ vars.GRAD_BUSINESS_NAMESPACE }}
+  GRAD_SCHOOL_NAMESPACE: ${{ vars.GRAD_SCHOOL_NAMESPACE }}
   IMAGE_REGISTRY: ghcr.io/${{ github.repository_owner }}
   IMAGE_REGISTRY_USER: ${{ github.actor }}
   IMAGE_REGISTRY_PASSWORD: ${{ github.token }}
@@ -141,7 +142,8 @@ jobs:
           ${{ secrets.STUDENT_ADMIN_URL_ROOT }} \
           ${{ secrets.REDIS_URL }} \
           ${{ secrets.REDIS_PORT }} \
-          ${{ secrets.REDIS_USER }}
+          ${{ secrets.REDIS_USER }} \
+          ${{ env.GRAD_SCHOOL_NAMESPACE }}
           
           # OVERRIDE Configmaps
           curl -s https://raw.githubusercontent.com/bcgov/${{ env.REPO_NAME }}/${{ github.ref }}/tools/config/override-configmap-dev.sh \
@@ -243,7 +245,8 @@ jobs:
           ${{ secrets.STUDENT_ADMIN_URL_ROOT }} \
           ${{ secrets.REDIS_URL }} \
           ${{ secrets.REDIS_PORT }} \
-          ${{ secrets.REDIS_USER }}
+          ${{ secrets.REDIS_USER }} \
+          ${{ secrets.GRAD_SCHOOL_NAMESPACE }}
 
           # Start rollout (if necessary) and follow it
           oc rollout restart deployment/${{ env.SPRING_BOOT_IMAGE_NAME }}

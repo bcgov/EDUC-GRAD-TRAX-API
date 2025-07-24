@@ -199,6 +199,9 @@ public class EducGradTraxApiConstants {
     @Value("${endpoint.student-admin.authority-details.url}")
     private String studentAdminAuthorityDetailsUrl;
 
+    @Value("${endpoint.grad-school-api.get-grad-details.url}")
+    private String schoolGradDetailsFromGradSchoolApiUrl;
+
     // Scheduler: ongoing updates from TRAX to GRAD
     @Value("${cron.scheduled.process.events.trax-to-grad.run}")
     private String traxToGradCronRun;
