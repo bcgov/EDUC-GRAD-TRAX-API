@@ -12,7 +12,6 @@ import ca.bc.gov.educ.api.trax.model.transformer.GradCourseTransformer;
 import ca.bc.gov.educ.api.trax.model.transformer.TraxStudentNoTransformer;
 import ca.bc.gov.educ.api.trax.repository.*;
 import ca.bc.gov.educ.api.trax.service.institute.CommonService;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,12 +22,10 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.*;
-import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-import redis.clients.jedis.JedisCluster;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -79,10 +76,6 @@ public class TraxCommonServiceTest {
 
     @MockBean
     private Subscriber subscriber;
-    @MockBean
-    private JedisConnectionFactory jedisConnectionFactoryMock;
-    @MockBean
-    private JedisCluster jedisClusterMock;
 
     @TestConfiguration
     static class TestConfig {
@@ -102,10 +95,6 @@ public class TraxCommonServiceTest {
         openMocks(this);
     }
 
-    @After
-    public void tearDown() {
-
-    }
 
     @Test
     public void testGetStudentMasterDataFromTrax() {
@@ -123,19 +112,13 @@ public class TraxCommonServiceTest {
         school.setMincode("12345678");
         school.setSchoolId(UUID.randomUUID().toString());
 
-        Object[] cols = new Object[] {
-                "1950", Integer.valueOf(0), Integer.valueOf(0), null
-        };
-        List<Object[]> list = new ArrayList<>();
-        list.add(cols);
 
         when(this.traxStudentRepository.loadTraxStudent(pen)).thenReturn(results);
         when(this.commonService.getSchoolIdFromRedisCache("12345678")).thenReturn(UUID.randomUUID());
 
         var result = traxCommonService.getStudentMasterDataFromTrax(pen);
 
-        assertThat(result).isNotNull();
-        assertThat(result).hasSize(1);
+        assertThat(result).isNotNull().hasSize(1);
         ConvGradStudent responseObject = result.get(0);
         assertThat(responseObject.getPen()).isEqualTo(pen);
         assertThat(responseObject.getStudentStatus()).isEqualTo(status.toString());
@@ -189,8 +172,7 @@ public class TraxCommonServiceTest {
 
         var result = traxCommonService.getTotalNumberOfTraxStudentNo();
 
-        assertThat(result).isNotNull();
-        assertThat(result).isEqualTo(1);
+        assertThat(result).isNotNull().isEqualTo(1);
     }
 
     @Test
@@ -201,8 +183,6 @@ public class TraxCommonServiceTest {
         List<Object[]> results = new ArrayList<>();
         results.add(obj);
 
-        String pen = (String) obj[0];
-        Character status = (Character)obj[4];
 
         when(this.traxStudentRepository.loadInitialCourseRestrictionRawData()).thenReturn(results);
 
@@ -255,73 +235,5 @@ public class TraxCommonServiceTest {
         assertThat(traxStudentNo.getStudNo()).isEqualTo(result.getStudNo());
         assertThat(traxStudentNo.getStatus()).isEqualTo(result.getStatus());
     }
-
-//    @Test
-//    public void testStudentIsNotGraduated() {
-//        // Student is graduated or not
-//        Boolean result = isStudentGraduated("2004", 0, 0, false);
-//
-//        assertThat(result).isNotNull();
-//        assertThat(result).isFalse();
-//    }
-//
-//    @Test
-//    public void testStudent_whenStatus_isNotInGraduatedOrUnGraduated_then_ReturnsNone() {
-//        // Student is graduated or not
-//        Boolean result = isStudentGraduated("SCCP", 202206, 0, false);
-//
-//        assertThat(result).isNotNull();
-//        assertThat(result).isFalse();
-//    }
-//
-//    @Test
-//    public void testStudent_whenUTG_Data_doesNotExist_then_ReturnsUnGraduated() {
-//        // Student is graduated or not
-//        Boolean result = isStudentGraduated("1996", 202206, 0, false);
-//
-//        when(this.tswService.existsTranscriptStudentDemog("123456789")).thenReturn(false);
-//
-//        assertThat(result).isNotNull();
-//        assertThat(result).isFalse();
-//    }
-//
-//    @Test
-//    public void testStudentForTwoPrograms_whenUTG_Data_doesNotExist_then_ReturnsNO_UTG() {
-//        // Student is graduated or not
-//        Boolean result = isStudentGraduated("1996", 202206, 202206, false);
-//
-//        when(this.tswService.existsTranscriptStudentDemog("123456789")).thenReturn(false);
-//
-//        assertThat(result).isNotNull();
-//        assertThat(result).isFalse();
-//    }
-//
-//    @ParameterizedTest
-//    @CsvSource({
-//            "'1950', 202206, 0",  // graduated 1 program
-//            "'SCCP', 0, 202206",  // graduated 1 program
-//            "'1950', 0, 202206"   // graduated 2 programs
-//    })
-//    void testStudentIsGraduated(String gradReqtYear, int gradDate, int sccDate) {
-//        // Student is graduated or not
-//        Boolean result = isStudentGraduated(gradReqtYear, gradDate, sccDate, true);
-//
-//        assertThat(result).isNotNull();
-//        assertThat(result).isTrue();
-//    }
-//
-//    private Boolean isStudentGraduated(String gradReqtYear, int gradDate, int sccDate, boolean existsUTG) {
-//        final String pen = "123456789";
-//
-//        Object[] cols = new Object[] {
-//                gradReqtYear, gradDate, sccDate, Integer.valueOf(0)
-//        };
-//        List<Object[]> list = new ArrayList<>();
-//        list.add(cols);
-//
-//        when(this.tswService.existsTranscriptStudentDemog(pen)).thenReturn(existsUTG);
-//        when(this.traxStudentRepository.getGraduationData(pen)).thenReturn(list);
-//        return traxCommonService.isGraduatedStudent(pen);
-//    }
 
 }

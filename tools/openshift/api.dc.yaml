@@ -70,6 +70,8 @@ objects:
                     name: grad-institute-api-client-secret
                 - secretRef:
                     name: redis-cache-secret
+                - secretRef:
+                    name: grad-school-api-client-secret
               resources:
                 requests:
                   cpu: "${MIN_CPU}"

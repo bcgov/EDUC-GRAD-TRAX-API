@@ -40,5 +40,18 @@
       "standardFlowEnabled": false,
       "directAccessGrantsEnabled": false
     }
+  },
+  {
+    "clientId": "grad-school-api-client",
+    "scopes": [
+      "READ_GRAD_SCHOOL"],
+    "settings": {
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false
+    }
   }
 ]

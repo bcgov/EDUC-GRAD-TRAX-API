@@ -1,25 +1,26 @@
 package ca.bc.gov.educ.api.trax.service.institute;
 
+import ca.bc.gov.educ.api.trax.config.RedisConfig;
 import ca.bc.gov.educ.api.trax.constant.CacheKey;
 import ca.bc.gov.educ.api.trax.constant.CacheStatus;
 import ca.bc.gov.educ.api.trax.model.dto.institute.*;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-import redis.clients.jedis.JedisCluster;
+
 
 import java.util.List;
 
 @Slf4j
 @Component
+@AllArgsConstructor
 public class ServiceHelper<T> {
 
-    @Autowired
-    JedisCluster jedisCluster;
+    RedisConfig redisConfig;
 
     public void initializeCache(boolean force, CacheKey cacheKey, T service) {
-        String cacheStatus = jedisCluster.get(cacheKey.name());
+        String cacheStatus = redisConfig.getStringRedisTemplate().opsForValue().get(cacheKey.name());
         cacheStatus = cacheStatus == null ? "" : cacheStatus;
         if (CacheStatus.LOADING.name().compareToIgnoreCase(cacheStatus) == 0
                 || CacheStatus.READY.name().compareToIgnoreCase(cacheStatus) == 0) {
@@ -76,7 +77,7 @@ public class ServiceHelper<T> {
                 }
             }
         } catch (Exception e) {
-            log.info(String.format("Exception thrown while loading cache %s. \n%s", cacheKey, e));
+            log.warn(String.format("Exception thrown while loading cache %s. \n%s", cacheKey, e));
         }
     }
 }

@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
@@ -30,7 +29,6 @@ import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 import reactor.core.publisher.Mono;
-import redis.clients.jedis.JedisCluster;
 
 import java.util.function.Consumer;
 
@@ -64,11 +62,6 @@ public class RESTServicePostTest {
     private WebClient instWebClient;
 
     private RESTService restService;
-
-    @MockBean
-    private JedisConnectionFactory jedisConnectionFactoryMock;
-    @MockBean
-    private JedisCluster jedisClusterMock;
 
     @Autowired
     private EducGradTraxApiConstants constants;

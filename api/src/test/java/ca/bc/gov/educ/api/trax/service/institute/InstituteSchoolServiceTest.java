@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.trax.service.institute;
 
 import ca.bc.gov.educ.api.trax.constant.CacheKey;
+import ca.bc.gov.educ.api.trax.model.dto.GradSchool;
 import ca.bc.gov.educ.api.trax.model.dto.ResponseObj;
 import ca.bc.gov.educ.api.trax.model.dto.institute.PaginatedResponse;
 import ca.bc.gov.educ.api.trax.model.dto.institute.School;
@@ -12,7 +13,9 @@ import ca.bc.gov.educ.api.trax.repository.redis.SchoolDetailRedisRepository;
 import ca.bc.gov.educ.api.trax.repository.redis.SchoolRedisRepository;
 import ca.bc.gov.educ.api.trax.service.RESTService;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
+import ca.bc.gov.educ.api.trax.util.JsonTransformer;
 import ca.bc.gov.educ.api.trax.util.RestUtils;
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,14 +28,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-import redis.clients.jedis.JedisCluster;
 
 import java.util.*;
 
@@ -56,15 +57,14 @@ class InstituteSchoolServiceTest {
 	@MockBean
 	private SchoolDetailRedisRepository schoolDetailRedisRepository;
 	@MockBean
-	private JedisConnectionFactory jedisConnectionFactoryMock;
-	@MockBean
-	private JedisCluster jedisClusterMock;
-	@MockBean
 	@Qualifier("default")
 	WebClient webClientMock;
 	@MockBean
 	@Qualifier("gradInstituteApiClient")
 	private WebClient instWebClient;
+	@MockBean
+	@Qualifier("gradSchoolApiClient")
+	private WebClient gradSchoolWebClient;
 	@Mock
 	private WebClient.RequestHeadersSpec requestHeadersSpecMock;
 	@Mock
@@ -100,6 +100,8 @@ class InstituteSchoolServiceTest {
 	private SchoolDetailTransformer schoolDetailTransformerMock;
 	@Autowired
 	private SchoolDetailTransformer schoolDetailTransformer;
+	@MockBean
+	private JsonTransformer jsonTransformer;
 
 	@TestConfiguration
 	static class TestConfigInstitute {
@@ -116,17 +118,6 @@ class InstituteSchoolServiceTest {
 
 	@Test
 	void whenGetSchoolsFromInstituteApi_returnsListOfSchools() {
-		List<SchoolEntity> schoolEntities = new ArrayList<>();
-		SchoolEntity schoolEntity = new SchoolEntity();
-
-		schoolEntity.setSchoolId("ID");
-		schoolEntity.setDistrictId("DistID");
-		schoolEntity.setSchoolNumber("12345");
-		schoolEntity.setSchoolCategoryCode("SCC");
-		schoolEntity.setEmail("abc@xyz.ca");
-		schoolEntity.setDisplayName("Tk̓emlúps te Secwépemc");
-		schoolEntity.setDisplayNameNoSpecialChars("Tkkemlups te Secwepemc");
-		schoolEntities.add(schoolEntity);
 
 		List<School> schools = new ArrayList<>();
 		School school = new School();
@@ -139,13 +130,24 @@ class InstituteSchoolServiceTest {
 		school.setDisplayNameNoSpecialChars("Tkkemlups te Secwepemc");
 		schools.add(school);
 
-		when(this.schoolTransformer.transformToDTO(schoolEntities)).thenReturn(schools);
-		when(this.restServiceMock.get(constants.getAllSchoolsFromInstituteApiUrl(),
-				List.class, instWebClient)).thenReturn(schoolEntities);
-
-		List<School> result = schoolService.getSchoolsFromInstituteApi();
-		assertEquals(schools, result);
+		when(schoolService.getSchoolsFromInstituteApi()).thenReturn(schools);
 		assertDoesNotThrow(() -> schoolService.loadSchoolDetailsFromInstituteApiIntoRedisCacheAsync());
+	}
+
+	@Test
+	void whenGetSchoolsFromSchoolApi_returnsListOfSchools() {
+		List<GradSchool> schoolGradEntries = new ArrayList<>();
+		GradSchool gradSchool = new GradSchool();
+		gradSchool.setSchoolID("ID");
+		gradSchool.setCanIssueCertificates("Y");
+		gradSchool.setCanIssueTranscripts("N");
+		schoolGradEntries.add(gradSchool);
+		when(this.restServiceMock.get(constants.getSchoolGradDetailsFromGradSchoolApiUrl(),
+				List.class, gradSchoolWebClient)).thenReturn(schoolGradEntries);
+		when(jsonTransformer.convertValue(any(), any(TypeReference.class)))
+				.thenReturn(schoolGradEntries);
+		List<GradSchool> result = schoolService.getSchoolGradDetailsFromSchoolApi();
+		assertEquals(schoolGradEntries, result);
 	}
 
 	@Test
@@ -256,15 +258,33 @@ class InstituteSchoolServiceTest {
 		school.setDisplayName("Tk̓emlúps te Secwépemc");
 		school.setDisplayNameNoSpecialChars("Tkkemlups te Secwepemc");
 		school.setMincode(mincode);
+		school.setCanIssueCertificates(false);
+		school.setCanIssueTranscripts(true);
 		schools.add(school);
 
-		when(this.schoolTransformer.transformToDTO(schoolEntities)).thenReturn(schools);
+		List<GradSchool> schoolGradEntries = new ArrayList<>();
+		GradSchool gradSchool = new GradSchool();
+		gradSchool.setSchoolID("ID");
+		gradSchool.setCanIssueCertificates("N");
+		gradSchool.setCanIssueTranscripts("Y");
+		schoolGradEntries.add(gradSchool);
+
 		when(this.restServiceMock.get(constants.getAllSchoolsFromInstituteApiUrl(),
 				List.class, instWebClient)).thenReturn(schoolEntities);
-
+		when(this.schoolTransformer.transformToDTO(schoolEntities)).thenReturn(schools);
+		when(this.restServiceMock.get(constants.getSchoolGradDetailsFromGradSchoolApiUrl(),
+				List.class, gradSchoolWebClient)).thenReturn(schoolGradEntries);
+		when(jsonTransformer.convertValue(any(), any())).thenAnswer(invocation -> {
+			TypeReference<?> typeRef = invocation.getArgument(1);
+			if (typeRef.getType().getTypeName().contains("SchoolEntity")) {
+				return schoolEntities;
+			} else if (typeRef.getType().getTypeName().contains("GradSchool")) {
+				return schoolGradEntries;
+			}
+			return Collections.emptyList(); // fallback
+		});
 		List<School> result = schoolService.getSchoolsFromInstituteApi();
 		assertEquals(schools, result);
-
 		when(this.schoolRedisRepository.findByMincode(mincode))
 				.thenReturn(Optional.empty());
 		assertEquals(school, schoolService.getSchoolByMinCodeFromRedisCache(mincode));
@@ -296,11 +316,31 @@ class InstituteSchoolServiceTest {
 		school.setDisplayName("Tk̓emlúps te Secwépemc");
 		school.setDisplayNameNoSpecialChars("Tkkemlups te Secwepemc");
 		school.setMincode(mincode);
+		school.setCanIssueCertificates(false);
+		school.setCanIssueTranscripts(true);
 		schools.add(school);
 
-		when(this.schoolTransformer.transformToDTO(schoolEntities)).thenReturn(schools);
+		List<GradSchool> schoolGradEntries = new ArrayList<>();
+		GradSchool gradSchool = new GradSchool();
+		gradSchool.setSchoolID("ID");
+		gradSchool.setCanIssueCertificates("N");
+		gradSchool.setCanIssueTranscripts("Y");
+		schoolGradEntries.add(gradSchool);
+
 		when(this.restServiceMock.get(constants.getAllSchoolsFromInstituteApiUrl(),
 				List.class, instWebClient)).thenReturn(schoolEntities);
+		when(this.schoolTransformer.transformToDTO(schoolEntities)).thenReturn(schools);
+		when(this.restServiceMock.get(constants.getSchoolGradDetailsFromGradSchoolApiUrl(),
+				List.class, gradSchoolWebClient)).thenReturn(schoolGradEntries);
+		when(jsonTransformer.convertValue(any(), any())).thenAnswer(invocation -> {
+			TypeReference<?> typeRef = invocation.getArgument(1);
+			if (typeRef.getType().getTypeName().contains("SchoolEntity")) {
+				return schoolEntities;
+			} else if (typeRef.getType().getTypeName().contains("GradSchool")) {
+				return schoolGradEntries;
+			}
+			return Collections.emptyList(); // fallback
+		});
 
 		List<School> result = schoolService.getSchoolsFromInstituteApi();
 		assertEquals(schools, result);
