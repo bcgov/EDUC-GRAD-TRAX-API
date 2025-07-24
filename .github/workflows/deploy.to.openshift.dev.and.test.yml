@@ -246,7 +246,7 @@ jobs:
           ${{ secrets.REDIS_URL }} \
           ${{ secrets.REDIS_PORT }} \
           ${{ secrets.REDIS_USER }} \
-          ${{ secrets.GRAD_SCHOOL_NAMESPACE }}
+          ${{ env.GRAD_SCHOOL_NAMESPACE }}
 
           # Start rollout (if necessary) and follow it
           oc rollout restart deployment/${{ env.SPRING_BOOT_IMAGE_NAME }}
