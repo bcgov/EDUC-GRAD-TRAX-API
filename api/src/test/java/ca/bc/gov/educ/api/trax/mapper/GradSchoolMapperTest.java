@@ -4,6 +4,7 @@ import ca.bc.gov.educ.api.trax.EducGradTraxApiApplication;
 import ca.bc.gov.educ.api.trax.model.dto.GradSchool;
 import ca.bc.gov.educ.api.trax.model.dto.institute.School;
 import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolEntity;
+import ca.bc.gov.educ.api.trax.util.BaseEventHistoryTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,7 +24,7 @@ import static org.junit.Assert.assertNotNull;
 @SpringBootTest(classes = { EducGradTraxApiApplication.class })
 @ActiveProfiles("test")
 @ExtendWith(OutputCaptureExtension.class)
-class GradSchoolMapperTest {
+class GradSchoolMapperTest extends BaseEventHistoryTest {
 
     private static final GradSchoolMapper gradSchoolMapper = GradSchoolMapper.mapper;
 
