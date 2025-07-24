@@ -19,5 +19,5 @@ ENTRYPOINT ["java","-Duser.name=EDUC_GRAD_TRAX_API","-Xms1800m","-Xmx1800m","-no
             "-XX:AdaptiveSizePolicyWeight=90","-XX:MaxMetaspaceSize=400m","-XX:ParallelGCThreads=4",\
             "-Djava.util.concurrent.ForkJoinPool.common.parallelism=1","-XX:CICompilerCount=2",\
             "-XX:+ExitOnOutOfMemoryError","-Djava.security.egd=file:/dev/./urandom",\
-            "-Dspring.backgroundpreinitializer.ignore=true","-cp","app:app/lib/*",\
+            "-Dspring.backgroundpreinitializer.ignore=true","-Dspring.profiles.active=openshift","-cp","app:app/lib/*",\
             "ca.bc.gov.educ.api.trax.EducGradTraxApiApplication"]

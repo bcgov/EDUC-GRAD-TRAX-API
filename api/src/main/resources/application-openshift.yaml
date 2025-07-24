@@ -1,0 +1,10 @@
+spring:
+  redis:
+    cluster:
+      nodes: ${REDIS_URL}
+      max-redirects: 6
+    lettuce:
+      cluster:
+        refresh:
+          adaptive: true
+          period: 5000
