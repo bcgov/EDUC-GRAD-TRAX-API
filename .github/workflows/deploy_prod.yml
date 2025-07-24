@@ -9,6 +9,7 @@ env:
   OPENSHIFT_NAMESPACE: ${{ vars.GRAD_NAMESPACE }}-prod
   COMMON_NAMESPACE: ${{ vars.COMMON_NAMESPACE }}
   BUSINESS_NAMESPACE: ${{ vars.GRAD_BUSINESS_NAMESPACE }}
+  GRAD_SCHOOL_NAMESPACE: ${{ vars.GRAD_SCHOOL_NAMESPACE }}
   KEYCLOAK_URL: ${{ secrets.KEYCLOAK_URL }}
   KEYCLOAK_REALM: ${{ secrets.KEYCLOAK_REALM }}
   TARGET_ENV: prod
@@ -105,7 +106,8 @@ jobs:
           ${{ secrets.STUDENT_ADMIN_URL_ROOT }} \
           ${{ secrets.REDIS_URL }} \
           ${{ secrets.REDIS_PORT }} \
-          ${{ secrets.REDIS_USER }}
+          ${{ secrets.REDIS_USER }} \
+          ${{ env.GRAD_SCHOOL_NAMESPACE }}
           
           # Start rollout (if necessary) and follow it
           oc rollout restart deployment/${{ env.SPRING_BOOT_IMAGE_NAME }}

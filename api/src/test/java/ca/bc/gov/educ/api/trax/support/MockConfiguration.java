@@ -41,6 +41,12 @@ public class MockConfiguration {
   }
 
   @Bean
+  @Qualifier("gradSchoolApiClient")
+  public WebClient gradSchoolApiClient() {
+    return Mockito.mock(WebClient.class);
+  }
+
+  @Bean
   @Primary
   public NatsConnection natsConnection() {
     return Mockito.mock(NatsConnection.class);

@@ -46,11 +46,18 @@ spring:
             client-id: ${GRAD_INSTITUTE_API_CLIENT_NAME}
             client-secret: ${GRAD_INSTITUTE_API_CLIENT_SECRET}
             authorization-grant-type: client_credentials
+          grad-school-api-client:
+            client-id: ${GRAD_SCHOOL_API_CLIENT_NAME}
+            client-secret: ${GRAD_SCHOOL_API_CLIENT_SECRET}
+            authorization-grant-type: client_credentials
         provider:
           trax-api-client:
             issuer-uri: ${TOKEN_ISSUER_URL}
             token-uri: ${TOKEN_ISSUER_URL}/protocol/openid-connect/token
           grad-institute-api-client:
+            issuer-uri: ${TOKEN_ISSUER_URL}
+            token-uri: ${TOKEN_ISSUER_URL}/protocol/openid-connect/token
+          grad-school-api-client:
             issuer-uri: ${TOKEN_ISSUER_URL}
             token-uri: ${TOKEN_ISSUER_URL}/protocol/openid-connect/token
 
@@ -205,6 +212,9 @@ endpoint:
       url: ${STUDENT_ADMIN_URL_ROOT}district/%s
     authority-details:
       url: ${STUDENT_ADMIN_URL_ROOT}authority/%s
+  grad-school-api:
+    get-grad-details:
+      url: ${GRAD_SCHOOL_API_URL_ROOT}api/v1/grad-school
 
 # other properties
 props:
