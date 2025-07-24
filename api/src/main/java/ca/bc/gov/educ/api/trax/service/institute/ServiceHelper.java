@@ -77,7 +77,7 @@ public class ServiceHelper<T> {
                 }
             }
         } catch (Exception e) {
-            log.info(String.format("Exception thrown while loading cache %s. \n%s", cacheKey, e));
+            log.warn(String.format("Exception thrown while loading cache %s. \n%s", cacheKey, e));
         }
     }
 }

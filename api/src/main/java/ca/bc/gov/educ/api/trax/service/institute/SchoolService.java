@@ -204,10 +204,10 @@ public class SchoolService {
 		if (response == null) {
 			return schoolDetails;
 		}
-		schoolDetails.addAll(response.getContent().stream()
-				.map(entry -> mapper.convertValue(entry, SchoolDetail.class))
-				.toList());
-
+		List<SchoolDetail> pagedSchoolDetails = response != null ? jsonTransformer.convertValue(response.getContent(), new TypeReference<List<SchoolDetail>>() {}) : Collections.emptyList();
+		if(!CollectionUtils.isEmpty(pagedSchoolDetails)) {
+			schoolDetails.addAll(pagedSchoolDetails);
+		}
 		if (response.hasNext()) {
 			return getSchoolDetailsPaginatedFromInstituteApi(response.nextPageable().getPageNumber(), schoolDetails);
 		}
