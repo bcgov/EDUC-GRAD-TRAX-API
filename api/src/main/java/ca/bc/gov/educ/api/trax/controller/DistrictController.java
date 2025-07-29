@@ -18,11 +18,15 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * @deprecated use endpoints in {@link ca.bc.gov.educ.api.trax.controller.v2.DistrictController}
+ */
 @CrossOrigin
 @RestController
 //@RequestMapping(EducGradTraxApiConstants.GRAD_DISTRICT_URL_MAPPING)
 @OpenAPIDefinition(info = @Info(title = "API for School Data.", description = "This Read API is for Reading school data.", version = "1"),
 		security = {@SecurityRequirement(name = "OAUTH2", scopes = {"READ_GRAD_SCHOOL_DATA"})})
+@Deprecated(forRemoval = true)
 public class DistrictController {
 
     @Autowired

@@ -21,12 +21,16 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * @deprecated Use the v2 endpoints instead found in {@link ca.bc.gov.educ.api.trax.controller.v2.SchoolController}
+ */
 @CrossOrigin
 @RestController
 @Slf4j
 //@RequestMapping(EducGradTraxApiConstants.GRAD_SCHOOL_URL_MAPPING)
 @OpenAPIDefinition(info = @Info(title = "API for School Data.", description = "This Read API is for Reading school data.", version = "1"),
-		security = {@SecurityRequirement(name = "OAUTH2", scopes = {"READ_GRAD_SCHOOL_DATA"})})
+        security = {@SecurityRequirement(name = "OAUTH2", scopes = {"READ_GRAD_SCHOOL_DATA"})})
+@Deprecated(forRemoval = true)
 public class SchoolController {
 
     SchoolService schoolService;
