@@ -27,6 +27,8 @@ public enum EventType {
   /**
    * INSTITUTE API EVENT TYPES
    */
+  UPDATE_SCHOOL_OF_RECORD,
+
   UPDATE_SCHOOL,
 
   CREATE_SCHOOL,
