@@ -716,9 +716,17 @@ class InstituteSchoolServiceTest {
 		schoolDetailEntity.setDisplayName("Stitó:s Lá:lém Totí:lt Elementary");
 		schoolDetailEntity.setDisplayNameNoSpecialChars("Stitos Lalem Totilt Elementary");
 
+		GradSchool gradSchool = new GradSchool();
+		gradSchool.setSchoolID(schoolId);
+		gradSchool.setCanIssueTranscripts("Y");
+		gradSchool.setCanIssueCertificates("Y");
+
+		when(this.restServiceMock.get(String.format(constants.getSchoolGradDetailsByIdFromGradSchoolApiUrl(), schoolId),
+				GradSchool.class, gradSchoolWebClient)).thenReturn(gradSchool);
 		when(this.schoolDetailTransformer.transformToDTO(schoolDetailEntity)).thenReturn(schoolDetail);
 		when(this.restServiceMock.get(String.format(constants.getSchoolDetailsByIdFromInstituteApiUrl(), schoolId),
 				SchoolDetailEntity.class, instWebClient)).thenReturn(schoolDetailEntity);
+
 
 		SchoolDetail result = schoolService.getSchoolDetailByIdFromInstituteApi(schoolId);
 		assertEquals(schoolDetail, result);
