@@ -1,6 +1,5 @@
 package ca.bc.gov.educ.api.trax.service;
 
-import ca.bc.gov.educ.api.trax.model.dto.GradSchool;
 import ca.bc.gov.educ.api.trax.model.dto.institute.School;
 import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolDetail;
 import ca.bc.gov.educ.api.trax.service.institute.GradSchoolService;
@@ -35,12 +34,12 @@ class SchoolEventBaseServiceTest {
     private SchoolEventBaseService<School> schoolEventBaseService = new SchoolCreatedService(schoolService, gradSchoolService) {};
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         closeable = openMocks(this);
     }
 
     @AfterEach
-    public void finish() throws Exception {
+    void finish() throws Exception {
         closeable.close();
     }
 
