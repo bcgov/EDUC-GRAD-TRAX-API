@@ -5,13 +5,13 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/api/v1/trax/psi/student?transmissionMode=PAPER&psiCode=ALL&psiYear=2024
+  url: {{baseUrl}}/api/v1/trax/psi/student
   body: none
-  auth: inherit
+  auth: none
 }
 
 params:query {
-  transmissionMode: PAPER
-  psiCode: ALL
-  psiYear: 2024
+  transmissionMode: 
+  psiCode: 
+  psiYear: 
 }
