@@ -310,8 +310,12 @@ public class SchoolService {
 			log.debug("Obtaining grad school details for school {}.",  schoolDetail.getSchoolId());
 			GradSchool gradSchool = this.restService.get(String.format(constants.getSchoolGradDetailsByIdFromGradSchoolApiUrl(), schoolDetail.getSchoolId()),
 					GradSchool.class, gradSchoolWebClient);
-			schoolDetail.setCanIssueTranscripts(gradSchool.getCanIssueTranscripts().equalsIgnoreCase("Y"));
-			schoolDetail.setCanIssueCertificates(gradSchool.getCanIssueCertificates().equalsIgnoreCase("Y"));
+			if(gradSchool != null) {
+				schoolDetail.setCanIssueTranscripts(gradSchool.getCanIssueTranscripts().equalsIgnoreCase("Y"));
+				schoolDetail.setCanIssueCertificates(gradSchool.getCanIssueCertificates().equalsIgnoreCase("Y"));
+			} else {
+				log.warn("No grad school details found for school {}. Possible delta.",  schoolDetail.getSchoolId());
+			}
 			log.debug("Updating school {} in cache.",  schoolDetail.getSchoolId());
 			schoolDetailRedisRepository.save(schoolDetailTransformer.transformToEntity(schoolDetail));
 			schoolRedisRepository.save(schoolDetailTransformer.transformToSchoolEntity(schoolDetail));

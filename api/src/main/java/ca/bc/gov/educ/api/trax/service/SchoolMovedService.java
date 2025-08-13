@@ -5,6 +5,7 @@ import ca.bc.gov.educ.api.trax.exception.ServiceException;
 import ca.bc.gov.educ.api.trax.model.dto.institute.MoveSchoolData;
 import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolDetail;
 import ca.bc.gov.educ.api.trax.model.entity.EventEntity;
+import ca.bc.gov.educ.api.trax.service.institute.GradSchoolService;
 import ca.bc.gov.educ.api.trax.service.institute.SchoolService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +19,8 @@ import java.util.Arrays;
 public class SchoolMovedService extends SchoolEventBaseService<MoveSchoolData> {
 
     @Autowired
-    public SchoolMovedService(@Qualifier("instituteSchoolService") SchoolService schoolService) {
-        super(schoolService);
+    public SchoolMovedService(@Qualifier("instituteSchoolService") SchoolService schoolService, GradSchoolService gradSchoolService) {
+        super(schoolService, gradSchoolService);
     }
 
     @Override

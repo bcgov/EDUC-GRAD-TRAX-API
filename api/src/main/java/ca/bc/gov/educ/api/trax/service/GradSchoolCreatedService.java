@@ -5,18 +5,19 @@ import ca.bc.gov.educ.api.trax.exception.ServiceException;
 import ca.bc.gov.educ.api.trax.model.dto.GradSchool;
 import ca.bc.gov.educ.api.trax.model.dto.institute.School;
 import ca.bc.gov.educ.api.trax.model.entity.EventEntity;
+import ca.bc.gov.educ.api.trax.service.institute.GradSchoolService;
 import ca.bc.gov.educ.api.trax.service.institute.SchoolService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
 public class GradSchoolCreatedService extends SchoolEventBaseService<GradSchool> {
 
-    @Autowired
-    public GradSchoolCreatedService(SchoolService schoolService) {
-        super(schoolService);
+    protected GradSchoolCreatedService(@Qualifier("instituteSchoolService") SchoolService schoolService, GradSchoolService gradSchoolService) {
+        super(schoolService, gradSchoolService);
     }
 
     @Override
