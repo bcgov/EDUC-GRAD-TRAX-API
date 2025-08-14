@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.trax.service;
 
 import ca.bc.gov.educ.api.trax.constant.EventType;
 import ca.bc.gov.educ.api.trax.exception.ServiceException;
+import ca.bc.gov.educ.api.trax.service.institute.GradSchoolService;
 import ca.bc.gov.educ.api.trax.service.institute.SchoolService;
 import ca.bc.gov.educ.api.trax.support.TestUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -10,9 +11,12 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 
 public class SchoolCreatedServiceTest extends BaseReplicationServiceTest {
 
@@ -21,6 +25,9 @@ public class SchoolCreatedServiceTest extends BaseReplicationServiceTest {
 
     @MockBean
     private SchoolService schoolServiceMock;
+
+    @MockBean
+    private GradSchoolService gradSchoolServiceMock;
 
     @Test
     public void testProcessEvent_givenCREATE_SCHOOL_Event_shouldProcessEvent() throws JsonProcessingException {
@@ -53,7 +60,11 @@ public class SchoolCreatedServiceTest extends BaseReplicationServiceTest {
     @Test
     public void testProcessEvent_givenCREATE_SCHOOL_EventWithPassingHistoryCriteria_shouldStoreInHistoryTable() throws JsonProcessingException {
         final var request = TestUtils.createSchool();
+        var schoolDetail = TestUtils.createSchoolDetail();
+        schoolDetail.setCanIssueTranscripts(false);
         final var event = TestUtils.createEvent(EventType.CREATE_SCHOOL.toString(), request, this.replicationTestUtils.getEventRepository());
+        when(schoolServiceMock.getSchoolDetailBySchoolIdFromRedisCache(UUID.fromString(request.getSchoolId()))).thenReturn(schoolDetail);
+        when(gradSchoolServiceMock.isGradSchoolTranscriptIssuer(request.getSchoolId())).thenReturn(true);
         this.schoolCreatedService.processEvent(request, event);
         var result = this.replicationTestUtils.getEventHistoryRepository().findByEvent_ReplicationEventId(event.getReplicationEventId());
         Assert.assertTrue(result.isPresent());

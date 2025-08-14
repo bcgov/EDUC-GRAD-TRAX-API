@@ -72,6 +72,10 @@ public abstract class EventHistoryMapper {
         if (eventEntity != null) {
             try {
                 switch (EventType.valueOf(eventEntity.getEventType())) {
+                    case CREATE_GRAD_SCHOOL, UPDATE_GRAD_SCHOOL -> {
+                        val gradSchool = JsonUtil.getJsonObjectFromString(ca.bc.gov.educ.api.trax.model.dto.GradSchool.class, eventEntity.getEventPayload());
+                        return Pair.of(EventHistoryType.SCHOOL, UUID.fromString(gradSchool.getSchoolID()));
+                    }
                     case CREATE_SCHOOL, UPDATE_SCHOOL -> {
                         val school = JsonUtil.getJsonObjectFromString(ca.bc.gov.educ.api.trax.model.dto.institute.School.class, eventEntity.getEventPayload());
                         return Pair.of(EventHistoryType.SCHOOL, UUID.fromString(school.getSchoolId()));

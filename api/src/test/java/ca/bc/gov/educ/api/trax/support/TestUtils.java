@@ -1,10 +1,10 @@
 package ca.bc.gov.educ.api.trax.support;
 
-import ca.bc.gov.educ.api.trax.model.dto.AuthorityContact;
+import ca.bc.gov.educ.api.trax.model.dto.*;
 import ca.bc.gov.educ.api.trax.model.dto.DistrictContact;
-import ca.bc.gov.educ.api.trax.model.dto.GradStatusEventPayloadDTO;
-import ca.bc.gov.educ.api.trax.model.dto.SchoolContact;
 import ca.bc.gov.educ.api.trax.model.dto.institute.*;
+import ca.bc.gov.educ.api.trax.model.dto.institute.District;
+import ca.bc.gov.educ.api.trax.model.dto.institute.School;
 import ca.bc.gov.educ.api.trax.model.entity.EventEntity;
 import ca.bc.gov.educ.api.trax.model.entity.EventHistoryEntity;
 import ca.bc.gov.educ.api.trax.model.entity.TraxStudentEntity;
@@ -111,6 +111,14 @@ public class TestUtils {
         contact.setUpdateDate(LocalDateTime.now().toString());
         contact.setUpdateUser("TEST");
         return contact;
+    }
+
+    public static GradSchool createGradSchool() {
+        var gradSchool = new GradSchool();
+        gradSchool.setSchoolID(UUID.randomUUID().toString());
+        gradSchool.setCanIssueCertificates("Y");
+        gradSchool.setCanIssueTranscripts("Y");
+        return gradSchool;
     }
 
     public static School createSchool() {

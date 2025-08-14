@@ -215,6 +215,8 @@ endpoint:
   grad-school-api:
     get-grad-details:
       url: ${GRAD_SCHOOL_API_URL_ROOT}api/v1/grad-school
+    get-grad-details-by-id:
+      url: ${GRAD_SCHOOL_API_URL_ROOT}api/v1/grad-school/search/%s
 
 # other properties
 props:

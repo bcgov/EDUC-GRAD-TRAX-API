@@ -1,7 +1,3 @@
-headers {
-  Authorization: Bearer {{token}}
-}
-
 auth {
   mode: oauth2
 }
@@ -9,9 +5,16 @@ auth {
 auth:oauth2 {
   grant_type: client_credentials
   access_token_url: {{tokenRootUrl}}/auth/realms/master/protocol/openid-connect/token
+  refresh_token_url: 
   client_id: {{clientId}}
   client_secret: {{secret}}
   scope: 
+  credentials_placement: body
+  credentials_id: credentials
+  token_placement: header
+  token_header_prefix: Bearer
+  auto_fetch_token: true
+  auto_refresh_token: false
 }
 
 script:post-response {

@@ -294,7 +294,6 @@ public class SchoolService {
 	public void updateSchoolCache(String schoolId) throws ServiceException {
 		if (StringUtils.isBlank(schoolId)) { log.info("updateSchoolCache: schoolId is null."); return; }
 		// get details from institute
-		log.debug("Updating school {} in cache.",  schoolId);
 		SchoolDetail schoolDetail = this.restService.get(String.format(constants.getSchoolDetailsByIdFromInstituteApiUrl(), schoolId),
 				SchoolDetail.class, webClient);
 		log.debug("Retrieved school: {} from Institute API", schoolId);
@@ -307,6 +306,17 @@ public class SchoolService {
 	 */
 	public void updateSchoolCache(SchoolDetail schoolDetail) throws ServiceException {
 		if(schoolDetail != null) {
+			// obtain grad school details from Grad School API
+			log.debug("Obtaining grad school details for school {}.",  schoolDetail.getSchoolId());
+			GradSchool gradSchool = this.restService.get(String.format(constants.getSchoolGradDetailsByIdFromGradSchoolApiUrl(), schoolDetail.getSchoolId()),
+					GradSchool.class, gradSchoolWebClient);
+			if(gradSchool != null) {
+				schoolDetail.setCanIssueTranscripts(gradSchool.getCanIssueTranscripts().equalsIgnoreCase("Y"));
+				schoolDetail.setCanIssueCertificates(gradSchool.getCanIssueCertificates().equalsIgnoreCase("Y"));
+			} else {
+				log.warn("No grad school details found for school {}. Possible delta.",  schoolDetail.getSchoolId());
+			}
+			log.debug("Updating school {} in cache.",  schoolDetail.getSchoolId());
 			schoolDetailRedisRepository.save(schoolDetailTransformer.transformToEntity(schoolDetail));
 			schoolRedisRepository.save(schoolDetailTransformer.transformToSchoolEntity(schoolDetail));
 		}

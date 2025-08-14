@@ -7,6 +7,7 @@ import ca.bc.gov.educ.api.trax.model.dto.DistrictContact;
 import ca.bc.gov.educ.api.trax.model.dto.GradStatusEventPayloadDTO;
 import ca.bc.gov.educ.api.trax.model.dto.SchoolContact;
 import ca.bc.gov.educ.api.trax.model.dto.institute.District;
+import ca.bc.gov.educ.api.trax.model.dto.GradSchool;
 import ca.bc.gov.educ.api.trax.model.dto.institute.MoveSchoolData;
 import ca.bc.gov.educ.api.trax.model.dto.institute.School;
 import ca.bc.gov.educ.api.trax.model.entity.EventEntity;
@@ -39,8 +40,8 @@ import static ca.bc.gov.educ.api.trax.constant.EventType.*;
 public class ChoreographEventHandler {
   private final Executor eventExecutor;
   private final Map<String, EventService> eventServiceMap;
-
   private final EventRepository eventRepository;
+  private final static String EVENT_MSG = "Processing {} eventEntity record :: {}";
 
   public ChoreographEventHandler(final List<EventService> eventServices, final EventRepository eventRepository) {
     this.eventServiceMap = new HashMap<>();
@@ -51,90 +52,109 @@ public class ChoreographEventHandler {
     eventServices.forEach(eventService -> this.eventServiceMap.put(eventService.getEventType(), eventService));
   }
 
+  private void debugEventLog(EventEntity eventEntity) {
+    log.debug("Processing {} eventEntity record :: {} ", eventEntity.getEventType(), eventEntity);
+  }
+
   public void handleEvent(@NonNull final EventEntity eventEntity) {
     //only one thread will process all the request. since RDB won't handle concurrent requests.
     this.eventExecutor.execute(() -> {
       try {
         switch (EventType.valueOf(eventEntity.getEventType())) {
           case GRAD_STUDENT_GRADUATED -> {
-            log.debug("Processing GRAD_STUDENT_GRADUATED eventEntity record :: {} ", eventEntity);
+            debugEventLog(eventEntity);
             val studentGraduated = JsonUtil.getJsonObjectFromString(GradStatusEventPayloadDTO.class, eventEntity.getEventPayload());
             this.eventServiceMap.get(GRAD_STUDENT_GRADUATED.toString()).processEvent(studentGraduated, eventEntity);
           }
           case GRAD_STUDENT_UPDATED -> {
-            log.debug("Processing GRAD_STUDENT_UPDATED eventEntity record :: {} ", eventEntity);
+            debugEventLog(eventEntity);
             val studentUpdated = JsonUtil.getJsonObjectFromString(GradStatusEventPayloadDTO.class, eventEntity.getEventPayload());
             this.eventServiceMap.get(GRAD_STUDENT_UPDATED.toString()).processEvent(studentUpdated, eventEntity);
           }
           case GRAD_STUDENT_UNDO_COMPLETION -> {
-            log.debug("Processing GRAD_STUDENT_UNDO_COMPLETION eventEntity record :: {} ", eventEntity);
+            debugEventLog(eventEntity);
             val studentUndoCompletion = JsonUtil.getJsonObjectFromString(GradStatusEventPayloadDTO.class, eventEntity.getEventPayload());
             this.eventServiceMap.get(GRAD_STUDENT_UNDO_COMPLETION.toString()).processEvent(studentUndoCompletion, eventEntity);
           }
           case CREATE_SCHOOL_CONTACT -> {
-            log.debug("Processing {} eventEntity record :: {} ", eventEntity.getEventType(), eventEntity);
+            debugEventLog(eventEntity);
             val schoolContactCreated = JsonUtil.getJsonObjectFromString(SchoolContact.class, eventEntity.getEventPayload());
             this.eventServiceMap.get(CREATE_SCHOOL_CONTACT.toString()).processEvent(schoolContactCreated, eventEntity);
           }
           case UPDATE_SCHOOL_CONTACT -> {
-            log.debug("Processing {} eventEntity record :: {} ", eventEntity.getEventType(), eventEntity);
+            debugEventLog(eventEntity);
             val schoolContactUpdated = JsonUtil.getJsonObjectFromString(SchoolContact.class, eventEntity.getEventPayload());
             this.eventServiceMap.get(UPDATE_SCHOOL_CONTACT.toString()).processEvent(schoolContactUpdated, eventEntity);
           }
           case DELETE_SCHOOL_CONTACT -> {
-            log.debug("Processing {} eventEntity record :: {} ", eventEntity.getEventType(), eventEntity);
+            debugEventLog(eventEntity);
             val schoolContactDeleted = JsonUtil.getJsonObjectFromString(SchoolContact.class, eventEntity.getEventPayload());
             this.eventServiceMap.get(DELETE_SCHOOL_CONTACT.toString()).processEvent(schoolContactDeleted, eventEntity);
           }
           case CREATE_AUTHORITY_CONTACT -> {
-            log.debug("Processing {} eventEntity record :: {} ", eventEntity.getEventType(), eventEntity);
+            debugEventLog(eventEntity);
             val authorityContactCreated = JsonUtil.getJsonObjectFromString(AuthorityContact.class, eventEntity.getEventPayload());
             this.eventServiceMap.get(CREATE_AUTHORITY_CONTACT.toString()).processEvent(authorityContactCreated, eventEntity);
           }
           case UPDATE_AUTHORITY_CONTACT -> {
-            log.debug("Processing {} eventEntity record :: {} ", eventEntity.getEventType(), eventEntity);
+            debugEventLog(eventEntity);
             val authorityContactUpdated = JsonUtil.getJsonObjectFromString(AuthorityContact.class, eventEntity.getEventPayload());
             this.eventServiceMap.get(UPDATE_AUTHORITY_CONTACT.toString()).processEvent(authorityContactUpdated, eventEntity);
           }
           case DELETE_AUTHORITY_CONTACT -> {
-            log.debug("Processing {} eventEntity record :: {} ", eventEntity.getEventType(), eventEntity);
+            debugEventLog(eventEntity);
             val authorityContactDeleted = JsonUtil.getJsonObjectFromString(AuthorityContact.class, eventEntity.getEventPayload());
             this.eventServiceMap.get(DELETE_AUTHORITY_CONTACT.toString()).processEvent(authorityContactDeleted, eventEntity);
           }
           case CREATE_DISTRICT_CONTACT -> {
-            log.debug("Processing {} eventEntity record :: {} ", eventEntity.getEventType(), eventEntity);
+            debugEventLog(eventEntity);
             val districtContactCreated = JsonUtil.getJsonObjectFromString(DistrictContact.class, eventEntity.getEventPayload());
             this.eventServiceMap.get(CREATE_DISTRICT_CONTACT.toString()).processEvent(districtContactCreated, eventEntity);
           }
           case UPDATE_DISTRICT_CONTACT -> {
-            log.debug("Processing {} eventEntity record :: {} ", eventEntity.getEventType(), eventEntity);
+            debugEventLog(eventEntity);
             val districtContactUpdated = JsonUtil.getJsonObjectFromString(DistrictContact.class, eventEntity.getEventPayload());
             this.eventServiceMap.get(UPDATE_DISTRICT_CONTACT.toString()).processEvent(districtContactUpdated, eventEntity);
           }
           case DELETE_DISTRICT_CONTACT -> {
-            log.debug("Processing {} eventEntity record :: {} ", eventEntity.getEventType(), eventEntity);
+            debugEventLog(eventEntity);
             val districtContactDeleted = JsonUtil.getJsonObjectFromString(DistrictContact.class, eventEntity.getEventPayload());
             this.eventServiceMap.get(DELETE_DISTRICT_CONTACT.toString()).processEvent(districtContactDeleted, eventEntity);
           }
           case UPDATE_SCHOOL -> {
+            debugEventLog(eventEntity);
             val schoolUpdated = JsonUtil.getJsonObjectFromString(School.class, eventEntity.getEventPayload());
             this.eventServiceMap.get(UPDATE_SCHOOL.toString()).processEvent(schoolUpdated, eventEntity);
           }
           case CREATE_SCHOOL -> {
+            debugEventLog(eventEntity);
             val schoolCreated = JsonUtil.getJsonObjectFromString(School.class, eventEntity.getEventPayload());
             this.eventServiceMap.get(CREATE_SCHOOL.toString()).processEvent(schoolCreated, eventEntity);
           }
           case CREATE_DISTRICT -> {
+            debugEventLog(eventEntity);
             val districtCreated = JsonUtil.getJsonObjectFromString(District.class, eventEntity.getEventPayload());
             this.eventServiceMap.get(CREATE_DISTRICT.toString()).processEvent(districtCreated, eventEntity);
           }
           case MOVE_SCHOOL -> {
+            debugEventLog(eventEntity);
             val schoolMoved = JsonUtil.getJsonObjectFromString(MoveSchoolData.class, eventEntity.getEventPayload());
             this.eventServiceMap.get(MOVE_SCHOOL.toString()).processEvent(schoolMoved, eventEntity);
           }
           case UPDATE_DISTRICT -> {
+            debugEventLog(eventEntity);
             val districtUpdated = JsonUtil.getJsonObjectFromString(District.class, eventEntity.getEventPayload());
             this.eventServiceMap.get(UPDATE_DISTRICT.toString()).processEvent(districtUpdated, eventEntity);
+          }
+          case CREATE_GRAD_SCHOOL -> {
+            debugEventLog(eventEntity);
+            val gradSchoolCreated = JsonUtil.getJsonObjectFromString(GradSchool.class, eventEntity.getEventPayload());
+            this.eventServiceMap.get(CREATE_GRAD_SCHOOL.toString()).processEvent(gradSchoolCreated, eventEntity);
+          }
+          case UPDATE_GRAD_SCHOOL -> {
+            debugEventLog(eventEntity);
+            val gradSchoolUpdated = JsonUtil.getJsonObjectFromString(GradSchool.class, eventEntity.getEventPayload());
+            this.eventServiceMap.get(UPDATE_GRAD_SCHOOL.toString()).processEvent(gradSchoolUpdated, eventEntity);
           }
           default -> {
             log.warn("Silently ignoring eventEntity: {}", eventEntity);
@@ -143,7 +163,6 @@ public class ChoreographEventHandler {
             existingEvent.setUpdateDate(LocalDateTime.now());
             this.eventRepository.save(existingEvent);
             });
-            break;
           }
         }
       } catch (final Exception exception) {
