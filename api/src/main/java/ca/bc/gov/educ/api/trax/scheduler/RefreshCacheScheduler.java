@@ -34,11 +34,8 @@ public class RefreshCacheScheduler {
         try {
             log.debug("Refreshing cache on scheduled process.");
             LockAssert.assertLocked();
-            log.debug("Refreshing school cache");
             schoolService.initializeSchoolCache(true);
-            log.debug("Refreshing district cache");
             districtService.initializeDistrictCache(true);
-            log.debug("Refreshing code cache");
             codeService.initializeSchoolCategoryCodeCache(true);
             codeService.initializeSchoolFundingGroupCodeCache(true);
         } catch (Exception e) {
