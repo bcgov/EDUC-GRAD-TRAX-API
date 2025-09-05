@@ -126,6 +126,10 @@ cron:
           lockAtLeastFor: 800ms
           lockAtMostFor: 900ms
           threshold: 100
+      update-cache:
+        run: 0 0 5 * * *
+        lockAtLeastFor: PT5M
+        lockAtMostFor: PT10M
       purge-old-records:
         run: 0 30 0 * * *
         staleInDays: 90
