@@ -167,6 +167,10 @@ cron:
           lockAtLeastFor: ${CRON_SCHEDULED_TRIGGER_TRAX_UPDATES_LOCK_AT_LEAST_FOR}
           lockAtMostFor: ${CRON_SCHEDULED_TRIGGER_TRAX_UPDATES_LOCK_AT_MOST_FOR}
           threshold: ${CRON_SCHEDULED_TRIGGER_TRAX_UPDATES_THRESHOLD}
+      update-cache:
+        run: 0 0 5 * * *
+        lockAtLeastFor: PT5M
+        lockAtMostFor: PT10M
       purge-old-records:
         run: ${CRON_SCHEDULED_PURGE_OLD_RECORDS}
         staleInDays: ${RECORDS_STALE_IN_DAYS}
