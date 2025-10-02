@@ -62,13 +62,16 @@ public class TraxUpdateService {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public TraxUpdatedPubEvent writeTraxUpdatedEvent(TraxUpdateInGradEntity traxUpdateInGradEntity) {
+    public List<TraxUpdatedPubEvent> writeTraxUpdatedEvent(List<TraxUpdateInGradEntity> traxUpdateInGradEntity) {
         // Save TraxUpdatedPubEvent
-        TraxUpdatedPubEvent traxUpdatedPubEvent = null;
+        List<TraxUpdatedPubEvent> traxUpdatedPubEvents = new ArrayList<>();
         try {
-            traxUpdatedPubEvent = persistTraxUpdatedEvent(traxUpdateInGradEntity);
-            updateStatus(traxUpdateInGradEntity);
-            return traxUpdatedPubEvent;
+            for(TraxUpdateInGradEntity ts : traxUpdateInGradEntity) {
+                traxUpdatedPubEvents.add(persistTraxUpdatedEvent(ts));
+                updateStatus(ts);
+            }
+            
+            return traxUpdatedPubEvents;
         } catch (JsonProcessingException ex) {
             logger.error("JSON Processing exception : {}", ex.getMessage());
             throw new TraxAPIRuntimeException("JSON Processing exception : " + ex.getMessage());
