@@ -19,8 +19,9 @@ public interface TraxUpdateInGradRepository extends CrudRepository<TraxUpdateInG
     @Query(value="SELECT tuge FROM TraxUpdateInGradEntity tuge \n"
     + "WHERE tuge.updateDate <= :currentDate \n"
     + "AND tuge.status = 'OUTSTANDING' \n"
+    + "AND ROWNUM < :numberOfRecordsToPull \n"
     + "ORDER BY tuge.id")
-    List<TraxUpdateInGradEntity> findOutstandingUpdates(@Param("currentDate") Date currentDate);
+    List<TraxUpdateInGradEntity> findOutstandingUpdates(@Param("currentDate") Date currentDate, int numberOfRecordsToPull);
 
     @Query(value="SELECT tuge FROM TraxUpdateInGradEntity tuge \n"
             + "WHERE tuge.pen = :pen \n"

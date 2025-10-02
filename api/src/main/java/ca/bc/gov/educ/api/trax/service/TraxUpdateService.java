@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.trax.service;
 
 import ca.bc.gov.educ.api.trax.constant.EventOutcome;
+import ca.bc.gov.educ.api.trax.exception.TraxAPIRuntimeException;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.trax.model.dto.*;
 import ca.bc.gov.educ.api.trax.model.entity.TraxUpdatedPubEvent;
@@ -50,29 +51,31 @@ public class TraxUpdateService {
     Publisher publisher;
 
     @Transactional(readOnly = true)
-    public List<TraxUpdateInGradEntity> getOutstandingList() {
-        return traxUpdateInGradRepository.findOutstandingUpdates(new Date(System.currentTimeMillis()));
+    public List<TraxUpdateInGradEntity> getOutstandingList(int numberOfRecordsToPull) {
+        return traxUpdateInGradRepository.findOutstandingUpdates(new Date(System.currentTimeMillis()), numberOfRecordsToPull);
     }
-
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void updateStatus(TraxUpdateInGradEntity traxUpdateInGradEntity) {
+    
+    private void updateStatus(TraxUpdateInGradEntity traxUpdateInGradEntity) {
         // update status to PUBLISHED
         traxUpdateInGradEntity.setStatus("PUBLISHED");
         traxUpdateInGradRepository.save(traxUpdateInGradEntity);
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void publishTraxUpdatedEvent(TraxUpdateInGradEntity traxUpdateInGradEntity) {
+    public List<TraxUpdatedPubEvent> writeTraxUpdatedEvent(List<TraxUpdateInGradEntity> traxUpdateInGradEntity) {
         // Save TraxUpdatedPubEvent
-        TraxUpdatedPubEvent traxUpdatedPubEvent = null;
+        List<TraxUpdatedPubEvent> traxUpdatedPubEvents = new ArrayList<>();
         try {
-            traxUpdatedPubEvent = persistTraxUpdatedEvent(traxUpdateInGradEntity);
+            for(TraxUpdateInGradEntity ts : traxUpdateInGradEntity) {
+                traxUpdatedPubEvents.add(persistTraxUpdatedEvent(ts));
+                updateStatus(ts);
+            }
+            
+            return traxUpdatedPubEvents;
         } catch (JsonProcessingException ex) {
             logger.error("JSON Processing exception : {}", ex.getMessage());
+            throw new TraxAPIRuntimeException("JSON Processing exception : " + ex.getMessage());
         }
-
-        // publish NATS message
-        publishToJetStream(traxUpdatedPubEvent);
     }
 
     private TraxUpdatedPubEvent persistTraxUpdatedEvent(TraxUpdateInGradEntity traxStudentEntity) throws JsonProcessingException {
@@ -180,7 +183,7 @@ public class TraxUpdateService {
         return result;
     }
 
-    private void publishToJetStream(final TraxUpdatedPubEvent traxUpdatedPubEvent) {
+    public void publishToJetStream(final TraxUpdatedPubEvent traxUpdatedPubEvent) {
         if (traxUpdatedPubEvent != null) {
             publisher.dispatchChoreographyEvent(traxUpdatedPubEvent);
         }
