@@ -47,6 +47,7 @@ import static ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants.DEFAULT_UPDA
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
@@ -119,7 +120,7 @@ public class TraxUpdateServiceTest {
         traxUpdateInGradEntity.setStatus("OUTSTANDING");
         traxUpdateInGradEntity.setUpdateDate(DateUtils.addDays(new Date(), -1));
 
-        when(traxUpdateInGradRepository.findOutstandingUpdates(any(), any())).thenReturn(Arrays.asList(traxUpdateInGradEntity));
+        when(traxUpdateInGradRepository.findOutstandingUpdates(any(), anyInt())).thenReturn(Arrays.asList(traxUpdateInGradEntity));
 
         List<TraxUpdateInGradEntity> results = traxUpdateService.getOutstandingList(100);
 
@@ -176,7 +177,7 @@ public class TraxUpdateServiceTest {
         ResponseObj tokenObj = new ResponseObj();
         tokenObj.setAccess_token("123");
         when(restUtils.getTokenResponseObject()).thenReturn(tokenObj);
-        when(traxUpdateInGradRepository.findOutstandingUpdates(any(), any())).thenReturn(Arrays.asList(traxUpdateInGradEntity));
+        when(traxUpdateInGradRepository.findOutstandingUpdates(any(), anyInt())).thenReturn(Arrays.asList(traxUpdateInGradEntity));
         when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
         when(traxCommonService.getStudentMasterDataFromTrax(pen)).thenReturn(Arrays.asList(traxStudent));
         when(commonService.getSchoolIdFromRedisCache(mincode)).thenReturn(schoolId );
