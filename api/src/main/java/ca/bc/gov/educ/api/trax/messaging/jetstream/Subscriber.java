@@ -124,7 +124,6 @@ public class Subscriber {
             log.error("IOException ", e);
           }
         });
-        log.debug("received event :: {} ", event);
       } catch (final Exception ex) {
         log.error("Exception ", ex);
       }

@@ -27,17 +27,15 @@ public class TraxUpdateTriggeredRecordScheduler {
     public void scheduledRunForTraxUpdates() {
         LockAssert.assertLocked();
         log.debug("PROCESS_TRAX_UPDATE_IN_GRAD_RECORDS: started - cron {}, lockAtMostFor {}", constants.getTraxTriggersCronRun(), constants.getTraxTriggersLockAtMostFor());
-        final var results = traxUpdateService.getOutstandingList();
+        final var results = traxUpdateService.getOutstandingList(constants.getTraxTriggersProcessingThreshold());
+        log.info("Number of records found to process from TRAX: {}", results.size());
         if (!results.isEmpty()) {
-            int cnt = 0;
             for (TraxUpdateInGradEntity ts : results) {
-                if (cnt++ >= constants.getTraxTriggersProcessingThreshold()) {
-                    log.info(" ==> Reached the processing threshold of {}", constants.getTraxTriggersProcessingThreshold());
-                    break;
-                }
                 try {
-                    traxUpdateService.publishTraxUpdatedEvent(ts);
-                    traxUpdateService.updateStatus(ts);
+                    var event = traxUpdateService.writeTraxUpdatedEvent(ts);
+                    if(event != null) {
+                        traxUpdateService.publishToJetStream(event);
+                    }
                 } catch (final Exception ex) {
                     log.error("Exception while trying to handle update_in_grad records", ex);
                 }
