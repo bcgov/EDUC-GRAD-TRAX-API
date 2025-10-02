@@ -181,7 +181,7 @@ public class TraxUpdateServiceTest {
         when(traxCommonService.getStudentMasterDataFromTrax(pen)).thenReturn(Arrays.asList(traxStudent));
         when(commonService.getSchoolIdFromRedisCache(mincode)).thenReturn(schoolId );
 
-        traxUpdateService.writeTraxUpdatedEvent(traxUpdateInGradEntity);
+        traxUpdateService.writeTraxUpdatedEvent(List.of(traxUpdateInGradEntity));
         
         assertThatNoException();
     }
@@ -230,7 +230,7 @@ public class TraxUpdateServiceTest {
         when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
         when(traxCommonService.getStudentMasterDataFromTrax(pen)).thenReturn(Arrays.asList(traxStudent));
 
-        traxUpdateService.writeTraxUpdatedEvent(traxUpdateInGradEntity);
+        traxUpdateService.writeTraxUpdatedEvent(List.of(traxUpdateInGradEntity));
 
 
         assertThatNoException();
@@ -287,7 +287,7 @@ public class TraxUpdateServiceTest {
         when(traxCommonService.getStudentMasterDataFromTrax(pen)).thenReturn(Arrays.asList(traxStudent));
         when(traxCommonService.getStudentDemographicsDataFromTrax(pen)).thenReturn(Arrays.asList(penStudent));
 
-        traxUpdateService.writeTraxUpdatedEvent(traxUpdateInGradEntity);
+        traxUpdateService.writeTraxUpdatedEvent(List.of(traxUpdateInGradEntity));
 
 
         assertThatNoException();
@@ -342,7 +342,7 @@ public class TraxUpdateServiceTest {
         when(traxCommonService.getStudentMasterDataFromTrax(pen)).thenReturn(Arrays.asList(traxStudent));
         when(commonService.getSchoolIdFromRedisCache(mincode)).thenReturn(schoolId );
 
-        traxUpdateService.writeTraxUpdatedEvent(traxUpdateInGradEntity);
+        traxUpdateService.writeTraxUpdatedEvent(List.of(traxUpdateInGradEntity));
 
 
         assertThatNoException();
@@ -396,7 +396,7 @@ public class TraxUpdateServiceTest {
         when(traxCommonService.getStudentMasterDataFromTrax(pen)).thenReturn(Arrays.asList(traxStudent));
         when(commonService.getSchoolIdFromRedisCache(mincode)).thenReturn(schoolId );
 
-        traxUpdateService.writeTraxUpdatedEvent(traxUpdateInGradEntity);
+        traxUpdateService.writeTraxUpdatedEvent(List.of(traxUpdateInGradEntity));
 
 
         assertThatNoException();
@@ -446,7 +446,7 @@ public class TraxUpdateServiceTest {
         when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
         when(traxCommonService.getStudentMasterDataFromTrax(pen)).thenReturn(Arrays.asList(traxStudent));
 
-        traxUpdateService.writeTraxUpdatedEvent(traxUpdateInGradEntity);
+        traxUpdateService.writeTraxUpdatedEvent(List.of(traxUpdateInGradEntity));
 
 
         assertThatNoException();
@@ -495,7 +495,7 @@ public class TraxUpdateServiceTest {
         when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
         when(traxCommonService.getStudentMasterDataFromTrax(pen)).thenReturn(Arrays.asList(traxStudent));
 
-        traxUpdateService.writeTraxUpdatedEvent(traxUpdateInGradEntity);
+        traxUpdateService.writeTraxUpdatedEvent(List.of(traxUpdateInGradEntity));
 
 
         assertThatNoException();
@@ -544,7 +544,7 @@ public class TraxUpdateServiceTest {
         when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
         when(traxCommonService.getStudentMasterDataFromTrax(pen)).thenReturn(Arrays.asList(traxStudent));
 
-        traxUpdateService.writeTraxUpdatedEvent(traxUpdateInGradEntity);
+        traxUpdateService.writeTraxUpdatedEvent(List.of(traxUpdateInGradEntity));
 
 
         assertThatNoException();
@@ -596,7 +596,7 @@ public class TraxUpdateServiceTest {
         when(traxUpdatedPubEventRepository.save(traxUpdatedPubEvent)).thenReturn(traxUpdatedPubEvent);
         when(traxCommonService.getStudentMasterDataFromTrax(pen)).thenReturn(Arrays.asList(traxStudent));
 
-        traxUpdateService.writeTraxUpdatedEvent(traxUpdateInGradEntity);
+        traxUpdateService.writeTraxUpdatedEvent(List.of(traxUpdateInGradEntity));
 
 
         assertThatNoException();
