@@ -48,11 +48,17 @@ public class TraxUpdateTriggeredRecordScheduler {
         log.info("Number of records found to process from TRAX: {}", results.size());
         if (!results.isEmpty()) {
             try {
+                log.info("Saving {} events for TRAX to GRAD updates", results.size());
                 var events = traxUpdateService.writeTraxUpdatedEvent(results);
+                log.info("Saved {} events for TRAX to GRAD", results.size());
+                log.info("Updating {} event statuses for TRAX to GRAD", results.size());
                 traxUpdateService.updateStatuses(results);
+                log.info("Updated {} event statuses for TRAX to GRAD", results.size());
                 
                 if(!events.isEmpty()) {
+                    log.info("Publishing {} events for TRAX to GRAD to jet stream", results.size());
                     events.forEach(traxUpdateService::publishToJetStream);
+                    log.info("Published {} events for TRAX to GRAD to jet stream", results.size());
                 }
             } catch (final Exception ex) {
                 log.error("Exception while trying to handle update_in_grad records", ex);

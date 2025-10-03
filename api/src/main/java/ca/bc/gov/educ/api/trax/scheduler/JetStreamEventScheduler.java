@@ -59,8 +59,9 @@ public class JetStreamEventScheduler {
     @SchedulerLock(name = "PROCESS_CHOREOGRAPHED_EVENTS_FROM_JET_STREAM", lockAtLeastFor = "${cron.scheduled.process.events.grad-to-trax.lockAtLeastFor}", lockAtMostFor = "${cron.scheduled.process.events.grad-to-trax.lockAtMostFor}")
     public void findAndProcessEvents() {
         LockAssert.assertLocked();
-        log.debug("PROCESS_CHOREOGRAPHED_EVENTS_FROM_JET_STREAM: started - cron {}, lockAtMostFor {}", constants.getGradToTraxCronRun(), constants.getGradToTraxLockAtMostFor());
+        log.info("Running query for GRAD to TRAX updates");
         final var results = this.eventRepository.fetchByEventStatus(List.of(DB_COMMITTED.toString()), constants.getGradToTraxProcessingThreshold());
+        log.info("Number of records found to process from GRAD to TRAX: {}", results.size());
         if (!results.isEmpty()) {
             var filteredList = results.stream().filter(el -> el.getUpdateDate().isBefore(LocalDateTime.now().minusMinutes(5))).toList();
             for (EventEntity e : filteredList) {
@@ -79,8 +80,9 @@ public class JetStreamEventScheduler {
     @SchedulerLock(name = "PUBLISH_TRAX_UPDATED_EVENTS_TO_JET_STREAM", lockAtLeastFor = "${cron.scheduled.process.events.trax-to-grad.lockAtLeastFor}", lockAtMostFor = "${cron.scheduled.process.events.trax-to-grad.lockAtMostFor}")
     public void findAndPublishGradStatusEventsToJetStream() {
         LockAssert.assertLocked();
-        log.debug("PUBLISH_TRAX_UPDATED_EVENTS_TO_JET_STREAM: started - cron {}, lockAtMostFor {}", constants.getTraxToGradCronRun(), constants.getTraxToGradLockAtMostFor());
+        log.info("Running query for TRAX to GRAD updates");
         final var results = this.traxUpdatedPubEventRepository.fetchByEventStatus(List.of(DB_COMMITTED.toString()), constants.getTraxToGradProcessingThreshold());
+        log.info("Number of records found to process from TRAX to GRAD: {}", results.size());
         if (!results.isEmpty()) {
             var filteredList = results.stream().filter(el -> el.getUpdateDate().isBefore(LocalDateTime.now().minusMinutes(5))).toList();
             for (TraxUpdatedPubEvent el : filteredList) {
