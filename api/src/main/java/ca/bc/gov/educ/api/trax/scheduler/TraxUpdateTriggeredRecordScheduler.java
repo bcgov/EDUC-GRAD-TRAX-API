@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.trax.scheduler;
 
+import ca.bc.gov.educ.api.trax.exception.TraxAPIRuntimeException;
 import ca.bc.gov.educ.api.trax.model.entity.TraxUpdateInGradEntity;
 import ca.bc.gov.educ.api.trax.repository.TraxUpdateInGradRepository;
 import ca.bc.gov.educ.api.trax.repository.TraxUpdatedPubEventRepository;
@@ -55,6 +56,7 @@ public class TraxUpdateTriggeredRecordScheduler {
                 }
             } catch (final Exception ex) {
                 log.error("Exception while trying to handle update_in_grad records", ex);
+                throw new TraxAPIRuntimeException("Exception while trying to handle update_in_grad records: " + ex.getMessage());
             }
             log.debug("PROCESS_TRAX_UPDATE_IN_GRAD_RECORDS: processing is completed");
         }

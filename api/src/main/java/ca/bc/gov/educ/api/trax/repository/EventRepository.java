@@ -20,7 +20,7 @@ public interface EventRepository extends JpaRepository<EventEntity, UUID> {
     List<EventEntity> findAllByEventStatusOrderByCreateDate(String eventStatus);
 
 
-    @Query(value = "SELECT s FROM REPLICATION_EVENT s WHERE s.EVENT_STATUS in :cleanupStatus AND ROWNUM < :batchSize ORDER BY CREATE_DATE", nativeQuery = true)
+    @Query(value = "SELECT s.* FROM REPLICATION_EVENT s WHERE s.EVENT_STATUS in :cleanupStatus AND ROWNUM < :batchSize ORDER BY CREATE_DATE", nativeQuery = true)
     List<EventEntity> fetchByEventStatus(List<String> cleanupStatus, int batchSize);
 
     @Transactional

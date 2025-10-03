@@ -40,7 +40,7 @@ public interface TraxUpdatedPubEventRepository extends JpaRepository<TraxUpdated
    */
   List<TraxUpdatedPubEvent> findByEventStatusOrderByCreateDate(String eventStatus);
 
-  @Query(value = "SELECT s FROM TRAX_UPDATED_PUB_EVENT s WHERE s.EVENT_STATUS in :cleanupStatus AND ROWNUM < :batchSize ORDER BY CREATE_DATE", nativeQuery = true)
+  @Query(value = "SELECT s.* FROM TRAX_UPDATED_PUB_EVENT s WHERE s.EVENT_STATUS in :cleanupStatus AND ROWNUM < :batchSize ORDER BY CREATE_DATE", nativeQuery = true)
   List<TraxUpdatedPubEvent> fetchByEventStatus(List<String> cleanupStatus, int batchSize);
 
   @Query(value = "SELECT EVENT_ID FROM TRAX_UPDATED_PUB_EVENT s WHERE s.EVENT_STATUS in :cleanupStatus AND ROWNUM < :batchSize", nativeQuery = true)

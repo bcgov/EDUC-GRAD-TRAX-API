@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.trax.scheduler;
 
 import ca.bc.gov.educ.api.trax.choreographer.ChoreographEventHandler;
+import ca.bc.gov.educ.api.trax.exception.TraxAPIRuntimeException;
 import ca.bc.gov.educ.api.trax.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.trax.model.entity.EventEntity;
 import ca.bc.gov.educ.api.trax.model.entity.TraxUpdatedPubEvent;
@@ -67,6 +68,7 @@ public class JetStreamEventScheduler {
                     choreographer.handleEvent(e);
                 } catch (final Exception ex) {
                     log.error("Exception while trying to handle GRAD updated message", ex);
+                    throw new TraxAPIRuntimeException("Exception while trying to handle GRAD updated message: " + ex.getMessage());
                 }
             }
             log.debug("PROCESS_CHOREOGRAPHED_EVENTS_FROM_JET_STREAM: processing is completed");
@@ -86,6 +88,7 @@ public class JetStreamEventScheduler {
                     publisher.dispatchChoreographyEvent(el);
                 } catch (final Exception ex) {
                     log.error("Exception while trying to handle TRAX updated message", ex);
+                    throw new TraxAPIRuntimeException("Exception while trying to handle TRAX updated message: " + ex.getMessage());
                 }
             }
             log.debug("PUBLISH_TRAX_UPDATED_EVENTS_TO_JET_STREAM: processing is completed");

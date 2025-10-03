@@ -79,7 +79,10 @@ public class SchoolService {
 	}
 
 	public School getSchoolByMinCodeFromRedisCache(String minCode) {
-		if (StringUtils.isBlank(minCode)) { log.info("getSchoolByMinCodeFromRedisCache: minCode is null."); return null; }
+		if (StringUtils.isBlank(minCode)) {
+			log.debug("getSchoolByMinCodeFromRedisCache: minCode is null."); 
+			return null; 
+		}
 		log.debug("Get School by minCode from Redis Cache: {}", minCode);
 		return schoolRedisRepository.findByMincode(minCode)
 				.map(schoolTransformer::transformToDTO)
