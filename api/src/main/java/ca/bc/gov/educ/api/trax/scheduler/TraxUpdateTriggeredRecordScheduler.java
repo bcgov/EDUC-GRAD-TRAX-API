@@ -77,7 +77,7 @@ public class TraxUpdateTriggeredRecordScheduler {
         
         log.debug("PROCESS_TRAX_UPDATE_IN_GRAD_RECORDS: started - cron {}, lockAtMostFor {}", constants.getTraxTriggersCronRun(), constants.getTraxTriggersLockAtMostFor());
         final var resultsOutstanding = traxUpdateService.getOutstandingList(constants.getTraxTriggersProcessingThreshold());
-        log.info("Number of records found to process from TRAX: {}", results.size());
+        log.info("Number of records found to process from TRAX: {}", resultsOutstanding.size());
         if (!resultsOutstanding.isEmpty()) {
             try {
                 log.info("Saving {} events for TRAX to GRAD updates", resultsOutstanding.size());

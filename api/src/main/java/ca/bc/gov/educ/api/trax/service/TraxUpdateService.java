@@ -52,7 +52,7 @@ public class TraxUpdateService {
 
     @Transactional(readOnly = true)
     public List<TraxUpdateInGradEntity> getOutstandingList(int numberOfRecordsToPull) {
-        return traxUpdateInGradRepository.findOutstandingUpdates(new Date(System.currentTimeMillis()), numberOfRecordsToPull);
+        return traxUpdateInGradRepository.findOutstandingUpdates(numberOfRecordsToPull);
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
