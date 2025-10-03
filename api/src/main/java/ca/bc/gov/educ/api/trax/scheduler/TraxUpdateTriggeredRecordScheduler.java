@@ -46,8 +46,12 @@ public class TraxUpdateTriggeredRecordScheduler {
         LockAssert.assertLocked();
 
         log.info("Querying for TRAX records to process");
-        if (this.traxUpdatedPubEventRepository.findByStatusIn(List.of(DB_COMMITTED.toString()), 102).size() > 100) { // at max there will be 100 parallel sagas.
-            log.info("Event count is greater than 100, so not processing any TRAX records");
+        final var resultsPubEvent = this.traxUpdatedPubEventRepository.fetchByEventStatus(List.of(DB_COMMITTED.toString()), constants.getTraxToGradProcessingThreshold());
+        log.info("Number of records found to process from TRAX to GRAD: {}", resultsPubEvent.size());
+        if (!resultsPubEvent.isEmpty()) {
+            var filteredList = resultsPubEvent.stream().filter(el -> el.getUpdateDate().isBefore(LocalDateTime.now().minusMinutes(5))).toList();
+            log.info("Publishing {} records for TRAX update processing", resultsPubEvent.size());
+            filteredList.forEach(traxUpdateService::publishToJetStream);
             return;
         }
 
@@ -64,15 +68,6 @@ public class TraxUpdateTriggeredRecordScheduler {
                 }
             }
             log.debug("PROCESS_CHOREOGRAPHED_EVENTS_FROM_JET_STREAM: processing is completed");
-        }
-
-        log.info("Running query for TRAX to GRAD updates");
-        final var resultsPubEvent = this.traxUpdatedPubEventRepository.fetchByEventStatus(List.of(DB_COMMITTED.toString()), constants.getTraxToGradProcessingThreshold());
-        log.info("Number of records found to process from TRAX to GRAD: {}", results.size());
-        if (!resultsPubEvent.isEmpty()) {
-            var filteredList = resultsPubEvent.stream().filter(el -> el.getUpdateDate().isBefore(LocalDateTime.now().minusMinutes(5))).toList();
-            filteredList.forEach(traxUpdateService::publishToJetStream);
-            log.debug("PUBLISH_TRAX_UPDATED_EVENTS_TO_JET_STREAM: processing is completed");
         }
         
         log.debug("PROCESS_TRAX_UPDATE_IN_GRAD_RECORDS: started - cron {}, lockAtMostFor {}", constants.getTraxTriggersCronRun(), constants.getTraxTriggersLockAtMostFor());
