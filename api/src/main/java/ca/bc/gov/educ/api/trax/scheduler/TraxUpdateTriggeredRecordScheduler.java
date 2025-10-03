@@ -37,7 +37,7 @@ public class TraxUpdateTriggeredRecordScheduler {
         LockAssert.assertLocked();
 
         log.info("Querying for TRAX records to process");
-        if (this.traxUpdatedPubEventRepository.findByStatusIn(List.of(DB_COMMITTED.toString()), 101).size() > 100) { // at max there will be 100 parallel sagas.
+        if (this.traxUpdatedPubEventRepository.findByStatusIn(List.of(DB_COMMITTED.toString()), 102).size() > 100) { // at max there will be 100 parallel sagas.
             log.info("Event count is greater than 100, so not processing any TRAX records");
             return;
         }
