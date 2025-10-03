@@ -48,6 +48,8 @@ public class TraxUpdateTriggeredRecordScheduler {
         if (!results.isEmpty()) {
             try {
                 var events = traxUpdateService.writeTraxUpdatedEvent(results);
+                traxUpdateService.updateStatuses(results);
+                
                 if(!events.isEmpty()) {
                     events.forEach(traxUpdateService::publishToJetStream);
                 }

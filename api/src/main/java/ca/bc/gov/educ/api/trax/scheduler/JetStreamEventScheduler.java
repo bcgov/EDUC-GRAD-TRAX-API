@@ -14,6 +14,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static ca.bc.gov.educ.api.trax.constant.EventStatus.DB_COMMITTED;
 
@@ -58,15 +59,10 @@ public class JetStreamEventScheduler {
     public void findAndProcessEvents() {
         LockAssert.assertLocked();
         log.debug("PROCESS_CHOREOGRAPHED_EVENTS_FROM_JET_STREAM: started - cron {}, lockAtMostFor {}", constants.getGradToTraxCronRun(), constants.getGradToTraxLockAtMostFor());
-        final var results = this.eventRepository.findAllByEventStatusOrderByCreateDate(DB_COMMITTED.toString());
+        final var results = this.eventRepository.fetchByEventStatus(List.of(DB_COMMITTED.toString()), constants.getGradToTraxProcessingThreshold());
         if (!results.isEmpty()) {
             var filteredList = results.stream().filter(el -> el.getUpdateDate().isBefore(LocalDateTime.now().minusMinutes(5))).toList();
-            int cnt = 0;
             for (EventEntity e : filteredList) {
-                if (cnt++ >= constants.getGradToTraxProcessingThreshold()) {
-                    log.info(" ==> Reached the processing threshold of {}", constants.getGradToTraxProcessingThreshold());
-                    break;
-                }
                 try {
                     choreographer.handleEvent(e);
                 } catch (final Exception ex) {
@@ -82,15 +78,10 @@ public class JetStreamEventScheduler {
     public void findAndPublishGradStatusEventsToJetStream() {
         LockAssert.assertLocked();
         log.debug("PUBLISH_TRAX_UPDATED_EVENTS_TO_JET_STREAM: started - cron {}, lockAtMostFor {}", constants.getTraxToGradCronRun(), constants.getTraxToGradLockAtMostFor());
-        final var results = this.traxUpdatedPubEventRepository.findByEventStatusOrderByCreateDate(DB_COMMITTED.toString());
+        final var results = this.traxUpdatedPubEventRepository.fetchByEventStatus(List.of(DB_COMMITTED.toString()), constants.getTraxToGradProcessingThreshold());
         if (!results.isEmpty()) {
             var filteredList = results.stream().filter(el -> el.getUpdateDate().isBefore(LocalDateTime.now().minusMinutes(5))).toList();
-            int cnt = 0;
             for (TraxUpdatedPubEvent el : filteredList) {
-                if (cnt++ >= constants.getTraxToGradProcessingThreshold()) {
-                    log.info(" ==> Reached the processing threshold of {}", constants.getTraxToGradProcessingThreshold());
-                    break;
-                }
                 try {
                     publisher.dispatchChoreographyEvent(el);
                 } catch (final Exception ex) {

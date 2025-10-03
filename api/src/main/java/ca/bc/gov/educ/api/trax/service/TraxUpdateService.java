@@ -54,11 +54,14 @@ public class TraxUpdateService {
     public List<TraxUpdateInGradEntity> getOutstandingList(int numberOfRecordsToPull) {
         return traxUpdateInGradRepository.findOutstandingUpdates(new Date(System.currentTimeMillis()), numberOfRecordsToPull);
     }
-    
-    private void updateStatus(TraxUpdateInGradEntity traxUpdateInGradEntity) {
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void updateStatuses(List<TraxUpdateInGradEntity> traxUpdateInGradEntities) {
         // update status to PUBLISHED
-        traxUpdateInGradEntity.setStatus("PUBLISHED");
-        traxUpdateInGradRepository.save(traxUpdateInGradEntity);
+        traxUpdateInGradEntities.forEach(traxUpdateInGradEntity -> {
+            traxUpdateInGradEntity.setStatus("PUBLISHED");
+        });
+        traxUpdateInGradRepository.saveAll(traxUpdateInGradEntities);
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -68,7 +71,6 @@ public class TraxUpdateService {
         try {
             for(TraxUpdateInGradEntity ts : traxUpdateInGradEntity) {
                 traxUpdatedPubEvents.add(persistTraxUpdatedEvent(ts));
-                updateStatus(ts);
             }
             
             return traxUpdatedPubEvents;
