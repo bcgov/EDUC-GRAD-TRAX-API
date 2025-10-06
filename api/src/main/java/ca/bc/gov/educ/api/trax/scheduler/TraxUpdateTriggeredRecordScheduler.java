@@ -3,17 +3,13 @@ package ca.bc.gov.educ.api.trax.scheduler;
 import ca.bc.gov.educ.api.trax.choreographer.ChoreographEventHandler;
 import ca.bc.gov.educ.api.trax.exception.TraxAPIRuntimeException;
 import ca.bc.gov.educ.api.trax.model.entity.EventEntity;
-import ca.bc.gov.educ.api.trax.model.entity.TraxUpdateInGradEntity;
-import ca.bc.gov.educ.api.trax.model.entity.TraxUpdatedPubEvent;
 import ca.bc.gov.educ.api.trax.repository.EventRepository;
-import ca.bc.gov.educ.api.trax.repository.TraxUpdateInGradRepository;
 import ca.bc.gov.educ.api.trax.repository.TraxUpdatedPubEventRepository;
 import ca.bc.gov.educ.api.trax.service.TraxUpdateService;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.core.LockAssert;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -45,9 +41,9 @@ public class TraxUpdateTriggeredRecordScheduler {
     public void scheduledRunForTraxUpdates() {
         LockAssert.assertLocked();
 
-        log.info("Querying for TRAX records to process");
+        log.info("Querying for TRAX events to process");
         final var resultsPubEvent = this.traxUpdatedPubEventRepository.fetchByEventStatus(List.of(DB_COMMITTED.toString()), constants.getTraxToGradProcessingThreshold());
-        log.info("Number of records found to process from TRAX to GRAD: {}", resultsPubEvent.size());
+        log.info("Number of outstanding events found to process from TRAX to GRAD: {}", resultsPubEvent.size());
         if (!resultsPubEvent.isEmpty()) {
             var filteredList = resultsPubEvent.stream().filter(el -> el.getUpdateDate().isBefore(LocalDateTime.now().minusMinutes(5))).toList();
             log.info("Publishing {} records for TRAX update processing", resultsPubEvent.size());
