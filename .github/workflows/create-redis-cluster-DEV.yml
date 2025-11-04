@@ -1,0 +1,70 @@
+name: Create Redis Cluster - DEV
+env:
+  OPENSHIFT_SERVER: ${{ vars.OPENSHIFT_SERVER }}
+  OPENSHIFT_TOKEN: ${{ secrets.OPENSHIFT_TOKEN }}
+  OPENSHIFT_NAMESPACE: ${{ vars.GRAD_NAMESPACE }}-dev
+  COMMON_NAMESPACE: ${{ vars.COMMON_NAMESPACE }}
+  GRAD_NAMESPACE: ${{ vars.GRAD_NAMESPACE }}
+  BUSINESS_NAMESPACE: ${{ vars.GRAD_BUSINESS_NAMESPACE }}
+  REPLICAS: 6
+on:
+  workflow_dispatch:
+jobs:
+  create-redis-cluster:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+      - name: Install oc
+        uses: redhat-actions/openshift-tools-installer@v1
+        with:
+          oc: 4
+      - name: init
+        run : |
+          echo "Initializing..."          
+          set -eux
+          # Login to OpenShift and select project
+          oc login --token=${{ env.OPENSHIFT_TOKEN }} --server=${{ env.OPENSHIFT_SERVER }}
+          oc project ${{ env.OPENSHIFT_NAMESPACE }}
+      - name: cleanup
+        run : |
+          echo "Cleaning up previous installation (if any)..."
+          oc delete all,rc,svc,dc,route,pvc,secret,configmap,sa,RoleBinding -l app=redis-ha
+      - name: Deploy Redis pods
+        run: |
+          oc process -f redis/redis-ha.yaml -p REPLICAS=${{ env.REPLICAS }} | oc apply -f -
+      - name: Wait for Readiness
+        run: |
+          echo "Waiting for pods to be ready..."
+          oc rollout status statefulset/redis-ha --timeout=600s
+      - name: Create Cluster
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Retrieve redis password..."
+          REDIS_PASSWORD="$(oc get secret redis-ha -o jsonpath='{.data.REDIS_PASSWORD}' | base64 --decode)"
+          echo "::add-mask::${REDIS_PASSWORD}"
+          echo "Creating Cluster..."
+          export REDISCLI_AUTH="${REDIS_PASSWORD}"
+          # Build the node list
+          NODES="$(oc get pods -l app=redis-ha -o jsonpath='{range.items[*]}{.status.podIP}:6379 {end}')"
+          oc exec -i redis-ha-0 -- \
+            redis-cli --cluster create --cluster-replicas 1 $NODES --cluster-yes
+      - name: Synch REDIS_PASSWORD
+        shell: bash
+        run: |
+          set -euo pipefail
+          B64="$(oc get secret redis-ha -o jsonpath='{.data.REDIS_PASSWORD}')"
+          echo "::add-mask::${B64}"
+          echo "Upserting 'redis-cache-secret' with REDIS_SECRET..."
+          if oc get secret redis-cache-secret >/dev/null 2>&1; then
+            oc patch secret redis-cache-secret --type=merge \
+              -p "{\"data\":{\"REDIS_SECRET\":\"${B64}\"}}"
+          else
+            # secret does not exist
+            echo "ERROR - redis-cache-secret not found!"
+      - name: Roll TRAX api pods
+        shell: bash
+        run: |
+          echo "Rolling TRAX api pods..."
+          oc rollout restart deployment/educ-grad-trax-api
