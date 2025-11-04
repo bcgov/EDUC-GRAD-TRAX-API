@@ -45,11 +45,10 @@ jobs:
           REDIS_PASSWORD="$(oc get secret redis-ha -o jsonpath='{.data.REDIS_PASSWORD}' | base64 --decode)"
           echo "::add-mask::${REDIS_PASSWORD}"
           echo "Creating Cluster..."
-          export REDISCLI_AUTH="${REDIS_PASSWORD}"
           # Build the node list
           NODES="$(oc get pods -l app=redis-ha -o jsonpath='{range.items[*]}{.status.podIP}:6379 {end}')"
           oc exec -i redis-ha-0 -- \
-            redis-cli --cluster create --cluster-replicas 1 $NODES --cluster-yes
+            redis-cli --cluster create --cluster-replicas 1 $NODES --cluster-yes -a $REDIS_PASSWORD
       - name: Synch REDIS_PASSWORD
         shell: bash
         run: |
