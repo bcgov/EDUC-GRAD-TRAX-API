@@ -1,4 +1,4 @@
-name: Create Redis Cluster - TEST
+name: Create Redis Cluster - PROD
 env:
   OPENSHIFT_SERVER: ${{ vars.OPENSHIFT_SERVER }}
   OPENSHIFT_TOKEN: ${{ secrets.OPENSHIFT_TOKEN }}
