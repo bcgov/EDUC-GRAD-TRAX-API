@@ -60,8 +60,8 @@ jobs:
             oc patch secret redis-cache-secret --type=merge \
               -p "{\"data\":{\"REDIS_SECRET\":\"${B64}\"}}"
           else
-            # secret does not exist
             echo "ERROR - redis-cache-secret not found!"
+          fi
       - name: Roll TRAX api pods
         shell: bash
         run: |
