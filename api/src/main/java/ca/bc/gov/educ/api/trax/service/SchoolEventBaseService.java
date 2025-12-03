@@ -26,6 +26,7 @@ public abstract class SchoolEventBaseService<T> extends EventBaseService<T> {
 
     /**
      * Acts as a filter. Add rules here for if a school event should be added to history table
+     *
      * @param school a school object
      * @return true if the school object passes eligibility for history table
      */
@@ -36,10 +37,14 @@ public abstract class SchoolEventBaseService<T> extends EventBaseService<T> {
     protected boolean shouldCreateHistory(String schoolId) {
         // currently only schools that can issue transcripts qualify
         SchoolDetail schoolDetail = this.schoolService.getSchoolDetailBySchoolIdFromRedisCache(UUID.fromString(schoolId));
-        if(schoolDetail != null){
-            try{
-                return schoolDetail.isCanIssueTranscripts() != this.gradSchoolService.isGradSchoolTranscriptIssuer(schoolId);
-            } catch (Exception e){
+        if (schoolDetail != null) {
+            try {
+                // if canIssueTranscripts has changed to either true or false or if is true in grad school api, add to history
+                boolean canIssue = this.gradSchoolService.isGradSchoolTranscriptIssuer(schoolId);
+                if ((schoolDetail.isCanIssueTranscripts() != canIssue) || canIssue) {
+                    return true;
+                }
+            } catch (Exception e) {
                 log.error("Error checking if school can issue transcripts: {}", e.getMessage());
             }
         }
