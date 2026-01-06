@@ -2,6 +2,8 @@ package ca.bc.gov.educ.api.trax.service.institute;
 
 import ca.bc.gov.educ.api.trax.constant.CacheKey;
 import ca.bc.gov.educ.api.trax.exception.ServiceException;
+import ca.bc.gov.educ.api.trax.mapper.GradSchoolMapper;
+import ca.bc.gov.educ.api.trax.model.dto.GradSchool;
 import ca.bc.gov.educ.api.trax.model.dto.institute.School;
 import ca.bc.gov.educ.api.trax.model.dto.institute.SchoolDetail;
 import ca.bc.gov.educ.api.trax.model.entity.institute.SchoolEntity;
@@ -13,8 +15,8 @@ import ca.bc.gov.educ.api.trax.repository.redis.SchoolRedisRepository;
 import ca.bc.gov.educ.api.trax.service.RESTService;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.model.dto.institute.PaginatedResponse;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import ca.bc.gov.educ.api.trax.util.JsonTransformer;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.base.Strings;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +30,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -36,6 +40,7 @@ public class SchoolService {
 
 	private EducGradTraxApiConstants constants;
 	private WebClient webClient;
+	private WebClient gradSchoolWebClient;
 	SchoolRedisRepository schoolRedisRepository;
 	SchoolDetailRedisRepository schoolDetailRedisRepository;
 	SchoolTransformer schoolTransformer;
@@ -43,16 +48,20 @@ public class SchoolService {
 	ServiceHelper<SchoolService> serviceHelper;
 	RESTService restService;
 	CacheService cacheService;
+	JsonTransformer jsonTransformer;
 
-	ObjectMapper mapper =  new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+	GradSchoolMapper gradSchoolMapper = GradSchoolMapper.mapper;
 
 	@Autowired
 	public SchoolService(EducGradTraxApiConstants constants, @Qualifier("gradInstituteApiClient") WebClient webClient,
+						 @Qualifier("gradSchoolApiClient") WebClient gradSchoolWebClient,
 						 SchoolRedisRepository schoolRedisRepository, SchoolDetailRedisRepository schoolDetailRedisRepository,
 						 SchoolTransformer schoolTransformer, SchoolDetailTransformer schoolDetailTransformer,
-						 ServiceHelper<SchoolService> serviceHelper, RESTService restService, CacheService cacheService) {
+						 ServiceHelper<SchoolService> serviceHelper, RESTService restService, CacheService cacheService,
+						 JsonTransformer jsonTransformer) {
 		this.constants = constants;
 		this.webClient = webClient;
+		this.gradSchoolWebClient = gradSchoolWebClient;
 		this.schoolRedisRepository = schoolRedisRepository;
 		this.schoolDetailRedisRepository = schoolDetailRedisRepository;
 		this.schoolTransformer = schoolTransformer;
@@ -60,6 +69,7 @@ public class SchoolService {
 		this.serviceHelper = serviceHelper;
 		this.restService = restService;
 		this.cacheService = cacheService;
+		this.jsonTransformer = jsonTransformer;
 	}
 
 	public List<School> getSchoolsFromRedisCache() {
@@ -69,7 +79,10 @@ public class SchoolService {
 	}
 
 	public School getSchoolByMinCodeFromRedisCache(String minCode) {
-		if (StringUtils.isBlank(minCode)) { log.info("getSchoolByMinCodeFromRedisCache: minCode is null."); return null; }
+		if (StringUtils.isBlank(minCode)) {
+			log.debug("getSchoolByMinCodeFromRedisCache: minCode is null."); 
+			return null; 
+		}
 		log.debug("Get School by minCode from Redis Cache: {}", minCode);
 		return schoolRedisRepository.findByMincode(minCode)
 				.map(schoolTransformer::transformToDTO)
@@ -107,13 +120,34 @@ public class SchoolService {
 	public List<School> getSchoolsFromInstituteApi() {
 		try {
 			log.debug("****Before Calling Institute API for schools");
-			List<SchoolEntity> response = this.restService.get(constants.getAllSchoolsFromInstituteApiUrl(),
+			var response = this.restService.get(constants.getAllSchoolsFromInstituteApiUrl(),
 					List.class, webClient);
-			return schoolTransformer.transformToDTO(response);
+			List<SchoolEntity> schoolEntities= response != null ? jsonTransformer.convertValue(response, new TypeReference<List<SchoolEntity>>() {}) : Collections.emptyList();
+			List<GradSchool> gradSchools = getSchoolGradDetailsFromSchoolApi();
+			if(CollectionUtils.isEmpty(gradSchools)) {
+				throw new ServiceException("Unable to fetch grad schools from Grad School API.");
+			}
+			Map<String, GradSchool> gradSchoolResponse = gradSchools.stream()
+					.collect(Collectors.toMap(GradSchool::getSchoolID, Function.identity(), (existing, replacement) -> replacement));
+			return gradSchoolMapper.toSchools(schoolEntities, gradSchoolResponse);
 		} catch (WebClientResponseException e) {
 			log.warn(String.format("Error getting Common School List: %s", e.getMessage()));
 		} catch (Exception e) {
 			log.error(String.format("Error getting data from Institute api: %s", e.getMessage()));
+		}
+		return Collections.emptyList();
+	}
+
+	public List<GradSchool> getSchoolGradDetailsFromSchoolApi() {
+		try {
+			log.debug("****Before Calling Grad School API for schools");
+			var response =  this.restService.get(constants.getSchoolGradDetailsFromGradSchoolApiUrl(),
+					List.class, gradSchoolWebClient);
+			return response != null ? jsonTransformer.convertValue(response, new TypeReference<List<GradSchool>>() {}) : Collections.emptyList();
+		} catch (WebClientResponseException e) {
+			log.warn(String.format("Error getting grad details from Grad School api : %s", e.getMessage()));
+		} catch (Exception e) {
+			log.error(String.format("Error getting grad details from Grad School api : %s", e.getMessage()));
 		}
 		return Collections.emptyList();
 	}
@@ -153,7 +187,7 @@ public class SchoolService {
 	private PaginatedResponse<SchoolDetail> getSchoolDetailsPaginatedFromInstituteApi(int pageNumber) {
 		int pageSize = 1000;
 		try {
-			return this.restService.get(String.format(constants.getSchoolsPaginatedFromInstituteApiUrl()+"?pageNumber=%d&pageSize=%d", pageNumber, pageSize),
+			return this.restService.get(String.format("%s?pageNumber=%d&pageSize=%d", constants.getSchoolsPaginatedFromInstituteApiUrl(), pageNumber, pageSize),
 					PaginatedResponse.class, webClient);
 		} catch (WebClientResponseException e) {
 			log.warn(String.format("Error getting School Details from Institute API: %s", e.getMessage()));
@@ -166,14 +200,14 @@ public class SchoolService {
 
 	// Recursive method to fetch school details page by page
 	public List<SchoolDetail> getSchoolDetailsPaginatedFromInstituteApi(int pageNumber, List<SchoolDetail> schoolDetails) {
-		PaginatedResponse response =  getSchoolDetailsPaginatedFromInstituteApi(pageNumber);
+		PaginatedResponse<SchoolDetail> response =  getSchoolDetailsPaginatedFromInstituteApi(pageNumber);
 		if (response == null) {
 			return schoolDetails;
 		}
-		schoolDetails.addAll(response.getContent().stream()
-				.map(entry -> mapper.convertValue(entry, SchoolDetail.class))
-				.toList());
-
+		List<SchoolDetail> pagedSchoolDetails = jsonTransformer.convertValue(response.getContent(), new TypeReference<List<SchoolDetail>>() {});
+		if(!CollectionUtils.isEmpty(pagedSchoolDetails)) {
+			schoolDetails.addAll(pagedSchoolDetails);
+		}
 		if (response.hasNext()) {
 			return getSchoolDetailsPaginatedFromInstituteApi(response.nextPageable().getPageNumber(), schoolDetails);
 		}
@@ -263,7 +297,6 @@ public class SchoolService {
 	public void updateSchoolCache(String schoolId) throws ServiceException {
 		if (StringUtils.isBlank(schoolId)) { log.info("updateSchoolCache: schoolId is null."); return; }
 		// get details from institute
-		log.debug("Updating school {} in cache.",  schoolId);
 		SchoolDetail schoolDetail = this.restService.get(String.format(constants.getSchoolDetailsByIdFromInstituteApiUrl(), schoolId),
 				SchoolDetail.class, webClient);
 		log.debug("Retrieved school: {} from Institute API", schoolId);
@@ -276,6 +309,17 @@ public class SchoolService {
 	 */
 	public void updateSchoolCache(SchoolDetail schoolDetail) throws ServiceException {
 		if(schoolDetail != null) {
+			// obtain grad school details from Grad School API
+			log.debug("Obtaining grad school details for school {}.",  schoolDetail.getSchoolId());
+			GradSchool gradSchool = this.restService.get(String.format(constants.getSchoolGradDetailsByIdFromGradSchoolApiUrl(), schoolDetail.getSchoolId()),
+					GradSchool.class, gradSchoolWebClient);
+			if(gradSchool != null) {
+				schoolDetail.setCanIssueTranscripts(gradSchool.getCanIssueTranscripts().equalsIgnoreCase("Y"));
+				schoolDetail.setCanIssueCertificates(gradSchool.getCanIssueCertificates().equalsIgnoreCase("Y"));
+			} else {
+				log.warn("No grad school details found for school {}. Possible delta.",  schoolDetail.getSchoolId());
+			}
+			log.debug("Updating school {} in cache.",  schoolDetail.getSchoolId());
 			schoolDetailRedisRepository.save(schoolDetailTransformer.transformToEntity(schoolDetail));
 			schoolRedisRepository.save(schoolDetailTransformer.transformToSchoolEntity(schoolDetail));
 		}

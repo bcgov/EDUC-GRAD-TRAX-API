@@ -56,5 +56,25 @@ public enum EventOutcome {
 
   GRAD_SCHOOL_UPDATED,
 
-  ASSESSMENT_STUDENT_UPDATED
+  ASSESSMENT_STUDENT_UPDATED,
+
+  SCHOOL_OF_RECORD_UPDATED,
+  
+  GRAD_STUDENT_CITIZENSHIP_UPDATED,
+  
+  GRAD_STUDENT_ADOPTED,
+  
+  STUDENT_COURSES_UPDATED;
+
+  public static boolean isValid(String value) {
+    if (value == null) {
+      return false;
+    }
+    try {
+      EventOutcome.valueOf(value);
+      return true;
+    } catch (IllegalArgumentException e) {
+      return false;
+    }
+  }
 }

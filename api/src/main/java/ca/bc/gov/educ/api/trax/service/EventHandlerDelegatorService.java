@@ -76,6 +76,9 @@ public class EventHandlerDelegatorService {
         try {
             topics = Topics.valueOf(message.getSubject());
             switch (topics) {
+                case GRAD_SCHOOL_EVENTS_TOPIC:
+                    choreographedEvent.setActivityCode(EventActivityCode.GRAD_SCHOOL_EVENT.toString());
+                    break;
                 case INSTITUTE_EVENTS_TOPIC:
                     choreographedEvent.setActivityCode(EventActivityCode.INSTITUTE_EVENT.toString());
                     break;

@@ -27,6 +27,8 @@ public enum EventType {
   /**
    * INSTITUTE API EVENT TYPES
    */
+  UPDATE_SCHOOL_OF_RECORD,
+
   UPDATE_SCHOOL,
 
   CREATE_SCHOOL,
@@ -67,5 +69,25 @@ public enum EventType {
 
   UPDATE_GRAD_SCHOOL,
 
-  ASSESSMENT_STUDENT_UPDATE
+  ASSESSMENT_STUDENT_UPDATE,
+
+  CREATE_GRAD_SCHOOL,
+
+  UPDATE_GRAD_STUDENT_CITIZENSHIP,
+  
+  ADOPT_GRAD_STUDENT,
+  
+  UPDATE_STUDENT_COURSES;
+
+  public static boolean isValid(String value) {
+    if (value == null) {
+      return false;
+    }
+    try {
+      EventType.valueOf(value);
+      return true;
+    } catch (IllegalArgumentException e) {
+      return false;
+    }
+  }
 }

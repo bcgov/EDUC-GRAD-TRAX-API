@@ -1,9 +1,11 @@
 package ca.bc.gov.educ.api.trax.messaging.jetstream;
 
+import ca.bc.gov.educ.api.trax.exception.IgnoreEventException;
 import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.constant.Topics;
 import ca.bc.gov.educ.api.trax.model.dto.ChoreographedEvent;
 import ca.bc.gov.educ.api.trax.service.EventHandlerDelegatorService;
+import ca.bc.gov.educ.api.trax.util.EventUtils;
 import ca.bc.gov.educ.api.trax.util.JsonUtil;
 import ca.bc.gov.educ.api.trax.util.LogHelper;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -77,6 +79,10 @@ public class Subscriber {
     instituteEventsTopics.add(Topics.INSTITUTE_EVENTS_TOPIC.name());
     this.streamTopicsMap.put(EducGradTraxApiConstants.INSTITUTE_STREAM_NAME, instituteEventsTopics);
 
+    final List<String> gradSchoolEventsTopics = new ArrayList<>();
+    gradSchoolEventsTopics.add(Topics.GRAD_SCHOOL_EVENTS_TOPIC.name());
+    this.streamTopicsMap.put(EducGradTraxApiConstants.GRAD_SCHOOL_EVENTS_STREAM_NAME, gradSchoolEventsTopics);
+
   }
 
   @PostConstruct
@@ -107,7 +113,7 @@ public class Subscriber {
       try {
         val eventString = new String(message.getData());
         LogHelper.logMessagingEventDetails(eventString, constants.isSplunkLogHelperEnabled());
-        final ChoreographedEvent event = JsonUtil.getJsonObjectFromString(ChoreographedEvent.class, eventString);
+        final ChoreographedEvent event = EventUtils.getChoreographedEventIfValid(eventString);
         if (event.getEventPayload() == null) {
           message.ack();
           log.warn("payload is null, ignoring event :: {}", event);
@@ -120,7 +126,9 @@ public class Subscriber {
             log.error("IOException ", e);
           }
         });
-        log.debug("received event :: {} ", event);
+      } catch (final IgnoreEventException ex) {
+        log.warn("Ignoring event with type :: {} :: and event outcome :: {}", ex.getEventType(), ex.getEventOutcome());
+        message.ack();
       } catch (final Exception ex) {
         log.error("Exception ", ex);
       }

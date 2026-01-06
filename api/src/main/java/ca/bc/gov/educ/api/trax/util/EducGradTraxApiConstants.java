@@ -20,6 +20,7 @@ public class EducGradTraxApiConstants {
     public static final String TRAX_STREAM_NAME="TRAX_STATUS_EVENT_STREAM";
 
     public static final String INSTITUTE_STREAM_NAME="INSTITUTE_EVENTS";
+    public static final String GRAD_SCHOOL_EVENTS_STREAM_NAME="GRAD_SCHOOL_EVENTS";
     public static final String CORRELATION_ID = "correlationID";
     public static final String USER_NAME = "User-Name";
     public static final String REQUEST_SOURCE = "Request-Source";
@@ -198,6 +199,12 @@ public class EducGradTraxApiConstants {
 
     @Value("${endpoint.student-admin.authority-details.url}")
     private String studentAdminAuthorityDetailsUrl;
+
+    @Value("${endpoint.grad-school-api.get-grad-details.url}")
+    private String schoolGradDetailsFromGradSchoolApiUrl;
+
+    @Value("${endpoint.grad-school-api.get-grad-details-by-id.url}")
+    private String schoolGradDetailsByIdFromGradSchoolApiUrl;
 
     // Scheduler: ongoing updates from TRAX to GRAD
     @Value("${cron.scheduled.process.events.trax-to-grad.run}")

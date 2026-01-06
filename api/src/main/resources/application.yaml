@@ -48,11 +48,18 @@ spring:
             client-id: ${GRAD_INSTITUTE_API_CLIENT_NAME}
             client-secret: ${GRAD_INSTITUTE_API_CLIENT_SECRET}
             authorization-grant-type: client_credentials
+          grad-school-api-client:
+            client-id: ${GRAD_SCHOOL_API_CLIENT_NAME}
+            client-secret: ${GRAD_SCHOOL_API_CLIENT_SECRET}
+            authorization-grant-type: client_credentials
         provider:
           trax-api-client:
             issuer-uri: ${TOKEN_ISSUER_URL}
             token-uri: ${TOKEN_ISSUER_URL}/protocol/openid-connect/token
           grad-institute-api-client:
+            issuer-uri: ${TOKEN_ISSUER_URL}
+            token-uri: ${TOKEN_ISSUER_URL}/protocol/openid-connect/token
+          grad-school-api-client:
             issuer-uri: ${TOKEN_ISSUER_URL}
             token-uri: ${TOKEN_ISSUER_URL}/protocol/openid-connect/token
 
@@ -162,6 +169,10 @@ cron:
           lockAtLeastFor: ${CRON_SCHEDULED_TRIGGER_TRAX_UPDATES_LOCK_AT_LEAST_FOR}
           lockAtMostFor: ${CRON_SCHEDULED_TRIGGER_TRAX_UPDATES_LOCK_AT_MOST_FOR}
           threshold: ${CRON_SCHEDULED_TRIGGER_TRAX_UPDATES_THRESHOLD}
+      update-cache:
+        run: 0 0 5 * * *
+        lockAtLeastFor: PT5M
+        lockAtMostFor: PT10M
       purge-old-records:
         run: ${CRON_SCHEDULED_PURGE_OLD_RECORDS}
         staleInDays: ${RECORDS_STALE_IN_DAYS}
@@ -209,6 +220,11 @@ endpoint:
       url: ${STUDENT_ADMIN_URL_ROOT}district/%s
     authority-details:
       url: ${STUDENT_ADMIN_URL_ROOT}authority/%s
+  grad-school-api:
+    get-grad-details:
+      url: ${GRAD_SCHOOL_API_URL_ROOT}api/v1/grad-school
+    get-grad-details-by-id:
+      url: ${GRAD_SCHOOL_API_URL_ROOT}api/v1/grad-school/search/%s
 
 # other properties
 props:

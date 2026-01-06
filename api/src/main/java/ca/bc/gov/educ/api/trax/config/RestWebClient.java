@@ -78,6 +78,26 @@ public class RestWebClient {
                 .build();
     }
 
+    @Bean("gradSchoolApiClient")
+    public WebClient getSchoolGradClientWebClient(OAuth2AuthorizedClientManager authorizedClientManager) {
+        ServletOAuth2AuthorizedClientExchangeFilterFunction filter = new ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager);
+        filter.setDefaultClientRegistrationId("grad-school-api-client");
+        DefaultUriBuilderFactory defaultUriBuilderFactory = new DefaultUriBuilderFactory();
+        defaultUriBuilderFactory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.NONE);
+        return WebClient.builder()
+                .uriBuilderFactory(defaultUriBuilderFactory)
+                .filter(setRequestHeaders())
+                .exchangeStrategies(ExchangeStrategies
+                        .builder()
+                        .codecs(codecs -> codecs
+                                .defaultCodecs()
+                                .maxInMemorySize(50 * 1024 * 1024))
+                        .build())
+                .apply(filter.oauth2Configuration())
+                .filter(this.log())
+                .build();
+    }
+
     @Bean
     public OAuth2AuthorizedClientManager authorizedClientManager(
             ClientRegistrationRepository clientRegistrationRepository,
