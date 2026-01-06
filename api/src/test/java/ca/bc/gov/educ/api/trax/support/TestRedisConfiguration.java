@@ -15,20 +15,31 @@ import redis.embedded.RedisServer;
 @Profile("redisTest")
 public class TestRedisConfiguration {
 
-  private final RedisServer redisServer;
-
-  public TestRedisConfiguration() {
-    this.redisServer = RedisServer.builder().port(6370).build();
-  }
+  private static RedisServer redisServer;
+  private static int referenceCount = 0;
+  private static final Object lock = new Object();
 
   @PostConstruct
   public void postConstruct() {
-    this.redisServer.start();
+    synchronized (lock) {
+      if (redisServer == null) {
+        redisServer = RedisServer.builder().port(6370).build();
+        redisServer.start();
+      }
+      referenceCount++;
+    }
   }
 
   @PreDestroy
   public void preDestroy() {
-    this.redisServer.stop();
+    synchronized (lock) {
+      referenceCount--;
+      if (referenceCount <= 0 && redisServer != null) {
+        redisServer.stop();
+        redisServer = null;
+        referenceCount = 0;
+      }
+    }
   }
 
   @Bean(name = "testJedisConnectionFactory")

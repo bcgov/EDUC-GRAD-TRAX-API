@@ -14,6 +14,8 @@ spring:
     database-platform: org.hibernate.dialect.Oracle12cDialect
     hibernate:
       ddl-auto: none
+      naming:
+        physical-strategy: ca.bc.gov.educ.api.trax.config.PsiTableNamingStrategy
   mvc:
     log-request-details: ${SPRING_SHOW_REQUEST_DETAILS}
   jackson:
@@ -168,6 +170,8 @@ cron:
 trax:
   update:
     enabled: ${ENABLE_TRAX_UPDATE}
+  psi:
+    table-name: ${PSI_TABLE_NAME}
 
 #Splunk LogHelper
 splunk:

@@ -51,6 +51,14 @@ PARSER_CONFIG="
 ###########################################################
 #Setup for config-maps
 ###########################################################
+
+if [ "$envValue" == "prod" ]
+then
+  PSI_TABLE_NAME="TAB_POSTSEC"
+else
+  PSI_TABLE_NAME="ISD_PSI_REGISTRY"
+fi
+
 echo Creating config map "$APP_NAME"-config-map
 oc create -n "$GRAD_NAMESPACE"-"$envValue" configmap "$APP_NAME"-config-map \
   --from-literal=APP_LOG_LEVEL="$APP_LOG_LEVEL" \
@@ -79,6 +87,7 @@ oc create -n "$GRAD_NAMESPACE"-"$envValue" configmap "$APP_NAME"-config-map \
   --from-literal=MAXIMUM_POOL_SIZE='15' \
   --from-literal=MAX_LIFETIME='300000' \
   --from-literal=ENABLE_COMPRESSION="true" \
+  --from-literal=PSI_TABLE_NAME="$PSI_TABLE_NAME" \
   --dry-run=client -o yaml | oc apply -f -
 
 echo Creating config map "$APP_NAME"-flb-sc-config-map
