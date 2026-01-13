@@ -11,7 +11,7 @@ import jakarta.persistence.Table;
 @Data
 @Immutable
 @Entity
-@Table(name = "ISD_PSI_REGISTRY")
+@Table(name = "TAB_POSTSEC")
 public class PsiEntity {
    
 	@Id
