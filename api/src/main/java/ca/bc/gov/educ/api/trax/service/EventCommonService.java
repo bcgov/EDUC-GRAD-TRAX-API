@@ -78,6 +78,8 @@ public abstract class EventCommonService<T> extends EventBaseService<T> {
     }
 
     private void process(Optional<TraxStudentEntity> existingStudent, GradStatusEventPayloadDTO gradStatusUpdate, EntityManager em, EntityTransaction tx, boolean updateTrax) {
+        log.info("Existing student is found {}", existingStudent.isPresent());
+        log.info("updateTrax is {}", updateTrax);
         if (updateTrax && existingStudent.isPresent()) {
             log.debug("==========> Start - Trax Incremental Update: pen# [{}]", gradStatusUpdate.getPen());
             Map<String, Pair<FieldType, Object>> updateFieldsMap = setupUpdateFieldsMap();

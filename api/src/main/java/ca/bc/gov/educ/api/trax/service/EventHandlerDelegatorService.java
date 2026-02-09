@@ -56,6 +56,7 @@ public class EventHandlerDelegatorService {
                 if(persistedEvent != null) {
                     message.ack(); // acknowledge to Jet Stream that api got the message and it is now in DB.
                     log.debug("acknowledged to Jet Stream for EVENT received: {}", persistedEvent.getEventType());
+                    log.info("Processing event {} and event payload is {}", persistedEvent.getEventType(), persistedEvent.getEventPayload());
                     this.choreographer.handleEvent(persistedEvent);
                 }
             } else {
