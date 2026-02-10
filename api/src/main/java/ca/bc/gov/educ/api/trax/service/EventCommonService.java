@@ -56,7 +56,7 @@ public abstract class EventCommonService<T> extends EventBaseService<T> {
         GradStatusEventPayloadDTO gradStatusUpdate = (GradStatusEventPayloadDTO) request;
 
         val em = this.getEntityManager();
-        var existingStudent = traxStudentRepository.findById(gradStatusUpdate.getPen());
+        var existingStudent = traxStudentRepository.findById(StringUtils.rightPad(gradStatusUpdate.getPen(), 10));
         final EntityTransaction tx = em.getTransaction();
         try {
             process(existingStudent, gradStatusUpdate, em, tx, constants.isTraxUpdateEnabled());
