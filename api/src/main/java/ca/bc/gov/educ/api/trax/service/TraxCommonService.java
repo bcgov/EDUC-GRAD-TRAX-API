@@ -70,14 +70,14 @@ public class TraxCommonService {
     // Student Master from TRAX
     @Transactional(readOnly = true)
     public List<ConvGradStudent> getStudentMasterDataFromTrax(String pen) {
-        List<Object[]> results = traxStudentRepository.loadTraxStudent(pen);
+        List<Object[]> results = traxStudentRepository.loadTraxStudent(StringUtils.rightPad(pen, 10));
         return buildConversionGradStudents(results);
     }
 
     @Transactional(readOnly = true)
     public List<Student> getStudentDemographicsDataFromTrax(String pen) {
         List<Student> students = new ArrayList<>();
-        List<Object[]> results = traxStudentRepository.loadStudentDemographicsData(pen);
+        List<Object[]> results = traxStudentRepository.loadStudentDemographicsData(StringUtils.rightPad(pen, 10));
         results.forEach(result -> {
             String legalFirstName = (String) result[1];
             legalFirstName = StringUtils.isNotBlank(legalFirstName)? legalFirstName.trim() : null;
