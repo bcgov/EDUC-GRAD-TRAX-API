@@ -110,7 +110,7 @@ public class TraxCommonServiceTest {
     @Test
     public void testGetStudentMasterDataFromTrax() {
         Object[] obj = new Object[] {
-                "123456789", "12345678", "12345678", "AD", Character.valueOf('A'),Character.valueOf('A'), "1950", Integer.valueOf(0),
+                "123456789 ", "12345678", "12345678", "AD", Character.valueOf('A'),Character.valueOf('A'), "1950", Integer.valueOf(0),
                 Integer.valueOf(0), null, null, null, null, null, null, null, null, null, null, Character.valueOf('C'), Character.valueOf('N'), null
         };
         List<Object[]> results = new ArrayList<>();
@@ -144,7 +144,7 @@ public class TraxCommonServiceTest {
     @Test
     public void testGetStudentDemographicsDataFromTrax() {
         Object[] obj = new Object[] {
-                "123456789", "Test", "QA", "", Character.valueOf('A'),Character.valueOf('A'), "12345678", "12", "V4N3Y2", Character.valueOf('M'), "19800111",  BigDecimal.valueOf(202005), null, "            "
+                "123456789 ", "Test", "QA", "", Character.valueOf('A'),Character.valueOf('A'), "12345678", "12", "V4N3Y2", Character.valueOf('M'), "19800111",  BigDecimal.valueOf(202005), null, "            "
         };
         List<Object[]> results = new ArrayList<>();
         results.add(obj);
