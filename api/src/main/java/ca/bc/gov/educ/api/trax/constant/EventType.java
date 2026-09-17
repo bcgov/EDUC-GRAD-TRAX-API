@@ -5,7 +5,10 @@ package ca.bc.gov.educ.api.trax.constant;
  */
 public enum EventType {
   /* ===========================================================
-    Incremental updates from Grad to Trax
+    ****deprecated****
+    * Incremental updates from Grad to Trax
+    * Required in order to process existing records stuck in DB_COMMITTED status in the DB
+    ****deprecated****
    =============================================================*/
   GRAD_STUDENT_GRADUATED,
   GRAD_STUDENT_UNDO_COMPLETION,
@@ -74,9 +77,9 @@ public enum EventType {
   CREATE_GRAD_SCHOOL,
 
   UPDATE_GRAD_STUDENT_CITIZENSHIP,
-  
+
   ADOPT_GRAD_STUDENT,
-  
+
   UPDATE_STUDENT_COURSES;
 
   public static boolean isValid(String value) {

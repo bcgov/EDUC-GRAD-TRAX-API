@@ -1,12 +1,11 @@
 package ca.bc.gov.educ.api.trax.messaging.jetstream;
 
-import ca.bc.gov.educ.api.trax.exception.IgnoreEventException;
-import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.constant.Topics;
+import ca.bc.gov.educ.api.trax.exception.IgnoreEventException;
 import ca.bc.gov.educ.api.trax.model.dto.ChoreographedEvent;
 import ca.bc.gov.educ.api.trax.service.EventHandlerDelegatorService;
+import ca.bc.gov.educ.api.trax.util.EducGradTraxApiConstants;
 import ca.bc.gov.educ.api.trax.util.EventUtils;
-import ca.bc.gov.educ.api.trax.util.JsonUtil;
 import ca.bc.gov.educ.api.trax.util.LogHelper;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.nats.client.Connection;
@@ -15,6 +14,7 @@ import io.nats.client.Message;
 import io.nats.client.PushSubscribeOptions;
 import io.nats.client.api.ConsumerConfiguration;
 import io.nats.client.api.DeliverPolicy;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.jboss.threads.EnhancedQueueExecutor;
@@ -22,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -58,8 +57,8 @@ public class Subscriber {
     this.natsConnection = natsConnection;
     this.constants = constants;
     this.subscriberExecutor = new EnhancedQueueExecutor.Builder()
-            .setThreadFactory(new ThreadFactoryBuilder().setNameFormat("jet-stream-subscriber-%d").build())
-            .setCorePoolSize(10).setMaximumPoolSize(10).setKeepAliveTime(Duration.ofSeconds(60)).build();
+        .setThreadFactory(new ThreadFactoryBuilder().setNameFormat("jet-stream-subscriber-%d").build())
+        .setCorePoolSize(10).setMaximumPoolSize(10).setKeepAliveTime(Duration.ofSeconds(60)).build();
     this.initializeStreamTopicMap();
   }
 
@@ -67,9 +66,6 @@ public class Subscriber {
    * this is the source of truth for all the topics this api subscribes to.
    */
   private void initializeStreamTopicMap() {
-    final List<String> gradStatusEventsTopics = new ArrayList<>();
-    gradStatusEventsTopics.add(Topics.GRAD_STATUS_EVENT_TOPIC.name());
-    this.streamTopicsMap.put(EducGradTraxApiConstants.GRAD_STREAM_NAME, gradStatusEventsTopics);
 
     final List<String> traxStatusEventsTopics = new ArrayList<>();
     traxStatusEventsTopics.add(Topics.TRAX_UPDATE_EVENT_TOPIC.name());
