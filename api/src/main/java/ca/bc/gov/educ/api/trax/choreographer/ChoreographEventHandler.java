@@ -4,10 +4,9 @@ import ca.bc.gov.educ.api.trax.constant.EventStatus;
 import ca.bc.gov.educ.api.trax.constant.EventType;
 import ca.bc.gov.educ.api.trax.model.dto.AuthorityContact;
 import ca.bc.gov.educ.api.trax.model.dto.DistrictContact;
-import ca.bc.gov.educ.api.trax.model.dto.GradStatusEventPayloadDTO;
+import ca.bc.gov.educ.api.trax.model.dto.GradSchool;
 import ca.bc.gov.educ.api.trax.model.dto.SchoolContact;
 import ca.bc.gov.educ.api.trax.model.dto.institute.District;
-import ca.bc.gov.educ.api.trax.model.dto.GradSchool;
 import ca.bc.gov.educ.api.trax.model.dto.institute.MoveSchoolData;
 import ca.bc.gov.educ.api.trax.model.dto.institute.School;
 import ca.bc.gov.educ.api.trax.model.entity.EventEntity;
@@ -47,8 +46,8 @@ public class ChoreographEventHandler {
     this.eventServiceMap = new HashMap<>();
     this.eventRepository = eventRepository;
     this.eventExecutor = new EnhancedQueueExecutor.Builder()
-            .setThreadFactory(new ThreadFactoryBuilder().setNameFormat("event-executor-%d").build())
-            .setCorePoolSize(10).setMaximumPoolSize(20).setKeepAliveTime(Duration.ofSeconds(60)).build();
+        .setThreadFactory(new ThreadFactoryBuilder().setNameFormat("event-executor-%d").build())
+        .setCorePoolSize(10).setMaximumPoolSize(20).setKeepAliveTime(Duration.ofSeconds(60)).build();
     eventServices.forEach(eventService -> this.eventServiceMap.put(eventService.getEventType(), eventService));
   }
 
@@ -61,21 +60,6 @@ public class ChoreographEventHandler {
     this.eventExecutor.execute(() -> {
       try {
         switch (EventType.valueOf(eventEntity.getEventType())) {
-          case GRAD_STUDENT_GRADUATED -> {
-            debugEventLog(eventEntity);
-            val studentGraduated = JsonUtil.getJsonObjectFromString(GradStatusEventPayloadDTO.class, eventEntity.getEventPayload());
-            this.eventServiceMap.get(GRAD_STUDENT_GRADUATED.toString()).processEvent(studentGraduated, eventEntity);
-          }
-          case GRAD_STUDENT_UPDATED -> {
-            debugEventLog(eventEntity);
-            val studentUpdated = JsonUtil.getJsonObjectFromString(GradStatusEventPayloadDTO.class, eventEntity.getEventPayload());
-            this.eventServiceMap.get(GRAD_STUDENT_UPDATED.toString()).processEvent(studentUpdated, eventEntity);
-          }
-          case GRAD_STUDENT_UNDO_COMPLETION -> {
-            debugEventLog(eventEntity);
-            val studentUndoCompletion = JsonUtil.getJsonObjectFromString(GradStatusEventPayloadDTO.class, eventEntity.getEventPayload());
-            this.eventServiceMap.get(GRAD_STUDENT_UNDO_COMPLETION.toString()).processEvent(studentUndoCompletion, eventEntity);
-          }
           case CREATE_SCHOOL_CONTACT -> {
             debugEventLog(eventEntity);
             val schoolContactCreated = JsonUtil.getJsonObjectFromString(SchoolContact.class, eventEntity.getEventPayload());
@@ -159,9 +143,9 @@ public class ChoreographEventHandler {
           default -> {
             log.warn("Silently ignoring eventEntity: {}", eventEntity);
             this.eventRepository.findByEventId(eventEntity.getEventId()).ifPresent(existingEvent -> {
-            existingEvent.setEventStatus(EventStatus.PROCESSED.toString());
-            existingEvent.setUpdateDate(LocalDateTime.now());
-            this.eventRepository.save(existingEvent);
+              existingEvent.setEventStatus(EventStatus.PROCESSED.toString());
+              existingEvent.setUpdateDate(LocalDateTime.now());
+              this.eventRepository.save(existingEvent);
             });
           }
         }
@@ -169,7 +153,6 @@ public class ChoreographEventHandler {
         log.error("Exception while processing eventEntity :: {}", eventEntity, exception);
       }
     });
-
 
   }
 }

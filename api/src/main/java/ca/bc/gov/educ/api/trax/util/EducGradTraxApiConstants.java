@@ -16,11 +16,10 @@ public class EducGradTraxApiConstants {
      * The constant GRAD-TRAX-API.
      */
     public static final String API_NAME = "GRAD-TRAX-API";
-    public static final String GRAD_STREAM_NAME ="GRAD_STATUS_EVENT_STREAM";
-    public static final String TRAX_STREAM_NAME="TRAX_STATUS_EVENT_STREAM";
+    public static final String TRAX_STREAM_NAME = "TRAX_STATUS_EVENT_STREAM";
 
-    public static final String INSTITUTE_STREAM_NAME="INSTITUTE_EVENTS";
-    public static final String GRAD_SCHOOL_EVENTS_STREAM_NAME="GRAD_SCHOOL_EVENTS";
+    public static final String INSTITUTE_STREAM_NAME = "INSTITUTE_EVENTS";
+    public static final String GRAD_SCHOOL_EVENTS_STREAM_NAME = "GRAD_SCHOOL_EVENTS";
     public static final String CORRELATION_ID = "correlationID";
     public static final String USER_NAME = "User-Name";
     public static final String REQUEST_SOURCE = "Request-Source";
@@ -30,13 +29,13 @@ public class EducGradTraxApiConstants {
     public static final String API_VERSION_V2 = "/api/v2";
 
     // API Root Mapping
-    public static final String GRAD_TRAX_API_ROOT_MAPPING_V1 = API_VERSION_V1+"/trax";
-    public static final String GRAD_TRAX_API_ROOT_MAPPING_V2 = API_VERSION_V2+"/trax";
+    public static final String GRAD_TRAX_API_ROOT_MAPPING_V1 = API_VERSION_V1 + "/trax";
+    public static final String GRAD_TRAX_API_ROOT_MAPPING_V2 = API_VERSION_V2 + "/trax";
 
     // Controller Mappings
     public static final String GET_COMMON_SCHOOLS = "/common";
-    public static final String GRAD_TRAX_CODE_URL_MAPPING_V1 =  GRAD_TRAX_API_ROOT_MAPPING_V1 + "/code";
-    public static final String GRAD_TRAX_CODE_URL_MAPPING_V2 =  GRAD_TRAX_API_ROOT_MAPPING_V2 + "/code";
+    public static final String GRAD_TRAX_CODE_URL_MAPPING_V1 = GRAD_TRAX_API_ROOT_MAPPING_V1 + "/code";
+    public static final String GRAD_TRAX_CODE_URL_MAPPING_V2 = GRAD_TRAX_API_ROOT_MAPPING_V2 + "/code";
     public static final String GRAD_SCHOOL_URL_MAPPING_V1 = GRAD_TRAX_API_ROOT_MAPPING_V1 + "/school";
     public static final String GRAD_SCHOOL_URL_MAPPING_V2 = GRAD_TRAX_API_ROOT_MAPPING_V2 + "/school";
     public static final String GRAD_SCHOOL_DETAIL_URL_MAPPING_V2 = GRAD_TRAX_API_ROOT_MAPPING_V2 + "/school-detail";
@@ -50,8 +49,8 @@ public class EducGradTraxApiConstants {
     public static final String GRAD_TSW_URL_MAPPING_V2 = GRAD_TRAX_API_ROOT_MAPPING_V2 + "/tsw";
     public static final String GRAD_EDW_URL_MAPPING_V1 = GRAD_TRAX_API_ROOT_MAPPING_V1 + "/edw";
     public static final String GRAD_EDW_URL_MAPPING_V2 = GRAD_TRAX_API_ROOT_MAPPING_V2 + "/edw";
-    public static final String GRAD_SCHOOL_CLOB_URL_MAPPING_V2 = GRAD_TRAX_API_ROOT_MAPPING_V2  + "/school-clob";
-    public static final String GRAD_SCHOOLS_BY_DISTRICT_URL_MAPPING_V2 = GRAD_TRAX_API_ROOT_MAPPING_V2  + "/schools-by-district";
+    public static final String GRAD_SCHOOL_CLOB_URL_MAPPING_V2 = GRAD_TRAX_API_ROOT_MAPPING_V2 + "/school-clob";
+    public static final String GRAD_SCHOOLS_BY_DISTRICT_URL_MAPPING_V2 = GRAD_TRAX_API_ROOT_MAPPING_V2 + "/schools-by-district";
 
     // Service Methods Mappings
 
@@ -64,7 +63,7 @@ public class EducGradTraxApiConstants {
     public static final String GET_SCHOOL_DETAIL_SEARCH_MAPPING = "/search";
 
     public static final String GET_PSI_BY_CODE_MAPPING = "/{psiCode}";
-    public static final String GET_PSI_SEARCH_MAPPING="/search";
+    public static final String GET_PSI_SEARCH_MAPPING = "/search";
 
     public static final String GET_STUDENT_PSI_BY_CODE_MAPPING = "/student";
 
