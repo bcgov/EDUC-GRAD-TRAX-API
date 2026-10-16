@@ -216,7 +216,33 @@ public class SchoolService {
 
 	public List<SchoolDetail> getSchoolDetailsFromInstituteApi() {
 		log.debug("****Before Calling Institute API for school details");
-		return getSchoolDetailsPaginatedFromInstituteApi(0, new ArrayList<>());
+		List<SchoolDetail> schoolDetails = getSchoolDetailsPaginatedFromInstituteApi(0, new ArrayList<>());
+		if (CollectionUtils.isEmpty(schoolDetails)) {
+			return schoolDetails;
+		}
+		// overlay grad school details, if there is an error log it and continue with
+		// the initial values from institute (canIssueTranscripts and canIssueCertificates)
+		List<GradSchool> gradSchools = getSchoolGradDetailsFromSchoolApi();
+		Map<String, GradSchool> gradSchoolMap = (gradSchools == null ? Collections.<GradSchool>emptyList() : gradSchools).stream()
+				.filter(Objects::nonNull)
+				.filter(gradSchool -> StringUtils.isNotBlank(gradSchool.getSchoolID()))
+				.collect(Collectors.toMap(GradSchool::getSchoolID, Function.identity(), (existing, replacement) -> replacement));
+		for (SchoolDetail schoolDetail : schoolDetails) {
+			GradSchool gradSchool = gradSchoolMap.get(schoolDetail.getSchoolId());
+			if (gradSchool == null || !isEligibilityValid(gradSchool.getCanIssueTranscripts())
+					|| !isEligibilityValid(gradSchool.getCanIssueCertificates())) {
+				log.error("Missing or invalid Grad School eligibility for school {}; using Institute API eligibility: transcripts={}, certificates={}.",
+						schoolDetail.getSchoolId(), schoolDetail.isCanIssueTranscripts(), schoolDetail.isCanIssueCertificates());
+				continue;
+			}
+			schoolDetail.setCanIssueTranscripts("Y".equalsIgnoreCase(gradSchool.getCanIssueTranscripts()));
+			schoolDetail.setCanIssueCertificates("Y".equalsIgnoreCase(gradSchool.getCanIssueCertificates()));
+		}
+		return schoolDetails;
+	}
+
+	private boolean isEligibilityValid(String eligibility) {
+		return "Y".equalsIgnoreCase(eligibility) || "N".equalsIgnoreCase(eligibility);
 	}
 
 	public List<SchoolDetail> loadSchoolDetailsFromInstituteApiIntoRedisCacheAsync() {
