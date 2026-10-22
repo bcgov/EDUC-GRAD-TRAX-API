@@ -1,5 +1,7 @@
 package ca.bc.gov.educ.api.trax.support;
 
+import java.io.File;
+
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import org.mockito.Mockito;
@@ -18,7 +20,11 @@ public class TestRedisConfiguration {
   private final RedisServer redisServer;
 
   public TestRedisConfiguration() {
-    this.redisServer = RedisServer.builder().port(6370).build();
+    // Allow a native Redis binary on platforms unsupported by embedded-redis.
+    String executable = System.getProperty("embedded.redis.executable");
+    this.redisServer = executable == null
+        ? RedisServer.builder().port(6370).build()
+        : new RedisServer(new File(executable), 6370);
   }
 
   @PostConstruct
