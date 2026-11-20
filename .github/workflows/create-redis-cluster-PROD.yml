@@ -9,6 +9,9 @@ env:
   REPLICAS: 6
 on:
   workflow_dispatch:
+permissions:
+  contents: read
+
 jobs:
   create-redis-cluster:
     runs-on: ubuntu-latest
